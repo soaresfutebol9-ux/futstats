@@ -723,6 +723,28 @@ body.light .mes-vigente-titulo{
 .ft.active{background:var(--grad-green);color:#07090d;border-color:transparent;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
 .rank-geral-btn{border-color:rgba(45,156,219,.35);color:#56CCF2;font-size:15px;padding:10px 24px}
 .rank-geral-btn.active{background:linear-gradient(135deg,#4dffb0,#60a5fa);border-color:transparent;color:#07090d;transform:scale(1.06);box-shadow:0 4px 20px rgba(77,255,176,.25),0 2px 8px rgba(96,165,250,.2);font-weight:700}
+.rank-rec-btn{border-color:rgba(255,209,102,.4);color:var(--am);font-size:15px;padding:10px 24px}
+.rank-rec-btn.active{background:var(--grad-gold);border-color:transparent;color:#07090d;transform:scale(1.06);box-shadow:0 4px 20px rgba(255,209,102,.35);font-weight:700}
+/* ── RECORDES ── */
+.rec-section{margin-bottom:1.5rem}
+.rec-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;gap:10px}
+.rec-section-title{font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px}
+.rec-share-btn{background:none;border:1px solid var(--bo2);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--tx2);display:flex;align-items:center;gap:6px;transition:all .15s;flex-shrink:0}
+.rec-share-btn:hover{border-color:var(--g);color:var(--g);background:rgba(77,255,176,.07)}
+.rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;transition:all .18s}
+.rec-card::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.rec-card-gold{border-color:rgba(255,209,102,.55)!important;background:linear-gradient(135deg,rgba(255,209,102,.13) 0%,var(--bg2) 60%)!important;box-shadow:0 0 24px rgba(255,185,0,.2),var(--glow-card)!important}
+.rec-card-gold::before{background:linear-gradient(135deg,rgba(255,209,102,.08) 0%,transparent 50%)}
+.rec-card-silver{border-color:rgba(195,215,255,.5)!important;background:linear-gradient(135deg,rgba(210,225,255,.1) 0%,var(--bg2) 60%)!important;box-shadow:0 0 18px rgba(190,215,255,.14),var(--glow-card)!important}
+.rec-card-bronze{border-color:rgba(200,140,60,.5)!important;background:linear-gradient(135deg,rgba(215,155,90,.1) 0%,var(--bg2) 60%)!important;box-shadow:0 0 18px rgba(200,140,60,.14),var(--glow-card)!important}
+.rec-medal{font-size:26px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));line-height:1}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-family:'Freshman',sans-serif;font-size:15px;font-weight:normal;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-meta{font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.03em}
+.rec-val{flex-shrink:0;text-align:right}
+.rec-val-num{font-family:'ClassyVogue',sans-serif;font-size:32px;font-weight:normal;line-height:1}
+.rec-val-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;opacity:.6;text-transform:uppercase;text-align:right}
+.rec-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace;letter-spacing:.04em}
 /* ── RANKING PÊNALTIS ── */
 .pen-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .pen-bar-track{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden;width:100%}
@@ -1223,6 +1245,7 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
         <div class="ft active" onclick="setRank('ga',this)">🔥 G+A</div>
         <div class="ft" onclick="setRank('pen',this)">🥅 Pênaltis</div>
         <div class="ft rank-geral-btn" onclick="setRank('geral',this)">🌐 Geral</div>
+        <div class="ft rank-rec-btn" onclick="setRank('recordes',this)">🏅 Recordes</div>
         <button onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
@@ -1916,7 +1939,7 @@ function enterLobby(){
   if(myProfile.groupId)loadGroup(myProfile.groupId);
 }
 async function loadGroup(gid){
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();setTimeout(()=>wcShow(myProfile&&myProfile.displayName),80);}catch(e){console.error('loadGroup erro:',e);}
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -2109,6 +2132,13 @@ function renderRanking(){
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
 
+  // ── RECORDES ──
+  if(rankStat==='recordes'){
+    if(banner)banner.style.display='none';
+    renderRecordes();
+    return;
+  }
+
   // ── RANKING GERAL ──
   if(rankStat==='geral'){
     if(banner)banner.style.display='';
@@ -2300,6 +2330,124 @@ window.setRank=(s,el)=>{
     rl.classList.remove('switching');
   },160);
 };
+
+// ── RECORDES ─────────────────────────────────────────────────────
+function buildRecordData(){
+  if(!gd)return{golsTop:[],assistTop:[]};
+  const hist=gd.historico||{};
+  const allKeys=Object.keys(hist).sort();
+  // Inclui mês vigente como "mês atual"
+  const vigenteKey=gd.mesAtivo||mesAtual();
+
+  // Coleta por jogador: melhor mês em gols e melhor mês em assist
+  const playerBestGols={};  // uid/name -> {val, mesKey, mesLabel}
+  const playerBestAssist={};
+
+  function processMatches(matches,mesKey){
+    // Agrupa por jogador
+    const byPlayer={};
+    matches.forEach(m=>{
+      const key=m.uid||m.player;
+      if(!byPlayer[key])byPlayer[key]={uid:m.uid,name:m.name||m.player,gols:0,assist:0};
+      byPlayer[key].gols+=(m.gols||0);
+      byPlayer[key].assist+=(m.assist||0);
+    });
+    Object.values(byPlayer).forEach(p=>{
+      const pkey=p.uid||p.name;
+      const label=getMesLabel(mesKey);
+      if(!playerBestGols[pkey]||p.gols>playerBestGols[pkey].val)
+        playerBestGols[pkey]={...p,val:p.gols,mesKey,mesLabel:label};
+      if(!playerBestAssist[pkey]||p.assist>playerBestAssist[pkey].val)
+        playerBestAssist[pkey]={...p,val:p.assist,mesKey,mesLabel:label};
+    });
+  }
+
+  // Histórico
+  allKeys.forEach(k=>{
+    processMatches((hist[k].matches||[]),k);
+  });
+  // Mês atual
+  processMatches(gd.matches||[],vigenteKey);
+
+  // Pega top 3 de cada, apenas com val>0
+  const golsTop=Object.values(playerBestGols)
+    .filter(p=>p.val>0)
+    .sort((a,b)=>b.val-a.val)
+    .slice(0,3);
+  const assistTop=Object.values(playerBestAssist)
+    .filter(p=>p.val>0)
+    .sort((a,b)=>b.val-a.val)
+    .slice(0,3);
+
+  return{golsTop,assistTop};
+}
+
+function recCardHTML(p,pos){
+  const medals=['🥇','🥈','🥉'];
+  const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
+  const valColors=['#FFD700','#C8D8F0','#D09050'];
+  return`<div class="rec-card ${cls[pos]}">
+    <div class="rec-medal">${medals[pos]}</div>
+    <div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>
+    <div class="rec-info">
+      <div class="rec-name">${p.name}</div>
+      <div class="rec-meta">${p.mesLabel}</div>
+    </div>
+    <div class="rec-val">
+      <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
+      <div class="rec-val-lbl">${p.val===1?'gol':'gols'}</div>
+    </div>
+  </div>`;
+}
+
+function recAssistCardHTML(p,pos){
+  const medals=['🥇','🥈','🥉'];
+  const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
+  const valColors=['#FFD700','#C8D8F0','#D09050'];
+  return`<div class="rec-card ${cls[pos]}">
+    <div class="rec-medal">${medals[pos]}</div>
+    <div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>
+    <div class="rec-info">
+      <div class="rec-name">${p.name}</div>
+      <div class="rec-meta">${p.mesLabel}</div>
+    </div>
+    <div class="rec-val">
+      <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
+      <div class="rec-val-lbl">${p.val===1?'assist.':'assists.'}</div>
+    </div>
+  </div>`;
+}
+
+function renderRecordes(){
+  const {golsTop,assistTop}=buildRecordData();
+  const empty='<div class="rec-empty">📭 Nenhum registro ainda</div>';
+  const golsHTML=golsTop.length?golsTop.map((p,i)=>recCardHTML(p,i)).join(''):empty;
+  const assistHTML=assistTop.length?assistTop.map((p,i)=>recAssistCardHTML(p,i)).join(''):empty;
+
+  $('rl').innerHTML=`
+    <div style="padding-bottom:.5rem">
+      <div class="rec-section">
+        <div class="rec-section-header">
+          <div class="rec-section-title">⚽ Mais Gols em um Mês</div>
+          <button class="rec-share-btn" onclick="shareRecord('gols')">
+            <img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="16" height="16" style="display:block"> Compartilhar
+          </button>
+        </div>
+        <div id="rec-gols-list">${golsHTML}</div>
+      </div>
+      <div class="rec-section">
+        <div class="rec-section-header">
+          <div class="rec-section-title">👟 Mais Assistências em um Mês</div>
+          <button class="rec-share-btn" onclick="shareRecord('assist')">
+            <img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="16" height="16" style="display:block"> Compartilhar
+          </button>
+        </div>
+        <div id="rec-assist-list">${assistHTML}</div>
+      </div>
+    </div>`;
+}
+// expose for share module
+window._buildRecordData = buildRecordData;
 
 function renderPerfil(){
   if(!gd)return;const s=getSt(currentUser.uid,null,true);const pct=s.penBat>0?Math.round(s.penOk/s.penBat*100):null;
@@ -2931,9 +3079,9 @@ window.showTab=(n,btn,e)=>{
 
 // ── CONTADOR ANIMADO — centralizado ──
 // Dispara somente após o welcome card ser fechado
-let _wcClosed = false;
+let _wcClosed = true;
 let _pendingCounters = false;
-window._wcClosed = false;
+window._wcClosed = true;
 window._pendingCounters = false;
 
 function _runCounters(){
@@ -4270,6 +4418,8 @@ window.irParaRankingGA=()=>{
       await drawRankingCard(hdCanvas, _lastCardData);
     } else if (_lastCardType === 'player') {
       await drawPlayerCard(hdCanvas, _lastCardData);
+    } else if (_lastCardType === 'record') {
+      await drawRecordCard(hdCanvas, _lastCardData);
     } else {
       await drawDueloCard(hdCanvas, _lastCardData);
     }
@@ -4562,6 +4712,149 @@ window.irParaRankingGA=()=>{
     const canvas = openShareModal();
     await drawMonthRankingCard(canvas, data);
   };
+
+  // ── COMPARTILHAR RECORDES ────────────────────────────────────
+  window.shareRecord = async function(tipo) {
+    const data = window._buildRecordData ? window._buildRecordData() : null;
+    if (!data) { alert('Nenhum dado disponível.'); return; }
+    const list = tipo === 'gols' ? data.golsTop : data.assistTop;
+    if (!list || !list.length) { alert('Nenhum recorde registrado ainda.'); return; }
+
+    const recData = { tipo, list, groupName: (window._gd && window._gd.name) || 'Grupo' };
+    _lastCardData = recData;
+    _lastCardType = 'record';
+    const canvas = openShareModal();
+    await drawRecordCard(canvas, recData);
+  };
+
+  async function drawRecordCard(canvas, data) {
+    const W = CARD_W, H = CARD_H;
+    const ctx = canvas._sharedCtx || canvas.getContext('2d');
+
+    const members = (window._gd && window._gd.members) || [];
+    await preloadPhotos(members);
+
+    drawCardBg(ctx, W, H);
+
+    // Header
+    const isGols = data.tipo === 'gols';
+    const emoji = isGols ? '⚽' : '👟';
+    const title = isGols ? 'MAIS GOLS EM UM MÊS' : 'MAIS ASSISTÊNCIAS EM UM MÊS';
+
+    // Group name
+    ctx.save();
+    ctx.font = "bold 11px 'DM Mono', monospace";
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.textAlign = 'center';
+    ctx.fillText(data.groupName.toUpperCase(), W / 2, 32);
+    ctx.restore();
+
+    // Badge
+    const badgeY = 48;
+    const badgeText = '🏅 RECORDES';
+    ctx.save();
+    ctx.font = "bold 10px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    const bw = ctx.measureText(badgeText).width + 20;
+    roundRect(ctx, W/2 - bw/2, badgeY - 12, bw, 20, 10);
+    ctx.fillStyle = 'rgba(255,209,102,0.18)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,209,102,0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#FFD166';
+    ctx.fillText(badgeText, W / 2, badgeY + 1);
+    ctx.restore();
+
+    // Title
+    ctx.save();
+    ctx.textAlign = 'center';
+    shadowText(ctx, emoji + ' ' + title, W/2, badgeY + 28, '#ffffff', "bold 13px 'DM Sans', sans-serif");
+    ctx.restore();
+
+    // Divider
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,209,102,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(36, badgeY + 40); ctx.lineTo(W - 36, badgeY + 40); ctx.stroke();
+    ctx.restore();
+
+    const medals = ['🥇', '🥈', '🥉'];
+    const valColors = ['#FFD700', '#C8D8F0', '#D09050'];
+    const bgColors = [
+      'rgba(255,209,102,0.13)',
+      'rgba(210,225,255,0.10)',
+      'rgba(215,155,90,0.10)',
+    ];
+    const borderColors = [
+      'rgba(255,209,102,0.55)',
+      'rgba(195,215,255,0.45)',
+      'rgba(200,140,60,0.45)',
+    ];
+
+    const rowH = 72;
+    const startY = badgeY + 56;
+    const margin = 24;
+    const listW = W - margin * 2;
+
+    for (let i = 0; i < data.list.length; i++) {
+      const p = data.list[i];
+      const ry = startY + i * (rowH + 10);
+      const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
+
+      // Card bg
+      ctx.save();
+      roundRect(ctx, margin, ry, listW, rowH, 14);
+      ctx.fillStyle = bgColors[i];
+      ctx.fill();
+      ctx.strokeStyle = borderColors[i];
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.restore();
+
+      // Medal
+      ctx.save();
+      ctx.font = '24px serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(medals[i], margin + 12, ry + rowH / 2 + 8);
+      ctx.restore();
+
+      // Avatar
+      const avX = margin + 50;
+      const avY = ry + rowH / 2;
+      const avR = 20;
+      drawAvatar(ctx, avX, avY, avR, p.name, photo);
+
+      // Name & month
+      ctx.save();
+      ctx.font = "bold 14px 'DM Sans', sans-serif";
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      const maxNameW = listW - 130;
+      let nameText = p.name;
+      while (ctx.measureText(nameText).width > maxNameW && nameText.length > 3)
+        nameText = nameText.slice(0, -1);
+      if (nameText !== p.name) nameText += '…';
+      ctx.fillText(nameText, avX + avR + 12, ry + rowH / 2 - 2);
+      ctx.font = "11px 'DM Mono', monospace";
+      ctx.fillStyle = 'rgba(255,255,255,0.40)';
+      ctx.fillText(p.mesLabel, avX + avR + 12, ry + rowH / 2 + 15);
+      ctx.restore();
+
+      // Value
+      ctx.save();
+      ctx.textAlign = 'right';
+      shadowText(ctx, String(p.val), W - margin - 14, ry + rowH / 2 + 10, valColors[i], "normal 30px 'ClassyVogue', sans-serif");
+      ctx.textAlign = 'right';
+      const lbl = isGols ? (p.val === 1 ? 'gol' : 'gols') : (p.val === 1 ? 'assist.' : 'assists.');
+      ctx.font = "9px 'DM Mono', monospace";
+      ctx.fillStyle = 'rgba(255,255,255,0.30)';
+      ctx.fillText(lbl.toUpperCase(), W - margin - 14, ry + rowH / 2 + 24);
+      ctx.restore();
+    }
+
+    drawFooter(ctx, W, H);
+  }
 
   // ── COMPARTILHAR PERFIL DO JOGADOR ───────────────────────────
   window.sharePlayerProfile = async function () {
