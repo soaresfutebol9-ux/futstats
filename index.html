@@ -694,12 +694,7 @@ body.light .mes-vigente-titulo{
 }
 .ri-anim{animation:ri-slide-in .35s cubic-bezier(.22,1,.36,1) both;}
 .podium-item{animation:podium-rise .4s cubic-bezier(.22,1,.36,1) both;}
-/* ── BARRA DE PROGRESSO 1º vs 2º ── */
-.rank-gap-bar{margin:0 0 1.1rem;padding:10px 14px;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.18);border-radius:12px;}
-.rank-gap-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--tx3);text-transform:uppercase;}
-.rank-gap-label span{color:#F2C94C;font-weight:700;}
-.rank-gap-track{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;}
-.rank-gap-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#F2C94C,#FFD700);width:0;transition:width 1s cubic-bezier(.22,1,.36,1);}
+
 .ri{
   display:grid;grid-template-columns:32px 50px 1fr auto;align-items:center;gap:14px;
   padding:20px 20px;border-radius:16px;
@@ -1920,7 +1915,7 @@ function enterLobby(){
   if(myProfile.groupId)loadGroup(myProfile.groupId);
 }
 async function loadGroup(gid){
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();setTimeout(()=>wcShow(myProfile&&myProfile.displayName),400);}catch(e){console.error('loadGroup erro:',e);}
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();setTimeout(()=>wcShow(myProfile&&myProfile.displayName),80);}catch(e){console.error('loadGroup erro:',e);}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -2122,7 +2117,7 @@ function renderRanking(){
     const podiumOrderG=[1,0,2];const podiumClsG=['p2','p1','p3'];const podiumCrownG=['🥈','🥇','🥉'];
     let podiumGeralHTML='';
     if(top3g.length>=2){
-      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;return`<div class="podium-item ${podiumClsG[vi]}"><div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${isMe?'<div class="podium-you">você</div>':''}<div class="podium-val">${p.gols+p.assist}</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
+      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;return`<div class="podium-item ${podiumClsG[vi]}"><div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${isMe?'<div class="podium-you">você</div>':''}<div class="podium-val ri-count" data-val="${p.gols+p.assist}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
@@ -2149,11 +2144,13 @@ function renderRanking(){
             <div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div>
           </div>
           <div class="ri-val">
-            <div class="ri-val-num" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">${p.gols+p.assist}</div>
+            <div class="ri-val-num ri-count" data-val="${p.gols+p.assist}" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">0</div>
             <div class="ri-val-lbl">G+A</div>
           </div>
         </div>`;
       }).join('')}</div>`;
+    // Contador animado
+    _scheduleCounters();
     return;
   }
 
@@ -2283,37 +2280,13 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  // Barra de progresso 1º vs 2º
-  let gapBarHTML='';
-  if(ranked.length>=2){
-    const v1=ranked[0].val,v2=ranked[1].val;
-    const pct=v2>0?Math.min(100,Math.round((v2/v1)*100)):0;
-    const diff=v1-v2;
-    gapBarHTML=`<div class="rank-gap-bar"><div class="rank-gap-label"><span>${ranked[0].name.split(' ')[0]}</span><span style="color:var(--tx3)">${diff>0?'+'+diff+' à frente':'empate'}</span></div><div class="rank-gap-track"><div class="rank-gap-fill" id="rank-gap-fill" style="width:0%"></div></div></div>`;
-  }
-
-  $('rl').innerHTML=`${podiumHTML}${gapBarHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,rgba(255,209,102,.28) 0%,rgba(255,185,50,.1) 100%)':pos===2?'linear-gradient(135deg,rgba(210,225,255,.22) 0%,var(--bg2) 100%)':pos===3?'linear-gradient(135deg,rgba(215,155,90,.22) 0%,var(--bg2) 100%)':'';const podiumBorder=pos===1?'rgba(255,209,102,.7)':pos===2?'rgba(195,215,255,.6)':pos===3?'rgba(205,150,80,.6)':'var(--bo)';const podiumShadow=pos===1?'0 0 28px rgba(255,185,0,.25),var(--glow-card)':pos===2?'0 0 18px rgba(190,215,255,.18),var(--glow-card)':pos===3?'0 0 18px rgba(200,140,60,.18),var(--glow-card)':'var(--glow-card)';const valColor=pos===1?'#FFD700':pos===2?'#C8D8F0':pos===3?'#D09050':'var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${isMe?'<span class="you">você</span>':''}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,rgba(255,209,102,.28) 0%,rgba(255,185,50,.1) 100%)':pos===2?'linear-gradient(135deg,rgba(210,225,255,.22) 0%,var(--bg2) 100%)':pos===3?'linear-gradient(135deg,rgba(215,155,90,.22) 0%,var(--bg2) 100%)':'';const podiumBorder=pos===1?'rgba(255,209,102,.7)':pos===2?'rgba(195,215,255,.6)':pos===3?'rgba(205,150,80,.6)':'var(--bo)';const podiumShadow=pos===1?'0 0 28px rgba(255,185,0,.25),var(--glow-card)':pos===2?'0 0 18px rgba(190,215,255,.18),var(--glow-card)':pos===3?'0 0 18px rgba(200,140,60,.18),var(--glow-card)':'var(--glow-card)';const valColor=pos===1?'#FFD700':pos===2?'#C8D8F0':pos===3?'#D09050':'var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${isMe?'<span class="you">você</span>':''}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
 
-  // Ativar barra de progresso
-  setTimeout(()=>{
-    const fill=document.getElementById('rank-gap-fill');
-    if(fill&&ranked.length>=2)fill.style.width=Math.min(100,Math.round((ranked[1].val/ranked[0].val)*100))+'%';
-  },100);
-
-  // Contador animado nos valores
-  document.querySelectorAll('.ri-count').forEach(el=>{
-    const target=parseInt(el.dataset.val)||0;
-    const dur=700,steps=40,inc=target/steps;
-    let cur=0,t=0;
-    const tick=setInterval(()=>{
-      t++;cur=t>=steps?target:Math.round(inc*t);
-      el.textContent=cur;
-      if(t>=steps)clearInterval(tick);
-    },dur/steps);
-  });
+  // Contador animado — dispara após fechar o welcome card
+  _scheduleCounters();
 }
 window.setRank=(s,el)=>{
   const rl=$('rl');
@@ -2900,7 +2873,39 @@ window.showTab=(n,btn,e)=>{
   if(n==='hist')renderHistTab();
 };
 
-setTimeout(()=>$('splash').classList.add('hide'),1400);
+// ── CONTADOR ANIMADO — centralizado ──
+// Dispara somente após o welcome card ser fechado
+let _wcClosed = false;
+let _pendingCounters = false;
+window._wcClosed = false;
+window._pendingCounters = false;
+
+function _runCounters(){
+  document.querySelectorAll('.ri-count').forEach(el=>{
+    const target=parseInt(el.dataset.val)||0;
+    if(target===0){el.textContent='0';return;}
+    const dur=650,steps=35;
+    let t=0;
+    const tick=setInterval(()=>{
+      t++;
+      el.textContent=t>=steps?target:Math.round((target/steps)*t);
+      if(t>=steps)clearInterval(tick);
+    },dur/steps);
+  });
+}
+window._runCounters = _runCounters;
+
+function _scheduleCounters(){
+  if(window._wcClosed){
+    // wc já fechado — anima imediatamente com pequeno delay de render
+    setTimeout(_runCounters, 80);
+  } else {
+    // wc ainda aberto — agenda para rodar ao fechar
+    window._pendingCounters = true;
+  }
+}
+
+
 
 // ══════════════════════════════════════════
 // CROWN CONFETTI — dispara ao abrir app se 1º colocado
@@ -3433,8 +3438,905 @@ window.irParaRankingGA=()=>{
     document.getElementById('wc-overlay').classList.remove('wc-show');
     const tabRank=document.querySelector('.tab[data-id="tr"]');
     if(tabRank)tabRank.click();
+    // Sinaliza wc fechado e dispara contadores pendentes
+    window._wcClosed = true;
+    if(window._pendingCounters){
+      window._pendingCounters = false;
+      setTimeout(function(){ if(window._runCounters) window._runCounters(); }, 120);
+    }
   }
 })();
+</script>
+
+<script>
+
+/* ═══════════════════════════════════════════════════════════
+   FUTSTATS — SISTEMA DE CARDS DE COMPARTILHAMENTO
+   Gera imagens estilizadas para WhatsApp / Instagram
+═══════════════════════════════════════════════════════════ */
+
+(function(){
+
+/* ── helpers de cor ── */
+const GOLD   = '#FFD166';
+const SILVER = '#C8D8F0';
+const BRONZE = '#D09050';
+const GREEN  = '#4dffb0';
+const RED    = '#FF5A7A';
+const BLUE   = '#60a5fa';
+const BG1    = '#07090d';
+const BG2    = '#0e1219';
+const BG3    = '#141a24';
+const TX     = '#f0f4ff';
+const TX2    = '#8a9bc0';
+const TX3    = '#465570';
+
+function isLight(){ return document.body.classList.contains('light'); }
+function getBG1(){ return isLight() ? '#f5f7fc' : BG1; }
+function getBG2(){ return isLight() ? '#ffffff' : BG2; }
+function getBG3(){ return isLight() ? '#edf0f8' : BG3; }
+function getTX(){ return isLight() ? '#0a0e1a' : TX; }
+function getTX2(){ return isLight() ? '#4a5580' : TX2; }
+function getTX3(){ return isLight() ? '#9aabcc' : TX3; }
+function getGreen(){ return isLight() ? '#00c97a' : GREEN; }
+
+/* ── Fonte compacta para canvas ── */
+const FONT_TITLE  = 'bold 48px "Syne", "DM Sans", sans-serif';
+const FONT_BIG    = '72px "DM Sans", sans-serif';
+const FONT_MED    = 'bold 36px "DM Sans", sans-serif';
+const FONT_SM     = '28px "DM Mono", monospace';
+const FONT_XS     = '22px "DM Mono", monospace';
+const FONT_NAME   = 'bold 34px "DM Sans", sans-serif';
+const FONT_STAT   = '56px "DM Sans", sans-serif';
+
+/* ── desenha retângulo arredondado ── */
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+/* ── Iniciais do jogador ── */
+function getInitials(name){
+  return (name||'?').trim().split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+}
+
+/* ── Cor do avatar baseada no nome ── */
+function avatarColor(name){
+  const colors = [
+    ['#4dffb0','#07090d'],['#60a5fa','#07090d'],['#FFD166','#07090d'],
+    ['#FF5A7A','#fff'],['#a78bfa','#07090d'],['#f472b6','#07090d'],
+  ];
+  let h=0;
+  for(let c of (name||'?')) h=(h*31+c.charCodeAt(0))&0xffff;
+  return colors[h%colors.length];
+}
+
+/* ── Desenha avatar (círculo com iniciais) ── */
+function drawAvatar(ctx, name, cx, cy, r){
+  const [bg, fg] = avatarColor(name);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = bg;
+  ctx.fill();
+  ctx.fillStyle = fg;
+  ctx.font = `bold ${Math.round(r*.9)}px "DM Sans", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(getInitials(name), cx, cy+2);
+  ctx.restore();
+}
+
+/* ── Gradiente de fundo do card ── */
+function drawCardBg(ctx, W, H){
+  const light = isLight();
+  // fundo base
+  ctx.fillStyle = light ? '#f5f7fc' : '#07090d';
+  ctx.fillRect(0,0,W,H);
+
+  // gradiente radial decorativo no topo
+  const grd = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, W*.7);
+  if(light){
+    grd.addColorStop(0,'rgba(0,201,122,.12)');
+    grd.addColorStop(1,'rgba(0,201,122,0)');
+  } else {
+    grd.addColorStop(0,'rgba(77,255,176,.1)');
+    grd.addColorStop(1,'rgba(77,255,176,0)');
+  }
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,0,W,H);
+
+  // linhas decorativas sutis
+  ctx.save();
+  ctx.globalAlpha = light ? .05 : .04;
+  ctx.strokeStyle = light ? '#000' : '#fff';
+  ctx.lineWidth = 1;
+  for(let i=0;i<H;i+=40){
+    ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(W,i); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ── Logo / watermark ── */
+function drawLogo(ctx, W, H){
+  ctx.save();
+  ctx.globalAlpha = .45;
+  ctx.fillStyle = isLight() ? '#0a0e1a' : '#f0f4ff';
+  ctx.font = 'bold 22px "DM Mono", monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('⚽ FutStats', W-28, H-24);
+  ctx.restore();
+}
+
+/* ── Linha separadora ── */
+function drawDivider(ctx, W, y){
+  ctx.save();
+  ctx.globalAlpha = .12;
+  ctx.strokeStyle = isLight() ? '#000' : '#fff';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(28,y); ctx.lineTo(W-28,y); ctx.stroke();
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════
+   CARD 1 — RANKING G+A / RANKING GERAL
+══════════════════════════════════════════ */
+function buildRankCard(titulo, subtitulo, players, statLabel){
+  const W = 720, H = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  drawCardBg(ctx, W, H);
+
+  /* ── Header ── */
+  ctx.save();
+  // faixa topo
+  const hGrad = ctx.createLinearGradient(0,0,W,0);
+  hGrad.addColorStop(0,'rgba(77,255,176,.2)');
+  hGrad.addColorStop(.5,'rgba(255,209,102,.12)');
+  hGrad.addColorStop(1,'rgba(77,255,176,.2)');
+  ctx.fillStyle = hGrad;
+  roundRect(ctx, 0, 0, W, 110, 0); ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = getTX();
+  ctx.font = 'bold 44px "Syne","DM Sans",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(titulo.toUpperCase(), W/2, 58);
+
+  ctx.fillStyle = getTX2();
+  ctx.font = '24px "DM Mono",monospace';
+  ctx.fillText(subtitulo, W/2, 90);
+
+  drawDivider(ctx, W, 110);
+
+  /* ── Pódio top 3 ── */
+  const podiumCrowns = ['🥇','🥈','🥉'];
+  const podiumColors = [GOLD, SILVER, BRONZE];
+  const podiumBgs = [
+    'rgba(255,209,102,.18)','rgba(200,215,255,.14)','rgba(210,155,90,.14)'
+  ];
+  const podiumBorders = [
+    'rgba(255,209,102,.7)','rgba(195,215,255,.5)','rgba(205,150,80,.5)'
+  ];
+
+  const top3 = players.slice(0,3);
+  // Ordem visual: 2°, 1°, 3°
+  const order = top3.length>=2 ? [1,0,2] : [0];
+  const heights= [160, 200, 140]; // altura do "pedestal" visual
+  const podW = 200;
+  const podStartX = (W - podW*3 - 20) / 2;
+  const podY = 130;
+
+  order.forEach((pi, vi)=>{
+    const p = top3[pi];
+    if(!p) return;
+    const x = podStartX + vi*(podW+10);
+    const podH = heights[vi];
+    const cardY = podY + (200-podH);
+    const cardH = podH + 150;
+
+    // card pódio
+    ctx.save();
+    roundRect(ctx, x, cardY, podW, cardH, 18);
+    const pgrd = ctx.createLinearGradient(x,cardY,x,cardY+cardH);
+    pgrd.addColorStop(0, podiumBgs[vi]);
+    pgrd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = pgrd;
+    ctx.fill();
+    ctx.strokeStyle = podiumBorders[vi];
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // coroa
+    ctx.font = '38px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(podiumCrowns[vi], x+podW/2, cardY+30);
+
+    // avatar
+    drawAvatar(ctx, p.name, x+podW/2, cardY+80, 36);
+
+    // nome
+    ctx.fillStyle = getTX();
+    ctx.font = 'bold 22px "DM Sans",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const shortName = p.name.length>10 ? p.name.substring(0,10)+'…' : p.name;
+    ctx.fillText(shortName, x+podW/2, cardY+130);
+
+    // valor
+    ctx.font = `bold 52px "DM Sans",sans-serif`;
+    ctx.fillStyle = podiumColors[vi];
+    ctx.shadowColor = podiumColors[vi];
+    ctx.shadowBlur = 20;
+    ctx.fillText(p.val, x+podW/2, cardY+185);
+    ctx.shadowBlur = 0;
+
+    // label
+    ctx.fillStyle = getTX2();
+    ctx.font = '20px "DM Mono",monospace';
+    ctx.fillText(statLabel, x+podW/2, cardY+215);
+  });
+
+  drawDivider(ctx, W, 520);
+
+  /* ── Lista posições 4+ ── */
+  const rest = players.slice(3, 8);
+  const listY = 540;
+  const rowH = 68;
+
+  rest.forEach((p, i)=>{
+    const y = listY + i*rowH;
+    const pos = i+4;
+
+    // fundo linha alternado
+    ctx.save();
+    ctx.globalAlpha = .04;
+    ctx.fillStyle = isLight()?'#000':'#fff';
+    roundRect(ctx, 24, y, W-48, rowH-6, 10);
+    ctx.fill();
+    ctx.restore();
+
+    // posição
+    ctx.fillStyle = getTX3();
+    ctx.font = '26px "DM Mono",monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pos, 60, y+rowH/2-3);
+
+    // avatar
+    drawAvatar(ctx, p.name, 112, y+rowH/2-3, 22);
+
+    // nome
+    ctx.fillStyle = getTX();
+    ctx.font = 'bold 26px "DM Sans",sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const nm = p.name.length>16 ? p.name.substring(0,16)+'…' : p.name;
+    ctx.fillText(nm, 144, y+rowH/2-3);
+
+    // sub-stats (gols · assist)
+    if(p.gols!==undefined){
+      ctx.fillStyle = getTX2();
+      ctx.font = '20px "DM Mono",monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${p.gols}G · ${p.assist}A`, 144, y+rowH/2+18);
+    }
+
+    // valor
+    ctx.fillStyle = getGreen();
+    ctx.font = 'bold 36px "DM Sans",sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(p.val, W-32, y+rowH/2-3);
+
+    ctx.fillStyle = getTX3();
+    ctx.font = '18px "DM Mono",monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(statLabel, W-32, y+rowH/2+18);
+  });
+
+  drawLogo(ctx, W, H);
+  return canvas;
+}
+
+
+/* ══════════════════════════════════════════
+   CARD 2 — RANKING PÊNALTIS
+══════════════════════════════════════════ */
+function buildPenCard(titulo, subtitulo, players){
+  const W = 720, H = 860;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  drawCardBg(ctx, W, H);
+
+  // header
+  ctx.save();
+  const hGrad = ctx.createLinearGradient(0,0,W,0);
+  hGrad.addColorStop(0,'rgba(255,90,122,.2)');
+  hGrad.addColorStop(.5,'rgba(255,209,102,.1)');
+  hGrad.addColorStop(1,'rgba(255,90,122,.2)');
+  ctx.fillStyle = hGrad;
+  roundRect(ctx,0,0,W,110,0); ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = getTX();
+  ctx.font = 'bold 44px "Syne","DM Sans",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(titulo.toUpperCase(), W/2, 58);
+
+  ctx.fillStyle = getTX2();
+  ctx.font = '24px "DM Mono",monospace';
+  ctx.fillText(subtitulo, W/2, 90);
+
+  drawDivider(ctx, W, 110);
+
+  const podiumColors = [GOLD, SILVER, BRONZE];
+  const podiumBgs = ['rgba(255,209,102,.18)','rgba(200,215,255,.14)','rgba(210,155,90,.14)'];
+  const podiumBorders = ['rgba(255,209,102,.7)','rgba(195,215,255,.5)','rgba(205,150,80,.5)'];
+  const medals = ['🥇','🥈','🥉'];
+
+  const top5 = players.slice(0,5);
+  const rowH = 120;
+  const startY = 128;
+
+  top5.forEach((p, i)=>{
+    const y = startY + i*rowH;
+    const isTop3 = i<3;
+
+    // fundo card
+    ctx.save();
+    roundRect(ctx, 20, y+4, W-40, rowH-10, 14);
+    if(isTop3){
+      const bg = ctx.createLinearGradient(20,y,W-20,y);
+      bg.addColorStop(0, podiumBgs[i]);
+      bg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = bg;
+      ctx.fill();
+      ctx.strokeStyle = podiumBorders[i];
+    } else {
+      ctx.fillStyle = isLight() ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.025)';
+      ctx.fill();
+      ctx.strokeStyle = isLight() ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.06)';
+    }
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+
+    const cy = y + rowH/2;
+
+    // medalha/posição
+    ctx.font = i<3 ? '32px serif' : '28px "DM Mono",monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if(i<3) ctx.fillText(medals[i], 60, cy);
+    else { ctx.fillStyle=getTX3(); ctx.fillText(i+1, 60, cy); }
+
+    // avatar
+    drawAvatar(ctx, p.name, 112, cy, 26);
+
+    // nome
+    ctx.fillStyle = getTX();
+    ctx.font = 'bold 28px "DM Sans",sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    const nm = p.name.length>14 ? p.name.substring(0,14)+'…' : p.name;
+    ctx.fillText(nm, 148, y+16);
+
+    // cobranças
+    ctx.fillStyle = getTX2();
+    ctx.font = '20px "DM Mono",monospace';
+    ctx.fillText(`${p.penBat} cobranças`, 148, y+50);
+
+    // barra de aproveitamento
+    const barX=148, barY=y+76, barW=320, barH=10;
+    ctx.save();
+    roundRect(ctx,barX,barY,barW,barH,5);
+    ctx.fillStyle = isLight()?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)';
+    ctx.fill();
+    const fillW = Math.max(4, barW*(p.pct/100));
+    const penColor = p.pct>=80?'#6FCF97':p.pct>=60?GOLD:'#EB5757';
+    roundRect(ctx,barX,barY,fillW,barH,5);
+    ctx.fillStyle = penColor;
+    ctx.shadowColor = penColor;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.restore();
+
+    // percentual
+    ctx.fillStyle = isTop3 ? podiumColors[i] : getGreen();
+    ctx.shadowColor = isTop3 ? podiumColors[i] : getGreen();
+    ctx.shadowBlur = 12;
+    ctx.font = `bold 44px "DM Sans",sans-serif`;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(`${p.pct}%`, W-32, cy);
+    ctx.shadowBlur=0;
+
+    // ok/bat
+    ctx.fillStyle = getTX2();
+    ctx.font = '20px "DM Mono",monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillText(`${p.penOk}/${p.penBat}`, W-32, y+rowH-14);
+  });
+
+  drawLogo(ctx, W, H);
+  return canvas;
+}
+
+
+/* ══════════════════════════════════════════
+   CARD 3 — DUELO
+══════════════════════════════════════════ */
+function buildDueloCard(mbA, mbB, sA, sB, scopeLabel, groupName){
+  const W = 720, H = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  drawCardBg(ctx, W, H);
+
+  /* header vermelho */
+  ctx.save();
+  const hGrad = ctx.createLinearGradient(0,0,W,100);
+  hGrad.addColorStop(0,'rgba(255,90,122,.25)');
+  hGrad.addColorStop(.5,'rgba(255,209,102,.12)');
+  hGrad.addColorStop(1,'rgba(255,90,122,.25)');
+  ctx.fillStyle = hGrad;
+  roundRect(ctx,0,0,W,120,0); ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = getTX();
+  ctx.font = 'bold 46px "Syne","DM Sans",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('⚔️ MODO DUELO', W/2, 60);
+
+  ctx.fillStyle = getTX2();
+  ctx.font = '22px "DM Mono",monospace';
+  ctx.fillText(`${groupName}  ·  ${scopeLabel}`, W/2, 96);
+
+  drawDivider(ctx, W, 120);
+
+  /* VS layout */
+  const gaA = sA.gols+sA.assist, gaB = sB.gols+sB.assist;
+  const winner = gaA>gaB?'A':gaB>gaA?'B':null;
+
+  const colW = 280;
+  const col1X = 40, col2X = W-40-colW;
+  const avY = 200;
+
+  // avatar A
+  drawAvatar(ctx, mbA.name, col1X+colW/2, avY, 54);
+  // avatar B
+  drawAvatar(ctx, mbB.name, col2X+colW/2, avY, 54);
+
+  // nomes
+  ctx.font = 'bold 30px "DM Sans",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+
+  ctx.fillStyle = winner==='A' ? getGreen() : getTX();
+  ctx.fillText(mbA.name.length>10?mbA.name.substring(0,10)+'…':mbA.name, col1X+colW/2, avY+64);
+
+  ctx.fillStyle = winner==='B' ? BLUE : getTX();
+  ctx.fillText(mbB.name.length>10?mbB.name.substring(0,10)+'…':mbB.name, col2X+colW/2, avY+64);
+
+  // badge vencedor
+  if(winner){
+    const winX = winner==='A' ? col1X+colW/2 : col2X+colW/2;
+    ctx.save();
+    roundRect(ctx, winX-44, avY+100, 88, 28, 14);
+    ctx.fillStyle = winner==='A'?getGreen():BLUE;
+    ctx.fill();
+    ctx.fillStyle = '#07090d';
+    ctx.font = 'bold 18px "DM Mono",monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('VENCEDOR', winX, avY+114);
+    ctx.restore();
+  }
+
+  // VS central
+  ctx.save();
+  ctx.font = 'bold 56px "DM Sans",sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const vsGrd = ctx.createLinearGradient(W/2-40,0,W/2+40,0);
+  vsGrd.addColorStop(0,'#FF5A7A'); vsGrd.addColorStop(1,'#FFD166');
+  ctx.fillStyle = vsGrd;
+  ctx.fillText('VS', W/2, avY);
+  ctx.restore();
+
+  drawDivider(ctx, W, 350);
+
+  /* tabela de stats */
+  const stats = [
+    {lbl:'Gols',     a:sA.gols,              b:sB.gols},
+    {lbl:'Assist.',  a:sA.assist,            b:sB.assist},
+    {lbl:'G+A',      a:gaA,                  b:gaB},
+    {lbl:'Partidas', a:sA.n,                 b:sB.n},
+    ...(sA.penBat>0||sB.penBat>0?[
+      {lbl:'Pên. %', a:sA.penBat>0?Math.round(sA.penOk/sA.penBat*100):0, b:sB.penBat>0?Math.round(sB.penOk/sB.penBat*100):0, suffix:'%'},
+    ]:[]),
+  ];
+
+  const tY = 370;
+  const rowH = 90;
+
+  stats.forEach((s, i)=>{
+    const y = tY + i*rowH;
+    const isWinA = s.a>s.b, isWinB = s.b>s.a;
+    const suf = s.suffix||'';
+
+    // separador
+    if(i>0){
+      ctx.save(); ctx.globalAlpha=.08;
+      ctx.strokeStyle=isLight()?'#000':'#fff';
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(28,y); ctx.lineTo(W-28,y); ctx.stroke();
+      ctx.restore();
+    }
+
+    // label centro
+    ctx.fillStyle = getTX3();
+    ctx.font = '22px "DM Mono",monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(s.lbl.toUpperCase(), W/2, y+rowH/2);
+
+    // valor A
+    ctx.font = `bold 52px "DM Sans",sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = isWinA ? getGreen() : isWinB ? RED : getTX2();
+    if(isWinA){ ctx.shadowColor=getGreen(); ctx.shadowBlur=18; }
+    ctx.fillText(s.a+suf, col1X+colW/2, y+rowH/2);
+    ctx.shadowBlur=0;
+
+    // valor B
+    ctx.fillStyle = isWinB ? BLUE : isWinA ? RED : getTX2();
+    if(isWinB){ ctx.shadowColor=BLUE; ctx.shadowBlur=18; }
+    ctx.fillText(s.b+suf, col2X+colW/2, y+rowH/2);
+    ctx.shadowBlur=0;
+
+    // badge WIN
+    if(isWinA){
+      ctx.save();
+      roundRect(ctx, col1X+colW/2-28, y+rowH-28, 56, 20, 10);
+      ctx.fillStyle=getGreen(); ctx.fill();
+      ctx.fillStyle='#07090d'; ctx.font='bold 13px "DM Mono",monospace';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('WIN', col1X+colW/2, y+rowH-18); ctx.restore();
+    }
+    if(isWinB){
+      ctx.save();
+      roundRect(ctx, col2X+colW/2-28, y+rowH-28, 56, 20, 10);
+      ctx.fillStyle=BLUE; ctx.fill();
+      ctx.fillStyle='#07090d'; ctx.font='bold 13px "DM Mono",monospace';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('WIN', col2X+colW/2, y+rowH-18); ctx.restore();
+    }
+  });
+
+  drawLogo(ctx, W, H);
+  return canvas;
+}
+
+
+/* ══════════════════════════════════════════
+   MODAL DE PREVIEW + COMPARTILHAR
+══════════════════════════════════════════ */
+function injectShareModal(){
+  if(document.getElementById('share-modal')) return;
+  const el = document.createElement('div');
+  el.id = 'share-modal';
+  el.style.cssText = `
+    display:none; position:fixed; inset:0; z-index:9000;
+    background:rgba(0,0,0,.82); backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    align-items:flex-end; justify-content:center;
+    animation:none;
+  `;
+  el.innerHTML = `
+    <div id="share-inner" style="
+      background:var(--bg2); border-radius:24px 24px 0 0;
+      width:100%; max-width:560px; max-height:92vh;
+      display:flex; flex-direction:column; overflow:hidden;
+      box-shadow:0 -8px 40px rgba(0,0,0,.6);
+      animation:sheetUp .28s cubic-bezier(.32,1,.6,1) forwards;
+    ">
+      <div style="display:flex;align-items:center;justify-content:space-between;
+        padding:1.1rem 1.2rem .9rem; border-bottom:1px solid var(--bo);
+        background:linear-gradient(135deg,rgba(77,255,176,.1) 0%,transparent 70%)">
+        <div style="font-family:'VarsityTeam',serif;font-size:18px;font-weight:bold;
+          background:linear-gradient(135deg,var(--g) 0%,var(--am) 100%);
+          -webkit-background-clip:text;background-clip:text;color:transparent">
+          📤 Compartilhar Card
+        </div>
+        <div onclick="closeShareModal()" style="
+          width:32px;height:32px;border-radius:50%;
+          background:var(--bg3);border:1px solid var(--bo2);
+          display:flex;align-items:center;justify-content:center;
+          cursor:pointer;color:var(--tx2);font-size:18px">×</div>
+      </div>
+      <div style="overflow-y:auto;padding:1rem 1.1rem 1.5rem;flex:1">
+        <div style="text-align:center;margin-bottom:1rem">
+          <canvas id="share-preview-canvas" style="
+            max-width:100%;border-radius:14px;
+            box-shadow:0 8px 32px rgba(0,0,0,.5);
+          "></canvas>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:1rem">
+          <button onclick="doShareCard()" style="
+            flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;
+            background:linear-gradient(135deg,var(--g) 0%,#26d68a 100%);
+            color:#07090d;font-family:'DM Sans',sans-serif;font-size:16px;
+            font-weight:700;box-shadow:0 4px 20px rgba(77,255,176,.3);
+            display:flex;align-items:center;justify-content:center;gap:8px
+          ">📤 Compartilhar</button>
+          <button onclick="doDownloadCard()" style="
+            flex:1;padding:14px;border-radius:14px;cursor:pointer;
+            background:var(--bg3);border:1px solid var(--bo2);
+            color:var(--tx);font-family:'DM Sans',sans-serif;font-size:16px;
+            font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px
+          ">⬇️ Baixar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(el);
+}
+
+let _shareCanvas = null;
+let _shareFilename = 'futstats-card.png';
+
+window.openShareModal = function(canvas, filename){
+  _shareCanvas = canvas;
+  _shareFilename = filename || 'futstats-card.png';
+  injectShareModal();
+  const modal = document.getElementById('share-modal');
+  const preview = document.getElementById('share-preview-canvas');
+  // Escala para preview
+  const maxW = Math.min(window.innerWidth - 40, 500);
+  const scale = maxW / canvas.width;
+  preview.width  = Math.round(canvas.width  * scale);
+  preview.height = Math.round(canvas.height * scale);
+  const pCtx = preview.getContext('2d');
+  pCtx.drawImage(canvas, 0, 0, preview.width, preview.height);
+  modal.style.display = 'flex';
+  void modal.offsetHeight;
+  modal.style.animation = 'modalBgIn .25s ease forwards';
+};
+
+window.closeShareModal = function(){
+  const modal = document.getElementById('share-modal');
+  if(!modal) return;
+  modal.style.opacity='0';
+  setTimeout(()=>{ modal.style.display='none'; modal.style.opacity=''; },220);
+};
+
+window.doShareCard = async function(){
+  if(!_shareCanvas) return;
+  _shareCanvas.toBlob(async blob=>{
+    if(!blob) return;
+    const file = new File([blob], _shareFilename, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:'FutStats'}); } catch(e){}
+    } else {
+      window.doDownloadCard();
+    }
+  },'image/png');
+};
+
+window.doDownloadCard = function(){
+  if(!_shareCanvas) return;
+  const a = document.createElement('a');
+  a.download = _shareFilename;
+  a.href = _shareCanvas.toDataURL('image/png');
+  a.click();
+};
+
+
+/* ══════════════════════════════════════════
+   BOTÕES DE SHARE INJETADOS NAS SEÇÕES
+══════════════════════════════════════════ */
+
+/* Estilos do botão share */
+const shareStyle = document.createElement('style');
+shareStyle.textContent = `
+.share-fab {
+  position:absolute; top:12px; right:12px; z-index:10;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--bg3); border:1px solid var(--bo2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:17px;
+  transition:all .18s; box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+.share-fab:hover {
+  background:var(--g); border-color:transparent;
+  transform:scale(1.12); box-shadow:0 4px 16px rgba(77,255,176,.35);
+}
+.share-fab-fixed {
+  position:fixed; bottom:160px; right:16px; z-index:500;
+  width:46px; height:46px; border-radius:50%;
+  background:linear-gradient(135deg,var(--g) 0%,#26d68a 100%);
+  border:none; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:20px;
+  box-shadow:0 4px 18px rgba(77,255,176,.45);
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+}
+.share-fab-fixed:hover { transform:scale(1.12); }
+.share-fab-fixed:active { transform:scale(.9); }
+`;
+document.head.appendChild(shareStyle);
+
+
+/* ── Coletar dados do ranking atual ── */
+function getRankData(stat){
+  if(!window.gd || !window.getSt) return [];
+  const mbs = (window.gd.members||[]);
+  return mbs.map(m=>{
+    const s = window.getSt(m.uid||m.name, null, !!m.uid);
+    const val = stat==='pen'
+      ? (s.penBat>0?Math.round(s.penOk/s.penBat*100):0)
+      : (s.gols+s.assist);
+    return {...s, name:m.name, uid:m.uid, val};
+  }).sort((a,b)=>b.val-a.val);
+}
+
+function getPenData(){
+  if(!window.gd || !window.getSt) return [];
+  const mbs = (window.gd.members||[]);
+  return mbs.map(m=>{
+    const s = window.getSt(m.uid||m.name, null, !!m.uid);
+    return {...s, name:m.name, uid:m.uid,
+      pct: s.penBat>0 ? Math.round(s.penOk/s.penBat*100) : 0
+    };
+  }).filter(p=>p.penBat>0).sort((a,b)=>b.pct-a.pct);
+}
+
+function getGroupLabel(){
+  return (window.gd && window.gd.name) ? window.gd.name : 'FutStats';
+}
+function getMesAtivo(){
+  if(!window.gd) return '';
+  const mk = window.gd.mesAtivo || (window.getMesKey?window.getMesKey():'');
+  return window.getMesLabel ? window.getMesLabel(mk) : mk;
+}
+
+/* ── Compartilhar ranking G+A ── */
+window.shareRankGA = function(){
+  const players = getRankData('ga');
+  if(!players.length){ alert('Sem dados para gerar o card.'); return; }
+  const canvas = buildRankCard(
+    '🏆 Ranking G+A',
+    getMesAtivo() + '  ·  ' + getGroupLabel(),
+    players,
+    'G+A'
+  );
+  openShareModal(canvas, `ranking-ga-${Date.now()}.png`);
+};
+
+/* ── Compartilhar ranking pênaltis ── */
+window.shareRankPen = function(){
+  const players = getPenData();
+  if(!players.length){ alert('Sem dados de pênaltis para gerar o card.'); return; }
+  const canvas = buildPenCard(
+    '🥅 Ranking Pênaltis',
+    getMesAtivo() + '  ·  ' + getGroupLabel(),
+    players
+  );
+  openShareModal(canvas, `ranking-penaltis-${Date.now()}.png`);
+};
+
+/* ── Compartilhar duelo (chamado após 2 jogadores selecionados) ── */
+window.shareDuelo = function(){
+  if(!window._dueloA || !window._dueloB){
+    alert('Selecione 2 jogadores para compartilhar o duelo.');
+    return;
+  }
+  const mbs = window.gd.members||[];
+  const mbA = mbs.find(m=>m.uid===window._dueloA);
+  const mbB = mbs.find(m=>m.uid===window._dueloB);
+  if(!mbA||!mbB) return;
+  const sA = window._getDueloStats(window._dueloA, window._dueloScope);
+  const sB = window._getDueloStats(window._dueloB, window._dueloScope);
+  const scopeLabel = window._dueloScope==='mes' ? getMesAtivo() : 'Ano Atual';
+  const canvas = buildDueloCard(mbA, mbB, sA, sB, scopeLabel, getGroupLabel());
+  openShareModal(canvas, `duelo-${mbA.name.replace(/\s+/g,'-')}-vs-${mbB.name.replace(/\s+/g,'-')}-${Date.now()}.png`);
+};
+
+
+/* ── Injetar botão flutuante no ranking ── */
+function injectRankShareBtn(){
+  if(document.getElementById('rank-share-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'rank-share-btn';
+  btn.className = 'share-fab-fixed';
+  btn.title = 'Compartilhar ranking';
+  btn.innerHTML = '📤';
+  btn.onclick = ()=>{
+    // detecta qual aba está ativa
+    const rl = document.getElementById('rl');
+    const isPen = window.rankStat === 'pen';
+    if(isPen) window.shareRankPen();
+    else window.shareRankGA();
+  };
+  document.body.appendChild(btn);
+
+  // mostra/esconde com o tab de ranking
+  const origShowTab = window.showTab;
+  window.showTab = (n, btn2, e)=>{
+    if(origShowTab) origShowTab(n, btn2, e);
+    const shareBtn = document.getElementById('rank-share-btn');
+    if(shareBtn) shareBtn.style.display = (n==='r'||n==='tr') ? 'flex' : 'none';
+  };
+  // visibilidade inicial
+  setTimeout(()=>{
+    const shareBtn = document.getElementById('rank-share-btn');
+    if(shareBtn) shareBtn.style.display='flex';
+  }, 1200);
+}
+
+/* ── Injetar botão de share no duelo (footer do modal) ── */
+function injectDueloShareBtn(){
+  const orig = window._renderDueloBody;
+  if(!orig) return;
+  window._renderDueloBody = function(){
+    orig();
+    const body = document.getElementById('duelo-body');
+    if(!body) return;
+    // Só adiciona se dois jogadores estão selecionados
+    if(window._dueloA && window._dueloB){
+      const existing = body.querySelector('.duelo-share-wrap');
+      if(!existing){
+        const wrap = document.createElement('div');
+        wrap.className = 'duelo-share-wrap';
+        wrap.style.cssText = 'margin-top:14px;text-align:center';
+        wrap.innerHTML = `<button onclick="shareDuelo()" style="
+          width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);
+          color:#07090d;font-family:'DM Sans',sans-serif;font-size:15px;
+          font-weight:700;display:flex;align-items:center;justify-content:center;
+          gap:8px;box-shadow:0 4px 20px rgba(255,90,122,.3)
+        ">📤 Compartilhar este Duelo</button>`;
+        body.appendChild(wrap);
+      }
+    }
+  };
+}
+
+/* ── Inicialização ── */
+function initShare(){
+  injectRankShareBtn();
+  injectDueloShareBtn();
+  // Re-hook a cada mudança de aba de ranking (pênatlis vs GA)
+  const origSetRank = window.setRank;
+  if(origSetRank){
+    window.setRank = (s, el)=>{
+      origSetRank(s, el);
+    };
+  }
+}
+
+// Aguarda app carregar
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', ()=>setTimeout(initShare,1500));
+} else {
+  setTimeout(initShare, 1500);
+}
+
+})();
+
 </script>
 </body>
 </html>
