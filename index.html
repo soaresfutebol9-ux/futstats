@@ -3465,9 +3465,8 @@ window.irParaRankingGA=()=>{
 (function () {
 
   /* ── CONSTANTES DE ESTILO ─────────────────────────── */
-  const CARD_SCALE = 2.25;
-  const CARD_W = Math.round(480 * CARD_SCALE);
-  const CARD_H = Math.round(640 * CARD_SCALE);
+  const CARD_W = 480;
+  const CARD_H = 640;
   const DARK_BG = '#0a0e1a';
   const ACCENT  = '#4dffb0';
   const BLUE    = '#60a5fa';
@@ -4149,16 +4148,25 @@ window.irParaRankingGA=()=>{
     canvas.style.height = 'auto';
     const ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(CARD_SCALE, CARD_SCALE);
     canvas._sharedCtx = ctx;
     return canvas;
   }
 
-  // Gera blob em alta resolução a partir do canvas
+  // Gera blob em alta resolução (2.25x = ~1080×1440) para salvar/compartilhar
   async function _getShareBlob() {
-    const canvas = document.getElementById('share-canvas');
-    if (!canvas) return null;
-    return new Promise(res => canvas.toBlob(res, 'image/png'));
+    const preview = document.getElementById('share-canvas');
+    if (!preview) return null;
+
+    const SCALE = 2.25;
+    const hdCanvas = document.createElement('canvas');
+    hdCanvas.width  = Math.round(CARD_W * SCALE);
+    hdCanvas.height = Math.round(CARD_H * SCALE);
+    const hdCtx = hdCanvas.getContext('2d');
+    hdCtx.scale(SCALE, SCALE);
+    // Copia o desenho do preview escalando para HD
+    hdCtx.drawImage(preview, 0, 0, CARD_W, CARD_H);
+
+    return new Promise(res => hdCanvas.toBlob(res, 'image/png'));
   }
 
   window._downloadShareCard = async () => {
