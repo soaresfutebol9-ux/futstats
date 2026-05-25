@@ -170,7 +170,7 @@ html.br-firefox .podium-val,html.br-firefox .mes-vigente-titulo{
   background-clip:unset!important;
 }
 html.br-firefox .p1 .podium-val,html.br-firefox .p2 .podium-val,html.br-firefox .p3 .podium-val{color:#fff!important;}
-html.br-firefox .mes-vigente-titulo{color:var(--g)!important;}
+html.br-firefox .mes-vigente-titulo{color:#ffffff!important;background:none!important;-webkit-background-clip:unset!important;background-clip:unset!important;}
 
 /* Reduce motion */
 html.reduce-motion *{
@@ -614,8 +614,8 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 /* ── MÊS VIGENTE DESTAQUE ── */
 .mes-vigente-banner{
-  background:linear-gradient(160deg,rgba(77,255,176,.1) 0%,rgba(77,255,176,.04) 50%,rgba(255,209,102,.03) 100%);
-  border:1.5px solid rgba(77,255,176,.3);
+  background:#0D6641;
+  border:1.5px solid #084D30;
   border-radius:var(--rl);
   padding:1.8rem 1.4rem 1.6rem;
   margin-bottom:1.25rem;
@@ -627,13 +627,13 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   gap:8px;
   position:relative;
   overflow:hidden;
-  box-shadow:0 0 40px rgba(77,255,176,.1),var(--glow-card);
+  box-shadow:0 0 40px rgba(13,102,65,.5),0 4px 24px rgba(0,0,0,.5);
 }
 .mes-vigente-banner::before{
   content:'';
   position:absolute;
   inset:0;border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 50%);
+  background:linear-gradient(135deg,rgba(255,255,255,.07) 0%,transparent 55%);
   pointer-events:none;
 }
 .mes-vigente-banner::after{
@@ -641,16 +641,16 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   position:absolute;
   bottom:-40px;left:50%;transform:translateX(-50%);
   width:240px;height:100px;
-  background:radial-gradient(ellipse,rgba(77,255,176,.2) 0%,transparent 70%);
+  background:radial-gradient(ellipse,rgba(77,255,176,.15) 0%,transparent 70%);
   pointer-events:none;
 }
 body.light .mes-vigente-banner{
-  background:linear-gradient(160deg,rgba(0,201,122,.1) 0%,rgba(0,201,122,.04) 60%,transparent 100%);
-  border-color:rgba(0,201,122,.3);
-  box-shadow:0 0 30px rgba(0,201,122,.08),var(--glow-card);
+  background:#0A7A4A;
+  border-color:#065E35;
+  box-shadow:0 0 36px rgba(10,122,74,.45),0 4px 20px rgba(0,0,0,.3);
 }
 body.light .mes-vigente-banner::after{
-  background:radial-gradient(ellipse,rgba(0,201,122,.15) 0%,transparent 70%);
+  background:radial-gradient(ellipse,rgba(77,255,176,.12) 0%,transparent 70%);
 }
 body.light #modal-partida-salva-card{
   border-color:rgba(0,201,122,.4);
@@ -661,20 +661,22 @@ body.light #modal-partida-salva-card{
   font-family:'VarsityTeam',serif;
   font-size:46px;
   font-weight:bold;
-  background:linear-gradient(135deg,var(--tx) 0%,rgba(77,255,176,.9) 60%,var(--am) 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  color:#ffffff;
+  background:none;
+  -webkit-background-clip:unset;
+  background-clip:unset;
   letter-spacing:1px;
   font-style:normal;
   line-height:1.1;
-  filter:drop-shadow(0 2px 12px rgba(77,255,176,.2));
+  text-shadow:0 2px 14px rgba(0,0,0,.5);
 }
 body.light .mes-vigente-titulo{
-  background:linear-gradient(135deg,#0a0e1a 0%,rgba(0,150,90,.9) 60%,#d4900a 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  filter:drop-shadow(0 1px 6px rgba(0,150,90,.15));
+  color:#ffffff;
+  background:none;
+  -webkit-background-clip:unset;
+  background-clip:unset;
+  text-shadow:0 2px 10px rgba(0,0,0,.4);
+  filter:none;
 }
 .mes-vigente-icon{font-size:28px;opacity:.75;line-height:1}
 
@@ -764,10 +766,10 @@ body.light .mes-vigente-titulo{
 .tr-filter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.1rem}
 .ft{padding:10px 20px;border-radius:99px;font-size:14px;cursor:pointer;border:1px solid var(--bo2);background:var(--bg3);color:var(--tx2);transition:all .18s;font-family:'DM Sans',sans-serif;font-weight:700}
 .ft.active{background:var(--grad-green);color:#07090d;border-color:transparent;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
-.rank-geral-btn{border-color:rgba(45,156,219,.35);color:#56CCF2;font-size:15px;padding:10px 24px}
-.rank-geral-btn.active{background:linear-gradient(135deg,#4dffb0,#60a5fa);border-color:transparent;color:#07090d;transform:scale(1.06);box-shadow:0 4px 20px rgba(77,255,176,.25),0 2px 8px rgba(96,165,250,.2);font-weight:700}
-.rank-rec-btn{border-color:rgba(255,209,102,.4);color:var(--am);font-size:15px;padding:10px 24px}
-.rank-rec-btn.active{background:var(--grad-gold);border-color:transparent;color:#07090d;transform:scale(1.06);box-shadow:0 4px 20px rgba(255,209,102,.35);font-weight:700}
+.rank-geral-btn{border-color:var(--bo2);color:var(--tx2)}
+.rank-geral-btn.active{background:var(--grad-green);border-color:transparent;color:#07090d;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
+.rank-rec-btn{border-color:var(--bo2);color:var(--tx2)}
+.rank-rec-btn.active{background:var(--grad-green);border-color:transparent;color:#07090d;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
 /* ── RECORDES ── */
 .rec-section{margin-bottom:1.5rem}
 .rec-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;gap:10px}
@@ -806,14 +808,14 @@ body.light .mes-vigente-titulo{
 /* ── BANNER MVP ── */
 .mvp-banner{
   position:relative;overflow:hidden;
-  background:#9A7000;
-  border:1.5px solid #7A5500;
+  background:linear-gradient(120deg,#E8520A 0%,#F0820A 40%,#F5B800 100%);
+  border:1.5px solid rgba(255,120,0,.6);
   border-radius:14px;
   padding:12px 16px;
   margin-bottom:1.1rem;
   display:flex;flex-direction:row;align-items:center;
   gap:14px;
-  box-shadow:0 0 32px rgba(154,112,0,.45),0 4px 20px rgba(0,0,0,.5);
+  box-shadow:0 0 36px rgba(232,82,10,.45),0 0 18px rgba(240,184,0,.25),0 4px 20px rgba(0,0,0,.5);
 }
 .mvp-banner::before{
   content:'';position:absolute;inset:0;border-radius:inherit;
@@ -904,18 +906,18 @@ body.light .mes-vigente-titulo{
 .pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 /* ── RANKING GERAL BANNER ── */
 .geral-banner{
-  background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(77,255,176,.07));
-  border:1.5px solid rgba(96,165,250,.25);
+  background:#56B4E9;
+  border:1.5px solid #2E8FC5;
   border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1.25rem;
   display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 0 30px rgba(96,165,250,.08),var(--glow-card);
+  box-shadow:0 0 36px rgba(86,180,233,.5),0 4px 20px rgba(0,0,0,.4);
   position:relative;overflow:hidden;
 }
-.geral-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 50%);pointer-events:none}
-.geral-banner-label{font-family:'DM Mono',monospace;font-size:11px;color:#56CCF2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-.geral-banner-titulo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-.5px}
-.geral-banner-sub{font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px}
-.geral-banner-icon{font-size:32px;opacity:.8}
+.geral-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 55%);pointer-events:none}
+.geral-banner-label{font-family:'DM Mono',monospace;font-size:11px;color:rgba(0,0,0,.55);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.geral-banner-titulo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#07090d;letter-spacing:-.5px;text-shadow:none}
+.geral-banner-sub{font-size:11px;color:rgba(0,0,0,.5);font-family:'DM Mono',monospace;margin-top:2px}
+.geral-banner-icon{font-size:32px;opacity:1}
 
 /* ── PARTIDAS ── */
 .mr{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--bo)}
@@ -1350,10 +1352,10 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
         <div class="mes-vigente-titulo" id="rank-mes-titulo">—</div>
       </div>
       <div class="tr-filter">
-        <div class="ft active" onclick="setRank('ga',this)">🔥 G+A</div>
-        <div class="ft" onclick="setRank('pen',this)">🥅 Pênaltis</div>
-        <div class="ft rank-geral-btn" onclick="setRank('geral',this)">🌐 Geral</div>
-        <div class="ft rank-rec-btn" onclick="setRank('recordes',this)">🏅 Recordes</div>
+        <div class="ft active" onclick="setRank('ga',this)">Mês</div>
+        <div class="ft" onclick="setRank('geral',this)">Geral</div>
+        <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
+        <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
         <button onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
@@ -2087,7 +2089,7 @@ async function checkMesViradaWith(gid,cur){
 function enterApp(){
   $('hname').textContent=gd.name;
   const mesLabel=getMesLabel(gd.mesAtivo||mesAtual());
-  $('rank-mes-titulo').textContent=mesLabel;
+  $('rank-mes-titulo').textContent=mesLabel.split(' ')[0].toUpperCase();
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();
@@ -2317,13 +2319,13 @@ function renderRanking(){
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
-      ${renderMvpBanner()}
       <div class="geral-banner">
         <div>
           <div class="geral-banner-titulo">Temporada Atual</div>
         </div>
         <div class="geral-banner-icon">🏆</div>
       </div>
+      ${renderMvpBanner()}
       ${podiumGeralHTML}
       <div class="rank-list">${listGeralItems.map((p,i)=>{
         const isMe=p.uid===currentUser?.uid;
