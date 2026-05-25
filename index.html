@@ -3465,8 +3465,9 @@ window.irParaRankingGA=()=>{
 (function () {
 
   /* ── CONSTANTES DE ESTILO ─────────────────────────── */
-  const CARD_W = 1080;
-  const CARD_H = 1920;
+  const CARD_SCALE = 2.25;
+  const CARD_W = Math.round(480 * CARD_SCALE);
+  const CARD_H = Math.round(640 * CARD_SCALE);
   const DARK_BG = '#0a0e1a';
   const ACCENT  = '#4dffb0';
   const BLUE    = '#60a5fa';
@@ -4148,10 +4149,7 @@ window.irParaRankingGA=()=>{
     canvas.style.height = 'auto';
     const ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    // Escala tudo proporcionalmente em relação ao tamanho lógico original (480×640)
-    const scaleX = CARD_W / 480;
-    const scaleY = CARD_H / 640;
-    ctx.scale(scaleX, scaleY);
+    ctx.scale(CARD_SCALE, CARD_SCALE);
     canvas._sharedCtx = ctx;
     return canvas;
   }
