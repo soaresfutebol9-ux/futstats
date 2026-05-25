@@ -3703,7 +3703,7 @@ window.irParaRankingGA=()=>{
   }
 
   async function drawRankingCard(canvas, data) {
-    const W = canvas.width, H = canvas.height;
+    const W = CARD_W, H = CARD_H;
     const ctx = canvas.getContext('2d');
 
     const members = (window._gd && window._gd.members) || [];
@@ -3879,7 +3879,7 @@ window.irParaRankingGA=()=>{
   }
 
   async function drawDueloCard(canvas, data) {
-    const W = canvas.width, H = canvas.height;
+    const W = CARD_W, H = CARD_H;
     const ctx = canvas.getContext('2d');
     const { mbA, mbB, stats, winner } = data;
 
@@ -4155,15 +4155,16 @@ window.irParaRankingGA=()=>{
     modal.style.display = 'flex';
     requestAnimationFrame(() => modal.classList.add('show'));
 
-    // Fix de resolução: renderiza em 2x para telas Retina/AMOLED
+    // Fix de resolução: renderiza em DPR real (até 3x) para telas Retina/AMOLED
     const canvas = document.getElementById('share-canvas');
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width  = CARD_W * dpr;
     canvas.height = CARD_H * dpr;
     canvas.style.width  = CARD_W + 'px';
     canvas.style.height = CARD_H + 'px';
+    // Aplica scale UMA vez aqui; drawRankingCard/drawDueloCard usam CARD_W/CARD_H como coords lógicas
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     return canvas;
   }
 
