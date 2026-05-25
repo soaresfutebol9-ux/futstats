@@ -2097,10 +2097,11 @@ onAuthStateChanged(auth,async user=>{
 });
 
 function enterLobby(){
-  $('lobby-name').textContent=myProfile.displayName;showScr('sloby');
+  $('lobby-name').textContent=myProfile.displayName;
   const params=new URLSearchParams(location.search);const joinCode=params.get('join');
-  if(joinCode){$('jcode').value=joinCode;openPCenter('pj');return;}
-  if(myProfile.groupId)loadGroup(myProfile.groupId);
+  if(joinCode){showScr('sloby');$('jcode').value=joinCode;openPCenter('pj');return;}
+  if(myProfile.groupId){loadGroup(myProfile.groupId);return;}
+  showScr('sloby');
 }
 async function loadGroup(gid){
   try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
