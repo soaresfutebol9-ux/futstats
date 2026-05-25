@@ -1765,7 +1765,7 @@ function enterLobby(){
   if(myProfile.groupId)loadGroup(myProfile.groupId);
 }
 async function loadGroup(gid){
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){}
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();wcShow();}catch(e){}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -1809,7 +1809,6 @@ function enterApp(){
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();
-  wcShow();
 }
 window.leaveGroup=async()=>{
   if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
@@ -2918,8 +2917,7 @@ window.irParaRankingGA=()=>{
     wcDismiss();
   };
   function wcDismiss(){
-    const overlay=document.getElementById('wc-overlay');
-    overlay.classList.remove('wc-show');
+    document.getElementById('wc-overlay').classList.remove('wc-show');
     const tabRank=document.querySelector('.tab[data-id="tr"]');
     if(tabRank)tabRank.click();
   }
