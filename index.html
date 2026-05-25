@@ -3141,22 +3141,29 @@ function _renderDueloBody(){
         const barTotalA=s.a+s.b>0?Math.round(s.a/(s.a+s.b)*100):50;
         const barTotalB=100-barTotalA;
         const suf=s.suffix||'';
+        // Cores padronizadas: vencedor=verde, perdedor=vermelho, empate=cinza
+        const colorA=clsA==='win'?'#4dffb0':clsA==='lose'?'#FF5A7A':'var(--tx2)';
+        const colorB=clsB==='win'?'#4dffb0':clsB==='lose'?'#FF5A7A':'var(--tx2)';
+        const barColorA=clsA==='win'?'#4dffb0':clsA==='lose'?'rgba(255,90,122,.55)':'rgba(150,160,190,.4)';
+        const barColorB=clsB==='win'?'#4dffb0':clsB==='lose'?'rgba(255,90,122,.55)':'rgba(150,160,190,.4)';
+        // Para valores com sufixo (%) não usamos contagem animada
+        const useCount=!suf;
         return`<div style="padding:12px 16px;${i<stats.length-1?'border-bottom:1px solid var(--bo)':''}">
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:8px">${s.lbl}</div>
           <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px">
             <div style="text-align:center">
-              <div style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${clsA==='win'?'#4dffb0':clsA==='lose'?'rgba(255,90,122,.6)':'var(--tx2)'}">${s.a}${suf}</div>
-              ${clsA==='win'?'<div style="font-size:9px;color:var(--g);font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':''}
+              <div class="${useCount?'duelo-count':''}" data-val="${s.a}" data-suf="${suf}" style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${colorA}">${useCount?'0':s.a+suf}</div>
+              ${clsA==='win'?'<div style="font-size:9px;color:#4dffb0;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsA==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
             </div>
             <div style="height:40px;width:2px;background:var(--bo2)"></div>
             <div style="text-align:center">
-              <div style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${clsB==='win'?'#60a5fa':clsB==='lose'?'rgba(255,90,122,.6)':'var(--tx2)'}">${s.b}${suf}</div>
-              ${clsB==='win'?'<div style="font-size:9px;color:#60a5fa;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':''}
+              <div class="${useCount?'duelo-count':''}" data-val="${s.b}" data-suf="${suf}" style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${colorB}">${useCount?'0':s.b+suf}</div>
+              ${clsB==='win'?'<div style="font-size:9px;color:#4dffb0;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsB==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
             </div>
           </div>
           <div style="display:flex;height:4px;border-radius:99px;overflow:hidden;margin-top:8px;gap:2px">
-            <div style="flex:${barTotalA};background:${clsA==='win'?'#4dffb0':'#60a5fa'};border-radius:99px 0 0 99px;transition:flex .5s ease;min-width:${barTotalA>0?4:0}px"></div>
-            <div style="flex:${barTotalB};background:${clsB==='win'?'#60a5fa':'rgba(255,90,122,.5)'};border-radius:0 99px 99px 0;transition:flex .5s ease;min-width:${barTotalB>0?4:0}px"></div>
+            <div class="duelo-bar-fill" data-flex="${barTotalA}" style="flex:0;background:${barColorA};border-radius:99px 0 0 99px;transition:flex .65s cubic-bezier(.4,0,.2,1);min-width:0px"></div>
+            <div class="duelo-bar-fill" data-flex="${barTotalB}" style="flex:0;background:${barColorB};border-radius:0 99px 99px 0;transition:flex .65s cubic-bezier(.4,0,.2,1);min-width:0px"></div>
           </div>
         </div>`;
       }).join('')}
@@ -3166,6 +3173,39 @@ function _renderDueloBody(){
   }
 
   el.innerHTML=scopeHTML+pickHTML+compareHTML;
+
+  // ── ANIMAÇÕES DO DUELO ──────────────────────────────────
+  if(_dueloA&&_dueloB){
+    // Pequeno delay para o DOM renderizar antes de animar
+    setTimeout(()=>{
+      // 1) Animar contagem dos números
+      el.querySelectorAll('.duelo-count').forEach(node=>{
+        const target=parseInt(node.dataset.val)||0;
+        const suf=node.dataset.suf||'';
+        if(target===0){node.textContent='0'+suf;return;}
+        const dur=650,steps=35;
+        let t=0;
+        const tick=setInterval(()=>{
+          t++;
+          node.textContent=(t>=steps?target:Math.round((target/steps)*t))+suf;
+          if(t>=steps)clearInterval(tick);
+        },dur/steps);
+      });
+      // 2) Animar barras (do 0 para o valor real)
+      el.querySelectorAll('.duelo-bar-fill').forEach(bar=>{
+        const targetFlex=parseFloat(bar.dataset.flex)||0;
+        // Força reflow antes de aplicar a transição
+        bar.style.flex='0';
+        bar.style.minWidth='0px';
+        requestAnimationFrame(()=>{
+          requestAnimationFrame(()=>{
+            bar.style.flex=String(targetFlex);
+            bar.style.minWidth=targetFlex>0?'4px':'0px';
+          });
+        });
+      });
+    },60);
+  }
 }
 
 // Mostra/esconde o FAB de duelo com o tab de ranking
