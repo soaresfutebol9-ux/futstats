@@ -1654,7 +1654,7 @@ window.closePCenter=id=>{
     if(pan){pan.style.transform='';pan.style.transition='';}
   },260);
 };
-function showScr(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
+function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
 window.switchAuth=mode=>{
