@@ -207,15 +207,7 @@ html.save-data #sl::after{display:none}
   background:var(--bg);
   transition:opacity .22s ease;
 }
-.theme-toggle{
-  position:fixed;top:12px;right:16px;z-index:50;
-  width:44px;height:44px;border-radius:50%;
-  background:var(--bg2);border:1px solid var(--bo2);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:20px;box-shadow:var(--shadow);
-  transition:all .2s;
-}
-.theme-toggle:hover{transform:scale(1.1)}
+.theme-toggle{display:none!important}
 
 /* ── AUTH ── */
 #sl{align-items:center;justify-content:center;padding:2rem;background:var(--bg);position:relative;overflow:hidden}
@@ -1794,8 +1786,8 @@ function _redrawAllPizzas(){
   });
 }
 (()=>{
-  const saved=localStorage.getItem('futstats-theme');
-  if(saved==='light'){document.body.classList.add('light');setTimeout(()=>{ const t=$('theme-toggle');if(t)t.textContent='🌙';},100);}
+  document.body.classList.add('light');
+  localStorage.setItem('futstats-theme','light');
 })();
 
 function getMesKey(date){const d=date||new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
@@ -3973,9 +3965,9 @@ window.irParaRankingGA=()=>{
   const DARK_BG = '#0a0e1a';
   const ACCENT  = '#4dffb0';
   const BLUE    = '#60a5fa';
-  const GOLD    = '#FFD166';
-  const SILVER  = '#C0C0C0';
-  const BRONZE  = '#CD7F32';
+  const GOLD    = '#e0c134';
+  const SILVER  = '#8190a1';
+  const BRONZE  = '#966c45';
   const RED     = '#FF5A7A';
 
   /* ── AVATAR HELPER ───────────────────────────────── */
@@ -4231,7 +4223,7 @@ window.irParaRankingGA=()=>{
 
       // Bloco do pódio
       const blockGrad = ctx.createLinearGradient(cx - 44, blockY, cx + 44, blockY + podiumH[vi]);
-      blockGrad.addColorStop(0, pi === 0 ? 'rgba(255,209,102,0.25)' : pi === 1 ? 'rgba(192,192,192,0.15)' : 'rgba(205,127,50,0.15)');
+      blockGrad.addColorStop(0, pi === 0 ? 'rgba(224,193,52,0.35)' : pi === 1 ? 'rgba(129,144,161,0.25)' : 'rgba(150,108,69,0.25)');
       blockGrad.addColorStop(1, 'rgba(255,255,255,0.03)');
       ctx.fillStyle = blockGrad;
       roundRect(ctx, cx - 44, blockY, 88, podiumH[vi] + 50, 10);
@@ -4504,19 +4496,19 @@ window.irParaRankingGA=()=>{
     style.textContent = `
       #share-modal {
         position: fixed; inset: 0; z-index: 99999;
-        background: rgba(0,0,0,0.82);
+        background: rgba(0,0,0,0.55);
         display: flex; align-items: flex-end; justify-content: center;
         opacity: 0; transition: opacity .25s;
         padding: 0;
       }
       #share-modal.show { opacity: 1; }
       #share-box {
-        background: #111827;
-        border: 1px solid rgba(77,255,176,0.15);
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.08);
         border-radius: 24px 24px 0 0;
         padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
         width: 100%; max-width: 560px;
-        box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+        box-shadow: 0 -4px 32px rgba(0,0,0,0.12);
         display: flex; flex-direction: column; gap: 16px;
         max-height: 92vh; overflow-y: auto;
         transform: translateY(40px);
@@ -4526,6 +4518,7 @@ window.irParaRankingGA=()=>{
       #share-box canvas {
         width: 100%; border-radius: 12px;
         display: block;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.15);
       }
       #share-header {
         display: flex; align-items: center; justify-content: space-between;
@@ -4533,18 +4526,18 @@ window.irParaRankingGA=()=>{
       #share-title {
         font-family: 'DM Mono', monospace;
         font-size: 11px; letter-spacing: .12em;
-        color: rgba(255,255,255,0.4);
+        color: rgba(0,0,0,0.4);
         text-transform: uppercase;
       }
       #share-close {
-        background: rgba(255,255,255,0.08); border: none; cursor: pointer;
-        color: rgba(255,255,255,0.5); font-size: 16px;
+        background: rgba(0,0,0,0.06); border: none; cursor: pointer;
+        color: rgba(0,0,0,0.4); font-size: 16px;
         width: 30px; height: 30px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         line-height: 1; padding: 0;
         transition: background .15s;
       }
-      #share-close:hover { background: rgba(255,255,255,0.14); }
+      #share-close:hover { background: rgba(0,0,0,0.12); }
       #share-actions {
         display: flex; flex-direction: column;
         gap: 8px;
@@ -4568,28 +4561,28 @@ window.irParaRankingGA=()=>{
       }
       .share-btn-label { font-size: 14px; }
       .share-btn-whatsapp {
-        background: rgba(37,211,102,0.12);
-        color: #fff;
-        border: 1px solid rgba(37,211,102,0.25);
+        background: rgba(37,211,102,0.1);
+        color: #1a1a1a;
+        border: 1px solid rgba(37,211,102,0.3);
       }
       .share-btn-whatsapp .share-btn-icon { background: #25D366; }
       .share-btn-instagram {
-        background: rgba(228,64,95,0.12);
-        color: #fff;
-        border: 1px solid rgba(228,64,95,0.25);
+        background: rgba(228,64,95,0.08);
+        color: #1a1a1a;
+        border: 1px solid rgba(228,64,95,0.2);
       }
       .share-btn-instagram .share-btn-icon {
         background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
       }
       .share-btn-save {
-        background: rgba(77,255,176,0.10);
-        color: #fff;
-        border: 1px solid rgba(77,255,176,0.2);
+        background: rgba(0,0,0,0.04);
+        color: #1a1a1a;
+        border: 1px solid rgba(0,0,0,0.1);
       }
-      .share-btn-save .share-btn-icon { background: rgba(77,255,176,0.18); color: #4dffb0; }
+      .share-btn-save .share-btn-icon { background: rgba(0,0,0,0.08); color: #444; }
       #share-hint {
         font-family: 'DM Mono', monospace;
-        font-size: 10px; color: rgba(255,255,255,0.22);
+        font-size: 10px; color: rgba(0,0,0,0.25);
         text-align: center; letter-spacing: .06em;
       }
     `;
@@ -4907,14 +4900,14 @@ window.irParaRankingGA=()=>{
 
     // Seção medalhas
     const medalSecY = statY+54;
-    ctx.fillStyle = 'rgba(255,209,102,0.08)';
+    ctx.fillStyle = 'rgba(224,193,52,0.1)';
     roundRect(ctx, 28, medalSecY, W-56, 148, 12);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,209,102,0.18)';
+    ctx.strokeStyle = 'rgba(224,193,52,0.2)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.fillStyle = 'rgba(255,209,102,0.65)';
+    ctx.fillStyle = 'rgba(224,193,52,0.7)';
     ctx.font = "9px 'DM Mono', monospace";
     ctx.textAlign = 'center';
     ctx.fillText('🏅 PÓDIO ' + (data.seasonLabel || 'GERAL').toUpperCase(), W/2, medalSecY+16);
@@ -4923,9 +4916,9 @@ window.irParaRankingGA=()=>{
     ctx.fillText(`${data.totalMeses} MÊS${data.totalMeses!==1?'ES':''} DISPUTADO${data.totalMeses!==1?'S':''}`, W/2, medalSecY+30);
 
     const medals = [
-      { emoji:'🥇', val: data.ouros,  color: '#FFD700', label:'OURO' },
-      { emoji:'🥈', val: data.pratas, color: '#bdbdbd', label:'PRATA' },
-      { emoji:'🥉', val: data.bronzes,color: '#cd7f32', label:'BRONZE' },
+      { emoji:'🥇', val: data.ouros,  color: '#e0c134', label:'OURO' },
+      { emoji:'🥈', val: data.pratas, color: '#8190a1', label:'PRATA' },
+      { emoji:'🥉', val: data.bronzes,color: '#966c45', label:'BRONZE' },
     ];
     medals.forEach((m, i) => {
       const mx = W/6 + i*(W/3);
@@ -4952,9 +4945,9 @@ window.irParaRankingGA=()=>{
       ctx.clip();
       let bx = 36;
       const segs = [
-        { v: data.ouros,  c: '#FFD700' },
-        { v: data.pratas, c: '#bdbdbd' },
-        { v: data.bronzes,c: '#cd7f32' },
+        { v: data.ouros,  c: '#e0c134' },
+        { v: data.pratas, c: '#8190a1' },
+        { v: data.bronzes,c: '#966c45' },
         { v: Math.max(0,total-data.ouros-data.pratas-data.bronzes), c: 'rgba(255,255,255,0.07)' },
       ];
       segs.forEach(seg => {
@@ -5025,12 +5018,12 @@ window.irParaRankingGA=()=>{
     ctx.textAlign = 'center';
     const bw = ctx.measureText(badgeText).width + 20;
     roundRect(ctx, W/2 - bw/2, badgeY - 12, bw, 20, 10);
-    ctx.fillStyle = 'rgba(255,209,102,0.18)';
+    ctx.fillStyle = 'rgba(224,193,52,0.18)';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,209,102,0.5)';
+    ctx.strokeStyle = 'rgba(224,193,52,0.5)';
     ctx.lineWidth = 1;
     ctx.stroke();
-    ctx.fillStyle = '#FFD166';
+    ctx.fillStyle = '#e0c134';
     ctx.fillText(badgeText, W / 2, badgeY + 1);
     ctx.restore();
 
@@ -5042,22 +5035,22 @@ window.irParaRankingGA=()=>{
 
     // Divider
     ctx.save();
-    ctx.strokeStyle = 'rgba(255,209,102,0.2)';
+    ctx.strokeStyle = 'rgba(224,193,52,0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(36, badgeY + 40); ctx.lineTo(W - 36, badgeY + 40); ctx.stroke();
     ctx.restore();
 
     const medals = ['🥇', '🥈', '🥉'];
-    const valColors = ['#FFD700', '#C8D8F0', '#D09050'];
+    const valColors = ['#e0c134', '#8190a1', '#966c45'];
     const bgColors = [
-      'rgba(255,209,102,0.13)',
-      'rgba(210,225,255,0.10)',
-      'rgba(215,155,90,0.10)',
+      'rgba(224,193,52,0.2)',
+      'rgba(129,144,161,0.15)',
+      'rgba(150,108,69,0.15)',
     ];
     const borderColors = [
-      'rgba(255,209,102,0.55)',
-      'rgba(195,215,255,0.45)',
-      'rgba(200,140,60,0.45)',
+      'rgba(224,193,52,0.6)',
+      'rgba(129,144,161,0.5)',
+      'rgba(150,108,69,0.5)',
     ];
 
     const rowH = 72;
