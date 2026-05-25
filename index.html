@@ -710,7 +710,7 @@ body.light .mes-vigente-titulo{
 
 .podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center}
 .podium-item.p1{background:#B8860B;border-color:#8B6508;box-shadow:0 0 40px rgba(184,134,11,.5),0 4px 24px rgba(0,0,0,.5)}
-.podium-item.p2{background:#4A6FA5;border-color:#2E5080;box-shadow:0 0 30px rgba(74,111,165,.4),0 4px 20px rgba(0,0,0,.45)}
+.podium-item.p2{background:#2E3540;border-color:#1C232E;box-shadow:0 0 24px rgba(46,53,64,.6),0 4px 20px rgba(0,0,0,.5)}
 .podium-item.p3{background:#7D4E2D;border-color:#5C3318;box-shadow:0 0 30px rgba(125,78,45,.4),0 4px 20px rgba(0,0,0,.45)}
 .podium-crown{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .podium-av .av{border:2px solid transparent;cursor:pointer;transition:transform .15s}.podium-av .av:hover{transform:scale(1.1)}
@@ -800,68 +800,58 @@ body.light .mes-vigente-titulo{
 
 /* ── ANEL MVP (dourado) ── */
 .av-mvp-ring{position:relative;display:inline-flex;flex-shrink:0}
-.av-mvp-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2.5px solid #FFD700;animation:mvpRingPulse 2.2s ease-in-out infinite;pointer-events:none;z-index:1}
+.av-mvp-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid #FFD700;animation:mvpRingPulse 2.2s ease-in-out infinite;pointer-events:none;z-index:1}
 @keyframes mvpRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.6),0 0 12px rgba(255,185,0,.3);opacity:1}50%{box-shadow:0 0 0 5px rgba(255,215,0,.0),0 0 22px rgba(255,185,0,.5);opacity:.8}}
 
 /* ── BANNER MVP ── */
 .mvp-banner{
   position:relative;overflow:hidden;
-  background:linear-gradient(135deg,rgba(255,185,0,.18) 0%,rgba(255,215,0,.08) 40%,rgba(255,140,0,.04) 100%);
-  border:1.5px solid rgba(255,215,0,.45);
-  border-radius:var(--rl);
-  padding:1.4rem 1.2rem 1.2rem;
+  background:#9A7000;
+  border:1.5px solid #7A5500;
+  border-radius:14px;
+  padding:12px 16px;
   margin-bottom:1.1rem;
-  display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:10px;
-  box-shadow:0 0 40px rgba(255,185,0,.15),0 0 0 0 rgba(255,215,0,.0),var(--glow-card);
+  display:flex;flex-direction:row;align-items:center;
+  gap:14px;
+  box-shadow:0 0 32px rgba(154,112,0,.45),0 4px 20px rgba(0,0,0,.5);
 }
 .mvp-banner::before{
   content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 60%);
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);
   pointer-events:none;
 }
-.mvp-banner::after{
-  content:'';position:absolute;
-  bottom:-50px;left:50%;transform:translateX(-50%);
-  width:260px;height:110px;
-  background:radial-gradient(ellipse,rgba(255,185,0,.22) 0%,transparent 70%);
-  pointer-events:none;
-}
-.mvp-crown{
-  font-size:32px;line-height:1;
-  animation:mvpCrownBounce 2.4s cubic-bezier(.36,1,.6,1) infinite;
-  filter:drop-shadow(0 2px 10px rgba(255,185,0,.6));
-}
-@keyframes mvpCrownBounce{
-  0%,100%{transform:translateY(0) scale(1)}
-  45%{transform:translateY(-6px) scale(1.08)}
-  60%{transform:translateY(-3px) scale(1.04)}
-}
+.mvp-banner::after{content:none}
+.mvp-crown{display:none}
+.mvp-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
 .mvp-label{
-  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(255,215,0,.75);
-  background:rgba(255,185,0,.1);border:1px solid rgba(255,215,0,.25);
-  border-radius:99px;padding:3px 12px;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(255,255,255,.65);
+  display:flex;align-items:center;gap:6px;
+}
+.mvp-streak-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,.25);border-radius:99px;
+  padding:2px 9px;font-family:'DM Mono',monospace;
+  font-size:12px;font-weight:700;color:#fff;letter-spacing:.02em;flex-shrink:0;
 }
 .mvp-name{
-  font-family:'VarsityTeam',serif;font-size:22px;font-weight:bold;
-  background:linear-gradient(135deg,#FFE566 0%,#FFB800 60%,#FF8C00 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 2px 10px rgba(255,185,0,.4));
-  letter-spacing:.5px;line-height:1.1;
-  word-break:break-word;max-width:220px;
+  font-family:'VarsityTeam',serif;font-size:18px;font-weight:bold;
+  color:#fff;
+  letter-spacing:.4px;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 6px rgba(0,0,0,.5);
 }
 .mvp-streak{
-  font-family:'DM Mono',monospace;font-size:12px;
-  color:rgba(255,215,0,.65);letter-spacing:.04em;
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:rgba(255,255,255,.65);letter-spacing:.03em;
 }
 .mvp-months{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:2px;
+  display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;
 }
 .mvp-month-badge{
-  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.04em;
-  background:rgba(255,185,0,.12);border:1px solid rgba(255,215,0,.3);
-  border-radius:6px;padding:3px 8px;color:rgba(255,215,0,.85);
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.03em;
+  background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.2);
+  border-radius:5px;padding:2px 6px;color:rgba(255,255,255,.8);
 }
 /* ── RANKING PÊNALTIS ── */
 .pen-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -2290,15 +2280,15 @@ function renderMvpBanner(){
   const mvp=getMvpStreak();
   if(!mvp)return'';
   const isMe=mvp.uid===currentUser?.uid;
-  const avHTML=`<div class="av-mvp-ring">${avatarHTML(mvp.name,54,mvp.uid)}</div>`;
+  const avHTML=`<div class="av-mvp-ring">${avatarHTML(mvp.name,42,mvp.uid)}</div>`;
   const monthBadges=mvp.months.map(m=>`<span class="mvp-month-badge">${m}</span>`).join('');
   return`<div class="mvp-banner">
-    <div class="mvp-crown">👑</div>
-    <div class="mvp-label">SEQUÊNCIA INSANA</div>
-    <div onclick="openPlayerProfile('${mvp.uid}')" style="cursor:pointer">${avHTML}</div>
-    <div class="mvp-name">${mvp.name}${isMe?' (você)':''}</div>
-    <div class="mvp-streak">${mvp.streak} ${mvp.streak===1?'mês consecutivo':'meses consecutivos'} no topo</div>
-    <div class="mvp-months">${monthBadges}</div>
+    <div onclick="openPlayerProfile('${mvp.uid}')" style="cursor:pointer;flex-shrink:0">${avHTML}</div>
+    <div class="mvp-left">
+      <div class="mvp-label">SEQUÊNCIA INSANA <span class="mvp-streak-badge">${mvp.streak}🔥</span></div>
+      <div class="mvp-name">${mvp.name}${isMe?' (você)':''}</div>
+      <div class="mvp-months">${monthBadges}</div>
+    </div>
   </div>`;
 }
 
