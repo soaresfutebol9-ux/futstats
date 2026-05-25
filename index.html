@@ -37,17 +37,17 @@
 }
 /* ── TEMA ESCURO (padrão) ── */
 :root{
-  --bg:#07090d;--bg2:#0e1219;--bg3:#141a24;--bg4:#1a2230;
-  --bo:rgba(255,255,255,.055);--bo2:rgba(255,255,255,.1);--bo3:rgba(255,255,255,.2);
+  --bg:#000000;--bg2:#0a0a0f;--bg3:#111118;--bg4:#18181f;
+  --bo:rgba(255,255,255,.045);--bo2:rgba(255,255,255,.09);--bo3:rgba(255,255,255,.17);
   --tx:#f0f4ff;--tx2:#8a9bc0;--tx3:#465570;--ac:#e0eaff;
   --g:#4dffb0;--gd:#26d68a;--gl:rgba(77,255,176,.1);--gt:#4dffb0;
   --am:#FFD166;--re:#FF5A7A;--rl2:rgba(255,90,122,.12);--rt:#FF5A7A;
   --r:12px;--rl:18px;
   --shadow:0 8px 40px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.4);
   --shadow-card:0 4px 24px rgba(0,0,0,.5),0 1px 4px rgba(255,255,255,.03);
-  --ah-bg:#080b10;
-  --bn-bg:#080b10;
-  --auth-card-bg:rgba(14,18,25,.92);
+  --ah-bg:#000000;
+  --bn-bg:#000000;
+  --auth-card-bg:rgba(10,10,15,.96);
   --grad-green:linear-gradient(135deg,#4dffb0 0%,#26d68a 100%);
   --grad-gold:linear-gradient(135deg,#FFD166 0%,#f0a500 100%);
   --grad-silver:linear-gradient(135deg,#e0e8f8 0%,#b0bed8 100%);
@@ -219,8 +219,14 @@ html.save-data #sl::after{display:none}
 
 /* ── AUTH ── */
 #sl{align-items:center;justify-content:center;padding:2rem;background:var(--bg);position:relative;overflow:hidden}
-#sl::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(111,207,151,.025) 0px,rgba(111,207,151,.025) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(0deg,rgba(111,207,151,.025) 0px,rgba(111,207,151,.025) 1px,transparent 1px,transparent 60px);pointer-events:none}
-#sl::after{content:'';position:absolute;bottom:-120px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse at center,rgba(111,207,151,.12) 0%,transparent 70%);pointer-events:none}
+#sl::before{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,rgba(77,255,176,.06) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 10% 80%,rgba(96,165,250,.04) 0%,transparent 55%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.016) 0px,rgba(255,255,255,.016) 1px,transparent 1px,transparent 56px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.016) 0px,rgba(255,255,255,.016) 1px,transparent 1px,transparent 56px);
+  pointer-events:none}
+#sl::after{content:'';position:absolute;bottom:-100px;left:50%;transform:translateX(-50%);width:500px;height:260px;background:radial-gradient(ellipse at center,rgba(77,255,176,.09) 0%,transparent 70%);pointer-events:none}
 
 .auth-wrap{width:100%;max-width:380px;position:relative;z-index:1}
 .auth-logo-wrap{text-align:center;margin-bottom:2rem;animation:slideup .6s ease both}
@@ -318,21 +324,22 @@ body.light .av5{background:rgba(224,32,80,.1);color:#e02050}
 #sloby::before{
   content:'';position:absolute;inset:0;pointer-events:none;
   background:
-    radial-gradient(ellipse 70% 50% at 20% 0%,rgba(77,255,176,.07) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 40% at 80% 100%,rgba(96,165,250,.05) 0%,transparent 50%),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.01) 0px,rgba(255,255,255,.01) 1px,transparent 1px,transparent 52px),
-    repeating-linear-gradient(0deg,rgba(255,255,255,.01) 0px,rgba(255,255,255,.01) 1px,transparent 1px,transparent 52px);
+    radial-gradient(ellipse 60% 45% at 20% 0%,rgba(77,255,176,.06) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 35% at 80% 100%,rgba(96,165,250,.04) 0%,transparent 55%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 56px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 56px);
 }
 
 /* ── APP ── */
 #sa{background:var(--bg);height:100dvh;height:calc(var(--vh,1vh)*100);display:flex;flex-direction:column;overflow:hidden;position:relative}
 #sa::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 0%,rgba(77,255,176,.05) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 100%,rgba(77,255,176,.03) 0%,transparent 50%),
-    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(255,209,102,.02) 0%,transparent 50%),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0px,rgba(255,255,255,.012) 1px,transparent 1px,transparent 52px),
-    repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0px,rgba(255,255,255,.012) 1px,transparent 1px,transparent 52px);
+    radial-gradient(ellipse 55% 40% at 15% 0%,rgba(77,255,176,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 35% at 85% 100%,rgba(77,255,176,.04) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 25% at 70% 20%,rgba(255,209,102,.025) 0%,transparent 55%),
+    radial-gradient(ellipse 20% 15% at 30% 75%,rgba(96,165,250,.03) 0%,transparent 50%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 48px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 48px);
   animation:none;
 }
 body.light #sa::before{
@@ -778,10 +785,18 @@ body.light .mes-vigente-titulo{
 .rec-share-btn:hover{border-color:var(--g);color:var(--g);background:rgba(77,255,176,.07)}
 .rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;transition:all .18s}
 .rec-card::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none}
-.rec-card-gold{border-color:rgba(255,209,102,.55)!important;background:linear-gradient(135deg,rgba(255,209,102,.13) 0%,var(--bg2) 60%)!important;box-shadow:0 0 24px rgba(255,185,0,.2),var(--glow-card)!important}
-.rec-card-gold::before{background:linear-gradient(135deg,rgba(255,209,102,.08) 0%,transparent 50%)}
-.rec-card-silver{border-color:rgba(195,215,255,.5)!important;background:linear-gradient(135deg,rgba(210,225,255,.1) 0%,var(--bg2) 60%)!important;box-shadow:0 0 18px rgba(190,215,255,.14),var(--glow-card)!important}
-.rec-card-bronze{border-color:rgba(200,140,60,.5)!important;background:linear-gradient(135deg,rgba(215,155,90,.1) 0%,var(--bg2) 60%)!important;box-shadow:0 0 18px rgba(200,140,60,.14),var(--glow-card)!important}
+.rec-card-gold{border-color:rgba(255,209,102,.75)!important;background:linear-gradient(160deg,rgba(255,209,102,.32) 0%,rgba(255,185,50,.14) 50%,rgba(255,209,102,.06) 100%)!important;box-shadow:0 0 50px rgba(255,209,102,.35),0 0 20px rgba(255,185,50,.2),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,230,120,.25)!important}
+.rec-card-gold::before{background:linear-gradient(135deg,rgba(255,209,102,.1) 0%,transparent 50%)}
+.rec-card-gold .rec-name{color:var(--tx)}
+.rec-card-gold .rec-meta{color:rgba(255,209,102,.75)}
+.rec-card-silver{border-color:rgba(200,215,255,.65)!important;background:linear-gradient(160deg,rgba(220,230,255,.28) 0%,rgba(180,195,230,.12) 50%,var(--bg2) 100%)!important;box-shadow:0 0 36px rgba(200,215,255,.22),0 0 14px rgba(180,200,240,.15),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(220,235,255,.2)!important}
+.rec-card-silver .rec-name{color:var(--tx)}
+.rec-card-silver .rec-meta{color:rgba(190,210,255,.7)}
+.rec-card-bronze{border-color:rgba(210,155,90,.65)!important;background:linear-gradient(160deg,rgba(220,160,100,.28) 0%,rgba(195,130,75,.12) 50%,var(--bg2) 100%)!important;box-shadow:0 0 36px rgba(200,140,80,.22),0 0 14px rgba(180,120,60,.15),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(225,170,100,.2)!important}
+.rec-card-bronze .rec-name{color:var(--tx)}
+.rec-card-gold .rec-val-lbl{color:rgba(255,209,102,.65)}
+.rec-card-silver .rec-val-lbl{color:rgba(190,210,255,.6)}
+.rec-card-bronze .rec-val-lbl{color:rgba(220,165,100,.65)}
 .rec-medal{font-size:26px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));line-height:1}
 .rec-info{flex:1;min-width:0}
 .rec-name{font-family:'Freshman',sans-serif;font-size:15px;font-weight:normal;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1216,6 +1231,35 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
 </style>
 </head>
 <body>
+<!-- noise grain filter -->
+<svg style="position:fixed;width:0;height:0;pointer-events:none;z-index:-1" aria-hidden="true">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+    <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay"/>
+  </filter>
+</svg>
+<style>
+/* ── NOISE GRAIN OVERLAY ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  background-repeat:repeat;
+}
+/* ── VIGNETTE ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+</style>
 
 <!-- OVERLAY TRANSIÇÃO TEMA -->
 <div id="theme-overlay"></div>
@@ -2308,7 +2352,7 @@ function renderRanking(){
 
   // ── RANKING GERAL ──
   if(rankStat==='geral'){
-    if(banner)banner.style.display='';
+    if(banner)banner.style.display='none';
     const anoAtual=new Date().getFullYear().toString();
     const geralData=mbs.map(m=>{const s=getStGeral(m);return{...s,name:m.name,uid:m.uid};}).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
     const top3g=geralData.slice(0,3);const restg=geralData.slice(3);
@@ -2355,7 +2399,7 @@ function renderRanking(){
 
   // ── RANKING PÊNALTIS ──
   if(rankStat==='pen'){
-    if(banner)banner.style.display='';
+    if(banner)banner.style.display='none';
     if(!window._penSubTab)window._penSubTab='mes';
 
     // Coleta dados do mês vigente
@@ -2560,7 +2604,12 @@ function buildRecordData(){
 function recCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valColors=['#FFD700','#C8D8F0','#D09050'];
+  const valColors=['#FFE066','#C8D8F0','#F0C080'];
+  const valShadows=[
+    'drop-shadow(0 2px 12px rgba(255,185,0,.65))',
+    'drop-shadow(0 2px 10px rgba(180,205,245,.5))',
+    'drop-shadow(0 2px 10px rgba(200,140,60,.5))'
+  ];
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -2575,7 +2624,7 @@ function recCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
+      <div class="rec-val-num" style="color:${valColors[pos]};filter:${valShadows[pos]}">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'gol':'gols'}</div>
     </div>
   </div>`;
@@ -2584,7 +2633,12 @@ function recCardHTML(p,pos){
 function recAssistCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valColors=['#FFD700','#C8D8F0','#D09050'];
+  const valColors=['#FFE066','#C8D8F0','#F0C080'];
+  const valShadows=[
+    'drop-shadow(0 2px 12px rgba(255,185,0,.65))',
+    'drop-shadow(0 2px 10px rgba(180,205,245,.5))',
+    'drop-shadow(0 2px 10px rgba(200,140,60,.5))'
+  ];
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -2599,7 +2653,7 @@ function recAssistCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
+      <div class="rec-val-num" style="color:${valColors[pos]};filter:${valShadows[pos]}">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'assist.':'assists.'}</div>
     </div>
   </div>`;
