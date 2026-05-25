@@ -666,7 +666,8 @@ body.light .mes-vigente-titulo{
 /* ── RANKING ── */
 .rank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
 .rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem;align-items:stretch;}
-.crown-1st{position:absolute;top:-14px;right:6px;width:32px;height:32px;transform:rotate(15deg);filter:drop-shadow(0 2px 6px rgba(180,120,0,.5));pointer-events:none;z-index:10;object-fit:contain}
+.crown-1st{position:absolute;top:-14px;right:6px;font-size:22px;transform:rotate(15deg);filter:drop-shadow(0 2px 6px rgba(180,120,0,.6));pointer-events:none;z-index:10;line-height:1}
+.crown-1st-sm{position:absolute;top:-10px;right:4px;font-size:14px;transform:rotate(15deg);filter:drop-shadow(0 1px 4px rgba(180,120,0,.6));pointer-events:none;z-index:10;line-height:1}
 .podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center}
 .podium-item.p1{background:linear-gradient(160deg,rgba(255,209,102,.32) 0%,rgba(255,185,50,.14) 50%,rgba(255,209,102,.06) 100%);border-color:rgba(255,209,102,.75);box-shadow:0 0 50px rgba(255,209,102,.35),0 0 20px rgba(255,185,50,.2),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,230,120,.25)}
 .podium-item.p2{background:linear-gradient(160deg,rgba(220,230,255,.28) 0%,rgba(180,195,230,.12) 50%,var(--bg2) 100%);border-color:rgba(200,215,255,.65);box-shadow:0 0 36px rgba(200,215,255,.22),0 0 14px rgba(180,200,240,.15),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(220,235,255,.2)}
@@ -1446,7 +1447,8 @@ const googleProvider = new GoogleAuthProvider();
 
 let currentUser=null,myProfile=null,gd=null,groupId=null,rankStat='ga',editIdx=null,_editingMesKey=null,unsubGroup=null;
 const $=id=>document.getElementById(id);
-const CROWN_SVG=`<img class="crown-1st" src="crown.png" alt="coroa">`;
+const CROWN_SVG=`<span class="crown-1st">👑</span>`;
+const CROWN_SVG_SM=`<span class="crown-1st-sm">👑</span>`;
 
 // ── TEMA ──
 window.toggleTheme=()=>{
@@ -2090,7 +2092,7 @@ function renderRanking(){
       const pizzaId='penPizza_'+i+'_'+p.uid.replace(/[^a-z0-9]/gi,'_');
       const errados=p.penBat-p.penOk;
       return`<div class="ri-pen-card${isMe?' ri-me':''}" style="position:relative;${i<3?`background:${penPodiumBg};border-color:${penPodiumBorder};`:''}">
-        ${i===0?CROWN_SVG:''}
+        ${i===0?CROWN_SVG_SM:''}
         <div class="pen-card-header">
           <div class="pen-card-rank">${i<3?['🥇','🥈','🥉'][i]:(i+1)}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,46,p.uid)}</div>
@@ -2157,7 +2159,7 @@ function renderRanking(){
     podiumHTML=`<div class="rank-podium">${podiumOrder.map((pi,vi)=>{const p=top3[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;return`<div class="podium-item ${podiumCls[vi]}">${podiumCls[vi]==='p1'?CROWN_SVG:''}<div class="podium-crown">${podiumCrown[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,podiumSizes[vi],p.uid)}</div><div class="podium-name">${p.name}</div>${isMe?'<div class="podium-you">você</div>':''}<div class="podium-val">${p.val}</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
-  $('rl').innerHTML=`${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,rgba(255,209,102,.28) 0%,rgba(255,185,50,.1) 100%)':pos===2?'linear-gradient(135deg,rgba(210,225,255,.22) 0%,var(--bg2) 100%)':pos===3?'linear-gradient(135deg,rgba(215,155,90,.22) 0%,var(--bg2) 100%)':'';const podiumBorder=pos===1?'rgba(255,209,102,.7)':pos===2?'rgba(195,215,255,.6)':pos===3?'rgba(205,150,80,.6)':'var(--bo)';const podiumShadow=pos===1?'0 0 28px rgba(255,185,0,.25),var(--glow-card)':pos===2?'0 0 18px rgba(190,215,255,.18),var(--glow-card)':pos===3?'0 0 18px rgba(200,140,60,.18),var(--glow-card)':'var(--glow-card)';const valColor=pos===1?'#FFD700':pos===2?'#C8D8F0':pos===3?'#D09050':'var(--tx)';return`<div class="ri${isMe?' ri-me':''}" style="position:relative;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${isMe?'<span class="you">você</span>':''}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">${p.val}</div><div class="ri-val-lbl">G+A</div></div>${pos===1?CROWN_SVG:''}</div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,rgba(255,209,102,.28) 0%,rgba(255,185,50,.1) 100%)':pos===2?'linear-gradient(135deg,rgba(210,225,255,.22) 0%,var(--bg2) 100%)':pos===3?'linear-gradient(135deg,rgba(215,155,90,.22) 0%,var(--bg2) 100%)':'';const podiumBorder=pos===1?'rgba(255,209,102,.7)':pos===2?'rgba(195,215,255,.6)':pos===3?'rgba(205,150,80,.6)':'var(--bo)';const podiumShadow=pos===1?'0 0 28px rgba(255,185,0,.25),var(--glow-card)':pos===2?'0 0 18px rgba(190,215,255,.18),var(--glow-card)':pos===3?'0 0 18px rgba(200,140,60,.18),var(--glow-card)':'var(--glow-card)';const valColor=pos===1?'#FFD700':pos===2?'#C8D8F0':pos===3?'#D09050':'var(--tx)';return`<div class="ri${isMe?' ri-me':''}" style="position:relative;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${isMe?'<span class="you">você</span>':''}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">${p.val}</div><div class="ri-val-lbl">G+A</div></div>${pos===1?CROWN_SVG_SM:''}</div>`;}).join('')}</div>`;
 }
 window.setRank=(s,el)=>{
   const rl=$('rl');
@@ -2468,7 +2470,7 @@ function _buildPlayerProfile(uid){
     ?`<div style="text-align:center;padding:1.5rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace">Nenhum dado em ${isAll?'nenhum mês':_mpAnoAtivo}.</div>`
     :mesesDoAno.map(m=>`
     <div class="mp-mes-card ${posClass(m.pos)}" style="position:relative;overflow:hidden">
-      ${m.pos===1?CROWN_SVG:''}
+      ${m.pos===1?CROWN_SVG_SM:''}
       ${m.current?`<div style="display:inline-block;background:var(--g);color:#0a0a0a;font-size:9px;font-family:'DM Mono',monospace;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.08em;margin-bottom:6px">ATUAL</div>`:''}
       <div class="mp-mes-label">
         <span style="font-weight:600;font-size:13px">${m.label}</span>
