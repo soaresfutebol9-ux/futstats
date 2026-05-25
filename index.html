@@ -1526,6 +1526,8 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
 <div class="ov" id="pvermes">
   <div class="pan" style="position:relative">
     <button onclick="closeP('pvermes')" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='#FF5A7A';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,90,122,.15)';this.style.color='#FF5A7A'">×</button>
+    <!-- Botão compartilhar histórico do mês -->
+    <button id="pvermes-share-btn" onclick="shareMonthRanking()" title="Compartilhar ranking do mês" style="position:absolute;top:12px;right:52px;width:30px;height:30px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;z-index:2;padding:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="18" height="18" style="display:block"></button>
     <div id="pvermes-content"></div>
     <button class="bg2btn" onclick="closeP('pvermes')" style="margin-top:10px">Fechar</button>
   </div>
@@ -2397,6 +2399,8 @@ window.setHistAno=ano=>{
 // Mostra ranking do mês vigente no modal
 window.verMesVigente=()=>{
   if(!gd)return;
+  window._pvermes_key=gd.mesAtivo||getMesKey();
+  window._pvermes_isVigente=true;
   const mbs=(gd.members||[]).map(m=>{
     const ms=(gd.matches||[]).filter(x=>x.player===m.name||(m.uid&&x.uid===m.uid));
     return{...m,ms,gols:ms.reduce((s,x)=>s+(x.gols||0),0),assist:ms.reduce((s,x)=>s+(x.assist||0),0),penBat:ms.reduce((s,x)=>s+(x.penBat||0),0),penOk:ms.reduce((s,x)=>s+(x.penOk||0),0)};
@@ -2408,6 +2412,8 @@ window.verMesVigente=()=>{
 
 window.verMesHist=key=>{
   const d=(gd.historico||{})[key];if(!d)return;
+  window._pvermes_key=key;
+  window._pvermes_isVigente=false;
   const mbs=(d.members||[]).map(m=>{const ms=(d.matches||[]).filter(x=>x.player===m.name||(m.uid&&x.uid===m.uid));return{...m,ms,gols:ms.reduce((s,x)=>s+(x.gols||0),0),assist:ms.reduce((s,x)=>s+(x.assist||0),0),penBat:ms.reduce((s,x)=>s+(x.penBat||0),0),penOk:ms.reduce((s,x)=>s+(x.penOk||0),0)};}).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
   const crown=['🥇','🥈','🥉'];
   $('pvermes-content').innerHTML=`<div class="pt">${getMesLabel(key)}</div>${mbs.map((m,i)=>`<div class="pc" style="margin-bottom:.7rem"><div class="ph" style="margin-bottom:.6rem;gap:16px;align-items:center"><div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--tx3);min-width:44px;text-align:center;flex-shrink:0">${i<3?crown[i]:(i+1)}</div>${avatarHTML(m.name,38,m.uid)}<div style="flex:1;min-width:0"><div style="font-family:'Freshman',sans-serif;font-size:13px;font-weight:normal;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}${m.uid===currentUser?.uid?'<span class="you">você</span>':''}</div><div style="font-size:12px;color:var(--tx2);font-family:'ClassyVogue',sans-serif">${m.ms.length}j · ${m.gols}G ${m.assist}A${m.penBat>0?' · '+m.penOk+'/'+m.penBat+' ('+Math.round(m.penOk/m.penBat*100)+'%)':''}</div></div><div style="font-family:'ClassyVogue',sans-serif;font-size:22px;font-weight:normal;color:${i===0?'#F2C94C':i===1?'#bdbdbd':i===2?'#a0785a':'var(--tx2)'};flex-shrink:0">${m.gols+m.assist}<span style="font-size:12px;color:var(--tx3);font-family:'ClassyVogue',sans-serif"> G+A</span></div></div></div>`).join('')}`;
@@ -2549,6 +2555,56 @@ function _buildPlayerProfile(uid){
   const cardPK=isAll?totalPK:anoPK_total;
   const cardLabel=isAll?'Todos os tempos':`Temporada ${_mpAnoAtivo}`;
 
+  // ── CARD DE MEDALHAS ──────────────────────────────
+  // Conta posição do jogador em TODOS os meses históricos (exceto mês atual)
+  const mesesDispHistorico=allMonths.filter(m=>!m.current); // apenas histórico fechado
+  const totalMesesDisputados=mesesDispHistorico.length;
+  const ouros=mesesDispHistorico.filter(m=>m.pos===1).length;
+  const pratas=mesesDispHistorico.filter(m=>m.pos===2).length;
+  const bronzes=mesesDispHistorico.filter(m=>m.pos===3).length;
+  const outros=mesesDispHistorico.filter(m=>m.pos>3).length;
+
+  const medalhasCard=totalMesesDisputados>0?`
+  <div style="background:linear-gradient(135deg,rgba(255,209,102,.12),rgba(255,185,0,.05));border:1.5px solid rgba(255,209,102,.3);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 0 24px rgba(255,185,0,.08)">
+    <div style="font-size:10px;color:#FFD166;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+      <span>🏅 Pódio Histórico</span>
+      <span style="color:var(--tx3)">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(255,185,0,.06));border:1px solid rgba(255,215,0,.35);border-radius:12px;padding:14px 8px;text-align:center">
+        <div style="font-size:26px;line-height:1;margin-bottom:6px">🥇</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#FFD700;line-height:1">${ouros}</div>
+        <div style="font-size:10px;color:rgba(255,215,0,.7);font-family:'DM Mono',monospace;margin-top:4px">Ouro</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(ouros/totalMesesDisputados*100):0}%</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(170,170,170,.04));border:1px solid rgba(192,192,192,.3);border-radius:12px;padding:14px 8px;text-align:center">
+        <div style="font-size:26px;line-height:1;margin-bottom:6px">🥈</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#bdbdbd;line-height:1">${pratas}</div>
+        <div style="font-size:10px;color:rgba(192,192,192,.7);font-family:'DM Mono',monospace;margin-top:4px">Prata</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(pratas/totalMesesDisputados*100):0}%</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(205,127,50,.18),rgba(180,100,30,.06));border:1px solid rgba(205,127,50,.3);border-radius:12px;padding:14px 8px;text-align:center">
+        <div style="font-size:26px;line-height:1;margin-bottom:6px">🥉</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#a0785a;line-height:1">${bronzes}</div>
+        <div style="font-size:10px;color:rgba(205,127,50,.7);font-family:'DM Mono',monospace;margin-top:4px">Bronze</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(bronzes/totalMesesDisputados*100):0}%</div>
+      </div>
+    </div>
+    <!-- Barra de aproveitamento -->
+    <div style="background:var(--bg3);border-radius:99px;height:6px;overflow:hidden;margin-top:2px;display:flex;gap:1px">
+      ${ouros>0?`<div style="flex:${ouros};background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:99px 0 0 99px;transition:flex .5s ease"></div>`:''}
+      ${pratas>0?`<div style="flex:${pratas};background:linear-gradient(90deg,#bdbdbd,#a0a0a0)"></div>`:''}
+      ${bronzes>0?`<div style="flex:${bronzes};background:linear-gradient(90deg,#cd7f32,#a05a20)"></div>`:''}
+      ${outros>0?`<div style="flex:${outros};background:var(--bg4);border-radius:0 99px 99px 0"></div>`:''}
+    </div>
+    <div style="display:flex;justify-content:center;gap:4px;margin-top:8px;flex-wrap:wrap">
+      ${ouros>0?`<span style="font-size:9px;color:#FFD700;font-family:'DM Mono',monospace;background:rgba(255,215,0,.1);border-radius:6px;padding:2px 8px">${ouros}🥇</span>`:''}
+      ${pratas>0?`<span style="font-size:9px;color:#bdbdbd;font-family:'DM Mono',monospace;background:rgba(192,192,192,.1);border-radius:6px;padding:2px 8px">${pratas}🥈</span>`:''}
+      ${bronzes>0?`<span style="font-size:9px;color:#a0785a;font-family:'DM Mono',monospace;background:rgba(205,127,50,.1);border-radius:6px;padding:2px 8px">${bronzes}🥉</span>`:''}
+      ${outros>0?`<span style="font-size:9px;color:var(--tx3);font-family:'DM Mono',monospace;background:var(--bg3);border-radius:6px;padding:2px 8px">${outros} outros</span>`:''}
+    </div>
+  </div>`:'';
+
   // Card totais
   const totalCard=`
   ${anoSelTotal}
@@ -2620,7 +2676,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :totalCard+anoSel+anoResCard+sepLabel+monthCards;
+    :medalhasCard+totalCard+anoSel+anoResCard+sepLabel+monthCards;
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -2636,6 +2692,7 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   }
 
   _mpUid=uid;
+  window._mpUid=uid;
   _mpAnoAtivo=null;
   const avEl=document.getElementById('mp-avatar');
   if(avEl)avEl.innerHTML=avatarHTML(mb.name,48,uid);
@@ -3301,7 +3358,10 @@ window.irParaRankingGA=()=>{
           <div id="mp-sub" style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px"></div>
         </div>
       </div>
-      <div class="mp-close" onclick="closePlayerProfile()">×</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="sharePlayerProfile()" title="Compartilhar perfil" style="width:32px;height:32px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="18" height="18" style="display:block"></button>
+        <div class="mp-close" onclick="closePlayerProfile()">×</div>
+      </div>
     </div>
     <div class="mp-body" id="mp-body"></div>
   </div>
@@ -4192,11 +4252,11 @@ window.irParaRankingGA=()=>{
     return canvas;
   }
 
-  // Gera blob redesenhando o card em canvas HD (2.25x) separado
+  // Gera blob redesenhando o card em canvas HD (3x) separado
   async function _getShareBlob() {
     if (!_lastCardData) return null;
 
-    const SCALE = 2.25;
+    const SCALE = 3;
     const hdCanvas = document.createElement('canvas');
     hdCanvas.width  = Math.round(CARD_W * SCALE);
     hdCanvas.height = Math.round(CARD_H * SCALE);
@@ -4206,6 +4266,10 @@ window.irParaRankingGA=()=>{
 
     if (_lastCardType === 'ranking') {
       await drawRankingCard(hdCanvas, _lastCardData);
+    } else if (_lastCardType === 'monthranking') {
+      await drawRankingCard(hdCanvas, _lastCardData);
+    } else if (_lastCardType === 'player') {
+      await drawPlayerCard(hdCanvas, _lastCardData);
     } else {
       await drawDueloCard(hdCanvas, _lastCardData);
     }
@@ -4282,8 +4346,238 @@ window.irParaRankingGA=()=>{
     await drawDueloCard(canvas, data);
   };
 
-})();
+  // ── CARD: RANKING DE MÊS HISTÓRICO ─────────────────────────
+  function buildMonthRankingData(key, isVigente) {
+    if (!window._gd) return null;
+    let mbs, mesLabel;
+    if (isVigente) {
+      const gdd = window._gd;
+      mbs = (gdd.members || []).map(m => {
+        const ms = (gdd.matches || []).filter(x => x.player === m.name || (m.uid && x.uid === m.uid));
+        return { ...m, gols: ms.reduce((s,x)=>s+(x.gols||0),0), assist: ms.reduce((s,x)=>s+(x.assist||0),0) };
+      }).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
+      mesLabel = (typeof getMesLabel === 'function' ? getMesLabel(gdd.mesAtivo || (typeof getMesKey==='function'?getMesKey():'')) : gdd.mesAtivo||'') + ' (atual)';
+    } else {
+      const h = (window._gd.historico || {})[key];
+      if (!h) return null;
+      mbs = (h.members || []).map(m => {
+        const ms = (h.matches || []).filter(x => x.player === m.name || (m.uid && x.uid === m.uid));
+        return { ...m, gols: ms.reduce((s,x)=>s+(x.gols||0),0), assist: ms.reduce((s,x)=>s+(x.assist||0),0) };
+      }).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
+      mesLabel = typeof getMesLabel === 'function' ? getMesLabel(key) : key;
+    }
+    return {
+      tipo: 'ga',
+      subtitulo: mesLabel,
+      players: mbs.slice(0, 5).map(m => ({ name: m.name, uid: m.uid, photo: m.photo, gols: m.gols, assist: m.assist, ga: m.gols + m.assist })),
+    };
+  }
 
+  // ── CARD: PERFIL INDIVIDUAL ───────────────────────────────────
+  function buildPlayerProfileData(uid) {
+    if (!window._gd || !uid) return null;
+    const mb = (window._gd.members || []).find(m => m.uid === uid);
+    if (!mb) return null;
+    const hist = window._gd.historico || {};
+    const allMonths = [];
+    Object.keys(hist).sort().forEach(k => {
+      const h = hist[k];
+      const ms = (h.matches || []).filter(x => mb.uid ? x.uid === mb.uid : x.player === mb.name);
+      const g = ms.reduce((s,x)=>s+(x.gols||0),0);
+      const a = ms.reduce((s,x)=>s+(x.assist||0),0);
+      const mbsH = h.members || [];
+      const ranked = [...mbsH].map(mm => {
+        const mms = (h.matches||[]).filter(x=>mm.uid?x.uid===mm.uid:x.player===mm.name);
+        return { uid: mm.uid, ga: mms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0) };
+      }).sort((x,y)=>y.ga-x.ga);
+      const pos = ranked.findIndex(r=>r.uid===uid)+1||ranked.length+1;
+      allMonths.push({ key: k, g, a, pos });
+    });
+    // Mês atual
+    {
+      const ms = (window._gd.matches || []).filter(x => mb.uid ? x.uid === mb.uid : x.player === mb.name);
+      const g = ms.reduce((s,x)=>s+(x.gols||0),0);
+      const a = ms.reduce((s,x)=>s+(x.assist||0),0);
+      allMonths.push({ key: 'atual', g, a, pos: 99, current: true });
+    }
+    const totalG = allMonths.reduce((s,m)=>s+m.g,0);
+    const totalA = allMonths.reduce((s,m)=>s+m.a,0);
+    const mesesHist = allMonths.filter(m=>!m.current);
+    const ouros = mesesHist.filter(m=>m.pos===1).length;
+    const pratas = mesesHist.filter(m=>m.pos===2).length;
+    const bronzes = mesesHist.filter(m=>m.pos===3).length;
+    return { tipo: 'player', name: mb.name, uid, photo: mb.photo, totalG, totalA, ouros, pratas, bronzes, totalMeses: mesesHist.length };
+  }
+
+  async function drawPlayerCard(canvas, data) {
+    const W = CARD_W, H = CARD_H;
+    const ctx = canvas._sharedCtx || canvas.getContext('2d');
+    const members = (window._gd && window._gd.members) || [];
+    await preloadPhotos(members);
+    drawCardBg(ctx, W, H);
+
+    // Logo
+    ctx.fillStyle = ACCENT;
+    ctx.font = "bold 12px 'DM Mono', monospace";
+    ctx.textAlign = 'left';
+    ctx.fillText('FUTSTATS ⚽', 28, 34);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = "11px 'DM Mono', monospace";
+    ctx.fillText((window._gd ? window._gd.name : '').toUpperCase(), 28, 52);
+
+    // Avatar grande
+    const photo = data.photo || null;
+    drawAvatar(ctx, W/2, 118, 48, data.name, photo);
+
+    // Anel verde
+    ctx.save();
+    const ringGrad = ctx.createLinearGradient(W/2-51, 67, W/2+51, 169);
+    ringGrad.addColorStop(0, 'rgba(77,255,176,0.7)');
+    ringGrad.addColorStop(1, 'rgba(77,255,176,0.2)');
+    ctx.beginPath();
+    ctx.arc(W/2, 118, 51, 0, Math.PI*2);
+    ctx.strokeStyle = ringGrad;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Nome
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "bold 22px 'Freshman', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText(data.name, W/2, 194);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = "10px 'DM Mono', monospace";
+    ctx.fillText('PERFIL DO JOGADOR', W/2, 212);
+
+    // Linha
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(28, 226);
+    ctx.lineTo(W-28, 226);
+    ctx.stroke();
+
+    // Stats G / A / G+A
+    const statY = 282;
+    const cols = [
+      { label:'GOLS', val: String(data.totalG), color:'#4dffb0' },
+      { label:'ASSIST.', val: String(data.totalA), color:'#60a5fa' },
+      { label:'G+A', val: String(data.totalG+data.totalA), color:'#FFD166' },
+    ];
+    const colW = (W-56)/3;
+    cols.forEach((s, i) => {
+      const x = 28 + colW/2 + i*colW;
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      roundRect(ctx, 30+i*colW, statY-36, colW-4, 62, 10);
+      ctx.fill();
+      shadowText(ctx, s.val, x, statY+2, s.color, "bold 30px 'ClassyVogue', sans-serif");
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.font = "9px 'DM Mono', monospace";
+      ctx.textAlign = 'center';
+      ctx.fillText(s.label, x, statY+18);
+    });
+
+    // Linha 2
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(28, statY+38);
+    ctx.lineTo(W-28, statY+38);
+    ctx.stroke();
+
+    // Seção medalhas
+    const medalSecY = statY+54;
+    ctx.fillStyle = 'rgba(255,209,102,0.08)';
+    roundRect(ctx, 28, medalSecY, W-56, 148, 12);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,209,102,0.18)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,209,102,0.65)';
+    ctx.font = "9px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText('🏅 PÓDIO HISTÓRICO', W/2, medalSecY+16);
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.font = "9px 'DM Mono', monospace";
+    ctx.fillText(`${data.totalMeses} MÊS${data.totalMeses!==1?'ES':''} DISPUTADO${data.totalMeses!==1?'S':''}`, W/2, medalSecY+30);
+
+    const medals = [
+      { emoji:'🥇', val: data.ouros,  color: '#FFD700', label:'OURO' },
+      { emoji:'🥈', val: data.pratas, color: '#bdbdbd', label:'PRATA' },
+      { emoji:'🥉', val: data.bronzes,color: '#cd7f32', label:'BRONZE' },
+    ];
+    medals.forEach((m, i) => {
+      const mx = W/6 + i*(W/3);
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.emoji, mx, medalSecY+56);
+      shadowText(ctx, String(m.val), mx, medalSecY+90, m.color, "bold 26px 'ClassyVogue', sans-serif");
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.font = "9px 'DM Mono', monospace";
+      ctx.fillText(m.label, mx, medalSecY+106);
+      const pct = data.totalMeses>0?Math.round(m.val/data.totalMeses*100):0;
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.font = "9px 'DM Mono', monospace";
+      ctx.fillText(pct+'%', mx, medalSecY+120);
+    });
+
+    // Barra de medalhas
+    const barY = medalSecY+134;
+    const barW = W-72;
+    const total = data.totalMeses;
+    if (total > 0) {
+      ctx.save();
+      roundRect(ctx, 36, barY, barW, 6, 3);
+      ctx.clip();
+      let bx = 36;
+      const segs = [
+        { v: data.ouros,  c: '#FFD700' },
+        { v: data.pratas, c: '#bdbdbd' },
+        { v: data.bronzes,c: '#cd7f32' },
+        { v: Math.max(0,total-data.ouros-data.pratas-data.bronzes), c: 'rgba(255,255,255,0.07)' },
+      ];
+      segs.forEach(seg => {
+        if (seg.v <= 0) return;
+        ctx.fillStyle = seg.c;
+        ctx.fillRect(bx, barY, seg.v/total*barW, 6);
+        bx += seg.v/total*barW;
+      });
+      ctx.restore();
+    }
+
+    drawFooter(ctx, W, H);
+  }
+
+  // ── COMPARTILHAR RANKING DO MÊS ──────────────────────────────
+  window.shareMonthRanking = async function () {
+    const key = window._pvermes_key;
+    const isVigente = window._pvermes_isVigente;
+    const data = buildMonthRankingData(key, isVigente);
+    if (!data || !data.players.length) { alert('Nenhum dado disponível.'); return; }
+    _lastCardData = data;
+    _lastCardType = 'monthranking';
+    const canvas = openShareModal();
+    await drawMonthRankingCard(canvas, data);
+  };
+
+  // ── COMPARTILHAR PERFIL DO JOGADOR ───────────────────────────
+  window.sharePlayerProfile = async function () {
+    const uid = window._mpUid;
+    if (!uid) { alert('Abra o perfil de um jogador primeiro.'); return; }
+    const data = buildPlayerProfileData(uid);
+    if (!data) { alert('Sem dados para compartilhar.'); return; }
+    _lastCardData = data;
+    _lastCardType = 'player';
+    const canvas = openShareModal();
+    await drawPlayerCard(canvas, data);
+  };
+
+  // ── FIM COMPARTILHAMENTO ────────────────────────────────────
+
+})();
 </script>
 </body>
 </html>
