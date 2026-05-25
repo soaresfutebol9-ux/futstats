@@ -898,69 +898,51 @@ body.light .mp-stat-box{background:rgba(0,0,0,.05)}
 .ri-av-click{cursor:pointer;transition:transform .15s}
 .ri-av-click:hover{transform:scale(1.1)}
 /* ── Welcome card ── */
-#welcome-card{
+#wc-overlay{
   position:fixed;inset:0;z-index:9999;
   display:flex;align-items:center;justify-content:center;
-  padding:24px;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  padding:32px 24px;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   opacity:0;pointer-events:none;
-  transition:opacity .4s cubic-bezier(.4,0,.2,1);
+  transition:opacity .4s ease;
 }
-#welcome-card.show{opacity:1;pointer-events:all;}
-#welcome-card .wc-inner{
-  position:relative;
-  width:100%;max-width:360px;
+#wc-overlay.wc-show{opacity:1;pointer-events:all;}
+#wc-box{
+  width:100%;max-width:340px;
   background:var(--bg2);
-  border:1px solid var(--bo);
-  border-radius:24px;
-  padding:36px 28px 28px;
+  border:1px solid var(--bo2);
+  border-radius:20px;
+  padding:32px 24px 24px;
   text-align:center;
-  box-shadow:0 0 60px rgba(77,255,176,.18),0 24px 60px rgba(0,0,0,.45);
-  transform:translateY(32px) scale(.96);
-  transition:transform .45s cubic-bezier(.34,1.56,.64,1);
-  overflow:hidden;
+  box-shadow:0 8px 48px rgba(0,0,0,.5);
+  transform:translateY(20px);
+  transition:transform .4s cubic-bezier(.34,1.46,.64,1);
 }
-#welcome-card.show .wc-inner{transform:translateY(0) scale(1);}
-.wc-glow{
-  position:absolute;top:-60px;left:50%;transform:translateX(-50%);
-  width:220px;height:220px;
-  background:radial-gradient(circle,rgba(77,255,176,.22) 0%,transparent 70%);
-  pointer-events:none;
+#wc-overlay.wc-show #wc-box{transform:translateY(0);}
+#wc-title{
+  font-family:'DM Mono',monospace;
+  font-size:12px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tx2);margin-bottom:10px;
 }
-.wc-emoji{font-size:48px;line-height:1;margin-bottom:16px;display:block;}
-.wc-label{
-  font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--g);margin-bottom:8px;
+#wc-name{
+  font-family:'Syne',sans-serif;
+  font-size:24px;font-weight:800;
+  color:var(--g);letter-spacing:-.2px;
+  margin-bottom:28px;line-height:1.2;
 }
-.wc-title{
-  font-family:'Freshman',sans-serif;font-size:22px;font-weight:normal;
-  letter-spacing:.6px;color:var(--tx);line-height:1.2;margin-bottom:6px;
-}
-.wc-name{
-  font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
-  color:var(--g);letter-spacing:-.3px;margin-bottom:20px;
-}
-.wc-divider{
-  width:48px;height:2px;border-radius:2px;
-  background:var(--g);opacity:.3;margin:0 auto 20px;
-}
-.wc-group{
-  font-size:12px;font-family:'DM Mono',monospace;color:var(--tx3);
-  margin-bottom:28px;letter-spacing:.05em;
-}
-.wc-btn{
-  display:block;width:100%;padding:14px;
+#wc-btn{
+  display:block;width:100%;
+  padding:13px;border:none;border-radius:12px;
   background:var(--g);color:#0a0a0a;
-  font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
-  letter-spacing:.04em;border:none;border-radius:14px;cursor:pointer;
-  transition:transform .15s,box-shadow .15s;
-  box-shadow:0 4px 20px rgba(77,255,176,.35);
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:opacity .15s;
 }
-.wc-btn:active{transform:scale(.97);}
-.wc-timer{
-  margin-top:12px;font-size:11px;font-family:'DM Mono',monospace;
+#wc-btn:active{opacity:.8;}
+#wc-countdown{
+  margin-top:10px;
+  font-family:'DM Mono',monospace;font-size:11px;
   color:var(--tx3);letter-spacing:.06em;
 }
 </style>
@@ -1827,36 +1809,8 @@ function enterApp(){
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();
-  showWelcomeCard();
+  wcShow();
 }
-
-let _wcTimer=null;
-function showWelcomeCard(){
-  const card=$('welcome-card');
-  $('wc-player-name').textContent=myProfile.displayName||'Jogador';
-  $('wc-group-name').textContent='⚡ '+( gd.name||'Seu grupo');
-  card.classList.add('show');
-  let secs=3;
-  const timerEl=$('wc-timer');
-  timerEl.textContent='fecha em '+secs+'s';
-  _wcTimer=setInterval(()=>{
-    secs--;
-    timerEl.textContent='fecha em '+secs+'s';
-    if(secs<=0){clearInterval(_wcTimer);_wcTimer=null;_dismissWelcome();}
-  },1000);
-}
-function _dismissWelcome(){
-  const card=$('welcome-card');
-  card.style.transition='opacity .35s cubic-bezier(.4,0,.2,1)';
-  card.classList.remove('show');
-  // garante aba ranking
-  const tabRank=document.querySelector('.tab[data-id="tr"]');
-  if(tabRank)tabRank.click();
-}
-window.closeWelcomeCard=function(){
-  if(_wcTimer){clearInterval(_wcTimer);_wcTimer=null;}
-  _dismissWelcome();
-};
 window.leaveGroup=async()=>{
   if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
   await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterLobby();
@@ -2932,19 +2886,44 @@ window.irParaRankingGA=()=>{
     </div>
   </div>
 </div>
-<!-- ── Welcome card ── -->
-<div id="welcome-card">
-  <div class="wc-inner">
-    <div class="wc-glow"></div>
-    <span class="wc-emoji">⚽</span>
-    <div class="wc-label">bem-vindo de volta</div>
-    <div class="wc-title">Olá,</div>
-    <div class="wc-name" id="wc-player-name"></div>
-    <div class="wc-divider"></div>
-    <div class="wc-group" id="wc-group-name"></div>
-    <button class="wc-btn" onclick="closeWelcomeCard()">Ir para tela principal</button>
-    <div class="wc-timer" id="wc-timer">fecha em 3s</div>
+
+<!-- Welcome card -->
+<div id="wc-overlay">
+  <div id="wc-box">
+    <div id="wc-title">bem-vindo de volta,</div>
+    <div id="wc-name"></div>
+    <button id="wc-btn" onclick="wcClose()">Ir para a tela principal</button>
+    <div id="wc-countdown"></div>
   </div>
 </div>
+
+<script>
+(function(){
+  let _wcT=null;
+  window.wcShow=function(){
+    const name=(myProfile&&myProfile.displayName)||'Jogador';
+    document.getElementById('wc-name').textContent=name+'!';
+    const overlay=document.getElementById('wc-overlay');
+    overlay.classList.add('wc-show');
+    let s=5;
+    document.getElementById('wc-countdown').textContent='some em '+s+'s';
+    _wcT=setInterval(function(){
+      s--;
+      document.getElementById('wc-countdown').textContent='some em '+s+'s';
+      if(s<=0){clearInterval(_wcT);_wcT=null;wcDismiss();}
+    },1000);
+  };
+  window.wcClose=function(){
+    if(_wcT){clearInterval(_wcT);_wcT=null;}
+    wcDismiss();
+  };
+  function wcDismiss(){
+    const overlay=document.getElementById('wc-overlay');
+    overlay.classList.remove('wc-show');
+    const tabRank=document.querySelector('.tab[data-id="tr"]');
+    if(tabRank)tabRank.click();
+  }
+})();
+</script>
 </body>
 </html>
