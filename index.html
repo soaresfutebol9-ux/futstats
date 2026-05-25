@@ -718,9 +718,9 @@ body.light .mes-vigente-titulo{
 .rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem;align-items:stretch;}
 
 .podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center}
-.podium-item.p1{background:linear-gradient(160deg,rgba(255,209,102,.13) 0%,rgba(255,185,50,.05) 55%,transparent 100%);border-color:rgba(255,209,102,.5);box-shadow:0 0 40px rgba(255,209,102,.18),0 0 12px rgba(255,185,50,.1),0 4px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,230,120,.12)}
-.podium-item.p2{background:linear-gradient(160deg,rgba(210,225,255,.1) 0%,rgba(180,195,230,.04) 55%,transparent 100%);border-color:rgba(200,215,255,.35);box-shadow:0 0 28px rgba(200,215,255,.12),0 0 10px rgba(180,200,240,.07),0 4px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(220,235,255,.08)}
-.podium-item.p3{background:linear-gradient(160deg,rgba(215,150,90,.12) 0%,rgba(190,125,65,.04) 55%,transparent 100%);border-color:rgba(210,150,85,.4);box-shadow:0 0 28px rgba(200,140,80,.13),0 0 10px rgba(180,120,60,.07),0 4px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(225,170,100,.09)}
+.podium-item.p1{background:linear-gradient(160deg,rgba(255,209,102,.32) 0%,rgba(255,185,50,.14) 50%,rgba(255,209,102,.06) 100%);border-color:rgba(255,209,102,.75);box-shadow:0 0 50px rgba(255,209,102,.35),0 0 20px rgba(255,185,50,.2),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,230,120,.25)}
+.podium-item.p2{background:linear-gradient(160deg,rgba(220,230,255,.28) 0%,rgba(180,195,230,.12) 50%,var(--bg2) 100%);border-color:rgba(200,215,255,.65);box-shadow:0 0 36px rgba(200,215,255,.22),0 0 14px rgba(180,200,240,.15),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(220,235,255,.2)}
+.podium-item.p3{background:linear-gradient(160deg,rgba(220,160,100,.28) 0%,rgba(195,130,75,.12) 50%,var(--bg2) 100%);border-color:rgba(210,155,90,.65);box-shadow:0 0 36px rgba(200,140,80,.22),0 0 14px rgba(180,120,60,.15),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(225,170,100,.2)}
 .podium-crown{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .podium-av .av{border:2px solid transparent;cursor:pointer;transition:transform .15s}.podium-av .av:hover{transform:scale(1.1)}
 .p1 .podium-av .av{border-color:rgba(255,255,200,.7);box-shadow:0 0 12px rgba(0,0,0,.4)}
@@ -771,7 +771,7 @@ body.light .mes-vigente-titulo{
 .pc .ph div div:first-child{font-family:'Manrope',sans-serif}
 
 .tr-filter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.1rem}
-.ft{padding:10px 20px;border-radius:99px;font-size:14px;cursor:pointer;border:1px solid var(--bo2);background:var(--bg3);color:var(--tx2);transition:all .18s;font-family:'DM Sans',sans-serif;font-weight:700}
+.ft{padding:10px 20px;border-radius:99px;font-size:14px;cursor:pointer;border:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,#2a2a2a 0%,#ffffff 100%);color:#1a1a1a;transition:all .18s;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .ft.active{background:var(--grad-green);color:#07090d;border-color:transparent;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
 .rank-geral-btn{border-color:var(--bo2);color:var(--tx2)}
 .rank-geral-btn.active{background:var(--grad-green);border-color:transparent;color:#07090d;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
@@ -786,27 +786,27 @@ body.light .mes-vigente-titulo{
 .rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;transition:all .18s}
 .rec-card::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none}
 .rec-card-gold{
-  border-color:rgba(255,209,102,.55)!important;
-  background:linear-gradient(160deg,rgba(255,209,102,.13) 0%,rgba(255,185,50,.06) 55%,transparent 100%)!important;
-  box-shadow:0 0 40px rgba(255,209,102,.18),0 0 12px rgba(255,185,50,.1),0 4px 20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,230,120,.12)!important}
-.rec-card-gold::before{background:linear-gradient(135deg,rgba(255,209,102,.06) 0%,transparent 50%)}
+  border-color:rgba(255,220,120,.8)!important;
+  background:linear-gradient(160deg,rgba(255,223,130,.36) 0%,rgba(255,200,80,.18) 50%,rgba(255,215,100,.07) 100%)!important;
+  box-shadow:0 0 50px rgba(255,220,120,.4),0 0 20px rgba(255,200,80,.22),0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,240,150,.3)!important}
+.rec-card-gold::before{background:linear-gradient(135deg,rgba(255,223,130,.12) 0%,transparent 50%)}
 .rec-card-gold .rec-name{color:var(--tx)}
-.rec-card-gold .rec-meta{color:rgba(255,209,102,.6)}
-.rec-card-gold .rec-val-lbl{color:rgba(255,209,102,.5)}
+.rec-card-gold .rec-meta{color:rgba(255,220,120,.8)}
+.rec-card-gold .rec-val-lbl{color:rgba(255,220,120,.65)}
 .rec-card-silver{
-  border-color:rgba(200,215,255,.38)!important;
-  background:linear-gradient(160deg,rgba(210,225,255,.1) 0%,rgba(180,195,230,.05) 55%,transparent 100%)!important;
-  box-shadow:0 0 28px rgba(200,215,255,.12),0 0 10px rgba(180,200,240,.08),0 4px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(220,235,255,.1)!important}
+  border-color:rgba(215,228,255,.72)!important;
+  background:linear-gradient(160deg,rgba(225,235,255,.32) 0%,rgba(195,210,245,.15) 50%,var(--bg2) 100%)!important;
+  box-shadow:0 0 36px rgba(215,228,255,.26),0 0 14px rgba(195,215,250,.18),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(235,245,255,.22)!important}
 .rec-card-silver .rec-name{color:var(--tx)}
-.rec-card-silver .rec-meta{color:rgba(190,210,255,.55)}
-.rec-card-silver .rec-val-lbl{color:rgba(190,210,255,.45)}
+.rec-card-silver .rec-meta{color:rgba(210,228,255,.75)}
+.rec-card-silver .rec-val-lbl{color:rgba(210,228,255,.6)}
 .rec-card-bronze{
-  border-color:rgba(210,155,90,.45)!important;
-  background:linear-gradient(160deg,rgba(215,150,90,.12) 0%,rgba(190,125,65,.05) 55%,transparent 100%)!important;
-  box-shadow:0 0 28px rgba(200,140,80,.14),0 0 10px rgba(180,120,60,.08),0 4px 20px rgba(0,0,0,.55),inset 0 1px 0 rgba(225,170,100,.1)!important}
+  border-color:rgba(225,170,105,.7)!important;
+  background:linear-gradient(160deg,rgba(230,170,110,.32) 0%,rgba(210,145,85,.14) 50%,var(--bg2) 100%)!important;
+  box-shadow:0 0 36px rgba(220,155,90,.26),0 0 14px rgba(200,135,70,.18),0 4px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(240,185,120,.22)!important}
 .rec-card-bronze .rec-name{color:var(--tx)}
-.rec-card-bronze .rec-meta{color:rgba(220,160,90,.6)}
-.rec-card-bronze .rec-val-lbl{color:rgba(220,160,90,.5)}
+.rec-card-bronze .rec-meta{color:rgba(230,175,110,.78)}
+.rec-card-bronze .rec-val-lbl{color:rgba(230,175,110,.62)}
 .rec-medal{font-size:26px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));line-height:1}
 .rec-info{flex:1;min-width:0}
 .rec-name{font-family:'Freshman',sans-serif;font-size:15px;font-weight:normal;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1411,6 +1411,14 @@ body::before{
         <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
         <button onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
+      </div>
+      <div id="geral-banner-wrap" style="display:none;margin-bottom:1.25rem">
+        <div class="geral-banner">
+          <div>
+            <div class="geral-banner-titulo">Temporada Atual</div>
+          </div>
+          <div class="geral-banner-icon">🏆</div>
+        </div>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
     </div>
@@ -2352,10 +2360,12 @@ function renderRanking(){
   if(!gd)return;const mbs=gd.members||[];
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
+  const geralWrap=document.getElementById('geral-banner-wrap');
 
   // ── RECORDES ──
   if(rankStat==='recordes'){
     if(banner)banner.style.display='none';
+    if(geralWrap)geralWrap.style.display='none';
     renderRecordes();
     return;
   }
@@ -2363,6 +2373,8 @@ function renderRanking(){
   // ── RANKING GERAL ──
   if(rankStat==='geral'){
     if(banner)banner.style.display='none';
+    const geralWrap=document.getElementById('geral-banner-wrap');
+    if(geralWrap)geralWrap.style.display='';
     const anoAtual=new Date().getFullYear().toString();
     const geralData=mbs.map(m=>{const s=getStGeral(m);return{...s,name:m.name,uid:m.uid};}).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
     const top3g=geralData.slice(0,3);const restg=geralData.slice(3);
@@ -2373,12 +2385,6 @@ function renderRanking(){
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
-      <div class="geral-banner">
-        <div>
-          <div class="geral-banner-titulo">Temporada Atual</div>
-        </div>
-        <div class="geral-banner-icon">🏆</div>
-      </div>
       ${renderMvpBanner()}
       ${podiumGeralHTML}
       <div class="rank-list">${listGeralItems.map((p,i)=>{
@@ -2410,6 +2416,7 @@ function renderRanking(){
   // ── RANKING PÊNALTIS ──
   if(rankStat==='pen'){
     if(banner)banner.style.display='none';
+    if(geralWrap)geralWrap.style.display='none';
     if(!window._penSubTab)window._penSubTab='mes';
 
     // Coleta dados do mês vigente
@@ -2524,6 +2531,7 @@ function renderRanking(){
 
   // ── RANKING NORMAL (apenas G+A) ──
   if(banner)banner.style.display='';
+  if(geralWrap)geralWrap.style.display='none';
   const ranked=mbs.map(m=>{const s=getSt(m.uid||m.name,null,!!m.uid);return{...s,name:m.name,uid:m.uid,val:s.gols+s.assist};}).sort((a,b)=>b.val-a.val);
   const top3=ranked.slice(0,3);const rest=ranked.slice(3);
   const podiumOrder=[1,0,2];const podiumCls=['p2','p1','p3'];const podiumCrown=['🥈','🥇','🥉'];const podiumSizes=[46,46,46];
