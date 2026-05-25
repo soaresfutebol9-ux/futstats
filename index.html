@@ -2336,19 +2336,29 @@ function buildRecordData(){
   if(!gd)return{golsTop:[],assistTop:[]};
   const hist=gd.historico||{};
   const allKeys=Object.keys(hist).sort();
-  // Inclui mês vigente como "mês atual"
   const vigenteKey=gd.mesAtivo||mesAtual();
+  const allMembers=gd.members||[];
 
-  // Coleta por jogador: melhor mês em gols e melhor mês em assist
-  const playerBestGols={};  // uid/name -> {val, mesKey, mesLabel}
+  // Helper: dado uid, retorna nome real do membro cadastrado
+  function getPlayerName(uid,playerField){
+    if(uid){
+      const mb=allMembers.find(m=>m.uid===uid);
+      if(mb&&mb.name)return mb.name;
+    }
+    return playerField||'?';
+  }
+
+  const playerBestGols={};
   const playerBestAssist={};
 
   function processMatches(matches,mesKey){
-    // Agrupa por jogador
     const byPlayer={};
     matches.forEach(m=>{
       const key=m.uid||m.player;
-      if(!byPlayer[key])byPlayer[key]={uid:m.uid,name:m.name||m.player,gols:0,assist:0};
+      if(!byPlayer[key]){
+        const nome=getPlayerName(m.uid,m.player);
+        byPlayer[key]={uid:m.uid||'',name:nome,gols:0,assist:0};
+      }
       byPlayer[key].gols+=(m.gols||0);
       byPlayer[key].assist+=(m.assist||0);
     });
@@ -2362,14 +2372,9 @@ function buildRecordData(){
     });
   }
 
-  // Histórico
-  allKeys.forEach(k=>{
-    processMatches((hist[k].matches||[]),k);
-  });
-  // Mês atual
+  allKeys.forEach(k=>{ processMatches((hist[k].matches||[]),k); });
   processMatches(gd.matches||[],vigenteKey);
 
-  // Pega top 3 de cada, apenas com val>0
   const golsTop=Object.values(playerBestGols)
     .filter(p=>p.val>0)
     .sort((a,b)=>b.val-a.val)
@@ -4710,7 +4715,7 @@ window.irParaRankingGA=()=>{
     _lastCardData = data;
     _lastCardType = 'monthranking';
     const canvas = openShareModal();
-    await drawMonthRankingCard(canvas, data);
+    await drawRankingCard(canvas, data);
   };
 
   // ── COMPARTILHAR RECORDES ────────────────────────────────────
