@@ -1236,6 +1236,7 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
         <div class="ft active" onclick="setRank('ga',this)">🔥 G+A</div>
         <div class="ft" onclick="setRank('pen',this)">🥅 Pênaltis</div>
         <div class="ft rank-geral-btn" onclick="setRank('geral',this)">🌐 Geral</div>
+        <button onclick="shareRanking()" title="Compartilhar ranking" style="background:rgba(77,255,176,0.12);border:1px solid rgba(77,255,176,0.3);border-radius:8px;color:#4dffb0;font-size:14px;padding:4px 10px;cursor:pointer;flex-shrink:0;line-height:1">↗</button>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
     </div>
@@ -3394,6 +3395,7 @@ window.irParaRankingGA=()=>{
   <div class="duelo-inner">
     <div class="duelo-header">
       <div class="duelo-title">⚔️ Modo Duelo</div>
+      <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:rgba(77,255,176,0.12);border:1px solid rgba(77,255,176,0.3);border-radius:8px;color:#4dffb0;font-size:13px;padding:4px 10px;cursor:pointer;line-height:1">↗</button>
       <div class="duelo-close" onclick="closeDuelo()">×</div>
     </div>
     <div class="duelo-body" id="duelo-body">
@@ -3446,6 +3448,702 @@ window.irParaRankingGA=()=>{
     }
   }
 })();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   FUTSTATS — MÓDULO DE COMPARTILHAMENTO
+   Gera cards visuais para ranking (G+A, Geral, Pênaltis)
+   e Modo Duelo, e permite baixar ou compartilhar via API.
+   
+   COMO USAR NO index.html:
+   1. Copie todo este conteúdo dentro de uma tag <script>
+      logo antes do </body>, após os scripts existentes.
+   2. Adicione um botão de compartilhar em cada tela:
+      - Ranking:  onclick="shareRanking()"
+      - Duelo:    onclick="shareDuelo()"
+   ═══════════════════════════════════════════════════════ */
+
+(function () {
+
+  /* ── CONSTANTES DE ESTILO ─────────────────────────── */
+  const CARD_W = 480;
+  const CARD_H = 640;
+  const DARK_BG = '#0a0e1a';
+  const ACCENT  = '#4dffb0';
+  const BLUE    = '#60a5fa';
+  const GOLD    = '#FFD166';
+  const SILVER  = '#C0C0C0';
+  const BRONZE  = '#CD7F32';
+  const RED     = '#FF5A7A';
+
+  /* ── AVATAR HELPER ───────────────────────────────── */
+  // Paleta idêntica ao avC() do app
+  const AV_COLORS = [
+    ['#4dffb0','#0a3020'],
+    ['#60a5fa','#0a1830'],
+    ['#f472b6','#2a0a1a'],
+    ['#facc15','#2a2000'],
+    ['#fb923c','#2a1200'],
+    ['#a78bfa','#1a0a30'],
+  ];
+  function avColorPair(name) {
+    let h = 0;
+    for (let c of (name || '?')) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+    return AV_COLORS[h % 6];
+  }
+  function initials(name) {
+    return (name || '?').trim().split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  }
+
+  /* ── DESENHA AVATAR NO CANVAS ────────────────────── */
+  function drawAvatar(ctx, x, y, r, name, photoUrl) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.clip();
+
+    if (photoUrl) {
+      // tenta desenhar foto; se falhar cai no fallback
+      try {
+        const img = _photoCache[photoUrl];
+        if (img && img.complete && img.naturalWidth) {
+          ctx.drawImage(img, x - r, y - r, r * 2, r * 2);
+          ctx.restore();
+          return;
+        }
+      } catch (_) {}
+    }
+
+    const [fg, bg] = avColorPair(name);
+    ctx.fillStyle = bg;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    ctx.fillStyle = fg;
+    ctx.font = `bold ${Math.round(r * 0.72)}px 'DM Mono', monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials(name), x, y + 1);
+    ctx.restore();
+  }
+
+  /* ── PRÉ-CARREGA FOTOS ──────────────────────────── */
+  const _photoCache = {};
+  function preloadPhotos(members) {
+    return Promise.all(
+      (members || [])
+        .filter(m => m.photo)
+        .map(m => new Promise(res => {
+          if (_photoCache[m.photo]) { res(); return; }
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = img.onerror = res;
+          img.src = m.photo;
+          _photoCache[m.photo] = img;
+        }))
+    );
+  }
+
+  /* ── BACKGROUND DO CARD ─────────────────────────── */
+  function drawCardBg(ctx, w, h) {
+    // fundo sólido escuro
+    ctx.fillStyle = DARK_BG;
+    ctx.fillRect(0, 0, w, h);
+
+    // gradiente sutil no topo
+    const g1 = ctx.createLinearGradient(0, 0, w, h * 0.5);
+    g1.addColorStop(0, 'rgba(77,255,176,0.06)');
+    g1.addColorStop(1, 'rgba(77,255,176,0)');
+    ctx.fillStyle = g1;
+    ctx.fillRect(0, 0, w, h);
+
+    // linha decorativa topo
+    const lineG = ctx.createLinearGradient(0, 0, w, 0);
+    lineG.addColorStop(0, 'rgba(77,255,176,0)');
+    lineG.addColorStop(0.5, ACCENT);
+    lineG.addColorStop(1, 'rgba(77,255,176,0)');
+    ctx.strokeStyle = lineG;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 3);
+    ctx.lineTo(w, 3);
+    ctx.stroke();
+
+    // pontinhos decorativos (canto inf dir)
+    ctx.fillStyle = 'rgba(77,255,176,0.08)';
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        ctx.beginPath();
+        ctx.arc(w - 20 - i * 14, h - 20 - j * 14, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  /* ── HEADER DO CARD ─────────────────────────────── */
+  function drawHeader(ctx, w, groupName, titulo, subtitulo) {
+    // Logo / nome do grupo
+    ctx.fillStyle = ACCENT;
+    ctx.font = "bold 12px 'DM Mono', monospace";
+    ctx.textAlign = 'left';
+    ctx.fillText('FUTSTATS ⚽', 28, 34);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = "11px 'DM Mono', monospace";
+    ctx.fillText((groupName || '').toUpperCase(), 28, 52);
+
+    // Título central
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "bold 28px 'Syne', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText(titulo, w / 2, 96);
+
+    // Subtítulo
+    if (subtitulo) {
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = "12px 'DM Mono', monospace";
+      ctx.fillText(subtitulo.toUpperCase(), w / 2, 116);
+    }
+
+    // linha separadora
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(28, 130);
+    ctx.lineTo(w - 28, 130);
+    ctx.stroke();
+  }
+
+  /* ── RODAPÉ DO CARD ─────────────────────────────── */
+  function drawFooter(ctx, w, h) {
+    const now = new Date();
+    const label = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.font = "10px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText(label.toUpperCase(), w / 2, h - 16);
+  }
+
+  /* ── HELPER: TEXTO COM SOMBRA ───────────────────── */
+  function shadowText(ctx, text, x, y, color, font, shadowColor) {
+    ctx.save();
+    ctx.shadowColor = shadowColor || 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = color;
+    ctx.font = font;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     CARD: RANKING (Geral, G+A, Pênaltis)
+  ═══════════════════════════════════════════════════ */
+  function buildRankingData() {
+    if (!gd) return null;
+    const mbs = gd.members || [];
+    const anoAtual = new Date().getFullYear().toString();
+    const tipo = rankStat; // 'geral', 'ga', 'pen'
+
+    if (tipo === 'pen') {
+      // Pênaltis — usa subtab atual (mes/total)
+      const sub = window._penSubTab || 'mes';
+      let src;
+      if (sub === 'mes') {
+        src = mbs.map(m => {
+          const s = getSt(m.uid || m.name, null, !!m.uid);
+          return { ...s, name: m.name, uid: m.uid, photo: m.photo };
+        });
+      } else {
+        src = mbs.map(m => {
+          const all = [];
+          all.push(...(gd.matches || []).filter(x => m.uid ? x.uid === m.uid : x.player === m.name));
+          Object.entries(gd.historico || {}).forEach(([k, h]) => {
+            if (k.startsWith(anoAtual))
+              all.push(...(h.matches || []).filter(x => m.uid ? x.uid === m.uid : x.player === m.name));
+          });
+          const penBat = all.reduce((s, x) => s + (x.penBat || 0), 0);
+          const penOk  = all.reduce((s, x) => s + (x.penOk  || 0), 0);
+          return { name: m.name, uid: m.uid, photo: m.photo, penBat, penOk };
+        });
+      }
+      return {
+        tipo: 'pen',
+        subtitulo: sub === 'mes' ? 'Mês Atual' : 'Temporada',
+        players: src
+          .filter(p => p.penBat > 0)
+          .map(p => ({ ...p, pct: Math.round(p.penOk / p.penBat * 100) }))
+          .sort((a, b) => b.pct - a.pct || (b.penOk - a.penOk))
+          .slice(0, 5),
+      };
+    }
+
+    // Geral ou G+A — ambos usam getStGeral
+    const players = mbs.map(m => {
+      const s = getStGeral(m);
+      return { name: m.name, uid: m.uid, photo: m.photo, gols: s.gols, assist: s.assist, ga: s.gols + s.assist };
+    }).sort((a, b) => b.ga - a.ga).slice(0, 5);
+
+    return {
+      tipo: tipo === 'geral' ? 'geral' : 'ga',
+      subtitulo: 'Temporada Atual',
+      players,
+    };
+  }
+
+  async function drawRankingCard(canvas, data) {
+    const W = canvas.width, H = canvas.height;
+    const ctx = canvas.getContext('2d');
+
+    const members = (gd && gd.members) || [];
+    await preloadPhotos(members);
+
+    drawCardBg(ctx, W, H);
+
+    const tituloMap = { geral: 'Ranking Geral', ga: 'Ranking G+A', pen: 'Pênaltis' };
+    drawHeader(ctx, W, gd ? gd.name : '', tituloMap[data.tipo] || 'Ranking', data.subtitulo);
+
+    const players = data.players;
+    if (!players.length) {
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = "14px 'DM Mono', monospace";
+      ctx.textAlign = 'center';
+      ctx.fillText('Nenhum dado disponível', W / 2, H / 2);
+      drawFooter(ctx, W, H);
+      return;
+    }
+
+    /* ── PÓDIO TOP 3 ── */
+    const podiumY   = 200;
+    const positions = [1, 0, 2]; // visual: 2º, 1º, 3º
+    const podiumX   = [W * 0.25, W * 0.5, W * 0.75];
+    const podiumH   = [80, 110, 60];
+    const medalColors= [SILVER, GOLD, BRONZE];
+    const medals     = ['🥈', '🥇', '🥉'];
+
+    positions.forEach((pi, vi) => {
+      const p = players[pi];
+      if (!p) return;
+
+      const cx = podiumX[vi];
+      const blockY = podiumY + (110 - podiumH[vi]);
+
+      // Bloco do pódio
+      const blockGrad = ctx.createLinearGradient(cx - 44, blockY, cx + 44, blockY + podiumH[vi]);
+      blockGrad.addColorStop(0, pi === 0 ? 'rgba(255,209,102,0.25)' : pi === 1 ? 'rgba(192,192,192,0.15)' : 'rgba(205,127,50,0.15)');
+      blockGrad.addColorStop(1, 'rgba(255,255,255,0.03)');
+      ctx.fillStyle = blockGrad;
+      roundRect(ctx, cx - 44, blockY, 88, podiumH[vi] + 50, 10);
+      ctx.fill();
+
+      // Avatar
+      const avY = blockY - 34;
+      const avR = 30;
+      const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
+
+      // anel colorido
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, avY, avR + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = medalColors[vi];
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+
+      drawAvatar(ctx, cx, avY, avR, p.name, photo);
+
+      // Medalha
+      ctx.font = '16px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(medals[vi], cx, blockY + 18);
+
+      // Nome
+      ctx.fillStyle = '#ffffff';
+      ctx.font = "bold 11px 'DM Mono', monospace";
+      ctx.textAlign = 'center';
+      const shortName = p.name.split(' ')[0];
+      ctx.fillText(shortName.length > 9 ? shortName.slice(0, 8) + '.' : shortName, cx, blockY + 32);
+
+      // Valor
+      if (data.tipo === 'pen') {
+        shadowText(ctx, p.pct + '%', cx, blockY + 52, medalColors[vi], "bold 18px 'DM Mono', monospace");
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = "9px 'DM Mono', monospace";
+        ctx.fillText(p.penOk + '/' + p.penBat, cx, blockY + 65);
+      } else {
+        shadowText(ctx, String(p.ga), cx, blockY + 50, medalColors[vi], "bold 20px 'DM Mono', monospace");
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = "9px 'DM Mono', monospace";
+        ctx.fillText(p.gols + 'G · ' + p.assist + 'A', cx, blockY + 63);
+      }
+    });
+
+    /* ── LISTA 4º e 5º ── */
+    const listY  = podiumY + 175;
+    const rowH   = 52;
+    players.slice(3).forEach((p, i) => {
+      const ry = listY + i * rowH;
+      const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
+
+      // fundo da linha
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      roundRect(ctx, 24, ry, W - 48, rowH - 6, 10);
+      ctx.fill();
+
+      // posição
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = "bold 12px 'DM Mono', monospace";
+      ctx.textAlign = 'left';
+      ctx.fillText(String(i + 4), 40, ry + 24);
+
+      // avatar
+      drawAvatar(ctx, 72, ry + 20, 18, p.name, photo);
+
+      // nome
+      ctx.fillStyle = '#ffffff';
+      ctx.font = "13px 'DM Mono', monospace";
+      ctx.textAlign = 'left';
+      ctx.fillText(p.name.split(' ')[0], 98, ry + 24);
+
+      // valor
+      ctx.textAlign = 'right';
+      if (data.tipo === 'pen') {
+        ctx.fillStyle = ACCENT;
+        ctx.font = "bold 14px 'DM Mono', monospace";
+        ctx.fillText(p.pct + '%', W - 40, ry + 18);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = "10px 'DM Mono', monospace";
+        ctx.fillText(p.penOk + '/' + p.penBat, W - 40, ry + 32);
+      } else {
+        ctx.fillStyle = ACCENT;
+        ctx.font = "bold 15px 'DM Mono', monospace";
+        ctx.fillText(String(p.ga), W - 40, ry + 18);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = "10px 'DM Mono', monospace";
+        ctx.fillText(p.gols + 'G · ' + p.assist + 'A', W - 40, ry + 32);
+      }
+    });
+
+    drawFooter(ctx, W, H);
+  }
+
+  /* ═══════════════════════════════════════════════════
+     CARD: DUELO
+  ═══════════════════════════════════════════════════ */
+  function buildDueloData() {
+    if (!gd || !_dueloA || !_dueloB) return null;
+    const mbA = (gd.members || []).find(m => m.uid === _dueloA);
+    const mbB = (gd.members || []).find(m => m.uid === _dueloB);
+    if (!mbA || !mbB) return null;
+
+    const sA = _getDueloStats(_dueloA, _dueloScope);
+    const sB = _getDueloStats(_dueloB, _dueloScope);
+
+    const stats = [
+      { lbl: 'Gols',     a: sA.gols,  b: sB.gols  },
+      { lbl: 'Assistências', a: sA.assist, b: sB.assist },
+      { lbl: 'G+A',      a: sA.gols + sA.assist, b: sB.gols + sB.assist },
+    ];
+    if (sA.penBat > 0 || sB.penBat > 0) {
+      stats.push(
+        { lbl: 'Pên. Bat.', a: sA.penBat, b: sB.penBat },
+        { lbl: 'Pên. OK',  a: sA.penOk,  b: sB.penOk  },
+        {
+          lbl: '% Pênalti',
+          a: sA.penBat > 0 ? Math.round(sA.penOk / sA.penBat * 100) : 0,
+          b: sB.penBat > 0 ? Math.round(sB.penOk / sB.penBat * 100) : 0,
+          suffix: '%',
+        }
+      );
+    }
+    stats.push({ lbl: 'Partidas', a: sA.n, b: sB.n });
+
+    const gaA = sA.gols + sA.assist, gaB = sB.gols + sB.assist;
+    const winner = gaA > gaB ? 'A' : gaB > gaA ? 'B' : null;
+
+    return {
+      mbA, mbB, sA, sB, stats, winner,
+      scope: _dueloScope === 'mes' ? 'Mês Atual' : 'Temporada',
+    };
+  }
+
+  async function drawDueloCard(canvas, data) {
+    const W = canvas.width, H = canvas.height;
+    const ctx = canvas.getContext('2d');
+    const { mbA, mbB, stats, winner } = data;
+
+    await preloadPhotos([mbA, mbB]);
+
+    drawCardBg(ctx, W, H);
+    drawHeader(ctx, W, gd ? gd.name : '', '⚔️ Duelo', data.scope);
+
+    /* ── CABEÇALHO DOS JOGADORES ── */
+    const playerY = 165;
+    const cx = W / 2;
+
+    // Jogador A (esquerda)
+    const photoA = mbA.photo || null;
+    const ringColorA = winner === 'A' ? ACCENT : winner === 'B' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.35)';
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx - 100, playerY, 37, 0, Math.PI * 2);
+    ctx.strokeStyle = ringColorA;
+    ctx.lineWidth = winner === 'A' ? 3 : 1.5;
+    ctx.stroke();
+    ctx.restore();
+    drawAvatar(ctx, cx - 100, playerY, 34, mbA.name, photoA);
+
+    ctx.fillStyle = winner === 'A' ? ACCENT : '#ffffff';
+    ctx.font = "bold 12px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText(mbA.name.split(' ')[0], cx - 100, playerY + 52);
+    if (winner === 'A') {
+      ctx.fillStyle = ACCENT;
+      ctx.font = "10px 'DM Mono', monospace";
+      ctx.fillText('👑 VENCEDOR', cx - 100, playerY + 66);
+    }
+
+    // VS
+    ctx.fillStyle = RED;
+    ctx.font = "bold 20px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText('VS', cx, playerY + 6);
+
+    // Jogador B (direita)
+    const photoB = mbB.photo || null;
+    const ringColorB = winner === 'B' ? BLUE : winner === 'A' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.35)';
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx + 100, playerY, 37, 0, Math.PI * 2);
+    ctx.strokeStyle = ringColorB;
+    ctx.lineWidth = winner === 'B' ? 3 : 1.5;
+    ctx.stroke();
+    ctx.restore();
+    drawAvatar(ctx, cx + 100, playerY, 34, mbB.name, photoB);
+
+    ctx.fillStyle = winner === 'B' ? BLUE : '#ffffff';
+    ctx.font = "bold 12px 'DM Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText(mbB.name.split(' ')[0], cx + 100, playerY + 52);
+    if (winner === 'B') {
+      ctx.fillStyle = BLUE;
+      ctx.font = "10px 'DM Mono', monospace";
+      ctx.fillText('👑 VENCEDOR', cx + 100, playerY + 66);
+    }
+
+    /* ── TABELA DE STATS ── */
+    const tableY = playerY + 92;
+    const rowH   = 42;
+
+    stats.forEach((s, i) => {
+      const ry = tableY + i * rowH;
+      const winA = s.a > s.b, winB = s.b > s.a, tie = s.a === s.b;
+
+      // fundo alternado
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.15)';
+      ctx.fillRect(24, ry, W - 48, rowH - 2);
+
+      // linha de destaque para vencedor
+      if (winA) {
+        ctx.fillStyle = 'rgba(77,255,176,0.07)';
+        ctx.fillRect(24, ry, (W - 48) / 2, rowH - 2);
+      } else if (winB) {
+        ctx.fillStyle = 'rgba(96,165,250,0.07)';
+        ctx.fillRect(24 + (W - 48) / 2, ry, (W - 48) / 2, rowH - 2);
+      }
+
+      // Valor A
+      const valA = (s.a || 0) + (s.suffix || '');
+      ctx.fillStyle = winA ? ACCENT : tie ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)';
+      ctx.font = `${winA ? 'bold ' : ''}16px 'DM Mono', monospace`;
+      ctx.textAlign = 'left';
+      ctx.fillText(valA, 40, ry + rowH / 2 + 5);
+
+      // Label
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = "10px 'DM Mono', monospace";
+      ctx.textAlign = 'center';
+      ctx.fillText(s.lbl.toUpperCase(), cx, ry + rowH / 2 + 5);
+
+      // Valor B
+      const valB = (s.b || 0) + (s.suffix || '');
+      ctx.fillStyle = winB ? BLUE : tie ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)';
+      ctx.font = `${winB ? 'bold ' : ''}16px 'DM Mono', monospace`;
+      ctx.textAlign = 'right';
+      ctx.fillText(valB, W - 40, ry + rowH / 2 + 5);
+    });
+
+    drawFooter(ctx, W, H);
+  }
+
+  /* ── HELPER: rounded rect ───────────────────────── */
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     MODAL DE COMPARTILHAMENTO
+  ═══════════════════════════════════════════════════ */
+  function createShareModal() {
+    if (document.getElementById('share-modal')) return;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #share-modal {
+        position: fixed; inset: 0; z-index: 99999;
+        background: rgba(0,0,0,0.82);
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity .25s;
+        padding: 16px;
+      }
+      #share-modal.show { opacity: 1; }
+      #share-box {
+        background: #111827;
+        border: 1px solid rgba(77,255,176,0.2);
+        border-radius: 20px;
+        padding: 20px;
+        width: 100%; max-width: 520px;
+        box-shadow: 0 0 60px rgba(77,255,176,0.1);
+        display: flex; flex-direction: column; gap: 14px;
+        max-height: 90vh; overflow-y: auto;
+      }
+      #share-box canvas {
+        width: 100%; border-radius: 12px;
+        display: block;
+      }
+      #share-title {
+        font-family: 'DM Mono', monospace;
+        font-size: 12px; letter-spacing: .12em;
+        color: rgba(255,255,255,0.4);
+        text-transform: uppercase;
+        text-align: center;
+      }
+      #share-actions {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .share-btn {
+        padding: 12px; border-radius: 12px;
+        border: none; cursor: pointer;
+        font-family: 'DM Mono', monospace;
+        font-size: 12px; font-weight: bold;
+        letter-spacing: .06em;
+        transition: opacity .15s, transform .1s;
+      }
+      .share-btn:active { transform: scale(.97); }
+      .share-btn-primary {
+        background: #4dffb0; color: #0a1a10;
+      }
+      .share-btn-secondary {
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.7);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      #share-close {
+        background: none; border: none; cursor: pointer;
+        color: rgba(255,255,255,0.35); font-size: 20px;
+        align-self: flex-end; padding: 0; line-height: 1;
+      }
+    `;
+    document.head.appendChild(style);
+
+    const modal = document.createElement('div');
+    modal.id = 'share-modal';
+    modal.innerHTML = `
+      <div id="share-box">
+        <button id="share-close" onclick="window._closeShareModal()">✕</button>
+        <div id="share-title">Compartilhar</div>
+        <canvas id="share-canvas" width="${CARD_W}" height="${CARD_H}"></canvas>
+        <div id="share-actions">
+          <button class="share-btn share-btn-primary" onclick="window._downloadShareCard()">
+            ⬇ Salvar imagem
+          </button>
+          <button class="share-btn share-btn-secondary" onclick="window._shareShareCard()">
+            ↗ Compartilhar
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    window._closeShareModal = () => {
+      modal.classList.remove('show');
+      setTimeout(() => { modal.style.display = 'none'; }, 260);
+    };
+    modal.addEventListener('click', e => {
+      if (e.target === modal) window._closeShareModal();
+    });
+  }
+
+  function openShareModal() {
+    createShareModal();
+    const modal = document.getElementById('share-modal');
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('show'));
+    return document.getElementById('share-canvas');
+  }
+
+  window._downloadShareCard = () => {
+    const canvas = document.getElementById('share-canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.download = 'futstats-card.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+
+  window._shareShareCard = async () => {
+    const canvas = document.getElementById('share-canvas');
+    if (!canvas) return;
+    try {
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const file = new File([blob], 'futstats-card.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'FutStats' });
+      } else {
+        window._downloadShareCard();
+      }
+    } catch (_) {
+      window._downloadShareCard();
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════
+     FUNÇÕES PÚBLICAS — chame estas no onclick
+  ═══════════════════════════════════════════════════ */
+
+  window.shareRanking = async function () {
+    const data = buildRankingData();
+    if (!data || !data.players.length) {
+      alert('Nenhum dado de ranking disponível para compartilhar.');
+      return;
+    }
+    const canvas = openShareModal();
+    await drawRankingCard(canvas, data);
+  };
+
+  window.shareDuelo = async function () {
+    const data = buildDueloData();
+    if (!data) {
+      alert('Selecione dois jogadores no modo duelo antes de compartilhar.');
+      return;
+    }
+    const canvas = openShareModal();
+    await drawDueloCard(canvas, data);
+  };
+
+})();
+
 </script>
 </body>
 </html>
