@@ -1236,7 +1236,7 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
         <div class="ft active" onclick="setRank('ga',this)">🔥 G+A</div>
         <div class="ft" onclick="setRank('pen',this)">🥅 Pênaltis</div>
         <div class="ft rank-geral-btn" onclick="setRank('geral',this)">🌐 Geral</div>
-        <button onclick="shareRanking()" title="Compartilhar" style="background:rgba(77,255,176,0.12);border:1px solid rgba(77,255,176,0.3);border-radius:8px;color:#4dffb0;font-size:14px;padding:4px 10px;cursor:pointer;flex-shrink:0;line-height:1">↗</button>
+        <button onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);font-family:'DM Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:.1em;padding:7px 13px;cursor:pointer;flex-shrink:0;line-height:1;text-transform:uppercase;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx)'">Compartilhar</button>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
     </div>
@@ -3406,8 +3406,10 @@ window.irParaRankingGA=()=>{
   <div class="duelo-inner">
     <div class="duelo-header">
       <div class="duelo-title">⚔️ Modo Duelo</div>
-      <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:rgba(77,255,176,0.12);border:1px solid rgba(77,255,176,0.3);border-radius:8px;color:#4dffb0;font-size:13px;padding:4px 10px;cursor:pointer;line-height:1">↗</button>
-      <div class="duelo-close" onclick="closeDuelo()">×</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);font-family:'DM Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:.1em;padding:7px 13px;cursor:pointer;line-height:1;text-transform:uppercase;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx)'">Compartilhar</button>
+        <div class="duelo-close" onclick="closeDuelo()">×</div>
+      </div>
     </div>
     <div class="duelo-body" id="duelo-body">
       <!-- preenchido por JS -->
@@ -4013,57 +4015,93 @@ window.irParaRankingGA=()=>{
       #share-modal {
         position: fixed; inset: 0; z-index: 99999;
         background: rgba(0,0,0,0.82);
-        display: flex; align-items: center; justify-content: center;
+        display: flex; align-items: flex-end; justify-content: center;
         opacity: 0; transition: opacity .25s;
-        padding: 16px;
+        padding: 0;
       }
       #share-modal.show { opacity: 1; }
       #share-box {
         background: #111827;
-        border: 1px solid rgba(77,255,176,0.2);
-        border-radius: 20px;
-        padding: 20px;
-        width: 100%; max-width: 520px;
-        box-shadow: 0 0 60px rgba(77,255,176,0.1);
-        display: flex; flex-direction: column; gap: 14px;
-        max-height: 90vh; overflow-y: auto;
+        border: 1px solid rgba(77,255,176,0.15);
+        border-radius: 24px 24px 0 0;
+        padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+        width: 100%; max-width: 560px;
+        box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+        display: flex; flex-direction: column; gap: 16px;
+        max-height: 92vh; overflow-y: auto;
+        transform: translateY(40px);
+        transition: transform .3s cubic-bezier(.16,1,.3,1);
       }
+      #share-modal.show #share-box { transform: translateY(0); }
       #share-box canvas {
         width: 100%; border-radius: 12px;
         display: block;
       }
+      #share-header {
+        display: flex; align-items: center; justify-content: space-between;
+      }
       #share-title {
         font-family: 'DM Mono', monospace;
-        font-size: 12px; letter-spacing: .12em;
+        font-size: 11px; letter-spacing: .12em;
         color: rgba(255,255,255,0.4);
         text-transform: uppercase;
-        text-align: center;
-      }
-      #share-actions {
-        display: grid; grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .share-btn {
-        padding: 12px; border-radius: 12px;
-        border: none; cursor: pointer;
-        font-family: 'DM Mono', monospace;
-        font-size: 12px; font-weight: bold;
-        letter-spacing: .06em;
-        transition: opacity .15s, transform .1s;
-      }
-      .share-btn:active { transform: scale(.97); }
-      .share-btn-primary {
-        background: #4dffb0; color: #0a1a10;
-      }
-      .share-btn-secondary {
-        background: rgba(255,255,255,0.06);
-        color: rgba(255,255,255,0.7);
-        border: 1px solid rgba(255,255,255,0.1);
       }
       #share-close {
-        background: none; border: none; cursor: pointer;
-        color: rgba(255,255,255,0.35); font-size: 20px;
-        align-self: flex-end; padding: 0; line-height: 1;
+        background: rgba(255,255,255,0.08); border: none; cursor: pointer;
+        color: rgba(255,255,255,0.5); font-size: 16px;
+        width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        line-height: 1; padding: 0;
+        transition: background .15s;
+      }
+      #share-close:hover { background: rgba(255,255,255,0.14); }
+      #share-actions {
+        display: flex; flex-direction: column;
+        gap: 8px;
+      }
+      .share-btn {
+        padding: 14px 16px; border-radius: 14px;
+        border: none; cursor: pointer;
+        font-family: 'DM Mono', monospace;
+        font-size: 13px; font-weight: bold;
+        letter-spacing: .04em;
+        transition: opacity .15s, transform .1s;
+        display: flex; align-items: center; gap: 12px;
+        text-align: left;
+        width: 100%;
+      }
+      .share-btn:active { transform: scale(.98); opacity: .85; }
+      .share-btn-icon {
+        width: 38px; height: 38px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+      }
+      .share-btn-label { display: flex; flex-direction: column; gap: 2px; }
+      .share-btn-label span { font-size: 11px; font-weight: normal; opacity: .55; letter-spacing: .02em; }
+      .share-btn-whatsapp {
+        background: rgba(37,211,102,0.12);
+        color: #fff;
+        border: 1px solid rgba(37,211,102,0.25);
+      }
+      .share-btn-whatsapp .share-btn-icon { background: #25D366; }
+      .share-btn-instagram {
+        background: rgba(228,64,95,0.12);
+        color: #fff;
+        border: 1px solid rgba(228,64,95,0.25);
+      }
+      .share-btn-instagram .share-btn-icon {
+        background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+      }
+      .share-btn-save {
+        background: rgba(77,255,176,0.10);
+        color: #fff;
+        border: 1px solid rgba(77,255,176,0.2);
+      }
+      .share-btn-save .share-btn-icon { background: rgba(77,255,176,0.18); color: #4dffb0; }
+      #share-hint {
+        font-family: 'DM Mono', monospace;
+        font-size: 10px; color: rgba(255,255,255,0.22);
+        text-align: center; letter-spacing: .06em;
       }
     `;
     document.head.appendChild(style);
@@ -4072,24 +4110,39 @@ window.irParaRankingGA=()=>{
     modal.id = 'share-modal';
     modal.innerHTML = `
       <div id="share-box">
-        <button id="share-close" onclick="window._closeShareModal()">✕</button>
-        <div id="share-title">Compartilhar</div>
+        <div id="share-header">
+          <div id="share-title">Compartilhar</div>
+          <button id="share-close" onclick="window._closeShareModal()">✕</button>
+        </div>
         <canvas id="share-canvas" width="${CARD_W}" height="${CARD_H}"></canvas>
         <div id="share-actions">
-          <button class="share-btn share-btn-primary" onclick="window._downloadShareCard()">
-            ⬇ Salvar imagem
+          <button class="share-btn share-btn-whatsapp" onclick="window._shareWhatsApp()">
+            <div class="share-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.558 4.121 1.533 5.851L.057 23.571a.75.75 0 0 0 .93.903l5.85-1.53A11.949 11.949 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 0 1-4.953-1.354l-.355-.212-3.676.963.981-3.588-.232-.369A9.718 9.718 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
+            </div>
+            <div class="share-btn-label">WhatsApp<span>Compartilhar no WhatsApp</span></div>
           </button>
-          <button class="share-btn share-btn-secondary" onclick="window._shareShareCard()">
-            ↗ Compartilhar
+          <button class="share-btn share-btn-instagram" onclick="window._shareInstagram()">
+            <div class="share-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            </div>
+            <div class="share-btn-label">Instagram<span>Salvar e abrir no Instagram</span></div>
+          </button>
+          <button class="share-btn share-btn-save" onclick="window._downloadShareCard()">
+            <div class="share-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-7 2h14v2H5v-2z"/></svg>
+            </div>
+            <div class="share-btn-label">Salvar no dispositivo<span>Baixar como imagem PNG</span></div>
           </button>
         </div>
+        <div id="share-hint">Toque fora para fechar</div>
       </div>
     `;
     document.body.appendChild(modal);
 
     window._closeShareModal = () => {
       modal.classList.remove('show');
-      setTimeout(() => { modal.style.display = 'none'; }, 260);
+      setTimeout(() => { modal.style.display = 'none'; }, 300);
     };
     modal.addEventListener('click', e => {
       if (e.target === modal) window._closeShareModal();
@@ -4113,21 +4166,47 @@ window.irParaRankingGA=()=>{
     a.click();
   };
 
-  window._shareShareCard = async () => {
+  window._shareWhatsApp = async () => {
     const canvas = document.getElementById('share-canvas');
     if (!canvas) return;
     try {
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
       const file = new File([blob], 'futstats-card.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'FutStats' });
+        await navigator.share({ files: [file], title: 'FutStats ⚽' });
       } else {
+        // fallback: abre WhatsApp Web com texto, pede para anexar manualmente
         window._downloadShareCard();
+        setTimeout(() => {
+          window.open('https://wa.me/?text=Confira%20meu%20ranking%20no%20FutStats%20%E2%9A%BD', '_blank');
+        }, 600);
       }
     } catch (_) {
       window._downloadShareCard();
     }
   };
+
+  window._shareInstagram = async () => {
+    const canvas = document.getElementById('share-canvas');
+    if (!canvas) return;
+    try {
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const file = new File([blob], 'futstats-card.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'FutStats ⚽' });
+      } else {
+        // fallback: salva imagem e abre Instagram
+        window._downloadShareCard();
+        setTimeout(() => {
+          window.open('https://www.instagram.com/', '_blank');
+        }, 600);
+      }
+    } catch (_) {
+      window._downloadShareCard();
+    }
+  };
+
+  window._shareShareCard = window._shareWhatsApp;
 
   /* ═══════════════════════════════════════════════════
      FUNÇÕES PÚBLICAS — chame estas no onclick
