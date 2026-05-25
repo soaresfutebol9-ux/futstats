@@ -1766,7 +1766,7 @@ function enterLobby(){
   if(myProfile.groupId)loadGroup(myProfile.groupId);
 }
 async function loadGroup(gid){
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();setTimeout(()=>wcShow(),400);}catch(e){console.error('loadGroup erro:',e);}
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();setTimeout(()=>wcShow(myProfile&&myProfile.displayName),400);}catch(e){console.error('loadGroup erro:',e);}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -2902,8 +2902,8 @@ window.irParaRankingGA=()=>{
 <script>
 (function(){
   let _wcT=null;
-  window.wcShow=function(){
-    const name=(myProfile&&myProfile.displayName)||'Jogador';
+  window.wcShow=function(playerName){
+    const name=playerName||'Jogador';
     document.getElementById('wc-name').textContent=name+'!';
     const overlay=document.getElementById('wc-overlay');
     overlay.classList.add('wc-show');
