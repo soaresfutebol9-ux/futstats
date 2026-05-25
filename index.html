@@ -745,6 +745,15 @@ body.light .mes-vigente-titulo{
 .rec-val-num{font-family:'ClassyVogue',sans-serif;font-size:32px;font-weight:normal;line-height:1}
 .rec-val-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;opacity:.6;text-transform:uppercase;text-align:right}
 .rec-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace;letter-spacing:.04em}
+/* ── BADGE RECORDE ATUAL ── */
+.rec-atual-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.12);border:1px solid rgba(77,255,176,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:var(--g);letter-spacing:.06em;text-transform:uppercase;animation:recAtualPulse 1.8s ease-in-out infinite;white-space:nowrap;margin-top:5px}
+.rec-atual-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:recAtualDot 1.8s ease-in-out infinite}
+@keyframes recAtualPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.4),0 0 8px rgba(77,255,176,.15)}50%{box-shadow:0 0 0 5px rgba(77,255,176,.0),0 0 16px rgba(77,255,176,.3)}}
+@keyframes recAtualDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+/* ── ANEL "VOCÊ" NO AVATAR ── */
+.av-you-ring{position:relative;display:inline-flex;flex-shrink:0}
+.av-you-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--g);animation:youRingPulse 2s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes youRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.5),inset 0 0 0 0 rgba(77,255,176,.0);opacity:1}50%{box-shadow:0 0 0 4px rgba(77,255,176,.0),inset 0 0 8px rgba(77,255,176,.08);opacity:.7}}
 /* ── RANKING PÊNALTIS ── */
 .pen-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .pen-bar-track{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden;width:100%}
@@ -2378,11 +2387,13 @@ function buildRecordData(){
   const golsTop=Object.values(playerBestGols)
     .filter(p=>p.val>0)
     .sort((a,b)=>b.val-a.val)
-    .slice(0,3);
+    .slice(0,3)
+    .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
   const assistTop=Object.values(playerBestAssist)
     .filter(p=>p.val>0)
     .sort((a,b)=>b.val-a.val)
-    .slice(0,3);
+    .slice(0,3)
+    .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
 
   return{golsTop,assistTop};
 }
@@ -2391,12 +2402,18 @@ function recCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
   const valColors=['#FFD700','#C8D8F0','#D09050'];
+  const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
+  const avWrap=isMe
+    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+  const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   return`<div class="rec-card ${cls[pos]}">
     <div class="rec-medal">${medals[pos]}</div>
-    <div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>
+    ${avWrap}
     <div class="rec-info">
       <div class="rec-name">${p.name}</div>
       <div class="rec-meta">${p.mesLabel}</div>
+      ${atualBadge}
     </div>
     <div class="rec-val">
       <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
@@ -2409,12 +2426,18 @@ function recAssistCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
   const valColors=['#FFD700','#C8D8F0','#D09050'];
+  const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
+  const avWrap=isMe
+    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+  const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   return`<div class="rec-card ${cls[pos]}">
     <div class="rec-medal">${medals[pos]}</div>
-    <div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>
+    ${avWrap}
     <div class="rec-info">
       <div class="rec-name">${p.name}</div>
       <div class="rec-meta">${p.mesLabel}</div>
+      ${atualBadge}
     </div>
     <div class="rec-val">
       <div class="rec-val-num" style="color:${valColors[pos]}">${p.val}</div>
