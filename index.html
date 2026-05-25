@@ -4152,10 +4152,9 @@ window.irParaRankingGA=()=>{
     return canvas;
   }
 
-  // Gera blob em alta resolução (2.25x = ~1080×1440) para salvar/compartilhar
+  // Gera blob redesenhando o card em canvas HD (2.25x) separado
   async function _getShareBlob() {
-    const preview = document.getElementById('share-canvas');
-    if (!preview) return null;
+    if (!_lastCardData) return null;
 
     const SCALE = 2.25;
     const hdCanvas = document.createElement('canvas');
@@ -4163,8 +4162,13 @@ window.irParaRankingGA=()=>{
     hdCanvas.height = Math.round(CARD_H * SCALE);
     const hdCtx = hdCanvas.getContext('2d');
     hdCtx.scale(SCALE, SCALE);
-    // Copia o desenho do preview escalando para HD
-    hdCtx.drawImage(preview, 0, 0, CARD_W, CARD_H);
+    hdCanvas._sharedCtx = hdCtx;
+
+    if (_lastCardType === 'ranking') {
+      await drawRankingCard(hdCanvas, _lastCardData);
+    } else {
+      await drawDueloCard(hdCanvas, _lastCardData);
+    }
 
     return new Promise(res => hdCanvas.toBlob(res, 'image/png'));
   }
@@ -4211,12 +4215,17 @@ window.irParaRankingGA=()=>{
      FUNÇÕES PÚBLICAS — chame estas no onclick
   ═══════════════════════════════════════════════════ */
 
+  let _lastCardData = null;
+  let _lastCardType = null;
+
   window.shareRanking = async function () {
     const data = buildRankingData();
     if (!data || !data.players.length) {
       alert('Nenhum dado de ranking disponível para compartilhar.');
       return;
     }
+    _lastCardData = data;
+    _lastCardType = 'ranking';
     const canvas = openShareModal();
     await drawRankingCard(canvas, data);
   };
@@ -4227,6 +4236,8 @@ window.irParaRankingGA=()=>{
       alert('Selecione dois jogadores no modo duelo antes de compartilhar.');
       return;
     }
+    _lastCardData = data;
+    _lastCardType = 'duelo';
     const canvas = openShareModal();
     await drawDueloCard(canvas, data);
   };
