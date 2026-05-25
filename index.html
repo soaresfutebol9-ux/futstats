@@ -1446,6 +1446,7 @@ const googleProvider = new GoogleAuthProvider();
 
 let currentUser=null,myProfile=null,gd=null,groupId=null,rankStat='ga',editIdx=null,_editingMesKey=null,unsubGroup=null;
 const $=id=>document.getElementById(id);
+const CROWN_SVG=`<svg class="crown-1st" viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg"><g fill="#FFD700" stroke="#B8860B" stroke-width=".8" stroke-linejoin="round"><path d="M20 2c0 0-2 3-2 5.5 0 1.5.8 2.5 2 2.5s2-1 2-2.5c0-2.5-2-5.5-2-5.5z"/><path d="M20 4.5c-1 1.5-1.5 2.8-1.5 4 0 .8.6 1.5 1.5 1.5s1.5-.7 1.5-1.5c0-1.2-.5-2.5-1.5-4z" fill="#FFF176" stroke="none"/><path d="M20 9.5c-.6 0-1 .3-1 .8v1.2h2v-1.2c0-.5-.4-.8-1-.8z"/><path d="M10 5c0 0-.5 2.5 0 4.5.3 1.2 1 2 2 2s1.5-.8 1.5-2c0-2-1-3.5-1-3.5l-2.5-.5z" transform="rotate(-20 12 8)"/><path d="M30 5c0 0 .5 2.5 0 4.5-.3 1.2-1 2-2 2s-1.5-.8-1.5-2c0-2 1-3.5 1-3.5l2.5-.5z" transform="rotate(20 28 8)"/><path d="M5 10l4 8h22l4-8-6 3-9-8-9 8-6-3z"/><rect x="7" y="27" width="26" height="5" rx="2.5"/><rect x="9" y="18" width="22" height="10" rx="1"/><line x1="14" y1="18" x2="14" y2="28" stroke="#B8860B" stroke-width=".6"/><line x1="20" y1="18" x2="20" y2="28" stroke="#B8860B" stroke-width=".6"/><line x1="26" y1="18" x2="26" y2="28" stroke="#B8860B" stroke-width=".6"/></g></svg>`;
 
 // ── TEMA ──
 window.toggleTheme=()=>{
@@ -1993,7 +1994,6 @@ function renderRanking(){
     const anoAtual=new Date().getFullYear().toString();
     const geralData=mbs.map(m=>{const s=getStGeral(m);return{...s,name:m.name,uid:m.uid};}).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist));
     const top3g=geralData.slice(0,3);const restg=geralData.slice(3);
-    const CROWN_SVG=`<svg class="crown-1st" viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg"><g fill="#FFD700" stroke="#B8860B" stroke-width=".8" stroke-linejoin="round"><path d="M20 2c0 0-2 3-2 5.5 0 1.5.8 2.5 2 2.5s2-1 2-2.5c0-2.5-2-5.5-2-5.5z"/><path d="M20 4.5c-1 1.5-1.5 2.8-1.5 4 0 .8.6 1.5 1.5 1.5s1.5-.7 1.5-1.5c0-1.2-.5-2.5-1.5-4z" fill="#FFF176" stroke="none"/><path d="M20 9.5c-.6 0-1 .3-1 .8v1.2h2v-1.2c0-.5-.4-.8-1-.8z"/><path d="M10 5c0 0-.5 2.5 0 4.5.3 1.2 1 2 2 2s1.5-.8 1.5-2c0-2-1-3.5-1-3.5l-2.5-.5z" transform="rotate(-20 12 8)"/><path d="M30 5c0 0 .5 2.5 0 4.5-.3 1.2-1 2-2 2s-1.5-.8-1.5-2c0-2 1-3.5 1-3.5l2.5-.5z" transform="rotate(20 28 8)"/><path d="M5 10l4 8h22l4-8-6 3-9-8-9 8-6-3z"/><rect x="7" y="27" width="26" height="5" rx="2.5"/><rect x="9" y="18" width="22" height="10" rx="1"/><line x1="14" y1="18" x2="14" y2="28" stroke="#B8860B" stroke-width=".6"/><line x1="20" y1="18" x2="20" y2="28" stroke="#B8860B" stroke-width=".6"/><line x1="26" y1="18" x2="26" y2="28" stroke="#B8860B" stroke-width=".6"/></g></svg>`;
     const podiumOrderG=[1,0,2];const podiumClsG=['p2','p1','p3'];const podiumCrownG=['🥈','🥇','🥉'];
     let podiumGeralHTML='';
     if(top3g.length>=2){
