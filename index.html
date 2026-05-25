@@ -3465,8 +3465,8 @@ window.irParaRankingGA=()=>{
 (function () {
 
   /* ── CONSTANTES DE ESTILO ─────────────────────────── */
-  const CARD_W = 480;
-  const CARD_H = 640;
+  const CARD_W = 1080;
+  const CARD_H = 1920;
   const DARK_BG = '#0a0e1a';
   const ACCENT  = '#4dffb0';
   const BLUE    = '#60a5fa';
@@ -3674,22 +3674,24 @@ window.irParaRankingGA=()=>{
       };
     }
 
-    // Geral ou G+A — ambos usam window._getStGeral
+    // G+A usa dados do mês atual (getSt); Geral usa temporada inteira (getStGeral)
     const players = mbs.map(m => {
-      const s = window._getStGeral(m);
+      const s = tipo === 'ga'
+        ? window._getSt(m.uid || m.name, null, !!m.uid)
+        : window._getStGeral(m);
       return { name: m.name, uid: m.uid, photo: m.photo, gols: s.gols, assist: s.assist, ga: s.gols + s.assist };
     }).sort((a, b) => b.ga - a.ga).slice(0, 5);
 
     return {
       tipo: tipo === 'geral' ? 'geral' : 'ga',
-      subtitulo: 'Temporada Atual',
+      subtitulo: tipo === 'ga' ? 'Mês Atual' : 'Temporada Atual',
       players,
     };
   }
 
   async function drawRankingCard(canvas, data) {
     const W = CARD_W, H = CARD_H;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas._sharedCtx || canvas.getContext('2d');
 
     const members = (window._gd && window._gd.members) || [];
     await preloadPhotos(members);
@@ -3865,7 +3867,7 @@ window.irParaRankingGA=()=>{
 
   async function drawDueloCard(canvas, data) {
     const W = CARD_W, H = CARD_H;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas._sharedCtx || canvas.getContext('2d');
     const { mbA, mbB, stats, winner } = data;
 
     await preloadPhotos([mbA, mbB]);
@@ -4139,16 +4141,18 @@ window.irParaRankingGA=()=>{
     modal.style.display = 'flex';
     requestAnimationFrame(() => modal.classList.add('show'));
 
-    // Fix de resolução: renderiza em DPR real (até 3x) para telas Retina/AMOLED
     const canvas = document.getElementById('share-canvas');
-    const dpr = Math.min(window.devicePixelRatio || 1, 3);
-    canvas.width  = CARD_W * dpr;
-    canvas.height = CARD_H * dpr;
-    canvas.style.width  = CARD_W + 'px';
-    canvas.style.height = CARD_H + 'px';
-    // Aplica scale UMA vez aqui; drawRankingCard/drawDueloCard usam CARD_W/CARD_H como coords lógicas
+    canvas.width  = CARD_W;
+    canvas.height = CARD_H;
+    canvas.style.width  = '100%';
+    canvas.style.height = 'auto';
     const ctx = canvas.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // Escala tudo proporcionalmente em relação ao tamanho lógico original (480×640)
+    const scaleX = CARD_W / 480;
+    const scaleY = CARD_H / 640;
+    ctx.scale(scaleX, scaleY);
+    canvas._sharedCtx = ctx;
     return canvas;
   }
 
