@@ -2732,8 +2732,9 @@ function _buildPlayerProfile(uid){
   const cardLabel=isAll?'Todos os tempos':`Temporada ${_mpAnoAtivo}`;
 
   // ── CARD DE MEDALHAS ──────────────────────────────
-  // Conta posição do jogador em TODOS os meses históricos (exceto mês atual)
-  const mesesDispHistorico=allMonths.filter(m=>!m.current); // apenas histórico fechado
+  // Filtra medalhas conforme a temporada selecionada
+  const _anoMedalhas=isAll?null:_mpAnoAtivo;
+  const mesesDispHistorico=allMonths.filter(m=>!m.current&&(_anoMedalhas===null||m.ano===_anoMedalhas));
   const totalMesesDisputados=mesesDispHistorico.length;
   const ouros=mesesDispHistorico.filter(m=>m.pos===1).length;
   const pratas=mesesDispHistorico.filter(m=>m.pos===2).length;
@@ -2743,7 +2744,7 @@ function _buildPlayerProfile(uid){
   const medalhasCard=totalMesesDisputados>0?`
   <div style="background:linear-gradient(135deg,rgba(255,209,102,.12),rgba(255,185,0,.05));border:1.5px solid rgba(255,209,102,.3);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 0 24px rgba(255,185,0,.08)">
     <div style="font-size:10px;color:#FFD166;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-      <span>🏅 Pódio Histórico</span>
+      <span>🏅 Pódio ${isAll?'Geral':_mpAnoAtivo}</span>
       <span style="color:var(--tx3)">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
@@ -4552,7 +4553,8 @@ window.irParaRankingGA=()=>{
   }
 
   // ── CARD: PERFIL INDIVIDUAL ───────────────────────────────────
-  function buildPlayerProfileData(uid) {
+  function buildPlayerProfileData(uid, season) {
+    // season: '2025', '2026', '__all__' (or falsy = all)
     if (!window._gd || !uid) return null;
     const mb = (window._gd.members || []).find(m => m.uid === uid);
     if (!mb) return null;
@@ -4569,22 +4571,34 @@ window.irParaRankingGA=()=>{
         return { uid: mm.uid, ga: mms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0) };
       }).sort((x,y)=>y.ga-x.ga);
       const pos = ranked.findIndex(r=>r.uid===uid)+1||ranked.length+1;
-      allMonths.push({ key: k, g, a, pos });
+      allMonths.push({ key: k, g, a, pos, ano: k.split('-')[0] });
     });
     // Mês atual
     {
       const ms = (window._gd.matches || []).filter(x => mb.uid ? x.uid === mb.uid : x.player === mb.name);
       const g = ms.reduce((s,x)=>s+(x.gols||0),0);
       const a = ms.reduce((s,x)=>s+(x.assist||0),0);
-      allMonths.push({ key: 'atual', g, a, pos: 99, current: true });
+      const mesKey = window._gd.mesAtivo || '';
+      allMonths.push({ key: 'atual', g, a, pos: 99, current: true, ano: mesKey ? mesKey.split('-')[0] : '' });
     }
-    const totalG = allMonths.reduce((s,m)=>s+m.g,0);
-    const totalA = allMonths.reduce((s,m)=>s+m.a,0);
-    const mesesHist = allMonths.filter(m=>!m.current);
+
+    // Filtra por temporada
+    const isAll = !season || season === '__all__';
+    const mesesHist = allMonths.filter(m => !m.current && (isAll || m.ano === season));
+    const allFiltered = isAll ? allMonths : allMonths.filter(m => m.ano === season || m.current);
+
+    const totalG = allFiltered.reduce((s,m)=>s+m.g,0);
+    const totalA = allFiltered.reduce((s,m)=>s+m.a,0);
     const ouros = mesesHist.filter(m=>m.pos===1).length;
     const pratas = mesesHist.filter(m=>m.pos===2).length;
     const bronzes = mesesHist.filter(m=>m.pos===3).length;
-    return { tipo: 'player', name: mb.name, uid, photo: mb.photo, totalG, totalA, ouros, pratas, bronzes, totalMeses: mesesHist.length };
+
+    // Anos disponíveis para o picker
+    const anosSet = new Set(allMonths.filter(m=>!m.current&&m.ano).map(m=>m.ano));
+    const anosDisponiveis = [...anosSet].filter(a=>parseInt(a)>=2025).sort();
+
+    const seasonLabel = isAll ? 'Geral' : season;
+    return { tipo: 'player', name: mb.name, uid, photo: mb.photo, totalG, totalA, ouros, pratas, bronzes, totalMeses: mesesHist.length, season: isAll ? '__all__' : season, seasonLabel, anosDisponiveis };
   }
 
   async function drawPlayerCard(canvas, data) {
@@ -4627,7 +4641,7 @@ window.irParaRankingGA=()=>{
 
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.font = "10px 'DM Mono', monospace";
-    ctx.fillText('PERFIL DO JOGADOR', W/2, 212);
+    ctx.fillText('PERFIL DO JOGADOR · ' + (data.seasonLabel || 'GERAL').toUpperCase(), W/2, 212);
 
     // Linha
     ctx.strokeStyle = 'rgba(255,255,255,0.07)';
@@ -4677,7 +4691,7 @@ window.irParaRankingGA=()=>{
     ctx.fillStyle = 'rgba(255,209,102,0.65)';
     ctx.font = "9px 'DM Mono', monospace";
     ctx.textAlign = 'center';
-    ctx.fillText('🏅 PÓDIO HISTÓRICO', W/2, medalSecY+16);
+    ctx.fillText('🏅 PÓDIO ' + (data.seasonLabel || 'GERAL').toUpperCase(), W/2, medalSecY+16);
     ctx.fillStyle = 'rgba(255,255,255,0.2)';
     ctx.font = "9px 'DM Mono', monospace";
     ctx.fillText(`${data.totalMeses} MÊS${data.totalMeses!==1?'ES':''} DISPUTADO${data.totalMeses!==1?'S':''}`, W/2, medalSecY+30);
@@ -4885,10 +4899,120 @@ window.irParaRankingGA=()=>{
   }
 
   // ── COMPARTILHAR PERFIL DO JOGADOR ───────────────────────────
+  function _createSeasonPickerModal() {
+    if (document.getElementById('season-picker-modal')) return;
+    const style = document.createElement('style');
+    style.textContent = `
+      #season-picker-modal {
+        position: fixed; inset: 0; z-index: 999999;
+        background: rgba(0,0,0,0.82);
+        display: none; align-items: flex-end; justify-content: center;
+        opacity: 0; transition: opacity .22s;
+      }
+      #season-picker-modal.show { opacity: 1; }
+      #season-picker-box {
+        background: #111827;
+        border: 1px solid rgba(77,255,176,0.15);
+        border-radius: 24px 24px 0 0;
+        padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+        width: 100%; max-width: 560px;
+        box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+        display: flex; flex-direction: column; gap: 14px;
+        transform: translateY(40px);
+        transition: transform .3s cubic-bezier(.16,1,.3,1);
+      }
+      #season-picker-modal.show #season-picker-box { transform: translateY(0); }
+      .sp-header { display: flex; align-items: center; justify-content: space-between; }
+      .sp-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .12em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+      .sp-close { background: rgba(255,255,255,0.08); border: none; cursor: pointer; color: rgba(255,255,255,0.5); font-size: 16px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+      .sp-close:hover { background: rgba(255,255,255,0.14); }
+      .sp-desc { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.55); text-align: center; }
+      .sp-options { display: flex; flex-direction: column; gap: 8px; }
+      .sp-opt {
+        padding: 15px 18px; border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.10); cursor: pointer;
+        font-family: 'DM Mono', monospace; font-size: 14px; font-weight: bold;
+        letter-spacing: .04em; background: rgba(255,255,255,0.04);
+        color: #fff; display: flex; align-items: center; gap: 12px;
+        transition: background .15s, border-color .15s;
+        text-align: left; width: 100%;
+      }
+      .sp-opt:hover { background: rgba(77,255,176,0.08); border-color: rgba(77,255,176,0.25); }
+      .sp-opt-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(77,255,176,0.12); border: 1px solid rgba(77,255,176,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+      .sp-opt.sp-opt-all .sp-opt-icon { background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.25); }
+      .sp-hint { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); text-align: center; letter-spacing: .06em; }
+    `;
+    document.head.appendChild(style);
+    const el = document.createElement('div');
+    el.id = 'season-picker-modal';
+    el.innerHTML = `
+      <div id="season-picker-box">
+        <div class="sp-header">
+          <div class="sp-title">Compartilhar Perfil</div>
+          <button class="sp-close" id="sp-close-btn">✕</button>
+        </div>
+        <div class="sp-desc">Escolha qual temporada exportar:</div>
+        <div class="sp-options" id="sp-options"></div>
+        <div class="sp-hint">Toque fora para fechar</div>
+      </div>`;
+    document.body.appendChild(el);
+    document.getElementById('sp-close-btn').onclick = _closeSeasonPicker;
+    el.addEventListener('click', e => { if (e.target === el) _closeSeasonPicker(); });
+  }
+
+  function _closeSeasonPicker() {
+    const el = document.getElementById('season-picker-modal');
+    if (!el) return;
+    el.classList.remove('show');
+    setTimeout(() => { el.style.display = 'none'; }, 260);
+  }
+
   window.sharePlayerProfile = async function () {
     const uid = window._mpUid;
     if (!uid) { alert('Abra o perfil de um jogador primeiro.'); return; }
-    const data = buildPlayerProfileData(uid);
+
+    // Descobre temporadas disponíveis
+    const testData = buildPlayerProfileData(uid, '__all__');
+    if (!testData) { alert('Sem dados para compartilhar.'); return; }
+    const anos = testData.anosDisponiveis || [];
+
+    _createSeasonPickerModal();
+    const modal = document.getElementById('season-picker-modal');
+    const opts = document.getElementById('sp-options');
+
+    // Monta opções dinamicamente
+    let optHTML = '';
+    anos.forEach(a => {
+      optHTML += `<button class="sp-opt" onclick="window._doSharePlayerSeason('${uid}','${a}')">
+        <div class="sp-opt-icon">📅</div>
+        <div>Temporada ${a}</div>
+      </button>`;
+    });
+    if (anos.length > 1) {
+      optHTML += `<button class="sp-opt sp-opt-all" onclick="window._doSharePlayerSeason('${uid}','__all__')">
+        <div class="sp-opt-icon">🌐</div>
+        <div>Geral — todas as temporadas</div>
+      </button>`;
+    }
+    if (!optHTML) {
+      // Sem histórico, compartilha direto como geral
+      const data = buildPlayerProfileData(uid, '__all__');
+      _lastCardData = data;
+      _lastCardType = 'player';
+      const canvas = openShareModal();
+      await drawPlayerCard(canvas, data);
+      return;
+    }
+    opts.innerHTML = optHTML;
+
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('show'));
+  };
+
+  window._doSharePlayerSeason = async function(uid, season) {
+    _closeSeasonPicker();
+    await new Promise(r => setTimeout(r, 260)); // aguarda fechar picker
+    const data = buildPlayerProfileData(uid, season);
     if (!data) { alert('Sem dados para compartilhar.'); return; }
     _lastCardData = data;
     _lastCardType = 'player';
