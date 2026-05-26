@@ -2393,7 +2393,7 @@ async function checkMesViradaWith(gid,cur){
   return cur;
 }
 function enterApp(){
-  $('hname').textContent=gd.name;
+  const _hn=$('hname');if(_hn)_hn.textContent=gd.name;
   const mesLabel=getMesLabel(gd.mesAtivo||mesAtual());
   $('rank-mes-titulo').textContent=mesLabel.split(' ')[0].toUpperCase();
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
