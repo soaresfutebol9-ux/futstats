@@ -4573,7 +4573,7 @@ window.irParaRankingGA=()=>{
   // Gradientes metálicos para o canvas de compartilhamento
   function makeMetalGrad(ctx, x, y, w, h, stops) {
     const g = ctx.createLinearGradient(x, y, x + w, y + h);
-    stops.forEach(([pos, col]) => g.addColorStop(pos, col));
+    stops.forEach(([stopPos, stopCol]) => g.addColorStop(stopPos, stopCol));
     return g;
   }
 
@@ -4584,7 +4584,8 @@ window.irParaRankingGA=()=>{
     ctx.textAlign = 'center';
     const m = ctx.measureText(text);
     const tw = m.width;
-    const th = parseInt(font) * 1.2;
+    const fontSize = parseFloat(font.match(/(\d+(?:\.\d+)?)px/)?.[1] || 16);
+    const th = fontSize * 1.2;
     const g = ctx.createLinearGradient(x - tw/2, y - th, x + tw/2, y);
     g.addColorStop(0,   '#666666');
     g.addColorStop(0.3, '#1a1a1a');
@@ -4695,7 +4696,7 @@ window.irParaRankingGA=()=>{
       ctx.beginPath();
       ctx.arc(cx, avY, avR + 4, 0, Math.PI * 2);
       const ringG = ctx.createLinearGradient(cx - avR, avY - avR, cx + avR, avY + avR);
-      metalStops[vi].slice(0, 5).forEach(([p, c]) => ringG.addColorStop(p, c));
+      metalStops[vi].slice(0, 5).forEach(([stopPos, stopCol]) => ringG.addColorStop(stopPos, stopCol));
       ctx.strokeStyle = ringG;
       ctx.lineWidth = 3;
       ctx.stroke();
@@ -5500,17 +5501,17 @@ window.irParaRankingGA=()=>{
     ctx.restore();
 
     const medals = ['🥇', '🥈', '🥉'];
-    const valColors = ['#e0c134', '#8190a1', '#966c45'];
-    const bgColors = [
-      'rgba(224,193,52,0.2)',
-      'rgba(129,144,161,0.15)',
-      'rgba(150,108,69,0.15)',
+
+    // Gradientes metálicos idênticos ao CSS da UI
+    const metalStopsRec = [
+      // ouro
+      [[0,'#fffde0'],[0.1,'#ffe066'],[0.22,'#c89000'],[0.34,'#f5c400'],[0.46,'#c8860a'],[0.58,'#f0c010'],[0.68,'#fff0a0'],[0.78,'#b8880a'],[0.88,'#f5d020'],[0.96,'#ffe880'],[1,'#d4a000']],
+      // prata
+      [[0,'#f8fbff'],[0.1,'#d0dce8'],[0.22,'#8090a4'],[0.35,'#c0d0e0'],[0.48,'#6a8098'],[0.58,'#a8c0d4'],[0.68,'#e4f0fa'],[0.78,'#7890a4'],[0.88,'#c0d0e0'],[0.94,'#f0f6fc'],[1,'#98aec0']],
+      // bronze
+      [[0,'#fce8c8'],[0.1,'#d4895a'],[0.22,'#a85820'],[0.34,'#e09860'],[0.46,'#8a4810'],[0.58,'#c87838'],[0.68,'#f0c080'],[0.78,'#7a3808'],[0.88,'#d4895a'],[0.96,'#e8b080'],[1,'#904020']],
     ];
-    const borderColors = [
-      'rgba(224,193,52,0.6)',
-      'rgba(129,144,161,0.5)',
-      'rgba(150,108,69,0.5)',
-    ];
+    const borderColorsRec = ['#d4a000', '#788898', '#904020'];
 
     const rowH = 72;
     const startY = badgeY + 56;
@@ -5522,15 +5523,21 @@ window.irParaRankingGA=()=>{
       const ry = startY + i * (rowH + 10);
       const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
 
-      // Card bg
+      // Fundo metálico do card
       ctx.save();
       roundRect(ctx, margin, ry, listW, rowH, 14);
-      ctx.fillStyle = bgColors[i];
+      const mg = ctx.createLinearGradient(margin, ry, margin + listW, ry + rowH);
+      metalStopsRec[i].forEach(([sp, sc]) => mg.addColorStop(sp, sc));
+      ctx.fillStyle = mg;
       ctx.fill();
-      ctx.strokeStyle = borderColors[i];
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = borderColorsRec[i];
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.7;
       ctx.stroke();
       ctx.restore();
+
+      // Shimmer
+      drawShimmer(ctx, margin, ry, listW, rowH, 14);
 
       // Medal
       ctx.save();
@@ -5545,10 +5552,10 @@ window.irParaRankingGA=()=>{
       const avR = 20;
       drawAvatar(ctx, avX, avY, avR, p.name, photo);
 
-      // Name & month
+      // Name & month — escuro para contrastar com fundo claro
       ctx.save();
       ctx.font = "bold 14px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#1a1a1a';
       ctx.textAlign = 'left';
       const maxNameW = listW - 130;
       let nameText = p.name;
@@ -5557,18 +5564,18 @@ window.irParaRankingGA=()=>{
       if (nameText !== p.name) nameText += '…';
       ctx.fillText(nameText, avX + avR + 12, ry + rowH / 2 - 2);
       ctx.font = "11px 'DM Mono', monospace";
-      ctx.fillStyle = 'rgba(255,255,255,0.40)';
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
       ctx.fillText(p.mesLabel, avX + avR + 12, ry + rowH / 2 + 15);
       ctx.restore();
 
-      // Value
+      // Valor — preto metálico
       ctx.save();
       ctx.textAlign = 'right';
-      shadowText(ctx, String(p.val), W - margin - 14, ry + rowH / 2 + 10, valColors[i], "normal 30px 'ClassyVogue', sans-serif");
+      drawDarkMetalText(ctx, String(p.val), W - margin - 14, ry + rowH / 2 + 10, "normal 30px 'ClassyVogue', sans-serif");
       ctx.textAlign = 'right';
       const lbl = isGols ? (p.val === 1 ? 'gol' : 'gols') : (p.val === 1 ? 'assist.' : 'assists.');
       ctx.font = "9px 'DM Mono', monospace";
-      ctx.fillStyle = 'rgba(255,255,255,0.30)';
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
       ctx.fillText(lbl.toUpperCase(), W - margin - 14, ry + rowH / 2 + 24);
       ctx.restore();
     }
