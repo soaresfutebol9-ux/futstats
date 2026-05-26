@@ -4570,6 +4570,53 @@ window.irParaRankingGA=()=>{
     };
   }
 
+  // Gradientes metálicos para o canvas de compartilhamento
+  function makeMetalGrad(ctx, x, y, w, h, stops) {
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    stops.forEach(([pos, col]) => g.addColorStop(pos, col));
+    return g;
+  }
+
+  // Desenha texto com gradiente metálico preto
+  function drawDarkMetalText(ctx, text, x, y, font) {
+    ctx.save();
+    ctx.font = font;
+    ctx.textAlign = 'center';
+    const m = ctx.measureText(text);
+    const tw = m.width;
+    const th = parseInt(font) * 1.2;
+    const g = ctx.createLinearGradient(x - tw/2, y - th, x + tw/2, y);
+    g.addColorStop(0,   '#666666');
+    g.addColorStop(0.3, '#1a1a1a');
+    g.addColorStop(0.55,'#000000');
+    g.addColorStop(0.75,'#2a2a2a');
+    g.addColorStop(1,   '#111111');
+    ctx.fillStyle = g;
+    // brilho claro sutil por baixo
+    ctx.shadowColor = 'rgba(255,255,255,0.55)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = -1;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  // Efeito de reflexo/shimmer numa área do canvas
+  function drawShimmer(ctx, x, y, w, h, r) {
+    ctx.save();
+    roundRect(ctx, x, y, w, h, r);
+    ctx.clip();
+    const sweep = ctx.createLinearGradient(x - w * 0.3, y, x + w * 1.3, y);
+    sweep.addColorStop(0,    'rgba(255,255,255,0)');
+    sweep.addColorStop(0.38, 'rgba(255,255,255,0)');
+    sweep.addColorStop(0.48, 'rgba(255,255,255,0.55)');
+    sweep.addColorStop(0.52, 'rgba(255,255,255,0.7)');
+    sweep.addColorStop(0.62, 'rgba(255,255,255,0)');
+    sweep.addColorStop(1,    'rgba(255,255,255,0)');
+    ctx.fillStyle = sweep;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+  }
+
   async function drawRankingCard(canvas, data) {
     const W = CARD_W, H = CARD_H;
     const ctx = canvas._sharedCtx || canvas.getContext('2d');
@@ -4593,98 +4640,124 @@ window.irParaRankingGA=()=>{
     }
 
     /* ── PÓDIO TOP 3 ── */
-    const podiumY   = 200;
+    const podiumY   = 195;
     const positions = [1, 0, 2]; // visual: 2º, 1º, 3º
     const podiumX   = [W * 0.25, W * 0.5, W * 0.75];
     const podiumH   = [80, 110, 60];
-    const medalColors= [SILVER, GOLD, BRONZE];
-    const medals     = ['🥈', '🥇', '🥉'];
+    const cardW     = 108;
+    const cardR     = 14;
+
+    // Stops de gradiente metálico para cada medalha (de cima para baixo)
+    const metalStops = [
+      // prata (pos visual 0 = 2º lugar)
+      [[0,'#f8fbff'],[0.1,'#d0dce8'],[0.22,'#8090a4'],[0.35,'#c0d0e0'],[0.48,'#6a8098'],[0.58,'#a8c0d4'],[0.68,'#e4f0fa'],[0.78,'#7890a4'],[0.88,'#c0d0e0'],[0.94,'#f0f6fc'],[1,'#98aec0']],
+      // ouro (pos visual 1 = 1º lugar)
+      [[0,'#fffde0'],[0.1,'#ffe066'],[0.22,'#c89000'],[0.34,'#f5c400'],[0.46,'#c8860a'],[0.58,'#f0c010'],[0.68,'#fff0a0'],[0.78,'#b8880a'],[0.88,'#f5d020'],[0.96,'#ffe880'],[1,'#d4a000']],
+      // bronze (pos visual 2 = 3º lugar)
+      [[0,'#fce8c8'],[0.1,'#d4895a'],[0.22,'#a85820'],[0.34,'#e09860'],[0.46,'#8a4810'],[0.58,'#c87838'],[0.68,'#f0c080'],[0.78,'#7a3808'],[0.88,'#d4895a'],[0.96,'#e8b080'],[1,'#904020']],
+    ];
+    const ringColors = ['#a0b4c8','#d4a000','#904020'];
+    const medals     = ['🥈','🥇','🥉'];
+    const avR        = 30;
 
     positions.forEach((pi, vi) => {
       const p = players[pi];
       if (!p) return;
 
-      const cx = podiumX[vi];
+      const cx    = podiumX[vi];
       const blockY = podiumY + (110 - podiumH[vi]);
+      const bx    = cx - cardW / 2;
+      const bh    = podiumH[vi] + 55;
 
-      // Bloco do pódio
-      const blockGrad = ctx.createLinearGradient(cx - 44, blockY, cx + 44, blockY + podiumH[vi]);
-      blockGrad.addColorStop(0, pi === 0 ? 'rgba(224,193,52,0.35)' : pi === 1 ? 'rgba(129,144,161,0.25)' : 'rgba(150,108,69,0.25)');
-      blockGrad.addColorStop(1, 'rgba(255,255,255,0.03)');
-      ctx.fillStyle = blockGrad;
-      roundRect(ctx, cx - 44, blockY, 88, podiumH[vi] + 50, 10);
+      // Fundo metálico do bloco
+      const mg = makeMetalGrad(ctx, bx, blockY, cardW, bh, metalStops[vi]);
+      ctx.fillStyle = mg;
+      roundRect(ctx, bx, blockY, cardW, bh, cardR);
       ctx.fill();
 
-      // Avatar
-      const avY = blockY - 34;
-      const avR = 30;
-      const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
-
-      // anel colorido
+      // Borda
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, avY, avR + 3, 0, Math.PI * 2);
-      ctx.strokeStyle = medalColors[vi];
-      ctx.lineWidth = 2.5;
+      roundRect(ctx, bx, blockY, cardW, bh, cardR);
+      ctx.strokeStyle = ringColors[vi];
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.7;
       ctx.stroke();
       ctx.restore();
 
-      drawAvatar(ctx, cx, avY, avR, p.name, photo);
+      // Shimmer / reflexo
+      drawShimmer(ctx, bx, blockY, cardW, bh, cardR);
 
-      // Medalha
-      ctx.font = '16px serif';
+      // Avatar
+      const avY = blockY - avR - 4;
+
+      // anel metálico ao redor do avatar
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, avY, avR + 4, 0, Math.PI * 2);
+      const ringG = ctx.createLinearGradient(cx - avR, avY - avR, cx + avR, avY + avR);
+      metalStops[vi].slice(0, 5).forEach(([p, c]) => ringG.addColorStop(p, c));
+      ctx.strokeStyle = ringG;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+
+      drawAvatar(ctx, cx, avY, avR, p.name, p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null);
+
+      // Medalha emoji
+      ctx.font = '15px serif';
       ctx.textAlign = 'center';
-      ctx.fillText(medals[vi], cx, blockY + 18);
+      ctx.fillText(medals[vi], cx, blockY + 17);
 
       // Nome
-      ctx.fillStyle = '#ffffff';
-      ctx.font = "bold 11px 'DM Mono', monospace";
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,255,255,0.4)';
+      ctx.shadowBlur = 3;
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = "bold 10px 'DM Mono', monospace";
       ctx.textAlign = 'center';
       const shortName = p.name.split(' ')[0];
-      ctx.fillText(shortName.length > 9 ? shortName.slice(0, 8) + '.' : shortName, cx, blockY + 32);
+      ctx.fillText(shortName.length > 9 ? shortName.slice(0, 8) + '.' : shortName, cx, blockY + 31);
+      ctx.restore();
 
-      // Valor
+      // Valor — preto metálico
       if (data.tipo === 'pen') {
-        shadowText(ctx, p.pct + '%', cx, blockY + 52, medalColors[vi], "bold 18px 'DM Mono', monospace");
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        drawDarkMetalText(ctx, p.pct + '%', cx, blockY + 51, "bold 19px 'DM Mono', monospace");
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
         ctx.font = "9px 'DM Mono', monospace";
-        ctx.fillText(p.penOk + '/' + p.penBat, cx, blockY + 65);
+        ctx.textAlign = 'center';
+        ctx.fillText(p.penOk + '/' + p.penBat, cx, blockY + 64);
       } else {
-        shadowText(ctx, String(p.ga), cx, blockY + 50, medalColors[vi], "bold 20px 'DM Mono', monospace");
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        drawDarkMetalText(ctx, String(p.ga), cx, blockY + 51, "bold 22px 'DM Mono', monospace");
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
         ctx.font = "9px 'DM Mono', monospace";
+        ctx.textAlign = 'center';
         ctx.fillText(p.gols + 'G · ' + p.assist + 'A', cx, blockY + 63);
       }
     });
 
     /* ── LISTA 4º e 5º ── */
-    const listY  = podiumY + 175;
+    const listY  = podiumY + 178;
     const rowH   = 52;
     players.slice(3).forEach((p, i) => {
       const ry = listY + i * rowH;
       const photo = p.photo || (members.find(m => m.uid === p.uid) || {}).photo || null;
 
-      // fundo da linha
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
       roundRect(ctx, 24, ry, W - 48, rowH - 6, 10);
       ctx.fill();
 
-      // posição
       ctx.fillStyle = 'rgba(255,255,255,0.35)';
       ctx.font = "bold 12px 'DM Mono', monospace";
       ctx.textAlign = 'left';
       ctx.fillText(String(i + 4), 40, ry + 24);
 
-      // avatar
       drawAvatar(ctx, 72, ry + 20, 18, p.name, photo);
 
-      // nome
       ctx.fillStyle = '#ffffff';
       ctx.font = "13px 'DM Mono', monospace";
       ctx.textAlign = 'left';
       ctx.fillText(p.name.split(' ')[0], 98, ry + 24);
 
-      // valor
       ctx.textAlign = 'right';
       if (data.tipo === 'pen') {
         ctx.fillStyle = ACCENT;
