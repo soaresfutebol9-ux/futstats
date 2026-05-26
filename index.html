@@ -184,14 +184,123 @@ html.save-data #sl::before,
 html.save-data #sl::after{display:none}
 
 /* ── SPLASH ── */
-#splash{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;transition:opacity .5s,visibility .5s}
+#splash{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;transition:opacity .6s,visibility .6s}
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.sp-logo{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px}
-.sp-logo span{color:var(--g)}
-.sp-sub{font-size:13px;color:var(--tx2);font-family:'DM Mono',monospace;letter-spacing:3px;margin-top:-4px}
-.sp-bar{width:140px;height:3px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:8px}
-.sp-fill{height:100%;background:var(--g);border-radius:99px;animation:spfill 1.4s ease forwards}
+
+.sp-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+
+/* Logo principal — letras metálicas em cascata */
+.sp-logo{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,8vw,52px);
+  font-weight:800;
+  letter-spacing:-2px;
+  max-width:90vw;
+  text-align:center;
+  overflow:hidden;
+  display:flex;
+  align-items:baseline;
+  position:relative;
+}
+
+/* Letras brancas — efeito metal prateado */
+.sp-logo .sp-char{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(65%) scaleY(.5);
+  animation:sp-char-in .7s cubic-bezier(.22,1,.36,1) forwards;
+  background: linear-gradient(180deg,
+    #ffffff 0%,
+    #d0d0d0 28%,
+    #a8a8a8 48%,
+    #e8e8e8 60%,
+    #ffffff 72%,
+    #c0c0c0 100%
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,.25));
+}
+
+/* Letras verdes — efeito metal esmeralda */
+.sp-logo .sp-char.green{
+  background: linear-gradient(180deg,
+    #a8ffd8 0%,
+    #4dffb0 22%,
+    #26d68a 45%,
+    #6effc8 58%,
+    #4dffb0 72%,
+    #1aaa6e 100%
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter: drop-shadow(0 0 8px rgba(77,255,176,.4));
+}
+
+/* Delays em cascata mais lentos */
+.sp-char:nth-child(1){animation-delay:.3s}
+.sp-char:nth-child(2){animation-delay:.42s}
+.sp-char:nth-child(3){animation-delay:.54s}
+.sp-char:nth-child(4){animation-delay:.68s}
+.sp-char:nth-child(5){animation-delay:.80s}
+.sp-char:nth-child(6){animation-delay:.92s}
+.sp-char:nth-child(7){animation-delay:1.04s}
+.sp-char:nth-child(8){animation-delay:1.16s}
+
+@keyframes sp-char-in{
+  0%  {opacity:0;transform:translateY(65%) scaleY(.5)}
+  55% {opacity:1;transform:translateY(-5%) scaleY(1.07)}
+  100%{opacity:1;transform:translateY(0) scaleY(1)}
+}
+
+/* Brilho metálico percorrendo a logo */
+.sp-logo::after{
+  content:'';
+  position:absolute;top:0;left:-100%;
+  width:55%;height:100%;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.08) 30%,
+    rgba(255,255,255,.45) 50%,
+    rgba(255,255,255,.08) 70%,
+    transparent 100%
+  );
+  transform:skewX(-18deg);
+  animation:sp-shine 1.2s 1.7s ease-in-out forwards;
+  opacity:0;pointer-events:none;
+}
+@keyframes sp-shine{
+  0%  {opacity:1;left:-100%}
+  100%{opacity:0;left:140%}
+}
+
+/* Subtítulo */
+.sp-sub{font-size:clamp(10px,2.5vw,13px);color:var(--tx2);font-family:'DM Mono',monospace;letter-spacing:4px;opacity:0;animation:sp-fade-up .5s 1.5s ease forwards}
+@keyframes sp-fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Barra de progresso */
+.sp-bar{width:clamp(100px,40vw,140px);height:2px;background:var(--bg3);border-radius:99px;overflow:hidden;opacity:0;animation:sp-fade-up .5s 1.6s ease forwards}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--gd),var(--g));border-radius:99px;animation:spfill 1.8s 1.6s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes spfill{from{width:0}to{width:100%}}
+
+/* ── RESPONSIVIDADE SPLASH / LOGO ── */
+@media (max-width:480px){
+  .sp-logo{font-size:clamp(28px,9vw,40px);letter-spacing:-1px}
+  .sp-sub{font-size:11px;letter-spacing:2px}
+  .sp-bar{width:clamp(80px,35vw,120px)}
+  .auth-logo{font-size:clamp(26px,9vw,38px);letter-spacing:-1px}
+  .auth-logo-wrap{margin-bottom:1.25rem}
+}
+@media (max-width:360px){
+  .sp-logo{font-size:28px;letter-spacing:-.5px}
+  .auth-logo{font-size:26px;letter-spacing:-.5px}
+}
+@media (min-width:1024px){
+  .sp-logo{font-size:56px}
+  .auth-logo{font-size:52px}
+}
 
 .screen{display:none;min-height:100vh;flex-direction:column;opacity:0;transition:opacity .3s}
 .screen.active{display:flex;opacity:1}
@@ -225,7 +334,7 @@ html.save-data #sl::after{display:none}
 .auth-ball{font-size:48px;display:block;margin-bottom:12px;animation:bounce 3s ease-in-out infinite}
 html.is-touch .auth-ball{animation:none}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.auth-logo{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1}
+.auth-logo{font-family:'Syne',sans-serif;font-size:clamp(30px,8vw,48px);font-weight:800;letter-spacing:-2px;line-height:1;max-width:90vw;text-align:center}
 .auth-logo span{color:var(--g)}
 .auth-tagline{font-size:13px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.15em;margin-top:8px;text-transform:uppercase}
 
@@ -360,16 +469,43 @@ body.light #sa::before{
 body.light .ah::after{
   background:linear-gradient(90deg,transparent,rgba(0,201,122,.3) 40%,rgba(0,201,122,.15) 60%,transparent);
 }
-.ah-left{display:flex;align-items:center;gap:12px;cursor:pointer}
+.ah-left{display:flex;align-items:center;gap:8px}
 .ah-center{
   position:absolute;left:50%;transform:translateX(-50%);
   display:flex;align-items:center;pointer-events:none;
   max-width:160px;
 }
 .ah{position:relative}
-.ah-avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--bo2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:500}
+
+/* Logo metálica no cabeçalho */
+.ah-logo{
+  display:flex;align-items:baseline;gap:0;
+  font-family:'Syne',sans-serif;
+  font-size:clamp(20px,5vw,26px);
+  font-weight:800;
+  letter-spacing:-1px;
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+.ah-logo .ahl-char{
+  display:inline-block;
+  background:linear-gradient(180deg,#ffffff 0%,#d0d0d0 28%,#a8a8a8 48%,#e8e8e8 60%,#ffffff 72%,#c0c0c0 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.2));
+}
+.ah-logo .ahl-char.g{
+  background:linear-gradient(180deg,#a8ffd8 0%,#4dffb0 22%,#26d68a 45%,#6effc8 58%,#4dffb0 72%,#1aaa6e 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 5px rgba(77,255,176,.35));
+}
+
+/* Avatar lado direito */
+.ah-right{display:flex;align-items:center;gap:8px;cursor:pointer}
+.ah-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--bo2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;transition:border-color .2s}
+.ah-right:hover .ah-avatar{border-color:var(--g)}
 .ah-avatar img{width:100%;height:100%;object-fit:cover}
-.ah-name{font-size:15px;font-weight:600;color:var(--tx);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-name{font-size:13px;font-weight:600;color:var(--tx2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gname{
   font-family:'BlackMustang',sans-serif;
   font-size:20px;
@@ -1315,9 +1451,13 @@ body::before{
 
 <!-- SPLASH -->
 <div id="splash">
-  <div class="sp-logo">FUT<span>STATS</span></div>
-  <div class="sp-sub">CARREGANDO</div>
-  <div class="sp-bar"><div class="sp-fill"></div></div>
+  <div class="sp-wrap">
+    <div class="sp-logo">
+      <span class="sp-char">F</span><span class="sp-char">U</span><span class="sp-char">T</span><span class="sp-char green">S</span><span class="sp-char green">T</span><span class="sp-char green">A</span><span class="sp-char green">T</span><span class="sp-char green">S</span>
+    </div>
+    <div class="sp-sub">CARREGANDO</div>
+    <div class="sp-bar"><div class="sp-fill"></div></div>
+  </div>
 </div>
 
 <!-- ══ AUTH ══ -->
@@ -1425,14 +1565,19 @@ body::before{
 <!-- ══ APP ══ -->
 <div id="sa" class="screen">
   <div class="ah">
-    <div class="ah-left" onclick="openPerfilPanel()">
-      <div class="ah-avatar" id="ah-av-wrap"></div>
-      <div class="ah-name" id="ah-uname">—</div>
+    <!-- Logo metálica (esquerda) -->
+    <div class="ah-logo">
+      <span class="ahl-char">F</span><span class="ahl-char">U</span><span class="ahl-char">T</span><span class="ahl-char g">S</span><span class="ahl-char g">T</span><span class="ahl-char g">A</span><span class="ahl-char g">T</span><span class="ahl-char g">S</span>
     </div>
+    <!-- Nome do grupo (centro) -->
     <div class="ah-center">
       <div class="gname" id="hname">Grupo</div>
     </div>
-    <div style="width:52px"></div>
+    <!-- Avatar perfil (direita) -->
+    <div class="ah-right" onclick="openPerfilPanel()">
+      <div class="ah-name" id="ah-uname">—</div>
+      <div class="ah-avatar" id="ah-av-wrap"></div>
+    </div>
   </div>
   <div class="ac">
     <!-- RANKING -->
@@ -1617,37 +1762,37 @@ body::before{
 
 <!-- PANEL PERFIL (agora completo: conta + grupo + partidas recentes) -->
 <div class="ov" id="pperfil">
-  <div class="pan" style="padding:0;overflow:hidden;border-radius:22px 22px 0 0;background:var(--bg2);box-shadow:0 -8px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06),0 0 80px rgba(77,255,176,.05)">
+  <div class="pan" style="padding:0;overflow:hidden;border-radius:22px 22px 0 0;background:#ecedeb;box-shadow:0 -8px 40px rgba(0,0,0,.35),0 0 0 1px #b7b8b6">
 
-    <!-- Header premium com gradiente -->
-    <div style="position:relative;background:linear-gradient(160deg,rgba(77,255,176,.12) 0%,rgba(77,255,176,.04) 40%,transparent 70%);border-bottom:1px solid var(--bo2);padding:1.4rem 1.4rem 1.2rem">
+    <!-- Header -->
+    <div style="position:relative;background:#b7b8b6;border-bottom:1px solid #b7b8b6;padding:1.4rem 1.4rem 1.2rem">
       <!-- Botão X -->
-      <button onclick="closeP('pperfil')" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);color:var(--tx2);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='var(--re)';this.style.color='#fff';this.style.borderColor='transparent'" onmouseout="this.style.background='var(--bg3)';this.style.color='var(--tx2)';this.style.borderColor='var(--bo2)'">×</button>
+      <button onclick="closeP('pperfil')" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#ecedeb;border:1px solid #b7b8b6;color:#494a48;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='var(--re)';this.style.color='#fff';this.style.borderColor='transparent'" onmouseout="this.style.background='#ecedeb';this.style.color='#494a48';this.style.borderColor='#b7b8b6'">×</button>
       <!-- Avatar + info -->
       <div style="display:flex;align-items:center;gap:16px">
         <div style="position:relative">
           <div class="profile-panel-avatar" id="pperfil-av" onclick="document.getElementById('photo-input-profile').click()" style="width:72px;height:72px;border:2px solid rgba(77,255,176,.4);box-shadow:0 0 20px rgba(77,255,176,.2)">
             <div class="edit-overlay">📷</div>
           </div>
-          <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:var(--g);border-radius:50%;border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
+          <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:var(--g);border-radius:50%;border:2px solid #b7b8b6;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
         </div>
         <input type="file" id="photo-input-profile" accept="image/*" onchange="updateProfilePhoto(this)">
         <div style="flex:1;min-width:0">
-          <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:var(--tx)" id="pperfil-nome">—</div>
-          <div style="font-size:12px;color:var(--tx2);margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
-          <div style="font-size:10px;color:var(--tx3);margin-top:4px;font-family:'DM Mono',monospace">Toque na foto para alterar</div>
+          <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000" id="pperfil-nome">—</div>
+          <div style="font-size:12px;color:#494a48;margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
+          <div style="font-size:10px;color:#353635;margin-top:4px;font-family:'DM Mono',monospace">Toque na foto para alterar</div>
         </div>
       </div>
     </div>
 
     <!-- Corpo com scroll -->
-    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(88vh - 130px);padding:1.2rem 1.4rem 1.5rem">
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(88vh - 130px);padding:1.2rem 1.4rem 1.5rem;background:#ecedeb">
 
       <!-- Editar nome -->
-      <div style="background:var(--bg3);border:1px solid var(--bo2);border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.2)">
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">✏️ Alterar nome</div>
+      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
+        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">✏️ Alterar nome</div>
         <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:var(--bg4);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s" onfocus="this.style.borderColor='var(--g)';this.style.boxShadow='0 0 0 3px rgba(77,255,176,.12)'" onblur="this.style.borderColor='var(--bo2)';this.style.boxShadow='none'">
+          <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s" onfocus="this.style.borderColor='var(--g)';this.style.boxShadow='0 0 0 3px rgba(77,255,176,.12)'" onblur="this.style.borderColor='#b7b8b6';this.style.boxShadow='none'">
           <button onclick="salvarNovoNome()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3)" onmouseover="this.style.filter='brightness(1.1)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">Salvar</button>
         </div>
         <div id="nome-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Nome atualizado!</div>
@@ -1661,13 +1806,13 @@ body::before{
       <div id="pperfil-stats-total" style="margin-bottom:1rem"></div>
 
       <!-- Info do grupo -->
-      <div style="background:var(--bg3);border:1px solid var(--bo2);border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.2)">
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏟️ Grupo</div>
-        <div style="font-size:17px;font-weight:700;margin-bottom:4px;color:var(--tx)" id="pperfil-gname">—</div>
-        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;word-break:break-all;margin-bottom:12px" id="pperfil-gcode">—</div>
+      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
+        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏟️ Grupo</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px;color:#000000" id="pperfil-gname">—</div>
+        <div style="font-size:11px;color:#353635;font-family:'DM Mono',monospace;word-break:break-all;margin-bottom:12px" id="pperfil-gcode">—</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="copyCodePerfil()" style="flex:1;background:var(--bg4);border:1px solid var(--bo2);color:var(--tx2);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-code-btn-perfil">📋 Copiar código</button>
-          <button onclick="copyInviteLinkPerfil()" style="flex:1;background:var(--bg4);border:1px solid var(--bo2);color:var(--tx2);border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-link-btn-perfil">🔗 Link convite</button>
+          <button onclick="copyCodePerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-code-btn-perfil">📋 Copiar código</button>
+          <button onclick="copyInviteLinkPerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-link-btn-perfil">🔗 Link convite</button>
         </div>
       </div>
 
@@ -2011,26 +2156,26 @@ function renderPerfilPanelStats(){
   // ── Card do mês atual ──
   const statsEl=$('pperfil-stats-mes');
   if(statsEl) statsEl.innerHTML=`
-    <div style="background:linear-gradient(135deg,rgba(77,255,176,.09),rgba(77,255,176,.02));border:1.5px solid rgba(77,255,176,.25);border-radius:14px;padding:14px 16px;box-shadow:0 0 24px rgba(77,255,176,.07),0 4px 16px rgba(0,0,0,.25)">
+    <div style="background:#7ed693;border:1.5px solid #40c960;border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:10px;color:var(--g);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Mês atual</div>
-        <div style="font-size:13px;font-weight:700;color:var(--tx);font-family:'Freshman',sans-serif;letter-spacing:.5px">${mesLabel}</div>
+        <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Mês atual</div>
+        <div style="font-size:13px;font-weight:700;color:#000000;font-family:'Freshman',sans-serif;letter-spacing:.5px">${mesLabel}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-        <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#4dffb0;line-height:1">${s.gols}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Gols</div>
+        <div style="background:#ecedeb;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.15)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${s.gols}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Gols</div>
         </div>
-        <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#60a5fa;line-height:1">${s.assist}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Assist.</div>
+        <div style="background:#ecedeb;border:2px solid #2a9cc9;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.15)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${s.assist}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Assist.</div>
         </div>
-        <div style="background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#FFD166;line-height:1">${s.gols+s.assist}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">G+A</div>
+        <div style="background:#ecedeb;border:2px solid #88ddeb;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.15)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${s.gols+s.assist}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">G+A</div>
         </div>
       </div>
-      ${pct!==null?`<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.15);border-radius:10px;padding:10px 14px;border:1px solid var(--bo)"><div style="font-size:13px;color:var(--tx2);font-family:'DM Mono',monospace">🥅 Pênaltis: ${s.penOk}/${s.penBat}</div><div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:${corPct}">${pct}%</div></div>`:''}
+      ${pct!==null?`<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;background:#ecedeb;border-radius:10px;padding:10px 14px;border:1px solid #b7b8b6;box-shadow:0 2px 8px rgba(0,0,0,.1)"><div style="font-size:13px;color:#494a48;font-family:'DM Mono',monospace">🥅 Pênaltis: ${s.penOk}/${s.penBat}</div><div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:${corPct}">${pct}%</div></div>`:''}
     </div>`;
 
   // ── Card de totais gerais ──
@@ -2045,20 +2190,20 @@ function renderPerfilPanelStats(){
       ta+=ms.reduce((acc,x)=>acc+(x.assist||0),0);
     });
     totalEl.innerHTML=`
-    <div style="background:var(--bg3);border:1px solid var(--bo2);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.25)">
-      <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">📊 Total geral — todos os meses</div>
+    <div style="background:#ecedeb;border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+      <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">📊 Total geral — todos os meses</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-        <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#4dffb0;line-height:1">${tg}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Gols</div>
+        <div style="background:#ecedeb;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${tg}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Gols</div>
         </div>
-        <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#60a5fa;line-height:1">${ta}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Assist.</div>
+        <div style="background:#ecedeb;border:2px solid #2a9cc9;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${ta}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Assist.</div>
         </div>
-        <div style="background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#FFD166;line-height:1">${tg+ta}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">G+A</div>
+        <div style="background:#ecedeb;border:2px solid #88ddeb;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${tg+ta}</div>
+          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">G+A</div>
         </div>
       </div>
     </div>`;
@@ -2594,22 +2739,12 @@ function renderRanking(){
       <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">📊 Pênaltis totais</div>
     </div>`;
 
-    const legendaHTML=`<div class="card" style="margin-bottom:1rem;padding:.75rem 1.1rem">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Legenda de acertividade</div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:50%;background:#EB5757"></div><span style="color:var(--tx2)">≤50% — ruim</span></div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:50%;background:#F2994A"></div><span style="color:var(--tx2)">51–65% — regular</span></div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:50%;background:#F2C94C"></div><span style="color:var(--tx2)">66–75% — bom</span></div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-family:'DM Mono',monospace"><div style="width:8px;height:8px;border-radius:50%;background:#6FCF97"></div><span style="color:var(--tx2)">≥76% — ótimo</span></div>
-      </div>
-    </div>`;
-
     if(!activeData.length){
-      $('rl').innerHTML=subTabsHTML+legendaHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':' neste ano'}.</div></div>`;
+      $('rl').innerHTML=subTabsHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':' neste ano'}.</div></div>`;
       return;
     }
 
-    $('rl').innerHTML=subTabsHTML+legendaHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
+    $('rl').innerHTML=subTabsHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
       const isMe=p.uid===currentUser?.uid;
       const cor=penColor(p.pct);
       const isPodium=i<3;
