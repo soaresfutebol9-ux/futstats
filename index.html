@@ -3324,7 +3324,7 @@ function _buildPlayerProfile(uid){
   const posBadgeColor=pos=>pos===1?'#3d2800':pos===2?'#1a1a1a':pos===3?'#634720':'var(--tx3)';
 
   // ── SELETOR INDEPENDENTE: MEDALHAS ──
-  const btnStyleM=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#f0f26b':'#b7b8b6'};background:${active?'#f0f26b':'#dedede'};color:${active?'#3d2800':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const btnStyleM=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#e8df2c':'#b7b8b6'};background:${active?'#e8df2c':'#dedede'};color:${active?'#3d2800':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
   const selMedalhas=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
     <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Pódio:</span>
     ${anos.map(a=>`<button onclick="setMpAnoMedalhas('${uid}','${a}')" style="${btnStyleM(a,a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__')}">${a}</button>`).join('')}
@@ -3366,14 +3366,14 @@ function _buildPlayerProfile(uid){
   const outros=mesesDispHistorico.filter(m=>m.pos>3).length;
 
   const medalhasCard=totalMesesDisputados>0?`
-  <div style="background:#ebebeb;border:1.5px solid #b7b8b6;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+  <div style="background:#ebebeb;border:1.5px solid #e8df2c;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
     ${selMedalhas}
     <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
       <span>🏅 Pódio ${_mpAnoMedalhas==='__all__'?'Geral':_mpAnoMedalhas}</span>
       <span style="color:#494a48">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-      <div style="background:#f0f26b;border:1px solid #f0f26b;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.6) inset">
+      <div style="background:linear-gradient(160deg,#f5ec60 0%,#c8ba00 25%,#e8df2c 50%,#f0e840 65%,#b8aa00 100%);border:1px solid #e8df2c;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.7) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥇</div>
         <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${ouros}</div>
         <div style="font-size:10px;color:#3d2800;font-family:'DM Mono',monospace;margin-top:4px">Ouro</div>
