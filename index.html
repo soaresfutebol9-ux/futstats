@@ -3255,6 +3255,9 @@ window.deletarMesHist=async key=>{
 // ── PERFIL INDIVIDUAL DO JOGADOR ──
 let _mpUid=null;
 let _mpAnoAtivo=null;
+let _mpAnoMedalhas=null;
+let _mpAnoTotal=null;
+let _mpAnoMeses=null;
 
 function _buildPlayerProfile(uid){
   if(!gd||!uid)return;
@@ -3302,7 +3305,11 @@ function _buildPlayerProfile(uid){
   // ── Anos disponíveis ──
   const anosSet=new Set(allMonths.map(m=>m.ano));
   const anos=[...anosSet].filter(a=>parseInt(a)>=2025).sort();
-  if(!_mpAnoAtivo||(_mpAnoAtivo!=='__all__'&&!anos.includes(_mpAnoAtivo))) _mpAnoAtivo=_resolveAnoAtivo(anos);
+  const anoAtualSys=new Date().getFullYear().toString();
+  // Init independent selectors on first open
+  if(!_mpAnoMedalhas||!anos.includes(_mpAnoMedalhas)) _mpAnoMedalhas='__all__';
+  if(!_mpAnoTotal||(!['__all__',...anos].includes(_mpAnoTotal))) _mpAnoTotal=_resolveAnoAtivo(anos);
+  if(!_mpAnoMeses||(!['__all__',...anos].includes(_mpAnoMeses))) _mpAnoMeses=_resolveAnoAtivo(anos);
 
   // ── Totais GERAIS (todos os anos) ──
   const totalG=allMonths.reduce((s,m)=>s+m.g,0);
@@ -3310,39 +3317,48 @@ function _buildPlayerProfile(uid){
   const totalPB=allMonths.reduce((s,m)=>s+m.pb,0);
   const totalPK=allMonths.reduce((s,m)=>s+m.pk,0);
 
-  // Totais do ano ativo (para o card principal)
-  const anoAtualSys=new Date().getFullYear().toString();
-  const mesesAnoAtivo=allMonths.filter(m=>m.ano===(_mpAnoAtivo||anoAtualSys));
-  const anoG_total=mesesAnoAtivo.reduce((s,m)=>s+m.g,0);
-  const anoA_total=mesesAnoAtivo.reduce((s,m)=>s+m.a,0);
-  const anoPB_total=mesesAnoAtivo.reduce((s,m)=>s+m.pb,0);
-  const anoPK_total=mesesAnoAtivo.reduce((s,m)=>s+m.pk,0);
-
   document.getElementById('mp-sub').textContent=`${anos.length} temporada${anos.length!==1?'s':''} · ${totalG+totalA} G+A total`;
 
   const posLabel=pos=>pos===1?'🥇 1º':pos===2?'🥈 2º':pos===3?'🥉 3º':`${pos}º`;
   const posClass=pos=>pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-other';
   const posBadgeColor=pos=>pos===1?'#3d2800':pos===2?'#1a1a1a':pos===3?'#634720':'var(--tx3)';
 
-  // Seletor de ano para totais (sempre visível acima do card de totais)
-  const anoSelTotal=anos.length>1?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-    <span style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-right:2px">Temporada:</span>
-    ${anos.map(a=>`<button onclick="setMpAno('${uid}','${a}')" style="padding:5px 14px;border-radius:99px;border:1.5px solid ${a===_mpAnoAtivo?'var(--g)':'var(--bo2)'};background:${a===_mpAnoAtivo?'rgba(77,255,176,.15)':'var(--bg3)'};color:${a===_mpAnoAtivo?'var(--g)':'var(--tx2)'};font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s">${a}</button>`).join('')}
-    <button onclick="setMpAno('${uid}','__all__')" style="padding:5px 14px;border-radius:99px;border:1.5px solid ${_mpAnoAtivo==='__all__'?'rgba(96,165,250,.7)':'var(--bo2)'};background:${_mpAnoAtivo==='__all__'?'rgba(96,165,250,.15)':'var(--bg3)'};color:${_mpAnoAtivo==='__all__'?'#60a5fa':'var(--tx2)'};font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s">🌐 Geral</button>
+  // ── SELETOR INDEPENDENTE: MEDALHAS ──
+  const btnStyleM=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#f0f26b':'#b7b8b6'};background:${active?'#f0f26b':'#dedede'};color:${active?'#3d2800':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const selMedalhas=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Pódio:</span>
+    ${anos.map(a=>`<button onclick="setMpAnoMedalhas('${uid}','${a}')" style="${btnStyleM(a,a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__')}">${a}</button>`).join('')}
+    <button onclick="setMpAnoMedalhas('${uid}','__all__')" style="${btnStyleM('__all__',_mpAnoMedalhas==='__all__')}">Geral</button>
   </div>`:'';
 
-  // Define valores a mostrar no card de totais conforme seleção
-  const isAll=(_mpAnoAtivo==='__all__');
-  const cardG=isAll?totalG:anoG_total;
-  const cardA=isAll?totalA:anoA_total;
-  const cardPB=isAll?totalPB:anoPB_total;
-  const cardPK=isAll?totalPK:anoPK_total;
-  const cardLabel=isAll?'Todos os tempos':`Temporada ${_mpAnoAtivo}`;
+  // ── SELETOR INDEPENDENTE: TOTAL ──
+  const isAllTotal=(_mpAnoTotal==='__all__');
+  const btnStyleT=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#40c960':'#b7b8b6'};background:${active?'#aef2b3':'#dedede'};color:${active?'#1a5c2a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const selTotal=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📊 Temporada:</span>
+    ${anos.map(a=>`<button onclick="setMpAnoTotal('${uid}','${a}')" style="${btnStyleT(a,a===_mpAnoTotal&&!isAllTotal)}">${a}</button>`).join('')}
+    <button onclick="setMpAnoTotal('${uid}','__all__')" style="${btnStyleT('__all__',isAllTotal)}">Geral</button>
+  </div>`:'';
+
+  // ── SELETOR INDEPENDENTE: MESES ──
+  const isAllMeses=(_mpAnoMeses==='__all__');
+  const btnStyleMes=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#2a9cc9':'#b7b8b6'};background:${active?'#b0d8f0':'#dedede'};color:${active?'#0a3a5a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const selMeses=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Ver meses:</span>
+    ${anos.map(a=>`<button onclick="setMpAnoMeses('${uid}','${a}')" style="${btnStyleMes(a,a===_mpAnoMeses&&!isAllMeses)}">${a}</button>`).join('')}
+    <button onclick="setMpAnoMeses('${uid}','__all__')" style="${btnStyleMes('__all__',isAllMeses)}">Todos</button>
+  </div>`:'';
+
+  // ── Totais por seleção ──
+  const mesesParaTotal=isAllTotal?allMonths:allMonths.filter(m=>m.ano===_mpAnoTotal);
+  const cardG=mesesParaTotal.reduce((s,m)=>s+m.g,0);
+  const cardA=mesesParaTotal.reduce((s,m)=>s+m.a,0);
+  const cardPB=mesesParaTotal.reduce((s,m)=>s+m.pb,0);
+  const cardPK=mesesParaTotal.reduce((s,m)=>s+m.pk,0);
+  const cardLabel=isAllTotal?'Todos os tempos':`Temporada ${_mpAnoTotal}`;
 
   // ── CARD DE MEDALHAS ──────────────────────────────
-  // Filtra medalhas conforme a temporada selecionada
-  const _anoMedalhas=isAll?null:_mpAnoAtivo;
-  const mesesDispHistorico=allMonths.filter(m=>!m.current&&(_anoMedalhas===null||m.ano===_anoMedalhas));
+  const mesesDispHistorico=allMonths.filter(m=>!m.current&&(_mpAnoMedalhas==='__all__'||m.ano===_mpAnoMedalhas));
   const totalMesesDisputados=mesesDispHistorico.length;
   const ouros=mesesDispHistorico.filter(m=>m.pos===1).length;
   const pratas=mesesDispHistorico.filter(m=>m.pos===2).length;
@@ -3351,8 +3367,9 @@ function _buildPlayerProfile(uid){
 
   const medalhasCard=totalMesesDisputados>0?`
   <div style="background:#ebebeb;border:1.5px solid #b7b8b6;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    ${selMedalhas}
     <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-      <span>🏅 Pódio ${isAll?'Geral':_mpAnoAtivo}</span>
+      <span>🏅 Pódio ${_mpAnoMedalhas==='__all__'?'Geral':_mpAnoMedalhas}</span>
       <span style="color:#494a48">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
@@ -3392,8 +3409,8 @@ function _buildPlayerProfile(uid){
 
   // Card totais
   const totalCard=`
-  ${anoSelTotal}
   <div style="background:#aef2b3;border:1.5px solid #40c960;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    ${selTotal}
     <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr${cardPB>0?' 1fr':''};gap:8px">
       <div style="background:#dedede;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center">
@@ -3415,23 +3432,17 @@ function _buildPlayerProfile(uid){
     </div>
   </div>`;
 
-  // Seletor de anos para mês-a-mês (abaixo do card de totais)
-  const anoSel=anos.length>1?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-    <span style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-right:2px">Ver meses de:</span>
-    ${anos.map(a=>`<button onclick="setMpAno('${uid}','${a}')" style="padding:6px 16px;border-radius:99px;border:1.5px solid ${a===_mpAnoAtivo&&_mpAnoAtivo!=='__all__'?'var(--g)':'var(--bo2)'};background:${a===_mpAnoAtivo&&_mpAnoAtivo!=='__all__'?'rgba(77,255,176,.15)':'var(--bg3)'};color:${a===_mpAnoAtivo&&_mpAnoAtivo!=='__all__'?'var(--g)':'var(--tx2)'};font-family:'DM Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s">${a}</button>`).join('')}
-  </div>`:'';
-
   // Meses do ano ativo (quando __all__ mostra todos)
-  const mesesDoAno=isAll?allMonths:allMonths.filter(m=>m.ano===_mpAnoAtivo);
+  const mesesDoAno=isAllMeses?allMonths:allMonths.filter(m=>m.ano===_mpAnoMeses);
   const anoG=mesesDoAno.reduce((s,m)=>s+m.g,0);
   const anoA=mesesDoAno.reduce((s,m)=>s+m.a,0);
 
   const anoResCard=mesesDoAno.length?`<div style="background:var(--bg3);border:1px solid var(--bo2);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">Resumo ${isAll?'geral':_mpAnoAtivo}</div>
+    <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">Resumo ${isAllMeses?'geral':_mpAnoMeses}</div>
     <div style="font-family:'ClassyVogue',sans-serif;font-size:18px;color:var(--tx)">${anoG}G &nbsp;${anoA}A &nbsp;<span style="color:var(--am)">${anoG+anoA} G+A</span></div>
   </div>`:'';
 
-  const sepLabel=`<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">📅 ${isAll?'Todos os anos':'Ano '+_mpAnoAtivo} — mês a mês</div>`;
+  const sepLabel=`${selMeses}<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">📅 ${isAllMeses?'Todos os anos':'Ano '+_mpAnoMeses} — mês a mês</div>`;
 
   const monthCards=mesesDoAno.length===0
     ?`<div style="text-align:center;padding:1.5rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace">Nenhum dado em ${isAll?'nenhum mês':_mpAnoAtivo}.</div>`
@@ -3461,7 +3472,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :medalhasCard+totalCard+anoSel+anoResCard+sepLabel+monthCards;
+    :medalhasCard+totalCard+anoResCard+sepLabel+monthCards;
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -3479,6 +3490,9 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   _mpUid=uid;
   window._mpUid=uid;
   _mpAnoAtivo=null;
+  _mpAnoMedalhas='__all__';
+  _mpAnoTotal=null;
+  _mpAnoMeses=null;
   const avEl=document.getElementById('mp-avatar');
   if(avEl)avEl.innerHTML=avatarHTML(mb.name,48,uid);
   document.getElementById('mp-nome').textContent=mb.name;
@@ -3494,6 +3508,9 @@ window.setMpAno=(uid,ano)=>{
   _mpAnoAtivo=ano;
   _buildPlayerProfile(uid);
 };
+window.setMpAnoMedalhas=(uid,ano)=>{_mpAnoMedalhas=ano;_buildPlayerProfile(uid);};
+window.setMpAnoTotal=(uid,ano)=>{_mpAnoTotal=ano;_buildPlayerProfile(uid);};
+window.setMpAnoMeses=(uid,ano)=>{_mpAnoMeses=ano;_buildPlayerProfile(uid);};
 
 // Garante que _mpAnoAtivo padrão seja o ano atual
 function _resolveAnoAtivo(anos){
