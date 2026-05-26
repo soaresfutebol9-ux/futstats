@@ -808,7 +808,7 @@ body.light .mes-vigente-titulo{
 
 .tr-filter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.1rem}
 .ft{padding:10px 20px;border-radius:99px;font-size:14px;cursor:pointer;border:1px solid rgba(0,0,0,.1);background:#f2f2f2;color:#1a1a1a;transition:all .18s;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:none}
-.ft.active{background:var(--grad-green);color:#07090d;border-color:transparent;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
+.ft.active{background:#f2f2f2;color:#07090d;border:2.5px solid #111111;transform:none;box-shadow:none;font-weight:700}
 .rank-geral-btn{border-color:var(--bo2);color:var(--tx2)}
 .rank-geral-btn.active{background:var(--grad-green);border-color:transparent;color:#07090d;transform:scale(1.04);box-shadow:0 4px 16px rgba(77,255,176,.3);font-weight:700}
 .rank-rec-btn{border-color:var(--bo2);color:var(--tx2)}
@@ -1454,7 +1454,7 @@ body::before{
         <div class="ft" onclick="setRank('geral',this)">Geral</div>
         <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
-        <button onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
+        <button id="rank-share-btn" onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
     </div>
@@ -2175,8 +2175,11 @@ window.joinGroup=async()=>{
 };
 function subscribeGroup(){
   if(unsubGroup){unsubGroup();unsubGroup=null;}
+  let _firstFire=true;
   unsubGroup=onSnapshot(doc(db,'groups',groupId),snap=>{
     if(!snap.exists())return;gd=snap.data();
+    // Primeiro disparo é o cache local, já tratado pelo enterApp — ignora
+    if(_firstFire){_firstFire=false;return;}
     const a=document.querySelector('.tv.active');if(!a)return;
     if(a.id==='tr'){showRankingSkeleton();setTimeout(()=>renderRanking(),80);}
     else if(a.id==='thist')renderHistTab();
@@ -2194,7 +2197,7 @@ function enterApp(){
   $('rank-mes-titulo').textContent=mesLabel.split(' ')[0].toUpperCase();
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
-  renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');showRankingSkeleton();setTimeout(()=>renderRanking(),120);
+  renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();
   // Crown check com delay para renderização completa
   setTimeout(()=>maybeFiraCrown(),900);
 }
@@ -2499,6 +2502,7 @@ function showRankingSkeleton(){
 
 function renderRanking(){
   if(!gd)return;const mbs=gd.members||[];
+  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=rankStat==='recordes'?'none':'flex';
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
   const geralWrap=document.getElementById('geral-banner-wrap');
@@ -2691,6 +2695,7 @@ window.setRank=(s,el)=>{
   rankStat=s;
   document.querySelectorAll('.ft').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
+  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=s==='recordes'?'none':'flex';
   showRankingSkeleton();
   setTimeout(()=>{
     renderRanking();
