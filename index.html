@@ -490,7 +490,7 @@ body.light .ah::after{
 }
 .ah-logo .ahl-char{
   display:inline-block;
-  background:linear-gradient(180deg,#ffffff 0%,#d0d0d0 28%,#a8a8a8 48%,#e8e8e8 60%,#ffffff 72%,#c0c0c0 100%);
+  background:linear-gradient(180deg,#c8c8c8 0%,#888888 28%,#606060 48%,#aaaaaa 60%,#c0c0c0 72%,#707070 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   filter:drop-shadow(0 0 4px rgba(255,255,255,.2));
 }
@@ -1326,25 +1326,29 @@ select option{background:var(--bg3)}
 /* ── MODAL PERFIL JOGADOR ── */
 #modal-player{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
 #modal-player.open{opacity:1;pointer-events:all}
-.modal-player-inner{background:var(--bg2);border-radius:22px 22px 0 0;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(60px);transition:transform .22s cubic-bezier(.32,1,.5,1)}
+.modal-player-inner{background:#ebebeb;border-radius:22px 22px 0 0;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(60px);transition:transform .22s cubic-bezier(.32,1,.5,1)}
 #modal-player.open .modal-player-inner{transform:translateY(0)}
-.mp-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid var(--bo);flex-shrink:0}
+.mp-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid #b7b8b6;flex-shrink:0;background:#ebebeb}
 .mp-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;transition:all .15s}
 .mp-close:hover{background:var(--re);color:#fff;border-color:transparent}
-.mp-body{overflow-y:auto;padding:1rem 1.1rem 1.5rem;flex:1}
+.mp-body{overflow-y:auto;padding:1rem 1.1rem 1.5rem;flex:1;background:#ebebeb}
 .mp-body::-webkit-scrollbar{width:3px}
 .mp-body::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px}
-.mp-mes-card{border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--bo)}
-.mp-mes-card.pos-1{background:linear-gradient(135deg,rgba(255,209,102,.18),rgba(255,209,102,.06));border-color:rgba(255,209,102,.4)}
-.mp-mes-card.pos-2{background:linear-gradient(135deg,rgba(200,210,240,.16),rgba(200,210,240,.05));border-color:rgba(200,210,240,.35)}
-.mp-mes-card.pos-3{background:linear-gradient(135deg,rgba(200,140,90,.16),rgba(200,140,90,.05));border-color:rgba(200,140,90,.35)}
-.mp-mes-card.pos-other{background:var(--bg3);border-color:var(--bo)}
+.mp-mes-card{border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #b7b8b6;position:relative;overflow:hidden}
+.mp-mes-card.pos-1{background:#f0f26b;border-color:#f0f26b;box-shadow:0 2px 10px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.6) inset}
+.mp-mes-card.pos-2{background:#b0b0b0;border-color:#b0b0b0;box-shadow:0 2px 10px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.6) inset}
+.mp-mes-card.pos-3{background:#bf9658;border-color:#bf9658;box-shadow:0 2px 10px rgba(0,0,0,.12),0 1px 0 rgba(255,200,120,.4) inset}
+.mp-mes-card.pos-other{background:#dedede;border-color:#b7b8b6}
+.mp-mes-card.pos-1::after,.mp-mes-card.pos-2::after,.mp-mes-card.pos-3::after{content:'';position:absolute;top:0;left:-80%;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-15deg);animation:mes-shine 4s ease-in-out infinite;pointer-events:none}
+.mp-mes-card.pos-1::after{animation-delay:0s}
+.mp-mes-card.pos-2::after{animation-delay:1.3s}
+.mp-mes-card.pos-3::after{animation-delay:2.6s}
+@keyframes mes-shine{0%,100%{left:-80%;opacity:0}8%{opacity:1}42%{left:130%;opacity:0}43%,99%{left:-80%;opacity:0}}
 .mp-mes-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
 .mp-mes-stats{display:flex;gap:10px}
-.mp-stat-box{flex:1;background:rgba(0,0,0,.12);border-radius:8px;padding:8px 10px;text-align:center}
-body.light .mp-stat-box{background:rgba(0,0,0,.05)}
+.mp-stat-box{flex:1;background:#dedede;border-radius:8px;padding:8px 10px;text-align:center}
 .mp-stat-val{font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;line-height:1}
-.mp-stat-lbl{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.mp-stat-lbl{font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
 .ri-av-click{cursor:pointer;transition:transform .15s}
 .ri-av-click:hover{transform:scale(1.1)}
 /* ── CROWN CONFETTI ── */
@@ -3318,7 +3322,7 @@ function _buildPlayerProfile(uid){
 
   const posLabel=pos=>pos===1?'🥇 1º':pos===2?'🥈 2º':pos===3?'🥉 3º':`${pos}º`;
   const posClass=pos=>pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-other';
-  const posBadgeColor=pos=>pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';
+  const posBadgeColor=pos=>pos===1?'#3d2800':pos===2?'#1a1a1a':pos===3?'#634720':'var(--tx3)';
 
   // Seletor de ano para totais (sempre visível acima do card de totais)
   const anoSelTotal=anos.length>1?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
@@ -3346,67 +3350,67 @@ function _buildPlayerProfile(uid){
   const outros=mesesDispHistorico.filter(m=>m.pos>3).length;
 
   const medalhasCard=totalMesesDisputados>0?`
-  <div style="background:linear-gradient(135deg,rgba(255,209,102,.12),rgba(255,185,0,.05));border:1.5px solid rgba(255,209,102,.3);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 0 24px rgba(255,185,0,.08)">
-    <div style="font-size:10px;color:#FFD166;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+  <div style="background:#ebebeb;border:1.5px solid #b7b8b6;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
       <span>🏅 Pódio ${isAll?'Geral':_mpAnoAtivo}</span>
-      <span style="color:var(--tx3)">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
+      <span style="color:#494a48">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-      <div style="background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(255,185,0,.06));border:1px solid rgba(255,215,0,.35);border-radius:12px;padding:14px 8px;text-align:center">
+      <div style="background:#f0f26b;border:1px solid #f0f26b;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.6) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥇</div>
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#FFD700;line-height:1">${ouros}</div>
-        <div style="font-size:10px;color:rgba(255,215,0,.7);font-family:'DM Mono',monospace;margin-top:4px">Ouro</div>
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(ouros/totalMesesDisputados*100):0}%</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${ouros}</div>
+        <div style="font-size:10px;color:#3d2800;font-family:'DM Mono',monospace;margin-top:4px">Ouro</div>
+        <div style="font-size:10px;color:#3d2800;font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(ouros/totalMesesDisputados*100):0}%</div>
       </div>
-      <div style="background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(170,170,170,.04));border:1px solid rgba(192,192,192,.3);border-radius:12px;padding:14px 8px;text-align:center">
+      <div style="background:#b0b0b0;border:1px solid #b0b0b0;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.6) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥈</div>
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#bdbdbd;line-height:1">${pratas}</div>
-        <div style="font-size:10px;color:rgba(192,192,192,.7);font-family:'DM Mono',monospace;margin-top:4px">Prata</div>
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(pratas/totalMesesDisputados*100):0}%</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${pratas}</div>
+        <div style="font-size:10px;color:#1a1a1a;font-family:'DM Mono',monospace;margin-top:4px">Prata</div>
+        <div style="font-size:10px;color:#1a1a1a;font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(pratas/totalMesesDisputados*100):0}%</div>
       </div>
-      <div style="background:linear-gradient(135deg,rgba(205,127,50,.18),rgba(180,100,30,.06));border:1px solid rgba(205,127,50,.3);border-radius:12px;padding:14px 8px;text-align:center">
+      <div style="background:#bf9658;border:1px solid #bf9658;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,200,130,.4) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥉</div>
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#a0785a;line-height:1">${bronzes}</div>
-        <div style="font-size:10px;color:rgba(205,127,50,.7);font-family:'DM Mono',monospace;margin-top:4px">Bronze</div>
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(bronzes/totalMesesDisputados*100):0}%</div>
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${bronzes}</div>
+        <div style="font-size:10px;color:#2a0e00;font-family:'DM Mono',monospace;margin-top:4px">Bronze</div>
+        <div style="font-size:10px;color:#2a0e00;font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(bronzes/totalMesesDisputados*100):0}%</div>
       </div>
     </div>
     <!-- Barra de aproveitamento -->
-    <div style="background:var(--bg3);border-radius:99px;height:6px;overflow:hidden;margin-top:2px;display:flex;gap:1px">
-      ${ouros>0?`<div style="flex:${ouros};background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:99px 0 0 99px;transition:flex .5s ease"></div>`:''}
-      ${pratas>0?`<div style="flex:${pratas};background:linear-gradient(90deg,#bdbdbd,#a0a0a0)"></div>`:''}
-      ${bronzes>0?`<div style="flex:${bronzes};background:linear-gradient(90deg,#cd7f32,#a05a20)"></div>`:''}
-      ${outros>0?`<div style="flex:${outros};background:var(--bg4);border-radius:0 99px 99px 0"></div>`:''}
+    <div style="background:#dedede;border-radius:99px;height:6px;overflow:hidden;margin-top:2px;display:flex;gap:1px">
+      ${ouros>0?`<div style="flex:${ouros};background:#f0f26b;border-radius:99px 0 0 99px;transition:flex .5s ease"></div>`:''}
+      ${pratas>0?`<div style="flex:${pratas};background:#b0b0b0"></div>`:''}
+      ${bronzes>0?`<div style="flex:${bronzes};background:#bf9658"></div>`:''}
+      ${outros>0?`<div style="flex:${outros};background:#aaaaaa;border-radius:0 99px 99px 0"></div>`:''}
     </div>
     <div style="display:flex;justify-content:center;gap:4px;margin-top:8px;flex-wrap:wrap">
-      ${ouros>0?`<span style="font-size:9px;color:#FFD700;font-family:'DM Mono',monospace;background:rgba(255,215,0,.1);border-radius:6px;padding:2px 8px">${ouros}🥇</span>`:''}
-      ${pratas>0?`<span style="font-size:9px;color:#bdbdbd;font-family:'DM Mono',monospace;background:rgba(192,192,192,.1);border-radius:6px;padding:2px 8px">${pratas}🥈</span>`:''}
-      ${bronzes>0?`<span style="font-size:9px;color:#a0785a;font-family:'DM Mono',monospace;background:rgba(205,127,50,.1);border-radius:6px;padding:2px 8px">${bronzes}🥉</span>`:''}
-      ${outros>0?`<span style="font-size:9px;color:var(--tx3);font-family:'DM Mono',monospace;background:var(--bg3);border-radius:6px;padding:2px 8px">${outros} outros</span>`:''}
+      ${ouros>0?`<span style="font-size:9px;color:#3d2800;font-family:'DM Mono',monospace;background:#f0f26b;border-radius:6px;padding:2px 8px">${ouros}🥇</span>`:''}
+      ${pratas>0?`<span style="font-size:9px;color:#1a1a1a;font-family:'DM Mono',monospace;background:#b0b0b0;border-radius:6px;padding:2px 8px">${pratas}🥈</span>`:''}
+      ${bronzes>0?`<span style="font-size:9px;color:#2a0e00;font-family:'DM Mono',monospace;background:#bf9658;border-radius:6px;padding:2px 8px">${bronzes}🥉</span>`:''}
+      ${outros>0?`<span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;background:#dedede;border-radius:6px;padding:2px 8px">${outros} outros</span>`:''}
     </div>
   </div>`:'';
 
   // Card totais
   const totalCard=`
   ${anoSelTotal}
-  <div style="background:linear-gradient(135deg,rgba(77,255,176,.1),rgba(77,255,176,.03));border:1.5px solid rgba(77,255,176,.3);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 0 24px rgba(77,255,176,.08)">
-    <div style="font-size:10px;color:var(--g);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
+  <div style="background:#aef2b3;border:1.5px solid #40c960;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr${cardPB>0?' 1fr':''};gap:8px">
-      <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.2);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#4dffb0;line-height:1">${cardG}</div>
-        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px">Gols</div>
+      <div style="background:#dedede;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Gols</div>
       </div>
-      <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#60a5fa;line-height:1">${cardA}</div>
-        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px">Assist.</div>
+      <div style="background:#dedede;border:2px solid #2a9cc9;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardA}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Assist.</div>
       </div>
-      <div style="background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#FFD166;line-height:1">${cardG+cardA}</div>
-        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px">G+A</div>
+      <div style="background:#dedede;border:2px solid #88ddeb;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG+cardA}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">G+A</div>
       </div>
-      ${cardPB>0?`<div style="background:rgba(255,90,122,.08);border:1px solid rgba(255,90,122,.2);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:#FF5A7A;line-height:1;margin-top:4px">${cardPK}/${cardPB}</div>
-        <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:4px">Pênaltis</div>
+      ${cardPB>0?`<div style="background:#dedede;border:2px solid #b7b8b6;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:\${cardPK/cardPB>=.7?'#1a8a3a':cardPK/cardPB>=.4?'#cc8800':'#cc2222'};line-height:1;margin-top:4px">${cardPK}/${cardPB}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Pênaltis</div>
       </div>`:''}
     </div>
   </div>`;
@@ -3441,11 +3445,11 @@ function _buildPlayerProfile(uid){
       </div>
       <div class="mp-mes-stats">
         <div class="mp-stat-box">
-          <div class="mp-stat-val" style="color:#4dffb0">${m.g}</div>
+          <div class="mp-stat-val" style="color:#000000">${m.g}</div>
           <div class="mp-stat-lbl">Gols</div>
         </div>
         <div class="mp-stat-box">
-          <div class="mp-stat-val" style="color:#60a5fa">${m.a}</div>
+          <div class="mp-stat-val" style="color:#000000">${m.a}</div>
           <div class="mp-stat-lbl">Assist.</div>
         </div>
         ${m.pb>0?`<div class="mp-stat-box">
@@ -4135,8 +4139,8 @@ window.irParaRankingGA=()=>{
       <div style="display:flex;align-items:center;gap:12px">
         <div id="mp-avatar"></div>
         <div>
-          <div id="mp-nome" style="font-family:'Freshman',sans-serif;font-size:16px;letter-spacing:.5px;color:var(--tx)"></div>
-          <div id="mp-sub" style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px"></div>
+          <div id="mp-nome" style="font-family:'Freshman',sans-serif;font-size:16px;letter-spacing:.5px;color:#000000"></div>
+          <div id="mp-sub" style="font-size:11px;color:#3d3d3d;font-family:'DM Mono',monospace;margin-top:2px"></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
