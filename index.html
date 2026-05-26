@@ -952,9 +952,9 @@ body.light .mes-vigente-titulo{
 .ri{
   display:grid;grid-template-columns:32px 50px 1fr auto;align-items:center;gap:14px;
   padding:20px 20px;border-radius:16px;
-  background:linear-gradient(160deg,#f5c0c0 0%,#eb7373 20%,#c04040 38%,#eb7373 54%,#b03030 68%,#eb7373 80%,#f5c0c0 100%);
-  border:1px solid #c04040;
-  box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 -1px 0 rgba(0,0,0,.12) inset,0 4px 18px rgba(192,64,64,.35),var(--glow-card);
+  background:#ffeeeb;
+  border:1px solid #e0c8c0;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 -1px 0 rgba(0,0,0,.06) inset,var(--glow-card);
   transition:border-color .2s,box-shadow .2s,transform .15s;
   position:relative;overflow:hidden;
 }
@@ -2795,7 +2795,7 @@ function renderRanking(){
         const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';
         const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'';
         const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'var(--bo)';
-        const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'0 4px 18px rgba(192,64,64,.35),0 0 0 1px rgba(255,180,180,.2) inset';
+        const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';
         const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
         const valStyle=pos<=3?darkMetal:'color:var(--tx)';
         return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
@@ -2861,8 +2861,8 @@ function renderRanking(){
       const isMe=p.uid===currentUser?.uid;
       const cor=penColor(p.pct);
       const isPodium=i<3;
-      const penPodiumBg=i===0?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':i===1?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':i===2?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'linear-gradient(135deg,#f5c0c0 0%,#eb7373 20%,#c04040 38%,#eb7373 54%,#b03030 68%,#eb7373 80%,#f5c0c0 100%)';
-      const penPodiumBorder=i===0?'#b8a800':i===1?'#888888':i===2?'#8a6020':'#c04040';
+      const penPodiumBg=i===0?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':i===1?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':i===2?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';
+      const penPodiumBorder=i===0?'#b8a800':i===1?'#888888':i===2?'#8a6020':'#e0c8c0';
       const errados=p.penBat-p.penOk;
       const txtColor=isPodium?'#1a1a1a':'var(--tx)';
       const txtMuted=isPodium?'rgba(0,0,0,.55)':'var(--tx2)';
@@ -2930,7 +2930,7 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'linear-gradient(135deg,#f5c0c0 0%,#eb7373 20%,#c04040 38%,#eb7373 54%,#b03030 68%,#eb7373 80%,#f5c0c0 100%)';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#c04040';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'0 4px 18px rgba(192,64,64,.35),0 0 0 1px rgba(255,180,180,.2) inset';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
@@ -3445,7 +3445,7 @@ function _buildPlayerProfile(uid){
 
   // ── SELETOR INDEPENDENTE: MÉDIAS ──
   const isAllMedia=(_mpAnoMedia==='__all__');
-  const btnStyleMed=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#FF5A7A':'#b7b8b6'};background:${active?'#FF5A7A':'#dedede'};color:${active?'#fff':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const btnStyleMed=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#629ade':'#b7b8b6'};background:${active?'#a0c8fa':'#dedede'};color:${active?'#629ade':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
   const selMedia=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
     <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Período:</span>
     ${anos.map(a=>`<button onclick="setMpAnoMedia('${uid}','${a}')" style="${btnStyleMed(a,a===_mpAnoMedia&&!isAllMedia)}">${a}</button>`).join('')}
@@ -3459,25 +3459,25 @@ function _buildPlayerProfile(uid){
   const mediaGA=mediaG+mediaA;
   const mediaLabel=isAllMedia?'Todos os tempos':`Temporada ${_mpAnoMedia}`;
 
-  const mediaCard=`<div style="background:linear-gradient(135deg,#2a1a2e 0%,#1a0a1e 100%);border:1.5px solid #FF5A7A;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(255,90,122,.2)">
+  const mediaCard=`<div style="background:#dedede;border:1.5px solid #000000;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.2)">
     ${selMedia}
-    <div style="font-size:10px;color:#FF9AB0;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📈 Médias de G+A — ${mediaLabel}</div>
-    ${nMedia===0?`<div style="text-align:center;padding:.5rem;color:#FF9AB0;font-size:12px;font-family:'DM Mono',monospace">Nenhum mês finalizado.</div>`:`
+    <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📈 Médias de G+A — ${mediaLabel}</div>
+    ${nMedia===0?`<div style="text-align:center;padding:.5rem;color:#000000;font-size:12px;font-family:'DM Mono',monospace">Nenhum mês finalizado.</div>`:`
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <div style="background:rgba(77,255,176,.08);border:1.5px solid rgba(77,255,176,.3);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#4dffb0;line-height:1">${mediaG.toFixed(1)}</div>
-        <div style="font-size:10px;color:#4dffb0;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Gols/mês</div>
+      <div style="background:#dedede;border:1.5px solid rgba(77,255,176,.3);border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${mediaG.toFixed(1)}</div>
+        <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Gols/mês</div>
       </div>
-      <div style="background:rgba(96,165,250,.08);border:1.5px solid rgba(96,165,250,.3);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#60a5fa;line-height:1">${mediaA.toFixed(1)}</div>
-        <div style="font-size:10px;color:#60a5fa;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Assist./mês</div>
+      <div style="background:#dedede;border:1.5px solid rgba(96,165,250,.3);border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${mediaA.toFixed(1)}</div>
+        <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Assist./mês</div>
       </div>
-      <div style="background:rgba(255,90,122,.08);border:1.5px solid rgba(255,90,122,.4);border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#FF5A7A;line-height:1">${mediaGA.toFixed(1)}</div>
-        <div style="font-size:10px;color:#FF5A7A;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">G+A/mês</div>
+      <div style="background:#dedede;border:1.5px solid #000000;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${mediaGA.toFixed(1)}</div>
+        <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">G+A/mês</div>
       </div>
     </div>
-    <div style="margin-top:10px;text-align:center;font-size:10px;color:#888;font-family:'DM Mono',monospace">${nMedia} ${nMedia===1?'mês finalizado':'meses finalizados'}</div>`}
+    <div style="margin-top:10px;text-align:center;font-size:10px;color:#000000;font-family:'DM Mono',monospace">${nMedia} ${nMedia===1?'mês finalizado':'meses finalizados'}</div>`}
   </div>`;
 
   const anoResCard='';
