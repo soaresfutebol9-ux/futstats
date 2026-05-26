@@ -169,7 +169,7 @@ html.br-firefox .podium-val,html.br-firefox .mes-vigente-titulo{
   background:none!important;-webkit-background-clip:unset!important;
   background-clip:unset!important;
 }
-html.br-firefox .p1 .podium-val,html.br-firefox .p2 .podium-val,html.br-firefox .p3 .podium-val{color:#fff!important;}
+html.br-firefox .p1 .podium-val,html.br-firefox .p2 .podium-val,html.br-firefox .p3 .podium-val{color:#111!important;}
 html.br-firefox .mes-vigente-titulo{color:#ffffff!important;background:none!important;-webkit-background-clip:unset!important;background-clip:unset!important;}
 
 /* Reduce motion */
@@ -874,7 +874,7 @@ body.light .mes-vigente-titulo{
 .p1 .podium-name,.p2 .podium-name,.p3 .podium-name{color:#ffffff;text-shadow:0 1px 5px rgba(0,0,0,.7)}
 .podium-you{font-size:9px;background:rgba(255,255,255,.3);color:#fff;border-radius:3px;padding:1px 5px;font-family:'DM Mono',monospace;font-weight:700;display:inline-block;margin-top:1px}
 .podium-val{font-family:'ClassyVogue',sans-serif;font-size:32px;font-weight:normal;line-height:1;margin-top:2px}
-.p1 .podium-val{background:linear-gradient(180deg,#fff8d0 0%,#ffe066 30%,#c89000 55%,#ffe580 75%,#b87800 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}.p2 .podium-val{background:linear-gradient(180deg,#ffffff 0%,#dde8f4 25%,#8090a8 50%,#c0d0e0 72%,#687888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}.p3 .podium-val{background:linear-gradient(180deg,#ffe8c0 0%,#d89050 30%,#904020 55%,#d88040 75%,#7a3808 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.p1 .podium-val,.p2 .podium-val,.p3 .podium-val{background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000000 55%,#2a2a2a 75%,#111111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.4)) drop-shadow(0 2px 8px rgba(0,0,0,.7))}
 .podium-stat{font-size:11px;font-family:'ClassyVogue',sans-serif;letter-spacing:.05em}
 .p1 .podium-stat,.p2 .podium-stat,.p3 .podium-stat{color:rgba(255,255,255,.75)}
 /* ── RANK LIST ITEMS ── */
@@ -2788,7 +2788,8 @@ function renderRanking(){
         const podiumBg=pos===1?'linear-gradient(135deg,#fff9c4 0%,#f5d020 14%,#e0a800 30%,#f5c400 44%,#c8860a 58%,#f0c010 70%,#b8880a 85%,#ffe066 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#d0dce8 10%,#8090a4 22%,#c0d0e0 34%,#6a8098 46%,#a8c0d4 56%,#e4f0fa 64%,#7890a4 74%,#b8ccd8 84%,#eef4fa 92%,#98aec0 100%)':pos===3?'linear-gradient(135deg,#f8dfc0 0%,#d4895a 14%,#a85820 30%,#e09860 44%,#8a4810 58%,#c87838 70%,#7a3808 85%,#e8b080 100%)':'';
         const podiumBorder=pos===1?'#d4a000':pos===2?'#788898':pos===3?'#904020':'var(--bo)';
         const podiumShadow=pos===1?'0 4px 28px rgba(200,150,0,.55),0 0 0 1px rgba(255,240,120,.25) inset':pos===2?'0 4px 22px rgba(80,100,120,.5),0 0 0 1px rgba(220,235,250,.3) inset':pos===3?'0 4px 22px rgba(120,60,20,.55),0 0 0 1px rgba(240,180,120,.25) inset':'var(--glow-card)';
-        const valColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#c09060':'var(--tx)';
+        const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+        const valStyle=pos<=3?darkMetal:'color:var(--tx)';
         return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
           <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div>
@@ -2797,7 +2798,7 @@ function renderRanking(){
             <div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div>
           </div>
           <div class="ri-val">
-            <div class="ri-val-num ri-count" data-val="${p.gols+p.assist}" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">0</div>
+            <div class="ri-val-num ri-count" data-val="${p.gols+p.assist}" style="${valStyle}">0</div>
             <div class="ri-val-lbl">G+A</div>
           </div>
         </div>`;
@@ -2868,7 +2869,7 @@ function renderRanking(){
             <div style="font-size:11px;color:${txtMuted};font-family:'DM Mono',monospace;margin-top:2px">${p.penBat} cobranças</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:'ClassyVogue',sans-serif;font-size:30px;line-height:1;color:${isPodium?'#1a1a1a':cor}">${p.pct}%</div>
+            <div style="font-family:'ClassyVogue',sans-serif;font-size:30px;line-height:1;${isPodium?'background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))':'color:'+cor}">${p.pct}%</div>
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:${txtMuted};margin-top:1px">${p.penOk}/${p.penBat}</div>
           </div>
         </div>
@@ -2921,7 +2922,7 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#fff9c4 0%,#f5d020 14%,#e0a800 30%,#f5c400 44%,#c8860a 58%,#f0c010 70%,#b8880a 85%,#ffe066 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#d0dce8 10%,#8090a4 22%,#c0d0e0 34%,#6a8098 46%,#a8c0d4 56%,#e4f0fa 64%,#7890a4 74%,#b8ccd8 84%,#eef4fa 92%,#98aec0 100%)':pos===3?'linear-gradient(135deg,#f8dfc0 0%,#d4895a 14%,#a85820 30%,#e09860 44%,#8a4810 58%,#c87838 70%,#7a3808 85%,#e8b080 100%)':'';const podiumBorder=pos===1?'#d4a000':pos===2?'#788898':pos===3?'#904020':'var(--bo)';const podiumShadow=pos===1?'0 4px 28px rgba(200,150,0,.55),0 0 0 1px rgba(255,240,120,.25) inset':pos===2?'0 4px 22px rgba(80,100,120,.5),0 0 0 1px rgba(220,235,250,.3) inset':pos===3?'0 4px 22px rgba(120,60,20,.55),0 0 0 1px rgba(240,180,120,.25) inset':'var(--glow-card)';const valColor=pos===1?'#FFD700':pos===2?'#C8D8F0':pos===3?'#D09050':'var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="color:${valColor};background:none;-webkit-background-clip:unset;background-clip:unset">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#fff9c4 0%,#f5d020 14%,#e0a800 30%,#f5c400 44%,#c8860a 58%,#f0c010 70%,#b8880a 85%,#ffe066 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#d0dce8 10%,#8090a4 22%,#c0d0e0 34%,#6a8098 46%,#a8c0d4 56%,#e4f0fa 64%,#7890a4 74%,#b8ccd8 84%,#eef4fa 92%,#98aec0 100%)':pos===3?'linear-gradient(135deg,#f8dfc0 0%,#d4895a 14%,#a85820 30%,#e09860 44%,#8a4810 58%,#c87838 70%,#7a3808 85%,#e8b080 100%)':'';const podiumBorder=pos===1?'#d4a000':pos===2?'#788898':pos===3?'#904020':'var(--bo)';const podiumShadow=pos===1?'0 4px 28px rgba(200,150,0,.55),0 0 0 1px rgba(255,240,120,.25) inset':pos===2?'0 4px 22px rgba(80,100,120,.5),0 0 0 1px rgba(220,235,250,.3) inset':pos===3?'0 4px 22px rgba(120,60,20,.55),0 0 0 1px rgba(240,180,120,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div><div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
@@ -3004,12 +3005,7 @@ function buildRecordData(){
 function recCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valColors=['#FFE066','#C8D8F0','#F0C080'];
-  const valShadows=[
-    'drop-shadow(0 2px 12px rgba(255,185,0,.65))',
-    'drop-shadow(0 2px 10px rgba(180,205,245,.5))',
-    'drop-shadow(0 2px 10px rgba(200,140,60,.5))'
-  ];
+  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -3024,7 +3020,7 @@ function recCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="color:${valColors[pos]};filter:${valShadows[pos]}">${p.val}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'gol':'gols'}</div>
     </div>
   </div>`;
@@ -3033,12 +3029,7 @@ function recCardHTML(p,pos){
 function recAssistCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valColors=['#FFE066','#C8D8F0','#F0C080'];
-  const valShadows=[
-    'drop-shadow(0 2px 12px rgba(255,185,0,.65))',
-    'drop-shadow(0 2px 10px rgba(180,205,245,.5))',
-    'drop-shadow(0 2px 10px rgba(200,140,60,.5))'
-  ];
+  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -3053,7 +3044,7 @@ function recAssistCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="color:${valColors[pos]};filter:${valShadows[pos]}">${p.val}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'assist.':'assists.'}</div>
     </div>
   </div>`;
