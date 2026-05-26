@@ -718,6 +718,10 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   from{transform:translateY(60px);opacity:0}
   to{transform:translateY(0);opacity:1}
 }
+@keyframes modalIn{
+  from{transform:translateY(32px) scale(.97);opacity:0}
+  to{transform:translateY(0) scale(1);opacity:1}
+}
 .modal-partidas-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:1.1rem 1.2rem .9rem;
@@ -1398,18 +1402,18 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
   display:none;
   position:fixed;inset:0;z-index:3000;
   background:rgba(0,0,0,.8);
-  align-items:flex-end;justify-content:center;
+  align-items:center;justify-content:center;
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
 #modal-duelo.open{display:flex;animation:modalBgIn .25s ease forwards;}
 .duelo-inner{
   background:var(--bg2);
-  border-radius:24px 24px 0 0;
-  width:100%;max-width:560px;
+  border-radius:24px;
+  width:92%;max-width:560px;
   max-height:92vh;
   display:flex;flex-direction:column;
-  box-shadow:0 -8px 40px rgba(0,0,0,.6);
-  animation:sheetUp .28s cubic-bezier(.32,1,.6,1) forwards;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
   overflow:hidden;
 }
 .duelo-header{
@@ -3379,13 +3383,13 @@ function _buildPlayerProfile(uid){
         <div style="font-size:10px;color:#3d2800;font-family:'DM Mono',monospace;margin-top:4px">Ouro</div>
         <div style="font-size:10px;color:#3d2800;font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(ouros/totalMesesDisputados*100):0}%</div>
       </div>
-      <div style="background:#b0b0b0;border:1px solid #b0b0b0;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.6) inset">
+      <div style="background:linear-gradient(160deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%);border:1px solid #888888;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.15),0 1px 0 rgba(255,255,255,.8) inset,0 -1px 0 rgba(0,0,0,.1) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥈</div>
         <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${pratas}</div>
         <div style="font-size:10px;color:#1a1a1a;font-family:'DM Mono',monospace;margin-top:4px">Prata</div>
         <div style="font-size:10px;color:#1a1a1a;font-family:'DM Mono',monospace;margin-top:2px">${totalMesesDisputados>0?Math.round(pratas/totalMesesDisputados*100):0}%</div>
       </div>
-      <div style="background:#bf9658;border:1px solid #bf9658;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1),0 1px 0 rgba(255,200,130,.4) inset">
+      <div style="background:linear-gradient(160deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%);border:1px solid #8a6020;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(138,96,32,.35),0 1px 0 rgba(232,200,150,.6) inset,0 -1px 0 rgba(0,0,0,.15) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥉</div>
         <div style="font-family:'ClassyVogue',sans-serif;font-size:34px;color:#000000;line-height:1">${bronzes}</div>
         <div style="font-size:10px;color:#2a0e00;font-family:'DM Mono',monospace;margin-top:4px">Bronze</div>
