@@ -3261,6 +3261,7 @@ let _mpUid=null;
 let _mpAnoAtivo=null;
 let _mpAnoMedalhas=null;
 let _mpAnoTotal=null;
+let _mpAnoMedia=null;
 let _mpAnoMeses=null;
 
 function _buildPlayerProfile(uid){
@@ -3314,6 +3315,7 @@ function _buildPlayerProfile(uid){
   if(!_mpAnoMedalhas||!anos.includes(_mpAnoMedalhas)) _mpAnoMedalhas='__all__';
   if(!_mpAnoTotal||(!['__all__',...anos].includes(_mpAnoTotal))) _mpAnoTotal=_resolveAnoAtivo(anos);
   if(!_mpAnoMeses||(!['__all__',...anos].includes(_mpAnoMeses))) _mpAnoMeses=_resolveAnoAtivo(anos);
+  if(!_mpAnoMedia||(!['__all__',...anos].includes(_mpAnoMedia))) _mpAnoMedia='__all__';
 
   // ── Totais GERAIS (todos os anos) ──
   const totalG=allMonths.reduce((s,m)=>s+m.g,0);
@@ -3441,10 +3443,44 @@ function _buildPlayerProfile(uid){
   const anoG=mesesDoAno.reduce((s,m)=>s+m.g,0);
   const anoA=mesesDoAno.reduce((s,m)=>s+m.a,0);
 
-  const anoResCard=mesesDoAno.length?`<div style="background:var(--bg3);border:1px solid var(--bo2);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">Resumo ${isAllMeses?'geral':_mpAnoMeses}</div>
-    <div style="font-family:'ClassyVogue',sans-serif;font-size:18px;color:var(--tx)">${anoG}G &nbsp;${anoA}A &nbsp;<span style="color:var(--am)">${anoG+anoA} G+A</span></div>
+  // ── SELETOR INDEPENDENTE: MÉDIAS ──
+  const isAllMedia=(_mpAnoMedia==='__all__');
+  const btnStyleMed=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#FF5A7A':'#b7b8b6'};background:${active?'#FF5A7A':'#dedede'};color:${active?'#fff':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const selMedia=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Período:</span>
+    ${anos.map(a=>`<button onclick="setMpAnoMedia('${uid}','${a}')" style="${btnStyleMed(a,a===_mpAnoMedia&&!isAllMedia)}">${a}</button>`).join('')}
+    <button onclick="setMpAnoMedia('${uid}','__all__')" style="${btnStyleMed('__all__',isAllMedia)}">Geral</button>
   </div>`:'';
+
+  const mesesParaMedia=isAllMedia?allMonths.filter(m=>!m.current):allMonths.filter(m=>!m.current&&m.ano===_mpAnoMedia);
+  const nMedia=mesesParaMedia.length;
+  const mediaG=nMedia?(mesesParaMedia.reduce((s,m)=>s+m.g,0)/nMedia):0;
+  const mediaA=nMedia?(mesesParaMedia.reduce((s,m)=>s+m.a,0)/nMedia):0;
+  const mediaGA=mediaG+mediaA;
+  const mediaLabel=isAllMedia?'Todos os tempos':`Temporada ${_mpAnoMedia}`;
+
+  const mediaCard=`<div style="background:linear-gradient(135deg,#2a1a2e 0%,#1a0a1e 100%);border:1.5px solid #FF5A7A;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(255,90,122,.2)">
+    ${selMedia}
+    <div style="font-size:10px;color:#FF9AB0;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📈 Médias de G+A — ${mediaLabel}</div>
+    ${nMedia===0?`<div style="text-align:center;padding:.5rem;color:#FF9AB0;font-size:12px;font-family:'DM Mono',monospace">Nenhum mês finalizado.</div>`:`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="background:rgba(77,255,176,.08);border:1.5px solid rgba(77,255,176,.3);border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#4dffb0;line-height:1">${mediaG.toFixed(1)}</div>
+        <div style="font-size:10px;color:#4dffb0;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Gols/mês</div>
+      </div>
+      <div style="background:rgba(96,165,250,.08);border:1.5px solid rgba(96,165,250,.3);border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#60a5fa;line-height:1">${mediaA.toFixed(1)}</div>
+        <div style="font-size:10px;color:#60a5fa;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">Assist./mês</div>
+      </div>
+      <div style="background:rgba(255,90,122,.08);border:1.5px solid rgba(255,90,122,.4);border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#FF5A7A;line-height:1">${mediaGA.toFixed(1)}</div>
+        <div style="font-size:10px;color:#FF5A7A;font-family:'DM Mono',monospace;margin-top:4px;opacity:.8">G+A/mês</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;text-align:center;font-size:10px;color:#888;font-family:'DM Mono',monospace">${nMedia} ${nMedia===1?'mês finalizado':'meses finalizados'}</div>`}
+  </div>`;
+
+  const anoResCard='';
 
   const sepLabel=`${selMeses}<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">📅 ${isAllMeses?'Todos os anos':'Ano '+_mpAnoMeses} — mês a mês</div>`;
 
@@ -3476,7 +3512,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :medalhasCard+totalCard+anoResCard+sepLabel+monthCards;
+    :medalhasCard+totalCard+mediaCard+sepLabel+monthCards;
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -3496,6 +3532,7 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   _mpAnoAtivo=null;
   _mpAnoMedalhas='__all__';
   _mpAnoTotal=null;
+  _mpAnoMedia=null;
   _mpAnoMeses=null;
   const avEl=document.getElementById('mp-avatar');
   if(avEl)avEl.innerHTML=avatarHTML(mb.name,48,uid);
@@ -3514,6 +3551,7 @@ window.setMpAno=(uid,ano)=>{
 };
 window.setMpAnoMedalhas=(uid,ano)=>{_mpAnoMedalhas=ano;_buildPlayerProfile(uid);};
 window.setMpAnoTotal=(uid,ano)=>{_mpAnoTotal=ano;_buildPlayerProfile(uid);};
+window.setMpAnoMedia=(uid,ano)=>{_mpAnoMedia=ano;_buildPlayerProfile(uid);};
 window.setMpAnoMeses=(uid,ano)=>{_mpAnoMeses=ano;_buildPlayerProfile(uid);};
 
 // Garante que _mpAnoAtivo padrão seja o ano atual
