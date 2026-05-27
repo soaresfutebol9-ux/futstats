@@ -1626,6 +1626,18 @@ body.conquistas-fab-visible .conquistas-fab{display:flex;}
   font-family:'DM Mono',monospace;font-size:9px;font-weight:700;
   color:#FFD700;letter-spacing:.06em;text-transform:uppercase;
 }
+.cq-stack-badge{
+  position:absolute;top:-7px;right:-7px;
+  min-width:22px;height:22px;border-radius:99px;
+  background:linear-gradient(135deg,#FFD700,#FF8C00);
+  border:2px solid var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  color:#1a1000;line-height:1;padding:0 4px;
+  box-shadow:0 2px 8px rgba(255,180,0,.5);
+  animation:stackPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes stackPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .cq-lock{
   position:absolute;top:6px;right:6px;
   font-size:12px;opacity:.35;
@@ -6428,45 +6440,75 @@ function calcConquistas(uid, gd){
   let prataStreak=0, prataStreakMax=0;
   let ultimoStreak=0, ultimoStreakMax=0, ultimoAcum=0;
 
+  // Histórico de streaks para contar quantas vezes cada threshold foi atingido
+  const ouroConsecHistory=[];
+  const prataConsecHistory=[];
+  const ultimoConsecHistory=[];
+
   allMonths.forEach(m=>{
-    if(m.pos===1){ ouroStreak++; ouroAcum++; } else ouroStreak=0;
-    if(m.pos===2) prataStreak++; else prataStreak=0;
-    if(m.isLast && m.total>=2){ ultimoStreak++; ultimoAcum++; } else ultimoStreak=0;
+    if(m.pos===1){ ouroStreak++; ouroAcum++; } else { if(ouroStreak>0) ouroConsecHistory.push(ouroStreak); ouroStreak=0; }
+    if(m.pos===2){ prataStreak++; } else { if(prataStreak>0) prataConsecHistory.push(prataStreak); prataStreak=0; }
+    if(m.isLast && m.total>=2){ ultimoStreak++; ultimoAcum++; } else { if(ultimoStreak>0) ultimoConsecHistory.push(ultimoStreak); ultimoStreak=0; }
     if(ouroStreak>ouroStreakMax) ouroStreakMax=ouroStreak;
     if(prataStreak>prataStreakMax) prataStreakMax=prataStreak;
     if(ultimoStreak>ultimoStreakMax) ultimoStreakMax=ultimoStreak;
   });
+  // flush streaks ainda em andamento
+  if(ouroStreak>0) ouroConsecHistory.push(ouroStreak);
+  if(prataStreak>0) prataConsecHistory.push(prataStreak);
+  if(ultimoStreak>0) ultimoConsecHistory.push(ultimoStreak);
+
+  // Quantas vezes um threshold consecutivo foi atingido (ex: streak 7 com threshold 2 → 3x)
+  function countConsecThreshold(history, threshold){
+    let total=0;
+    history.forEach(streakLen=>{ total += Math.floor(streakLen / threshold); });
+    return total;
+  }
+  // Quantas vezes um acumulado atingiu o threshold (ex: 23 ouros com threshold 10 → 2x)
+  function countAcumThreshold(acum, threshold){ return Math.floor(acum / threshold); }
+  // Quantos meses o jogador atingiu determinado threshold
+  function countMesThreshold(months, campo, threshold){
+    return months.filter(m=>{ const v=campo==='ga'?m.gols+m.assist:m[campo]; return v>=threshold; }).length;
+  }
 
   // --- Avaliação ---
   const unlocked = {};
   CONQUISTAS.forEach(cq=>{
-    let achieved=false, progress=0, max=cq.val;
+    let achieved=false, progress=0, max=cq.val, count=0;
     if(cq.tipo==='ouro_consec'){
-      achieved = ouroStreakMax >= cq.val;
+      count = countConsecThreshold(ouroConsecHistory, cq.val);
+      achieved = count > 0;
       progress = Math.min(ouroStreakMax, cq.val);
     } else if(cq.tipo==='ouro_acum'){
-      achieved = ouroAcum >= cq.val;
+      count = countAcumThreshold(ouroAcum, cq.val);
+      achieved = count > 0;
       progress = Math.min(ouroAcum, cq.val);
     } else if(cq.tipo==='prata_consec'){
-      achieved = prataStreakMax >= cq.val;
+      count = countConsecThreshold(prataConsecHistory, cq.val);
+      achieved = count > 0;
       progress = Math.min(prataStreakMax, cq.val);
     } else if(cq.tipo==='ultimo_consec'){
-      achieved = ultimoStreakMax >= cq.val;
+      count = countConsecThreshold(ultimoConsecHistory, cq.val);
+      achieved = count > 0;
       progress = Math.min(ultimoStreakMax, cq.val);
     } else if(cq.tipo==='ultimo_acum'){
-      achieved = ultimoAcum >= cq.val;
+      count = countAcumThreshold(ultimoAcum, cq.val);
+      achieved = count > 0;
       progress = Math.min(ultimoAcum, cq.val);
     } else if(cq.tipo==='gols_mes'){
-      achieved = totalGolsMelhorMes >= cq.val;
+      count = countMesThreshold(allMonths, 'gols', cq.val);
+      achieved = count > 0;
       progress = Math.min(totalGolsMelhorMes, cq.val);
     } else if(cq.tipo==='assist_mes'){
-      achieved = totalAssistMelhorMes >= cq.val;
+      count = countMesThreshold(allMonths, 'assist', cq.val);
+      achieved = count > 0;
       progress = Math.min(totalAssistMelhorMes, cq.val);
     } else if(cq.tipo==='ga_mes'){
-      achieved = totalGAMelhorMes >= cq.val;
+      count = countMesThreshold(allMonths, 'ga', cq.val);
+      achieved = count > 0;
       progress = Math.min(totalGAMelhorMes, cq.val);
     }
-    unlocked[cq.id] = { achieved, progress, max };
+    unlocked[cq.id] = { achieved, progress, max, count };
   });
 
   return unlocked;
@@ -6491,10 +6533,19 @@ window._checkConquistas = async function(db, currentUser, gd){
 
   CONQUISTAS.forEach(cq=>{
     const r = calc[cq.id];
-    if(r && r.achieved && !jaDesbloqueadas[cq.id]){
-      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: Date.now() };
+    if(!r || !r.achieved) return;
+    const savedCount = jaDesbloqueadas[cq.id] ? (jaDesbloqueadas[cq.id].count || 1) : 0;
+    const newCount   = r.count || 1;
+    if(savedCount === 0){
+      // Primeira vez desbloqueando
+      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push(cq);
+    } else if(newCount > savedCount){
+      // Conquistou de novo (count aumentou)
+      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: jaDesbloqueadas[cq.id].ts, tsLast: Date.now(), count: newCount };
+      novasIds.push(cq.id);
+      newlyUnlocked.push({...cq, _stackCount: newCount});
     }
   });
 
@@ -6573,7 +6624,15 @@ async function _renderConquistasModal(uid){
 
   const totalDesb = Object.values(calc).filter(v=>v.achieved).length;
   const totalAll  = CONQUISTAS.length;
-  const novas = Object.keys(calc).filter(id=>calc[id].achieved && !jaVistas.includes(id));
+  // "nova" = primeira vez OU count aumentou em relação ao que estava salvo
+  const novas = Object.keys(calc).filter(id=>{
+    if(!calc[id].achieved) return false;
+    if(!jaVistas.includes(id)) return true; // nunca vista
+    const saved = jaDesbloqueadas[id];
+    if(!saved) return false;
+    const savedCount = saved.count || 1;
+    return (calc[id].count || 1) > savedCount; // count subiu
+  });
 
   // Agrupa por categoria
   const cats = {};
@@ -6603,14 +6662,17 @@ async function _renderConquistasModal(uid){
       <div class="cq-cat-title">${cat}</div>
       <div class="cq-grid">`;
     cqs.forEach(cq=>{
-      const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val};
+      const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val, count:0};
       const isNova = r.achieved && novas.includes(cq.id);
-      const dataDesb = jaDesbloqueadas[cq.id] ? new Date(jaDesbloqueadas[cq.id].ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
+      const savedEntry = jaDesbloqueadas[cq.id] || null;
+      const stackCount = r.count || 0;
+      const dataDesb = savedEntry ? new Date(savedEntry.ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
 
       if(r.achieved){
         html += `<div class="cq-card desbloqueada${isNova?' nova':''}">
           ${isNova?'<div class="cq-nova-tag">nova!</div>':''}
+          ${stackCount > 1 ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
           <div class="cq-card-desc">${cq.desc}</div>
@@ -6638,7 +6700,14 @@ async function _marcarConquistasVistas(uid){
     const calc = _calcConquistas(uid, window._gd);
     const ids = Object.keys(calc).filter(id=>calc[id].achieved);
     if(!ids.length) return;
-    await window._db_updateDoc_safe(uid, { conquistasVistas: ids });
+    // Salva lista de ids vistos + count atual de cada conquista (para detectar futuras repetições)
+    const updates = { conquistasVistas: ids };
+    ids.forEach(id=>{
+      const c = calc[id].count || 1;
+      // Atualiza o count salvo no Firestore para o valor atual (sem sobrescrever ts)
+      updates[`conquistasDesbloqueadas.${id}.count`] = c;
+    });
+    await window._db_updateDoc_safe(uid, updates);
     // Remove badge
     const badge = document.getElementById('conquistas-fab-badge');
     if(badge) badge.style.display='none';
