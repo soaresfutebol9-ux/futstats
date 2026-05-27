@@ -1594,7 +1594,7 @@ body.conquistas-fab-visible .conquistas-fab{display:flex;}
   display:flex;flex-direction:column;align-items:center;
   text-align:center;gap:5px;
   transition:transform .15s,box-shadow .15s;
-  position:relative;overflow:hidden;
+  position:relative;overflow:visible;
 }
 .cq-card.desbloqueada{
   border-color:rgba(255,215,0,.4);
@@ -1627,15 +1627,16 @@ body.conquistas-fab-visible .conquistas-fab{display:flex;}
   color:#FFD700;letter-spacing:.06em;text-transform:uppercase;
 }
 .cq-stack-badge{
-  position:absolute;top:-7px;right:-7px;
-  min-width:22px;height:22px;border-radius:99px;
+  position:absolute;top:6px;left:6px;
+  min-width:20px;height:20px;border-radius:99px;
   background:linear-gradient(135deg,#FFD700,#FF8C00);
   border:2px solid var(--bg2);
   display:flex;align-items:center;justify-content:center;
-  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
   color:#1a1000;line-height:1;padding:0 4px;
   box-shadow:0 2px 8px rgba(255,180,0,.5);
   animation:stackPop .35s cubic-bezier(.34,1.56,.64,1);
+  z-index:2;
 }
 @keyframes stackPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .cq-lock{
@@ -6662,7 +6663,8 @@ async function _renderConquistasModal(uid){
     cqs.forEach(cq=>{
       const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val, count:0};
       const isNova = r.achieved && novas.includes(cq.id);
-      const stackCount = r.count || 0;
+      // Se achieved=true mas count=0 (dados antigos/incompletos), garante mínimo 1
+      const stackCount = r.achieved ? (r.count > 0 ? r.count : 1) : 0;
       // ts pode ser número (ms) ou Firestore Timestamp {seconds, nanoseconds}
       const _tsRaw = jaDesbloqueadas[cq.id]?.ts;
       const _tsMs  = _tsRaw ? (_tsRaw.seconds ? _tsRaw.seconds*1000 : _tsRaw) : null;
