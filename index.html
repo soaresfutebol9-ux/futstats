@@ -5327,7 +5327,7 @@ window.irParaRankingGA=()=>{
     // Filtra por temporada
     const isAll = !season || season === '__all__';
     const mesesHist = allMonths.filter(m => !m.current && (isAll || m.ano === season));
-    const allFiltered = isAll ? allMonths : allMonths.filter(m => m.ano === season || m.current);
+    const allFiltered = isAll ? allMonths : allMonths.filter(m => m.ano === season);
 
     const totalG = allFiltered.reduce((s,m)=>s+m.g,0);
     const totalA = allFiltered.reduce((s,m)=>s+m.a,0);
