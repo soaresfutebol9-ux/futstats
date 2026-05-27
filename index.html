@@ -1348,6 +1348,7 @@ select option{background:var(--bg3)}
 .mp-mes-card.pos-2::after{animation-delay:1.3s}
 .mp-mes-card.pos-3::after{animation-delay:2.6s}
 @keyframes mes-shine{0%,100%{left:-80%;opacity:0}8%{opacity:1}42%{left:130%;opacity:0}43%,99%{left:-80%;opacity:0}}
+@keyframes bar-shine{0%,100%{transform:translateX(-100%)}60%{transform:translateX(200%)}}
 .mp-mes-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
 .mp-mes-stats{display:flex;gap:10px}
 .mp-stat-box{flex:1;background:#dedede;border-radius:8px;padding:8px 10px;text-align:center}
@@ -1525,6 +1526,133 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
   font-family:'DM Mono',monospace;font-size:10px;
   color:var(--tx3);letter-spacing:.08em;
 }
+
+/* ── CONQUISTAS FAB ── */
+.conquistas-fab{
+  position:fixed;bottom:160px;right:16px;z-index:500;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
+  border:none;cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  color:#07090d;
+  box-shadow:0 4px 20px rgba(255,180,0,.55),0 2px 8px rgba(0,0,0,.4);
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+  position:fixed;
+}
+.conquistas-fab:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(255,180,0,.65),0 2px 8px rgba(0,0,0,.4);}
+.conquistas-fab:active{transform:scale(.92);}
+body.conquistas-fab-visible .conquistas-fab{display:flex;}
+.conquistas-fab-badge{
+  position:absolute;top:-3px;right:-3px;
+  min-width:18px;height:18px;border-radius:99px;padding:0 5px;
+  background:#FF5A7A;border:2px solid #07090d;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  animation:badgePulse 1.8s ease-in-out infinite;
+}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,122,.5)}50%{box-shadow:0 0 0 5px rgba(255,90,122,0)}}
+
+/* ── MODAL CONQUISTAS ── */
+.conquistas-inner{
+  background:var(--bg2);border-radius:24px;
+  width:92%;max-width:560px;max-height:92vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+.conquistas-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.2rem .9rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(255,215,0,.08) 0%,transparent 70%);
+}
+.conquistas-title{
+  font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px;
+  background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.conquistas-body{overflow-y:auto;padding:.9rem 1rem 1.5rem;flex:1;}
+
+/* Cards de categoria */
+.cq-categoria{margin-bottom:1.5rem}
+.cq-cat-title{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx3);
+  padding:0 4px;margin-bottom:.7rem;
+  display:flex;align-items:center;gap:8px;
+}
+.cq-cat-title::after{content:'';flex:1;height:1px;background:var(--bo)}
+.cq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Card individual de conquista */
+.cq-card{
+  border-radius:14px;padding:12px 12px 10px;
+  border:1px solid var(--bo);
+  background:var(--bg3);
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:5px;
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.cq-card.desbloqueada{
+  border-color:rgba(255,215,0,.4);
+  background:linear-gradient(135deg,rgba(255,215,0,.1) 0%,var(--bg3) 100%);
+  box-shadow:0 0 20px rgba(255,215,0,.12);
+}
+.cq-card.desbloqueada.nova{
+  border-color:rgba(255,215,0,.8);
+  box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4);
+  animation:cqNovaPulse 1.8s ease-in-out 3;
+}
+@keyframes cqNovaPulse{
+  0%,100%{box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4)}
+  50%{box-shadow:0 0 48px rgba(255,215,0,.65),0 0 0 2px rgba(255,215,0,.7)}
+}
+.cq-card.bloqueada{
+  opacity:.5;filter:grayscale(.6);
+}
+.cq-card-icon{font-size:30px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.cq-card.bloqueada .cq-card-icon{filter:grayscale(1) opacity(.4)}
+.cq-card-nome{font-family:'VarsityTeam',serif;font-size:13px;letter-spacing:.3px;color:var(--tx);line-height:1.2}
+.cq-card.bloqueada .cq-card-nome{color:var(--tx3)}
+.cq-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.03em;line-height:1.3}
+.cq-card-data{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.6);margin-top:2px}
+.cq-nova-tag{
+  position:absolute;top:6px;right:6px;
+  background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);
+  border-radius:99px;padding:1px 6px;
+  font-family:'DM Mono',monospace;font-size:9px;font-weight:700;
+  color:#FFD700;letter-spacing:.06em;text-transform:uppercase;
+}
+.cq-lock{
+  position:absolute;top:6px;right:6px;
+  font-size:12px;opacity:.35;
+}
+
+/* Progress bar na conquista bloqueada */
+.cq-progress-bar{
+  width:100%;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px;
+}
+.cq-progress-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,#FFD700,#FF8C00);
+  transition:width .5s ease;
+}
+
+/* Contadores no topo */
+.cq-counters{
+  display:flex;gap:8px;margin-bottom:1rem;
+  background:var(--bg3);border:1px solid var(--bo);
+  border-radius:14px;padding:12px 14px;
+}
+.cq-counter{flex:1;text-align:center}
+.cq-counter-val{font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1}
+.cq-counter-val.gold{background:linear-gradient(135deg,#FFD700,#FF8C00);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cq-counter-val.silver{color:var(--tx2)}
+.cq-counter-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
 </style>
 </head>
 <body>
@@ -1914,6 +2042,9 @@ body::before{
       <!-- Stats do mês atual -->
       <div id="pperfil-stats-mes" style="margin-bottom:1rem"></div>
 
+      <!-- Meta pessoal do mês -->
+      <div id="pperfil-meta" style="margin-bottom:1rem"></div>
+
       <!-- Stats totais -->
       <div id="pperfil-stats-total" style="margin-bottom:1rem"></div>
 
@@ -2021,6 +2152,52 @@ body::before{
   </div>
 </div>
 
+<!-- ══ CONQUISTAS FAB ══ -->
+<button class="conquistas-fab" id="conquistas-fab" onclick="abrirConquistas()" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  <div class="conquistas-fab-badge" id="conquistas-fab-badge" style="display:none"></div>
+</button>
+
+<!-- ══ MODAL CONQUISTAS ══ -->
+<div id="modal-conquistas" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.8);align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+  <div class="conquistas-inner" id="conquistas-inner">
+    <div class="conquistas-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;color:#FFD700"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <div class="conquistas-title">Conquistas</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="conquistas-player-name" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3)"></div>
+        <button onclick="fecharConquistas()" class="duelo-close">×</button>
+      </div>
+    </div>
+    <div class="conquistas-body" id="conquistas-body">
+      <div style="text-align:center;padding:2rem;color:var(--tx3);font-family:'DM Mono',monospace">Carregando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST CONQUISTA DESBLOQUEADA ══ -->
+<div id="conquista-toast" style="display:none;position:fixed;inset:0;z-index:9990;pointer-events:none;align-items:center;justify-content:center">
+  <div id="conquista-toast-box" style="
+    background:linear-gradient(160deg,rgba(255,215,0,.18) 0%,rgba(255,180,0,.08) 100%);
+    border:2px solid rgba(255,215,0,.6);
+    border-radius:24px;padding:28px 32px 22px;
+    text-align:center;min-width:260px;max-width:320px;
+    box-shadow:0 0 60px rgba(255,200,0,.35),0 20px 60px rgba(0,0,0,.7);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    transform:scale(.7);opacity:0;
+    transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .38s cubic-bezier(.22,1,.36,1);
+    pointer-events:all;
+  ">
+    <div id="conquista-toast-icon" style="font-size:52px;line-height:1;margin-bottom:10px;display:block"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,200,80,.8);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px">🏆 Conquista Desbloqueada!</div>
+    <div id="conquista-toast-nome" style="font-family:'VarsityTeam',serif;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFE066 0%,#FFB800 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 10px rgba(255,185,0,.5));margin-bottom:6px"></div>
+    <div id="conquista-toast-desc" style="font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,200,80,.7);letter-spacing:.04em;line-height:1.5;margin-bottom:16px"></div>
+    <button onclick="verConquistasDoToast()" style="background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);color:#FFE066;border-radius:12px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em;pointer-events:all">Ver conquistas →</button>
+  </div>
+</div>
+
 <!-- ══ FIREBASE + APP ══ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -2048,10 +2225,17 @@ Object.defineProperties(window,{
   _dueloA_:{get:()=>_dueloA,set:v=>{_dueloA=v;}},
   _dueloB_:{get:()=>_dueloB,set:v=>{_dueloB=v;}},
   _dueloScope_:{get:()=>_dueloScope,set:v=>{_dueloScope=v;}},
+  _currentUserUid:{get:()=>currentUser?.uid},
 });
 window._getSt=(...a)=>getSt(...a);
 window._getStGeral=(...a)=>getStGeral(...a);
 window._getDueloStats_=(...a)=>_getDueloStats(...a);
+// Expõe helpers Firestore para módulo de conquistas
+window._db_getDoc = (ref)=>getDoc(ref);
+window._db_updateDoc = (ref,data)=>updateDoc(ref,data);
+window._db_updateDoc_safe = async (uid,data)=>{ try{ await updateDoc(doc(db,'users',uid),data); }catch(e){} };
+window._db_doc = (col,id)=>doc(db,col,id);
+document._firestoreDoc = (uid)=>doc(db,'users',uid);
 const $=id=>document.getElementById(id);
 
 
@@ -2290,6 +2474,76 @@ function renderPerfilPanelStats(){
       ${pct!==null?`<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;background:#ecedeb;border-radius:10px;padding:10px 14px;border:1px solid #b7b8b6;box-shadow:0 2px 8px rgba(0,0,0,.1)"><div style="font-size:13px;color:#494a48;font-family:'DM Mono',monospace">🥅 Pênaltis: ${s.penOk}/${s.penBat}</div><div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:${corPct}">${pct}%</div></div>`:''}
     </div>`;
 
+  // ── Card de meta pessoal do mês ──
+  const metaEl=$('pperfil-meta');
+  if(metaEl){
+    const mesKey=gd.mesAtivo||mesAtual();
+    const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
+    const metaTipo=metaSalva?.tipo||'ga'; // 'ga','gols','assist'
+    const metaAlvo=metaSalva?.alvo||0;
+    const progAtual=metaTipo==='gols'?s.gols:metaTipo==='assist'?s.assist:(s.gols+s.assist);
+    const pct=metaAlvo>0?Math.min(Math.round(progAtual/metaAlvo*100),100):0;
+    const atingiu=metaAlvo>0&&progAtual>=metaAlvo;
+    const tipoLabel=metaTipo==='gols'?'⚽ Gols':metaTipo==='assist'?'👟 Assist.':'⚡ G+A';
+    const barColor=atingiu?'#40c960':pct>=70?'#FFD166':pct>=40?'#60a5fa':'#FF5A7A';
+    const barBg=atingiu?'rgba(64,201,96,.18)':pct>=70?'rgba(255,209,102,.15)':pct>=40?'rgba(96,165,250,.15)':'rgba(255,90,122,.12)';
+    const borderColor=atingiu?'#40c960':pct>=70?'#FFD166':'#b7b8b6';
+    const faltam=metaAlvo>0?Math.max(metaAlvo-progAtual,0):0;
+
+    metaEl.innerHTML=`
+    <div style="background:#ecedeb;border:1.5px solid ${borderColor};border-radius:14px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.12)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🎯 Meta do mês</div>
+        <button onclick="abrirEditarMeta()" style="font-size:10px;font-family:'DM Mono',monospace;background:none;border:1px solid #b7b8b6;border-radius:8px;color:#494a48;padding:3px 10px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#dedede'" onmouseout="this.style.background='none'">${metaAlvo>0?'✏️ Editar':'+ Definir'}</button>
+      </div>
+      ${metaAlvo===0?`
+        <div style="text-align:center;padding:12px 0;color:#494a48;font-family:'DM Mono',monospace;font-size:12px">
+          <div style="font-size:24px;margin-bottom:6px">🎯</div>
+          <div>Nenhuma meta definida para este mês.</div>
+          <button onclick="abrirEditarMeta()" style="margin-top:10px;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(77,255,176,.25)">Definir meta 🎯</button>
+        </div>`:`
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace">${tipoLabel}</div>
+            <div style="font-family:'ClassyVogue',sans-serif;font-size:20px;color:#000000;line-height:1">${progAtual}<span style="font-size:13px;color:#494a48"> / ${metaAlvo}</span></div>
+          </div>
+          <!-- Barra de progresso -->
+          <div style="background:#dedede;border-radius:99px;height:10px;overflow:hidden;margin-bottom:6px;position:relative">
+            <div style="height:100%;width:${pct}%;background:${barColor};border-radius:99px;transition:width .6s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden">
+              ${pct>15?`<div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%);animation:bar-shine 2.2s ease-in-out infinite"></div>`:''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:10px;font-family:'DM Mono',monospace;color:${barColor};font-weight:700">${atingiu?'✅ Meta atingida!':pct+'% completo'}</div>
+            <div style="font-size:10px;font-family:'DM Mono',monospace;color:#494a48">${atingiu?'🔥 Parabéns!':faltam>0?`Faltam ${faltam}`:''}</div>
+          </div>
+        </div>`}
+    </div>
+    <!-- Modal editar meta (inline, toggle) -->
+    <div id="meta-edit-box" style="display:none;background:#dedede;border:1.5px solid #40c960;border-radius:14px;padding:14px 16px;margin-top:8px;box-shadow:0 4px 20px rgba(0,0,0,.18)">
+      <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">🎯 Definir meta para ${getMesLabel(mesKey)}</div>
+      <!-- Tipo da meta -->
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        ${['ga','gols','assist'].map(t=>{
+          const lbl=t==='ga'?'⚡ G+A':t==='gols'?'⚽ Gols':'👟 Assist.';
+          const active=metaTipo===t;
+          return`<button onclick="setMetaTipo('${t}')" id="meta-tipo-${t}" style="flex:1;padding:7px 4px;border-radius:10px;border:1.5px solid ${active?'#40c960':'#b7b8b6'};background:${active?'#aef2b3':'#ecedeb'};color:${active?'#1a5c2a':'#494a48'};font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">${lbl}</button>`;
+        }).join('')}
+      </div>
+      <!-- Valor da meta -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <button onclick="stepMeta(-1)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #b7b8b6;background:#ecedeb;color:#494a48;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#dedede'" onmouseout="this.style.background='#ecedeb'">−</button>
+        <input type="number" id="meta-alvo-input" min="1" max="99" value="${metaAlvo>0?metaAlvo:5}" style="flex:1;text-align:center;background:#ecedeb;border:1.5px solid #b7b8b6;border-radius:10px;color:#000000;font-family:'ClassyVogue',sans-serif;font-size:32px;padding:8px 4px;-moz-appearance:textfield;outline:none;width:0" oninput="if(this.value<1)this.value=1;if(this.value>99)this.value=99" onfocus="this.style.borderColor='#40c960';this.style.boxShadow='0 0 0 3px rgba(64,201,96,.15)'" onblur="this.style.borderColor='#b7b8b6';this.style.boxShadow='none'">
+        <button onclick="stepMeta(1)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #b7b8b6;background:#ecedeb;color:#494a48;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#dedede'" onmouseout="this.style.background='#ecedeb'">+</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="salvarMeta()" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(77,255,176,.3);transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Salvar meta ✓</button>
+        ${metaAlvo>0?`<button onclick="removerMeta()" style="padding:11px 14px;background:none;border:1.5px solid var(--re);color:var(--re);border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.1)'" onmouseout="this.style.background='none'">🗑</button>`:''}
+        <button onclick="fecharEditarMeta()" style="padding:11px 14px;background:none;border:1.5px solid #b7b8b6;color:#494a48;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s" onmouseover="this.style.background='#dedede'" onmouseout="this.style.background='none'">✕</button>
+      </div>
+    </div>`;
+  }
+
   // ── Card de totais gerais ──
   const mb=(gd.members||[]).find(m=>m.uid===currentUser.uid);
   const totalEl=$('pperfil-stats-total');
@@ -2367,6 +2621,72 @@ window.salvarNovoNome=async()=>{
 window.copyCodePerfil=()=>{
   navigator.clipboard.writeText(groupId).then(()=>{const b=$('copy-code-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));
 };
+
+// ── METAS PESSOAIS ──────────────────────────────────────────────
+let _metaTipoAtual='ga';
+
+window.abrirEditarMeta=()=>{
+  const box=$('meta-edit-box');
+  if(!box)return;
+  const mesKey=gd?.mesAtivo||mesAtual();
+  const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
+  _metaTipoAtual=metaSalva?.tipo||'ga';
+  _updateMetaTipoBtns();
+  if(metaSalva?.alvo>0){const inp=$('meta-alvo-input');if(inp)inp.value=metaSalva.alvo;}
+  box.style.display='block';
+  setTimeout(()=>{const inp=$('meta-alvo-input');if(inp)inp.focus();},80);
+};
+
+window.fecharEditarMeta=()=>{
+  const box=$('meta-edit-box');if(box)box.style.display='none';
+};
+
+window.setMetaTipo=(tipo)=>{
+  _metaTipoAtual=tipo;
+  _updateMetaTipoBtns();
+};
+
+function _updateMetaTipoBtns(){
+  ['ga','gols','assist'].forEach(t=>{
+    const btn=$('meta-tipo-'+t);if(!btn)return;
+    const active=t===_metaTipoAtual;
+    btn.style.border=`1.5px solid ${active?'#40c960':'#b7b8b6'}`;
+    btn.style.background=active?'#aef2b3':'#ecedeb';
+    btn.style.color=active?'#1a5c2a':'#494a48';
+  });
+}
+
+window.stepMeta=(d)=>{
+  const inp=$('meta-alvo-input');if(!inp)return;
+  let v=parseInt(inp.value)||1;
+  v=Math.max(1,Math.min(99,v+d));
+  inp.value=v;
+};
+
+window.salvarMeta=async()=>{
+  if(!currentUser)return;
+  const inp=$('meta-alvo-input');
+  const alvo=Math.max(1,Math.min(99,parseInt(inp?.value)||5));
+  const mesKey=gd?.mesAtivo||mesAtual();
+  const meta={tipo:_metaTipoAtual,alvo,mesKey};
+  myProfile.meta=meta;
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid),{meta});
+  }catch(e){console.warn('meta save:',e);}
+  fecharEditarMeta();
+  renderPerfilPanelStats();
+};
+
+window.removerMeta=async()=>{
+  if(!currentUser)return;
+  myProfile.meta=null;
+  try{await updateDoc(doc(db,'users',currentUser.uid),{meta:null});}catch(e){}
+  fecharEditarMeta();
+  renderPerfilPanelStats();
+};
+// ── FIM METAS ────────────────────────────────────────────────────
+
+
 window.copyInviteLinkPerfil=()=>{
   const link=location.href.split('?')[0]+'?join='+groupId;
   navigator.clipboard.writeText(link).then(()=>{const b=$('copy-link-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));
@@ -2455,9 +2775,43 @@ function enterApp(){
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();
+  // Mostra FABs
+  document.body.classList.add('duelo-fab-visible');
+  document.body.classList.add('conquistas-fab-visible');
+  const cfab=$('conquistas-fab');if(cfab)cfab.style.display='flex';
   // Crown check com delay para renderização completa
   setTimeout(()=>maybeFiraCrown(),900);
+  // Conquistas check após carregar dados
+  setTimeout(async()=>{
+    if(window._checkConquistas && currentUser && gd){
+      const novas = await window._checkConquistas(db, currentUser, gd);
+      if(novas && novas.length > 0){
+        const badge=$('conquistas-fab-badge');
+        if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
+        window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
+      } else {
+        // Verifica se há não vistas para mostrar badge
+        _checkBadgeConquistas();
+      }
+    }
+  }, 1500);
 }
+async function _checkBadgeConquistas(){
+  if(!currentUser||!gd) return;
+  try {
+    const snap=await getDoc(doc(db,'users',currentUser.uid));
+    if(!snap.exists()) return;
+    const data=snap.data();
+    const desb=data.conquistasDesbloqueadas||{};
+    const vistas=data.conquistasVistas||[];
+    const naoVistas=Object.keys(desb).filter(id=>!vistas.includes(id));
+    if(naoVistas.length>0){
+      const badge=$('conquistas-fab-badge');
+      if(badge){ badge.textContent=naoVistas.length; badge.style.display='flex'; }
+    }
+  }catch(e){}
+}
+
 window.leaveGroup=async()=>{
   if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
   await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterLobby();
@@ -2477,6 +2831,17 @@ window.addMatch=async()=>{
     await setDoc(doc(db,'groups',groupId),cur);gd=cur;
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
+    // Verifica conquistas após salvar partida
+    setTimeout(async()=>{
+      if(window._checkConquistas && currentUser && gd){
+        const novas=await window._checkConquistas(db,currentUser,gd);
+        if(novas&&novas.length>0){
+          const badge=$('conquistas-fab-badge');
+          if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
+          window._mostrarToastConquistas&&window._mostrarToastConquistas(novas);
+        }
+      }
+    },800);
   }catch(e){showErr('aerr','Erro: '+e.message)}
 };
 window.openEdit=gi=>{const m=(gd.matches||[])[gi];if(!m)return;editIdx=gi;$('edate').value=m.date||'';$('ename').value=m.name||'';$('egols').value=m.gols||0;$('eassist').value=m.assist||0;$('epb').value=m.penBat||0;$('epk').value=m.penOk||0;openP('pedit');};
@@ -3589,9 +3954,26 @@ function _buildPlayerProfile(uid){
       </div>
     </div>`).join('');
 
+  // ── CARD DE CONQUISTAS ──────────────────────────────
+  const calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : {};
+  const cqDesb  = window._CONQUISTAS ? window._CONQUISTAS.filter(c=>calcCq[c.id]&&calcCq[c.id].achieved) : [];
+  const cqTotal = window._CONQUISTAS ? window._CONQUISTAS.length : 0;
+  const conquistasCard = cqTotal>0 ? `
+  <div style="background:#ebebeb;border:1.5px solid rgba(255,215,0,.5);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 16px rgba(255,200,0,.12);cursor:pointer" onclick="abrirConquistas('${uid}')">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:10px;color:#8a6a00;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Conquistas
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8a6a00;font-weight:700">${cqDesb.length}/${cqTotal} →</div>
+    </div>
+    ${cqDesb.length===0?`<div style="text-align:center;padding:6px;color:#8a6a00;font-size:12px;font-family:'DM Mono',monospace;opacity:.6">Nenhuma conquista ainda</div>`
+    :`<div style="display:flex;flex-wrap:wrap;gap:4px">${cqDesb.slice(0,12).map(c=>`<span title="${c.nome}" style="font-size:22px;line-height:1">${c.icon}</span>`).join('')}${cqDesb.length>12?`<span style="font-size:12px;color:#8a6a00;font-family:'DM Mono',monospace;align-self:center;margin-left:2px">+${cqDesb.length-12}</span>`:''}</div>`}
+  </div>` : '';
+
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
+    :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -5925,6 +6307,424 @@ window.irParaRankingGA=()=>{
   };
 
   // ── FIM COMPARTILHAMENTO ────────────────────────────────────
+
+})();
+
+// ══════════════════════════════════════════════════════════════
+//  SISTEMA DE CONQUISTAS
+// ══════════════════════════════════════════════════════════════
+(function(){
+
+const CONQUISTAS = [
+  // ── OUROS CONSECUTIVOS ──────────────────────────────────────
+  { id:'ouro_consec_2', cat:'🥇 Ouros Consecutivos', nome:'Em Chamas',       desc:'2 ouros consecutivos',      icon:'🔥',  tipo:'ouro_consec', val:2  },
+  { id:'ouro_consec_3', cat:'🥇 Ouros Consecutivos', nome:'Imparável',       desc:'3 ouros consecutivos',      icon:'⚡',  tipo:'ouro_consec', val:3  },
+  { id:'ouro_consec_4', cat:'🥇 Ouros Consecutivos', nome:'Dominador',       desc:'4 ouros consecutivos',      icon:'👑',  tipo:'ouro_consec', val:4  },
+  { id:'ouro_consec_5', cat:'🥇 Ouros Consecutivos', nome:'Rei da Pelada',   desc:'5 ouros consecutivos',      icon:'🏆',  tipo:'ouro_consec', val:5  },
+  { id:'ouro_semestre', cat:'🥇 Ouros Consecutivos', nome:'Dinastia',        desc:'6 meses consecutivos em 1º',icon:'👑',  tipo:'ouro_consec', val:6  },
+  // ── OUROS ACUMULATIVOS ──────────────────────────────────────
+  { id:'ouro_acum_3',  cat:'🥇 Ouros Acumulativos', nome:'Ganhador',         desc:'3 ouros acumulados',         icon:'🌟',  tipo:'ouro_acum', val:3  },
+  { id:'ouro_acum_5',  cat:'🥇 Ouros Acumulativos', nome:'Campeão',          desc:'5 ouros acumulados',         icon:'🏅',  tipo:'ouro_acum', val:5  },
+  { id:'ouro_acum_10', cat:'🥇 Ouros Acumulativos', nome:'Lenda',            desc:'10 ouros acumulados',        icon:'🦁',  tipo:'ouro_acum', val:10 },
+  { id:'ouro_acum_15', cat:'🥇 Ouros Acumulativos', nome:'Imortal',          desc:'15 ouros acumulados',        icon:'⚔️', tipo:'ouro_acum', val:15 },
+  { id:'ouro_acum_20', cat:'🥇 Ouros Acumulativos', nome:'Eterno',           desc:'20 ouros acumulados',        icon:'🌠',  tipo:'ouro_acum', val:20 },
+  { id:'ouro_acum_25', cat:'🥇 Ouros Acumulativos', nome:'Mítico',           desc:'25 ouros acumulados',        icon:'🔮',  tipo:'ouro_acum', val:25 },
+  { id:'ouro_acum_30', cat:'🥇 Ouros Acumulativos', nome:'Transcendente',    desc:'30 ouros acumulados',        icon:'✨',  tipo:'ouro_acum', val:30 },
+  // ── PRATAS CONSECUTIVOS ──────────────────────────────────────
+  { id:'prata_consec_2', cat:'🥈 Pratas Consecutivos', nome:'Vice Recorrente',   desc:'2 pratas consecutivas',  icon:'😤',  tipo:'prata_consec', val:2 },
+  { id:'prata_consec_3', cat:'🥈 Pratas Consecutivos', nome:'Azarão de Prata',   desc:'3 pratas consecutivas',  icon:'😬',  tipo:'prata_consec', val:3 },
+  { id:'prata_consec_4', cat:'🥈 Pratas Consecutivos', nome:'Eterno Segundo',    desc:'4 pratas consecutivas',  icon:'😩',  tipo:'prata_consec', val:4 },
+  { id:'prata_consec_5', cat:'🥈 Pratas Consecutivos', nome:'Maldição do Vice',  desc:'5 pratas consecutivas',  icon:'😭',  tipo:'prata_consec', val:5 },
+  // ── ÚLTIMO LUGAR CONSECUTIVO ────────────────────────────────
+  { id:'ultimo_consec_2', cat:'💀 Último Lugar Consecutivo', nome:'Engatinhando',  desc:'2 últimos consecutivos', icon:'🐢', tipo:'ultimo_consec', val:2 },
+  { id:'ultimo_consec_3', cat:'💀 Último Lugar Consecutivo', nome:'Lanterninha',   desc:'3 últimos consecutivos', icon:'🔦', tipo:'ultimo_consec', val:3 },
+  { id:'ultimo_consec_4', cat:'💀 Último Lugar Consecutivo', nome:'Invisível',     desc:'4 últimos consecutivos', icon:'👻', tipo:'ultimo_consec', val:4 },
+  { id:'ultimo_consec_5', cat:'💀 Último Lugar Consecutivo', nome:'Fantasma',      desc:'5 últimos consecutivos', icon:'💨', tipo:'ultimo_consec', val:5 },
+  // ── ÚLTIMO LUGAR ACUMULATIVO ────────────────────────────────
+  { id:'ultimo_acum_5',  cat:'💀 Último Lugar Acumulativo', nome:'Frequentador do Fundo', desc:'5 últimos acumulados',  icon:'🪣', tipo:'ultimo_acum', val:5  },
+  { id:'ultimo_acum_10', cat:'💀 Último Lugar Acumulativo', nome:'Morador do Último Lugar',desc:'10 últimos acumulados', icon:'🕳️',tipo:'ultimo_acum', val:10 },
+  { id:'ultimo_acum_20', cat:'💀 Último Lugar Acumulativo', nome:'Patrimônio da Derrota', desc:'20 últimos acumulados', icon:'🪦', tipo:'ultimo_acum', val:20 },
+  // ── GOLS ──────────────────────────────────────────────────
+  { id:'gols_20', cat:'⚽ Gols', nome:'Artilheiro',      desc:'20 gols marcados no total', icon:'⚽', tipo:'gols_acum', val:20 },
+  { id:'gols_25', cat:'⚽ Gols', nome:'Goleador',         desc:'25 gols marcados no total', icon:'🎯', tipo:'gols_acum', val:25 },
+  { id:'gols_30', cat:'⚽ Gols', nome:'Sniper',           desc:'30 gols marcados no total', icon:'💥', tipo:'gols_acum', val:30 },
+  { id:'gols_35', cat:'⚽ Gols', nome:'Máquina de Gols',  desc:'35 gols marcados no total', icon:'🤖', tipo:'gols_acum', val:35 },
+  { id:'gols_40', cat:'⚽ Gols', nome:'Predador',         desc:'40 gols marcados no total', icon:'🦅', tipo:'gols_acum', val:40 },
+  // ── ASSISTÊNCIAS ────────────────────────────────────────────
+  { id:'assist_10', cat:'👟 Assistências', nome:'Garçom',       desc:'10 assistências no total', icon:'🍽️', tipo:'assist_acum', val:10 },
+  { id:'assist_15', cat:'👟 Assistências', nome:'Maestro',       desc:'15 assistências no total', icon:'🎼', tipo:'assist_acum', val:15 },
+  { id:'assist_20', cat:'👟 Assistências', nome:'Visão de Jogo', desc:'20 assistências no total', icon:'👁️', tipo:'assist_acum', val:20 },
+  { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',    desc:'25 assistências no total', icon:'🏗️', tipo:'assist_acum', val:25 },
+  { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',     desc:'30 assistências no total', icon:'📐', tipo:'assist_acum', val:30 },
+  // ── G+A TOTAL ──────────────────────────────────────────────
+  { id:'ga_30',  cat:'⚡ G+A Total', nome:'Participativo', desc:'30 G+A no total', icon:'🌱', tipo:'ga_acum', val:30 },
+  { id:'ga_35',  cat:'⚡ G+A Total', nome:'Decisivo',      desc:'35 G+A no total', icon:'🎲', tipo:'ga_acum', val:35 },
+  { id:'ga_40',  cat:'⚡ G+A Total', nome:'Protagonista',  desc:'40 G+A no total', icon:'🎬', tipo:'ga_acum', val:40 },
+  { id:'ga_45',  cat:'⚡ G+A Total', nome:'Estrela',       desc:'45 G+A no total', icon:'⭐', tipo:'ga_acum', val:45 },
+  { id:'ga_50',  cat:'⚡ G+A Total', nome:'Craque',        desc:'50 G+A no total', icon:'🌟', tipo:'ga_acum', val:50 },
+  { id:'ga_55',  cat:'⚡ G+A Total', nome:'Fenômeno',      desc:'55 G+A no total', icon:'🚀', tipo:'ga_acum', val:55 },
+  { id:'ga_60',  cat:'⚡ G+A Total', nome:'Extraterrestre',desc:'60 G+A no total', icon:'🛸', tipo:'ga_acum', val:60 },
+];
+
+// ── Cálculo de conquistas para um jogador ──────────────────────
+function calcConquistas(uid, gd){
+  if(!gd || !uid) return {};
+  const hist = gd.historico || {};
+  const mbs  = gd.members   || [];
+  const mb   = mbs.find(m => m.uid === uid);
+  if(!mb) return {};
+
+  // helper: filtra partidas de um jogador num conjunto de matches
+  const pMatches = (matches) =>
+    (matches||[]).filter(x => x.uid ? x.uid===uid : x.player===mb.name);
+
+  // helper: ranking de um mês (retorna posição 1-indexed; empate = mesma pos)
+  function rankMes(matches, membros){
+    const scored = membros.map(m=>{
+      const ms=(matches||[]).filter(x=>x.uid?x.uid===m.uid:x.player===m.name);
+      return { uid:m.uid, ga: ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0) };
+    }).sort((a,b)=>b.ga-a.ga);
+    const myEntry = scored.findIndex(r=>r.uid===uid);
+    if(myEntry<0) return null;
+    return { pos: myEntry+1, total: scored.length, isLast: myEntry === scored.length-1 };
+  }
+
+  // coleta todos os meses em ordem cronológica
+  const allMonthKeys = Object.keys(hist).sort();
+  const allMonths = allMonthKeys.map(k=>{
+    const h = hist[k];
+    const rank = rankMes(h.matches, h.members||mbs);
+    const ms   = pMatches(h.matches);
+    return {
+      key:k,
+      pos: rank ? rank.pos : null,
+      isLast: rank ? rank.isLast : false,
+      total: rank ? rank.total : 0,
+      gols: ms.reduce((s,x)=>s+(x.gols||0),0),
+      assist: ms.reduce((s,x)=>s+(x.assist||0),0),
+    };
+  });
+  // mês atual
+  {
+    const rank = rankMes(gd.matches, mbs);
+    const ms   = pMatches(gd.matches);
+    allMonths.push({
+      key: gd.mesAtivo||'',
+      pos: rank ? rank.pos : null,
+      isLast: rank ? rank.isLast : false,
+      total: rank ? rank.total : 0,
+      gols: ms.reduce((s,x)=>s+(x.gols||0),0),
+      assist: ms.reduce((s,x)=>s+(x.assist||0),0),
+    });
+  }
+
+  // --- Estatísticas acumuladas ---
+  const totalGols   = allMonths.reduce((s,m)=>s+m.gols,0);
+  const totalAssist = allMonths.reduce((s,m)=>s+m.assist,0);
+  const totalGA     = totalGols + totalAssist;
+
+  // --- Streak de ouro / prata / último ---
+  let ouroStreak=0, ouroStreakMax=0, ouroAcum=0;
+  let prataStreak=0, prataStreakMax=0;
+  let ultimoStreak=0, ultimoStreakMax=0, ultimoAcum=0;
+
+  allMonths.forEach(m=>{
+    if(m.pos===1){ ouroStreak++; ouroAcum++; } else ouroStreak=0;
+    if(m.pos===2) prataStreak++; else prataStreak=0;
+    if(m.isLast && m.total>=2){ ultimoStreak++; ultimoAcum++; } else ultimoStreak=0;
+    if(ouroStreak>ouroStreakMax) ouroStreakMax=ouroStreak;
+    if(prataStreak>prataStreakMax) prataStreakMax=prataStreak;
+    if(ultimoStreak>ultimoStreakMax) ultimoStreakMax=ultimoStreak;
+  });
+
+  // --- Avaliação ---
+  const unlocked = {};
+  CONQUISTAS.forEach(cq=>{
+    let achieved=false, progress=0, max=cq.val;
+    if(cq.tipo==='ouro_consec'){
+      achieved = ouroStreakMax >= cq.val;
+      progress = Math.min(ouroStreakMax, cq.val);
+    } else if(cq.tipo==='ouro_acum'){
+      achieved = ouroAcum >= cq.val;
+      progress = Math.min(ouroAcum, cq.val);
+    } else if(cq.tipo==='prata_consec'){
+      achieved = prataStreakMax >= cq.val;
+      progress = Math.min(prataStreakMax, cq.val);
+    } else if(cq.tipo==='ultimo_consec'){
+      achieved = ultimoStreakMax >= cq.val;
+      progress = Math.min(ultimoStreakMax, cq.val);
+    } else if(cq.tipo==='ultimo_acum'){
+      achieved = ultimoAcum >= cq.val;
+      progress = Math.min(ultimoAcum, cq.val);
+    } else if(cq.tipo==='gols_acum'){
+      achieved = totalGols >= cq.val;
+      progress = Math.min(totalGols, cq.val);
+    } else if(cq.tipo==='assist_acum'){
+      achieved = totalAssist >= cq.val;
+      progress = Math.min(totalAssist, cq.val);
+    } else if(cq.tipo==='ga_acum'){
+      achieved = totalGA >= cq.val;
+      progress = Math.min(totalGA, cq.val);
+    }
+    unlocked[cq.id] = { achieved, progress, max };
+  });
+
+  return unlocked;
+}
+
+// ── Verificar e salvar novas conquistas para o usuário logado ──
+window._checkConquistas = async function(db, currentUser, gd){
+  if(!currentUser || !gd) return [];
+  const uid = currentUser.uid;
+  const calc = calcConquistas(uid, gd);
+  const newlyUnlocked = [];
+
+  // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
+  let userSnap;
+  try { userSnap = await window._db_getDoc(doc(db,'users',uid)); } catch(e){ return []; }
+  const userData = userSnap.exists() ? userSnap.data() : {};
+  const jaDesbloqueadas = userData.conquistasDesbloqueadas || {};
+  const jaVistas         = userData.conquistasVistas || [];
+
+  const updates = {};
+  const novasIds = [];
+
+  CONQUISTAS.forEach(cq=>{
+    const r = calc[cq.id];
+    if(r && r.achieved && !jaDesbloqueadas[cq.id]){
+      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: Date.now() };
+      novasIds.push(cq.id);
+      newlyUnlocked.push(cq);
+    }
+  });
+
+  if(novasIds.length > 0){
+    try {
+      await window._db_updateDoc(doc(db,'users',uid), updates);
+    } catch(e){ console.warn('conquistas save:',e); }
+  }
+
+  return newlyUnlocked;
+};
+
+// Expõe helpers para o módulo principal
+window._calcConquistas = calcConquistas;
+window._CONQUISTAS = CONQUISTAS;
+
+// ── ABRIR CONQUISTAS ───────────────────────────────────────────
+let _cqUid = null;
+
+window.abrirConquistas = function(uid){
+  _cqUid = uid || (window._currentUserUid);
+  if(!_cqUid) return;
+  const modal = document.getElementById('modal-conquistas');
+  if(!modal) return;
+  modal.style.display='flex';
+  requestAnimationFrame(()=>{
+    modal.style.opacity='0';
+    modal.style.transition='opacity .22s ease';
+    requestAnimationFrame(()=>{ modal.style.opacity='1'; });
+  });
+  _renderConquistasModal(_cqUid);
+  // Marca como vistas
+  _marcarConquistasVistas(_cqUid);
+};
+
+window.fecharConquistas = function(){
+  const modal = document.getElementById('modal-conquistas');
+  if(!modal) return;
+  modal.style.transition='opacity .2s ease';
+  modal.style.opacity='0';
+  setTimeout(()=>{ modal.style.display='none'; modal.style.opacity=''; modal.style.transition=''; },220);
+};
+
+window.verConquistasDoToast = function(){
+  _esconderToastConquista();
+  setTimeout(()=>window.abrirConquistas(),150);
+};
+
+// ── Render modal ───────────────────────────────────────────────
+async function _renderConquistasModal(uid){
+  const body = document.getElementById('conquistas-body');
+  const nameEl = document.getElementById('conquistas-player-name');
+  if(!body) return;
+
+  body.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--tx3);font-family:'DM Mono',monospace"><span style="display:inline-block;animation:sp 1s linear infinite">◌</span> calculando...</div>`;
+
+  const gd = window._gd;
+  if(!gd){ body.innerHTML='<div style="text-align:center;padding:2rem;color:var(--tx3)">Sem dados.</div>'; return; }
+
+  const mbs = gd.members||[];
+  const mb  = mbs.find(m=>m.uid===uid);
+  if(mb && nameEl) nameEl.textContent = mb.name;
+
+  const calc = _calcConquistas(uid, gd);
+
+  // Conquistas já desbloqueadas salvas no Firestore (para saber datas e novas)
+  let jaDesbloqueadas = {};
+  let jaVistas = [];
+  try {
+    const snap = await window._db_getDoc(document._firestoreDoc(uid));
+    if(snap && snap.exists()){
+      jaDesbloqueadas = snap.data().conquistasDesbloqueadas || {};
+      jaVistas        = snap.data().conquistasVistas || [];
+    }
+  } catch(e){}
+
+  const totalDesb = Object.values(calc).filter(v=>v.achieved).length;
+  const totalAll  = CONQUISTAS.length;
+  const novas = Object.keys(calc).filter(id=>calc[id].achieved && !jaVistas.includes(id));
+
+  // Agrupa por categoria
+  const cats = {};
+  CONQUISTAS.forEach(cq=>{
+    if(!cats[cq.cat]) cats[cq.cat]=[];
+    cats[cq.cat].push(cq);
+  });
+
+  let html = `
+  <div class="cq-counters">
+    <div class="cq-counter">
+      <div class="cq-counter-val gold">${totalDesb}</div>
+      <div class="cq-counter-lbl">Desbloqueadas</div>
+    </div>
+    <div class="cq-counter">
+      <div class="cq-counter-val silver">${totalAll-totalDesb}</div>
+      <div class="cq-counter-lbl">Bloqueadas</div>
+    </div>
+    <div class="cq-counter">
+      <div class="cq-counter-val" style="color:var(--tx2)">${totalAll}</div>
+      <div class="cq-counter-lbl">Total</div>
+    </div>
+  </div>`;
+
+  Object.entries(cats).forEach(([cat, cqs])=>{
+    html += `<div class="cq-categoria">
+      <div class="cq-cat-title">${cat}</div>
+      <div class="cq-grid">`;
+    cqs.forEach(cq=>{
+      const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val};
+      const isNova = r.achieved && novas.includes(cq.id);
+      const dataDesb = jaDesbloqueadas[cq.id] ? new Date(jaDesbloqueadas[cq.id].ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
+      const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
+
+      if(r.achieved){
+        html += `<div class="cq-card desbloqueada${isNova?' nova':''}">
+          ${isNova?'<div class="cq-nova-tag">nova!</div>':''}
+          <div class="cq-card-icon">${cq.icon}</div>
+          <div class="cq-card-nome">${cq.nome}</div>
+          <div class="cq-card-desc">${cq.desc}</div>
+          ${dataDesb?`<div class="cq-card-data">🗓 ${dataDesb}</div>`:''}
+        </div>`;
+      } else {
+        html += `<div class="cq-card bloqueada">
+          <div class="cq-lock">🔒</div>
+          <div class="cq-card-icon">${cq.icon}</div>
+          <div class="cq-card-nome">${cq.nome}</div>
+          <div class="cq-card-desc">${cq.desc}</div>
+          ${r.progress>0?`<div class="cq-progress-bar"><div class="cq-progress-fill" style="width:${pct}%"></div></div><div class="cq-card-data">${r.progress}/${r.max}</div>`:''}
+        </div>`;
+      }
+    });
+    html += `</div></div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+// ── Marcar conquistas como vistas ─────────────────────────────
+async function _marcarConquistasVistas(uid){
+  try {
+    const calc = _calcConquistas(uid, window._gd);
+    const ids = Object.keys(calc).filter(id=>calc[id].achieved);
+    if(!ids.length) return;
+    await window._db_updateDoc_safe(uid, { conquistasVistas: ids });
+    // Remove badge
+    const badge = document.getElementById('conquistas-fab-badge');
+    if(badge) badge.style.display='none';
+  } catch(e){}
+}
+
+// ── Toast de nova conquista ────────────────────────────────────
+let _toastQueue = [];
+let _toastShowing = false;
+
+window._mostrarToastConquistas = function(conquistas){
+  if(!conquistas || !conquistas.length) return;
+  _toastQueue.push(...conquistas);
+  if(!_toastShowing) _processarFilaToast();
+};
+
+function _processarFilaToast(){
+  if(!_toastQueue.length){ _toastShowing=false; return; }
+  _toastShowing=true;
+  const cq = _toastQueue.shift();
+  _mostrarUmToast(cq, ()=>{
+    setTimeout(_processarFilaToast, 400);
+  });
+}
+
+function _mostrarUmToast(cq, cb){
+  const overlay = document.getElementById('conquista-toast');
+  const box     = document.getElementById('conquista-toast-box');
+  const icon    = document.getElementById('conquista-toast-icon');
+  const nome    = document.getElementById('conquista-toast-nome');
+  const desc    = document.getElementById('conquista-toast-desc');
+  if(!overlay||!box) { if(cb)cb(); return; }
+
+  icon.textContent = cq.icon;
+  nome.textContent = cq.nome;
+  desc.textContent = cq.desc;
+
+  overlay.style.display='flex';
+  // Reset
+  box.style.opacity='0';
+  box.style.transform='scale(.7)';
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      box.style.opacity='1';
+      box.style.transform='scale(1)';
+    });
+  });
+
+  // Mostrar badge no FAB
+  const badge = document.getElementById('conquistas-fab-badge');
+  if(badge) badge.style.display='flex';
+
+  setTimeout(()=>{
+    _esconderToastConquista(cb);
+  }, 4000);
+}
+
+function _esconderToastConquista(cb){
+  const overlay = document.getElementById('conquista-toast');
+  const box     = document.getElementById('conquista-toast-box');
+  if(!overlay||!box){ if(cb)cb(); return; }
+  box.style.opacity='0';
+  box.style.transform='scale(.7)';
+  setTimeout(()=>{
+    overlay.style.display='none';
+    if(cb) cb();
+  },380);
+}
+
+// ── Clique fora para fechar conquista toast ────────────────────
+document.addEventListener('click', e=>{
+  const overlay = document.getElementById('conquista-toast');
+  if(!overlay || overlay.style.display==='none') return;
+  const box = document.getElementById('conquista-toast-box');
+  if(box && !box.contains(e.target)){
+    _esconderToastConquista();
+    _toastQueue = [];
+    _toastShowing = false;
+  }
+});
+
+// ── Clique fora para fechar modal conquistas ───────────────────
+document.getElementById('modal-conquistas').addEventListener('click', e=>{
+  const inner = document.getElementById('conquistas-inner');
+  if(inner && !inner.contains(e.target)) window.fecharConquistas();
+});
 
 })();
 </script>
