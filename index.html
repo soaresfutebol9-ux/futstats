@@ -6357,17 +6357,18 @@ const CONQUISTAS = [
   { id:'ultimo_acum_10', cat:'💀 Último Lugar Acumulativo', nome:'Morador do Último Lugar',desc:'10 últimos acumulados', icon:'🕳️',tipo:'ultimo_acum', val:10 },
   { id:'ultimo_acum_20', cat:'💀 Último Lugar Acumulativo', nome:'Patrimônio da Derrota', desc:'20 últimos acumulados', icon:'🪦', tipo:'ultimo_acum', val:20 },
   // ── GOLS ──────────────────────────────────────────────────
-  { id:'gols_20', cat:'⚽ Gols', nome:'Artilheiro',      desc:'20 gols em um mês', icon:'⚽', tipo:'gols_mes', val:20 },
-  { id:'gols_25', cat:'⚽ Gols', nome:'Goleador',         desc:'25 gols em um mês', icon:'🎯', tipo:'gols_mes', val:25 },
-  { id:'gols_30', cat:'⚽ Gols', nome:'Sniper',           desc:'30 gols em um mês', icon:'💥', tipo:'gols_mes', val:30 },
-  { id:'gols_35', cat:'⚽ Gols', nome:'Máquina de Gols',  desc:'35 gols em um mês', icon:'🤖', tipo:'gols_mes', val:35 },
-  { id:'gols_40', cat:'⚽ Gols', nome:'Predador',         desc:'40 gols em um mês', icon:'🦅', tipo:'gols_mes', val:40 },
+  { id:'gols_15', cat:'⚽ Gols', nome:'Yuri Alberto',  desc:'15 gols em um mês', icon:'🇧🇷', tipo:'gols_mes', val:15 },
+  { id:'gols_20', cat:'⚽ Gols', nome:'Fred',            desc:'20 gols em um mês', icon:'💪', tipo:'gols_mes', val:20 },
+  { id:'gols_25', cat:'⚽ Gols', nome:'Karim Benzema',   desc:'25 gols em um mês', icon:'🥇', tipo:'gols_mes', val:25 },
+  { id:'gols_30', cat:'⚽ Gols', nome:'Luis Suárez',     desc:'30 gols em um mês', icon:'🦷', tipo:'gols_mes', val:30 },
+  { id:'gols_35', cat:'⚽ Gols', nome:'Lewandowski',     desc:'35 gols em um mês', icon:'🔥', tipo:'gols_mes', val:35 },
+  { id:'gols_40', cat:'⚽ Gols', nome:'Harry Kane',      desc:'40 gols em um mês', icon:'👑', tipo:'gols_mes', val:40 },
   // ── ASSISTÊNCIAS ────────────────────────────────────────────
-  { id:'assist_10', cat:'👟 Assistências', nome:'Garçom',       desc:'10 assistências em um mês', icon:'🍽️', tipo:'assist_mes', val:10 },
-  { id:'assist_15', cat:'👟 Assistências', nome:'Maestro',       desc:'15 assistências em um mês', icon:'🎼', tipo:'assist_mes', val:15 },
-  { id:'assist_20', cat:'👟 Assistências', nome:'Visão de Jogo', desc:'20 assistências em um mês', icon:'👁️', tipo:'assist_mes', val:20 },
-  { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',    desc:'25 assistências em um mês', icon:'🏗️', tipo:'assist_mes', val:25 },
-  { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',     desc:'30 assistências em um mês', icon:'📐', tipo:'assist_mes', val:30 },
+  { id:'assist_10', cat:'👟 Assistências', nome:'Olise',                  desc:'10 assistências em um mês', icon:'🪄', tipo:'assist_mes', val:10 },
+  { id:'assist_15', cat:'👟 Assistências', nome:'Iniesta',                desc:'15 assistências em um mês', icon:'🎩', tipo:'assist_mes', val:15 },
+  { id:'assist_20', cat:'👟 Assistências', nome:'Yamal',                  desc:'20 assistências em um mês', icon:'⚡', tipo:'assist_mes', val:20 },
+  { id:'assist_25', cat:'👟 Assistências', nome:'Kevin De Bruyne',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
+  { id:'assist_30', cat:'👟 Assistências', nome:'MESSIII',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
   // ── G+A MÊS ──────────────────────────────────────────────
   { id:'ga_30',  cat:'⚡ G+A no Mês', nome:'Participativo', desc:'30 G+A em um mês', icon:'🌱', tipo:'ga_mes', val:30 },
   { id:'ga_35',  cat:'⚡ G+A no Mês', nome:'Decisivo',      desc:'35 G+A em um mês', icon:'🎲', tipo:'ga_mes', val:35 },
@@ -6672,7 +6673,7 @@ async function _renderConquistasModal(uid){
       if(r.achieved){
         html += `<div class="cq-card desbloqueada${isNova?' nova':''}">
           ${isNova?'<div class="cq-nova-tag">nova!</div>':''}
-          ${stackCount > 1 ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
+          ${stackCount >= 1 ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
           <div class="cq-card-desc">${cq.desc}</div>
