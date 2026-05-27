@@ -6453,20 +6453,17 @@ function calcConquistas(uid, gd){
     if(prataStreak>prataStreakMax) prataStreakMax=prataStreak;
     if(ultimoStreak>ultimoStreakMax) ultimoStreakMax=ultimoStreak;
   });
-  // flush streaks ainda em andamento
   if(ouroStreak>0) ouroConsecHistory.push(ouroStreak);
   if(prataStreak>0) prataConsecHistory.push(prataStreak);
   if(ultimoStreak>0) ultimoConsecHistory.push(ultimoStreak);
 
-  // Quantas vezes um threshold consecutivo foi atingido (ex: streak 7 com threshold 2 → 3x)
+  // Quantas vezes um threshold consecutivo foi atingido
   function countConsecThreshold(history, threshold){
     let total=0;
     history.forEach(streakLen=>{ total += Math.floor(streakLen / threshold); });
     return total;
   }
-  // Quantas vezes um acumulado atingiu o threshold (ex: 23 ouros com threshold 10 → 2x)
   function countAcumThreshold(acum, threshold){ return Math.floor(acum / threshold); }
-  // Quantos meses o jogador atingiu determinado threshold
   function countMesThreshold(months, campo, threshold){
     return months.filter(m=>{ const v=campo==='ga'?m.gols+m.assist:m[campo]; return v>=threshold; }).length;
   }
@@ -6534,7 +6531,8 @@ window._checkConquistas = async function(db, currentUser, gd){
   CONQUISTAS.forEach(cq=>{
     const r = calc[cq.id];
     if(!r || !r.achieved) return;
-    const savedCount = jaDesbloqueadas[cq.id] ? (jaDesbloqueadas[cq.id].count || 1) : 0;
+    const savedEntry = jaDesbloqueadas[cq.id];
+    const savedCount = savedEntry ? (savedEntry.count || 1) : 0;
     const newCount   = r.count || 1;
     if(savedCount === 0){
       // Primeira vez desbloqueando
@@ -6543,7 +6541,8 @@ window._checkConquistas = async function(db, currentUser, gd){
       newlyUnlocked.push(cq);
     } else if(newCount > savedCount){
       // Conquistou de novo (count aumentou)
-      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: jaDesbloqueadas[cq.id].ts, tsLast: Date.now(), count: newCount };
+      const prevTs = savedEntry.ts && savedEntry.ts.seconds ? savedEntry.ts.seconds*1000 : (savedEntry.ts || Date.now());
+      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: prevTs, tsLast: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push({...cq, _stackCount: newCount});
     }
@@ -6624,14 +6623,12 @@ async function _renderConquistasModal(uid){
 
   const totalDesb = Object.values(calc).filter(v=>v.achieved).length;
   const totalAll  = CONQUISTAS.length;
-  // "nova" = primeira vez OU count aumentou em relação ao que estava salvo
   const novas = Object.keys(calc).filter(id=>{
     if(!calc[id].achieved) return false;
-    if(!jaVistas.includes(id)) return true; // nunca vista
+    if(!jaVistas.includes(id)) return true;
     const saved = jaDesbloqueadas[id];
     if(!saved) return false;
-    const savedCount = saved.count || 1;
-    return (calc[id].count || 1) > savedCount; // count subiu
+    return (calc[id].count || 1) > (saved.count || 1);
   });
 
   // Agrupa por categoria
@@ -6664,9 +6661,12 @@ async function _renderConquistasModal(uid){
     cqs.forEach(cq=>{
       const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val, count:0};
       const isNova = r.achieved && novas.includes(cq.id);
-      const savedEntry = jaDesbloqueadas[cq.id] || null;
       const stackCount = r.count || 0;
-      const dataDesb = savedEntry ? new Date(savedEntry.ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
+      // ts pode ser número (ms) ou Firestore Timestamp {seconds, nanoseconds}
+      const _tsRaw = jaDesbloqueadas[cq.id]?.ts;
+      const _tsMs  = _tsRaw ? (_tsRaw.seconds ? _tsRaw.seconds*1000 : _tsRaw) : null;
+      const _tsDate = _tsMs ? new Date(_tsMs) : null;
+      const dataDesb = (_tsDate && !isNaN(_tsDate)) ? _tsDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
 
       if(r.achieved){
@@ -6700,15 +6700,11 @@ async function _marcarConquistasVistas(uid){
     const calc = _calcConquistas(uid, window._gd);
     const ids = Object.keys(calc).filter(id=>calc[id].achieved);
     if(!ids.length) return;
-    // Salva lista de ids vistos + count atual de cada conquista (para detectar futuras repetições)
     const updates = { conquistasVistas: ids };
     ids.forEach(id=>{
-      const c = calc[id].count || 1;
-      // Atualiza o count salvo no Firestore para o valor atual (sem sobrescrever ts)
-      updates[`conquistasDesbloqueadas.${id}.count`] = c;
+      updates[`conquistasDesbloqueadas.${id}.count`] = calc[id].count || 1;
     });
     await window._db_updateDoc_safe(uid, updates);
-    // Remove badge
     const badge = document.getElementById('conquistas-fab-badge');
     if(badge) badge.style.display='none';
   } catch(e){}
