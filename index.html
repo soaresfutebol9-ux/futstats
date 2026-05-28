@@ -4023,8 +4023,8 @@ function _renderNotifPanel(){
         const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
         const btns=podeResponder
           ?'<div style="display:flex;gap:6px;margin-top:8px">'
-            +'<button onclick="_dcAceitar(''+n.desafioId+'');document.getElementById('notif-panel').classList.remove('open')" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
-            +'<button onclick="_dcCancelar(''+n.desafioId+'')" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
+            +'<button onclick="_dcAceitar(\u0027'+n.desafioId+'\u0027);document.getElementById(\u0027notif-panel\u0027).classList.remove(\u0027open\u0027)" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
+            +'<button onclick="_dcCancelar(\u0027'+n.desafioId+'\u0027)" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
             +'</div>'
           :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
         return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
