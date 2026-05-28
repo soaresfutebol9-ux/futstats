@@ -1488,7 +1488,81 @@ select option{background:var(--bg3)}
 .duelo-fab:active{transform:scale(.92);}
 body.duelo-fab-visible .duelo-fab{display:flex;}
 
-/* ── MODAL DUELO ── */
+/* ── MODAL MVP VOTAÇÃO ── */
+#modal-mvp{
+  position:fixed;inset:0;z-index:9100;
+  display:flex;align-items:center;justify-content:center;
+  padding:1.5rem;
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  transition:background .35s ease;
+}
+#modal-mvp.open{background:rgba(0,0,0,.72);pointer-events:all;}
+#modal-mvp-card{
+  width:100%;max-width:380px;
+  background:var(--bg2);
+  border:1.5px solid rgba(255,209,102,.35);
+  border-radius:28px;
+  padding:0;
+  box-shadow:0 0 80px rgba(255,209,102,.18),0 24px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07);
+  position:relative;overflow:hidden;
+  opacity:0;transform:scale(.88) translateY(24px);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .38s cubic-bezier(.22,1,.36,1);
+  max-height:90vh;display:flex;flex-direction:column;
+}
+#modal-mvp.open #modal-mvp-card{opacity:1;transform:scale(1) translateY(0);}
+.mvp-header{
+  padding:1.5rem 1.5rem 0;text-align:center;flex-shrink:0;
+}
+.mvp-players-list{
+  overflow-y:auto;padding:.75rem 1.25rem;flex:1;
+  display:flex;flex-direction:column;gap:10px;
+}
+.mvp-players-list::-webkit-scrollbar{width:3px;}
+.mvp-players-list::-webkit-scrollbar-thumb{background:var(--bo2);border-radius:99px;}
+.mvp-player-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg3);border-radius:14px;
+  padding:10px 12px;border:1px solid var(--bo2);
+  transition:border-color .15s;
+}
+.mvp-player-row:hover{border-color:rgba(255,209,102,.3);}
+.mvp-player-photo{
+  width:38px;height:38px;border-radius:50%;object-fit:cover;
+  border:1.5px solid var(--bo2);flex-shrink:0;
+  background:var(--bg4);display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.mvp-player-name{
+  flex:1;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--tx);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mvp-stars{display:flex;gap:4px;align-items:center;flex-shrink:0;}
+.mvp-star-btn{
+  background:none;border:none;cursor:pointer;
+  font-size:20px;line-height:1;padding:2px;
+  transition:transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mvp-star-btn:active{transform:scale(.82);}
+.mvp-nota-label{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  min-width:22px;text-align:center;color:var(--am);
+}
+.mvp-footer{padding:0 1.25rem 1.5rem;flex-shrink:0;}
+
+/* MVP badge no perfil */
+.mvp-badge-perfil{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,140,0,.12));
+  border:1px solid rgba(255,209,102,.45);
+  border-radius:10px;padding:5px 10px;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  color:#FFD166;
+}
+
+/* MODAL DUELO ── */
+#modal-duelo{
 #modal-duelo{
   display:none;
   position:fixed;inset:0;z-index:3000;
@@ -2226,20 +2300,37 @@ body::before{
       <!-- Apelido no grupo -->
       <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
         <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">🏷️ Título no ranking</div>
-        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Escolha uma conquista desbloqueada para exibir abaixo do seu nome.</div>
-        <!-- Grid de conquistas desbloqueadas -->
-        <div id="apelido-conquistas-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
-        <div id="apelido-vazio" style="display:none;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:10px;padding:10px;background:var(--bg4);border-radius:10px;text-align:center">
-          🔒 Desbloqueie conquistas para escolher seu título
+
+        <!-- MODO COMPACTO: exibido quando já há título salvo -->
+        <div id="apelido-modo-compacto" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg4);border-radius:10px;border:1px solid rgba(77,255,176,.3)">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="apelido-compacto-icon" style="font-size:18px"></span>
+              <span id="apelido-compacto-nome" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--g)"></span>
+            </div>
+            <button onclick="_apelidoModoEditar()" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;white-space:nowrap;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx2)'">✏️ Editar</button>
+          </div>
         </div>
-        <!-- Preview do título atual -->
-        <div id="apelido-preview" style="display:none;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx2);margin-bottom:10px;padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2)">
-          Título atual: <span id="apelido-preview-txt" style="color:var(--g)"></span>
+
+        <!-- MODO EDIÇÃO: grid completo (inicial ou ao clicar em editar) -->
+        <div id="apelido-modo-edicao" style="display:block">
+          <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Escolha uma conquista desbloqueada para exibir abaixo do seu nome.</div>
+          <!-- Grid de conquistas desbloqueadas -->
+          <div id="apelido-conquistas-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
+          <div id="apelido-vazio" style="display:none;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:10px;padding:10px;background:var(--bg4);border-radius:10px;text-align:center">
+            🔒 Desbloqueie conquistas para escolher seu título
+          </div>
+          <!-- Preview do título selecionado no grid -->
+          <div id="apelido-preview" style="display:none;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx2);margin-bottom:10px;padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2)">
+            Título atual: <span id="apelido-preview-txt" style="color:var(--g)"></span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="salvarApelido()" id="apelido-salvar-btn" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);display:none" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Usar este título</button>
+            <button onclick="removerApelido()" id="apelido-remover-btn" style="background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Remover</button>
+            <button onclick="_apelidoCancelarEdicao()" id="apelido-cancelar-btn" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Cancelar</button>
+          </div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="salvarApelido()" id="apelido-salvar-btn" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);display:none" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Usar este título</button>
-          <button onclick="removerApelido()" id="apelido-remover-btn" style="background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Remover</button>
-        </div>
+
         <!-- input hidden para guardar o valor selecionado -->
         <input type="hidden" id="apelido-input">
         <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
@@ -2943,6 +3034,87 @@ function renderPerfilPanelStats(){
     </div>`;
   }
 
+  // ── Card MVP do mês + Craque da Rodada ──
+  const mesKeyMVP = gd.mesAtivo || mesAtual();
+  const mediasProPerfil = window._getMVPMedias ? _getMVPMedias(mesKeyMVP) : [];
+  const minhaMVP = mediasProPerfil.find(x => x.uid === currentUser.uid);
+  const euSouMVP = mediasProPerfil.length > 0 && mediasProPerfil[0].uid === currentUser.uid;
+  const jaVoteiMVP = _mvpJaVotou ? _mvpJaVotou() : false;
+
+  // Craque da última rodada (última partida do grupo)
+  const todasPartidas = gd.matches||[];
+  const ultimaPartida = todasPartidas.length ? todasPartidas[todasPartidas.length-1] : null;
+  const ultimaCraqueKey = ultimaPartida ? _craqueKey(ultimaPartida.ts) : null;
+  const craqueAtual = ultimaCraqueKey && window._getCraqueVencedor ? _getCraqueVencedor(gd, ultimaCraqueKey) : null;
+  const craqueMembro = craqueAtual ? (gd.members||[]).find(m=>m.uid===craqueAtual.uid) : null;
+  const euSouCraque = craqueAtual && craqueAtual.uid === currentUser.uid;
+  const jaVoteiCraque = ultimaPartida && window._craqueJaVotou ? _craqueJaVotou(ultimaPartida.ts) : false;
+
+  const totalVotantes = Object.keys((gd.mvpVotos||{})[mesKeyMVP]||{}).length;
+
+  const totalEl2 = $('pperfil-stats-total');
+  if(totalEl2){
+    const mvpCardId = 'pperfil-mvp-card';
+    let mvpCardEl = $(mvpCardId);
+    if(!mvpCardEl){
+      mvpCardEl = document.createElement('div');
+      mvpCardEl.id = mvpCardId;
+      mvpCardEl.style.marginBottom = '1rem';
+      totalEl2.parentNode.insertBefore(mvpCardEl, totalEl2.nextSibling);
+    }
+
+    let mvpHtml = `<div style="display:flex;flex-direction:column;gap:10px">`;
+
+    // ── Craque da Rodada ──
+    if(ultimaPartida){
+      mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.25);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">⭐ Craque da Rodada</div>
+          ${jaVoteiCraque
+            ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">✓ Você votou</div>`
+            : `<button onclick="abrirModalMVP(${ultimaPartida.ts})" style="background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Mono',monospace">Votar</button>`}
+        </div>
+        ${craqueMembro
+          ? `<div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:24px">${euSouCraque?'🌟':'⭐'}</div>
+              <div>
+                <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${craqueMembro.name}</div>
+                <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${craqueAtual.media} · ${craqueAtual.votos} voto${craqueAtual.votos!==1?'s':''}</div>
+              </div>
+            </div>`
+          : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Ainda sem votos nesta rodada.</div>`}
+        ${euSouCraque ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">🌟 Você é o Craque desta rodada!</div>`:''}
+      </div>`;
+    }
+
+    // ── MVP do Mês ──
+    const topMVP = mediasProPerfil[0];
+    const topMembro = topMVP ? (gd.members||[]).find(m=>m.uid===topMVP.uid) : null;
+    mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.2);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏆 MVP do mês</div>
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">${totalVotantes} avaliação${totalVotantes!==1?'ões':''}</div>
+      </div>
+      ${topMembro
+        ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:${minhaMVP&&!euSouMVP?'10px':'0'}">
+            <div style="font-size:24px">🥇</div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${topMembro.name}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${topMVP.media}</div>
+            </div>
+          </div>`
+        : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Ainda sem avaliações este mês.</div>`}
+      ${minhaMVP && !euSouMVP ? `<div style="padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--tx2)">Sua média</div>
+        <div style="font-family:'VarsityTeam',serif;font-size:18px;color:#FFD166">${minhaMVP.media}</div>
+      </div>` : ''}
+      ${euSouMVP ? `<div style="margin-top:${topMembro?'8px':'0'};padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">⭐ Você é o MVP deste mês! Média ${minhaMVP.media}</div>` : ''}
+    </div>`;
+
+    mvpHtml += `</div>`;
+    mvpCardEl.innerHTML = mvpHtml;
+  }
+
   // ── Últimas partidas ──
   const allMatches=gd.matches||[];
   const myMatches=allMatches.map((m,i)=>({...m,_gi:i})).filter(m=>m.uid===currentUser.uid||m.player===myProfile.displayName).sort((a,b)=>b.ts-a.ts).slice(0,5);
@@ -3004,27 +3176,37 @@ window._renderApelidoGrid = function(){
   const previewTxt=$('apelido-preview-txt');
   const salvarBtn=$('apelido-salvar-btn');
   const removerBtn=$('apelido-remover-btn');
+  const cancelarBtn=$('apelido-cancelar-btn');
   const hiddenInput=$('apelido-input');
+  const modoCompacto=$('apelido-modo-compacto');
+  const modoEdicao=$('apelido-modo-edicao');
   if(!grid||!currentUser||!gd) return;
 
-  // Conquistas desbloqueadas do usuário atual
   const calcCq = window._calcConquistas ? window._calcConquistas(currentUser.uid, gd) : {};
   const desbloqueadas = (window._CONQUISTAS||[]).filter(c => calcCq[c.id]&&calcCq[c.id].achieved);
 
-  // Apelido atual
   const mb=(gd.members||[]).find(m=>m.uid===currentUser.uid);
   const apelidoAtual = mb?.apelido||'';
   if(hiddenInput) hiddenInput.value = apelidoAtual;
 
-  // Mostra preview se tiver apelido
-  if(apelidoAtual && preview && previewTxt){
-    preview.style.display='block';
-    previewTxt.textContent=apelidoAtual;
-    if(removerBtn) removerBtn.style.display='block';
-  } else {
-    if(preview) preview.style.display='none';
-    if(removerBtn) removerBtn.style.display='none';
+  // Se tem titulo salvo: modo compacto
+  if(apelidoAtual){
+    if(modoCompacto) modoCompacto.style.display='block';
+    if(modoEdicao) modoEdicao.style.display='none';
+    const parts = apelidoAtual.split(' ');
+    const iconEl=$('apelido-compacto-icon');
+    const nomeEl=$('apelido-compacto-nome');
+    if(iconEl) iconEl.textContent = parts[0]||'';
+    if(nomeEl) nomeEl.textContent = parts.slice(1).join(' ')||apelidoAtual;
+    return;
   }
+
+  // Sem titulo: modo edicao
+  if(modoCompacto) modoCompacto.style.display='none';
+  if(modoEdicao) modoEdicao.style.display='block';
+  if(preview) preview.style.display='none';
+  if(removerBtn) removerBtn.style.display='none';
+  if(cancelarBtn) cancelarBtn.style.display='none';
 
   if(!desbloqueadas.length){
     grid.style.display='none';
@@ -3047,6 +3229,56 @@ window._renderApelidoGrid = function(){
       <span style="${selecionado?'color:var(--g)':''}">${c.nome}</span>
     </div>`;
   }).join('');
+};
+
+// Abre modo edicao a partir do compacto
+window._apelidoModoEditar = function(){
+  const modoCompacto=$('apelido-modo-compacto');
+  const modoEdicao=$('apelido-modo-edicao');
+  const cancelarBtn=$('apelido-cancelar-btn');
+  const removerBtn=$('apelido-remover-btn');
+  const preview=$('apelido-preview');
+  const previewTxt=$('apelido-preview-txt');
+  const hiddenInput=$('apelido-input');
+  if(modoCompacto) modoCompacto.style.display='none';
+  if(modoEdicao) modoEdicao.style.display='block';
+  if(cancelarBtn) cancelarBtn.style.display='block';
+  const apelidoAtual = hiddenInput?.value||'';
+  if(apelidoAtual && preview && previewTxt){
+    preview.style.display='block';
+    previewTxt.textContent=apelidoAtual;
+    if(removerBtn) removerBtn.style.display='block';
+  }
+  const calcCq = window._calcConquistas ? window._calcConquistas(currentUser.uid, gd) : {};
+  const desbloqueadas = (window._CONQUISTAS||[]).filter(c => calcCq[c.id]&&calcCq[c.id].achieved);
+  const grid=$('apelido-conquistas-grid');
+  const vazio=$('apelido-vazio');
+  if(!desbloqueadas.length){
+    if(grid) grid.style.display='none';
+    if(vazio) vazio.style.display='block';
+    return;
+  }
+  if(vazio) vazio.style.display='none';
+  if(grid){
+    grid.style.display='flex';
+    grid.innerHTML = desbloqueadas.map(c=>{
+      const selecionado = apelidoAtual === (c.icon+' '+c.nome);
+      return `<div onclick="_selecionarConquistaApelido('${c.id}')"
+        data-cq-id="${c.id}"
+        style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:10px;cursor:pointer;
+          border:1.5px solid ${selecionado?'var(--g)':'var(--bo2)'};
+          background:${selecionado?'rgba(77,255,176,.1)':'var(--bg4)'};
+          transition:all .15s;font-family:'DM Mono',monospace;font-size:11px;color:var(--tx)">
+        <span style="font-size:15px">${c.icon}</span>
+        <span style="${selecionado?'color:var(--g)':''}">${c.nome}</span>
+      </div>`;
+    }).join('');
+  }
+};
+
+// Cancela edicao e volta ao compacto
+window._apelidoCancelarEdicao = function(){
+  _renderApelidoGrid();
 };
 
 window._selecionarConquistaApelido = function(cqId){
@@ -3114,6 +3346,245 @@ window.removerApelido=async()=>{
   }catch(e){errEl.textContent='Erro ao remover.';errEl.style.display='block';}
 };
 // ── FIM APELIDO ──────────────────────────────────────────────────
+
+// ── CRAQUE DA RODADA + MVP DO MÊS ────────────────────────────────
+// Estrutura no Firestore:
+//   craqueVotos[partidaKey][votanteUid] = { uid: nota, ... }  → Craque da Rodada (por partida)
+//   mvpVotos[mesKey][votanteUid] = { uid: nota, ... }         → MVP do Mês (agregado mensal)
+//   mvpMes[mesKey] = { uid, media }                            → cache do líder mensal
+
+let _craqueNotas = {}; // notas em andamento no modal
+let _craquePartidaKey = ''; // chave da partida atual sendo avaliada
+
+function _mesAtual(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ── CRAQUE DA RODADA ─────────────────────────────────────────────
+
+// Gera chave única para uma partida (ts do registro)
+window._craqueKey = function(ts){ return 'p_'+ts; };
+
+// Verifica se o usuário já avaliou esta partida
+window._craqueJaVotou = function(partidaTs){
+  if(!gd||!currentUser) return false;
+  const key = _craqueKey(partidaTs);
+  return !!(gd.craqueVotos && gd.craqueVotos[key] && gd.craqueVotos[key][currentUser.uid]);
+};
+
+// Abre modal de votação Craque da Rodada
+window.abrirModalMVP = function(partidaTs){
+  if(!gd||!currentUser) return;
+  const modal = document.getElementById('modal-mvp');
+  const lista = document.getElementById('mvp-players-list');
+  if(!modal||!lista) return;
+
+  _craqueNotas = {};
+  _craquePartidaKey = _craqueKey(partidaTs || Date.now());
+
+  const colegas = (gd.members||[]).filter(m => m.uid !== currentUser.uid);
+  if(!colegas.length) return;
+
+  lista.innerHTML = colegas.map(m => {
+    const foto = m.photo
+      ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid var(--bo2);flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const avatar = `<div style="width:38px;height:38px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--bo2);display:${m.photo?'none':'flex'};align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👤</div>`;
+    return `<div class="mvp-player-row" id="mvp-row-${m.uid}">
+      ${foto}${avatar}
+      <div class="mvp-player-name">${m.name||'Jogador'}</div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',-1)">‹</button>
+        <div class="mvp-nota-label" id="mvp-nota-${m.uid}">—</div>
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',1)">›</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const okEl = document.getElementById('mvp-ok');
+  if(okEl) okEl.style.display='none';
+  modal.classList.add('open');
+};
+
+window._craqueAjustarNota = function(uid, delta){
+  const atual = _craqueNotas[uid] === undefined ? null : _craqueNotas[uid];
+  const nova = atual === null ? 5 : Math.max(0, Math.min(10, atual + delta));
+  _craqueNotas[uid] = nova;
+  const el = document.getElementById('mvp-nota-'+uid);
+  if(el){
+    el.textContent = nova;
+    el.style.color = nova >= 8 ? '#4dffb0' : nova >= 5 ? '#FFD166' : '#FF5A7A';
+  }
+  const row = document.getElementById('mvp-row-'+uid);
+  if(row) row.style.borderColor = nova >= 8 ? 'rgba(77,255,176,.4)' : nova >= 5 ? 'rgba(255,209,102,.4)' : 'rgba(255,90,122,.3)';
+};
+
+window.fecharModalMVP = function(){
+  const modal = document.getElementById('modal-mvp');
+  if(modal) modal.classList.remove('open');
+};
+
+window.salvarVotosMVP = async function(){
+  if(!gd||!currentUser||!groupId) return;
+  const entradas = Object.entries(_craqueNotas);
+  if(!entradas.length){ fecharModalMVP(); return; }
+
+  const mesKey = gd.mesAtivo || _mesAtual();
+  const partidaKey = _craquePartidaKey;
+
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur = snap.data();
+
+    // ── Salva Craque da Rodada ──
+    if(!cur.craqueVotos) cur.craqueVotos = {};
+    if(!cur.craqueVotos[partidaKey]) cur.craqueVotos[partidaKey] = {};
+    cur.craqueVotos[partidaKey][currentUser.uid] = {};
+    entradas.forEach(([uid, nota]) => { cur.craqueVotos[partidaKey][currentUser.uid][uid] = nota; });
+
+    // Mantém máximo de 60 partidas no histórico de craque
+    const chavesCraque = Object.keys(cur.craqueVotos);
+    if(chavesCraque.length > 60){
+      chavesCraque.sort().slice(0, chavesCraque.length - 60).forEach(k => delete cur.craqueVotos[k]);
+    }
+
+    // Notifica craque da rodada
+    _notificarCraqueDaRodada(cur, partidaKey);
+
+    // ── Agrega notas para MVP do Mês ──
+    // Cada voto de craque também conta para o MVP mensal
+    if(!cur.mvpVotos) cur.mvpVotos = {};
+    if(!cur.mvpVotos[mesKey]) cur.mvpVotos[mesKey] = {};
+    // Usa chave composta votante+partida para não sobrescrever votos de outras rodadas
+    const mvpChaveVotante = currentUser.uid + '_' + partidaKey;
+    cur.mvpVotos[mesKey][mvpChaveVotante] = {};
+    entradas.forEach(([uid, nota]) => { cur.mvpVotos[mesKey][mvpChaveVotante][uid] = nota; });
+
+    // Recalcula e notifica MVP do mês
+    _calcularENotificarMVP(cur, mesKey);
+
+    await setDoc(doc(db,'groups',groupId), cur);
+    gd = cur;
+
+    const okEl = document.getElementById('mvp-ok');
+    if(okEl) okEl.style.display='block';
+    setTimeout(fecharModalMVP, 1400);
+
+    // Publica no feed o craque da rodada
+    const craqueRodada = _getCraqueVencedor(cur, partidaKey);
+    if(craqueRodada){
+      const mb = (cur.members||[]).find(m=>m.uid===craqueRodada.uid);
+      if(mb) await _publishFeed('craque', `⭐ <strong>${mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${craqueRodada.media}!`);
+    }
+
+  } catch(e){ console.warn('craque save:',e); fecharModalMVP(); }
+};
+
+// Calcula o vencedor do Craque da Rodada de uma partida
+window._getCraqueVencedor = function(cur, partidaKey){
+  const votos = (cur.craqueVotos||{})[partidaKey];
+  if(!votos) return null;
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
+    });
+  });
+  const lista = Object.entries(totais).map(([uid,{soma,count}]) => ({uid, media:+(soma/count).toFixed(1), count}));
+  if(!lista.length) return null;
+  lista.sort((a,b) => b.media - a.media);
+  return lista[0];
+};
+
+// Notifica o craque da rodada se houver maioria
+window._notificarCraqueDaRodada = function(cur, partidaKey){
+  const vencedor = _getCraqueVencedor(cur, partidaKey);
+  if(!vencedor) return;
+  const totalMembros = (cur.members||[]).length - 1; // excluindo o próprio
+  if(vencedor.count < 1) return;
+  if(!cur.notifs) cur.notifs = {};
+  if(!cur.notifs[vencedor.uid]) cur.notifs[vencedor.uid] = [];
+  // Atualiza ou cria notif para esta partida
+  cur.notifs[vencedor.uid] = cur.notifs[vencedor.uid].filter(n => !(n.tipo==='craque_rodada' && n.partidaKey===partidaKey));
+  cur.notifs[vencedor.uid].push({
+    id: 'craque_'+partidaKey+'_'+Date.now(),
+    tipo: 'craque_rodada',
+    partidaKey,
+    media: vencedor.media,
+    votos: vencedor.count,
+    ts: Date.now()
+  });
+  if(cur.notifs[vencedor.uid].length > 20) cur.notifs[vencedor.uid].splice(0, cur.notifs[vencedor.uid].length - 20);
+};
+
+// Verifica se já votou nesta partida (usa ts da última partida salva)
+window._mvpJaVotou = function(){
+  if(!gd||!currentUser) return false;
+  // Pega o ts da última partida do usuário atual
+  const minhasPartidas = (gd.matches||[]).filter(m=>m.uid===currentUser.uid);
+  if(!minhasPartidas.length) return true;
+  const ultima = minhasPartidas[minhasPartidas.length-1];
+  return _craqueJaVotou(ultima.ts);
+};
+
+// ── MVP DO MÊS ───────────────────────────────────────────────────
+
+// Calcula médias mensais e notifica MVP do mês se mudou
+window._calcularENotificarMVP = function(cur, mesKey){
+  if(!cur.mvpVotos||!cur.mvpVotos[mesKey]) return;
+  const votos = cur.mvpVotos[mesKey];
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
+    });
+  });
+  const medias = Object.entries(totais).map(([uid,{soma,count}]) => ({
+    uid, media:+(soma/count).toFixed(2), count
+  })).filter(x=>x.count>=1).sort((a,b)=>b.media-a.media);
+  if(!medias.length) return medias;
+
+  const mvpAtual = medias[0];
+  const prevMvp = cur.mvpMes && cur.mvpMes[mesKey];
+
+  if(!prevMvp || prevMvp.uid !== mvpAtual.uid){
+    if(!cur.mvpMes) cur.mvpMes = {};
+    cur.mvpMes[mesKey] = { uid: mvpAtual.uid, media: mvpAtual.media };
+
+    if(!cur.notifs) cur.notifs = {};
+    if(!cur.notifs[mvpAtual.uid]) cur.notifs[mvpAtual.uid] = [];
+    cur.notifs[mvpAtual.uid] = cur.notifs[mvpAtual.uid].filter(n => !(n.tipo==='mvp_mes' && n.mes===mesKey));
+    cur.notifs[mvpAtual.uid].push({
+      id: 'mvp_'+mesKey+'_'+Date.now(),
+      tipo: 'mvp_mes',
+      mes: mesKey,
+      media: mvpAtual.media,
+      ts: Date.now()
+    });
+    if(cur.notifs[mvpAtual.uid].length > 20) cur.notifs[mvpAtual.uid].splice(0, cur.notifs[mvpAtual.uid].length - 20);
+  }
+  return medias;
+};
+
+// Retorna médias MVP do mês para exibição
+window._getMVPMedias = function(mesKey){
+  if(!gd||!gd.mvpVotos||!gd.mvpVotos[mesKey]) return [];
+  const votos = gd.mvpVotos[mesKey];
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
+    });
+  });
+  return Object.entries(totais).map(([uid,{soma,count}]) => ({
+    uid, media:+(soma/count).toFixed(1), count
+  })).sort((a,b)=>b.media-a.media);
+};
+// ── FIM CRAQUE / MVP ──────────────────────────────────────────────
 
 window.copyCodePerfil=()=>{
   navigator.clipboard.writeText(groupId).then(()=>{const b=$('copy-code-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));
@@ -3246,6 +3717,26 @@ function _renderNotifPanel(){
           </div>
         </div>`;
       }
+      if(n.tipo==='mvp_mes'){
+        const [ano, mes] = (n.mes||'').split('-');
+        const mesNome = mes ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1] : '';
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🏆</div>
+          <div class="notif-body">
+            <div class="notif-text">Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      }
+      if(n.tipo==='craque_rodada'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">⭐</div>
+          <div class="notif-body">
+            <div class="notif-text">Você foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      }
       return'';
     }).join('');
     if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
@@ -3261,7 +3752,7 @@ function _renderNotifPanel(){
     html+='<div style=\"font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px\">Atividade do grupo</div>';
     html+=feed.slice(0,25).map(ev=>{
       const unread=!lidasF.includes(ev.id);
-      const icon=ev.tipo==='partida'?'⚽':ev.tipo==='conquista'?'🏆':ev.tipo==='meta'?'🎯':ev.tipo==='membro'?'👋':'📌';
+      const icon=ev.tipo==='partida'?'⚽':ev.tipo==='conquista'?'🏆':ev.tipo==='meta'?'🎯':ev.tipo==='membro'?'👋':ev.tipo==='mvp'?'⭐':'📌';
       return`<div class="notif-item${unread?' unread':''}">
         <div class="notif-icon">${icon}</div>
         <div class="notif-body">
@@ -3995,8 +4486,15 @@ window.addMatch=async()=>{
     const already=(cur.members||[]).some(m=>m.uid===currentUser.uid);
     if(!already)cur.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
     await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+    const _partidaTs = cur.matches[cur.matches.length-1].ts;
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
+    // Abre modal Craque da Rodada após fechar o modal de partida salva
+    setTimeout(()=>{
+      if(!window._craqueJaVotou || !_craqueJaVotou(_partidaTs)){
+        abrirModalMVP(_partidaTs);
+      }
+    }, 5200);
     // Publica no feed
     (async()=>{
       const partes=[];
@@ -5932,6 +6430,34 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL PARTIDA SALVA ══ -->
+<!-- ── MODAL MVP VOTAÇÃO ── -->
+<div id="modal-mvp">
+  <div id="modal-mvp-card">
+    <!-- Glow overlay -->
+    <div style="position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(160deg,rgba(255,209,102,.1) 0%,transparent 55%);z-index:0"></div>
+
+    <div class="mvp-header" style="position:relative;z-index:1">
+      <div style="font-size:40px;line-height:1;margin-bottom:.6rem">⭐</div>
+      <div style="font-family:'VarsityTeam',serif;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFE066,#FFB800);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.3rem">Craque da Rodada</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--tx2);line-height:1.5;margin-bottom:.75rem">Dê uma nota de 0 a 10 para os colegas desta partida.</div>
+    </div>
+
+    <div class="mvp-players-list" id="mvp-players-list" style="position:relative;z-index:1">
+      <!-- preenchido por JS -->
+    </div>
+
+    <div class="mvp-footer" style="position:relative;z-index:1;display:flex;flex-direction:column;gap:8px">
+      <button id="mvp-salvar-btn" onclick="salvarVotosMVP()" style="width:100%;padding:14px 20px;border-radius:14px;background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 20px rgba(255,180,0,.4);transition:filter .15s,transform .15s" onmouseover="this.style.filter='brightness(1.08)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">
+        ⭐ Enviar votos
+      </button>
+      <button onclick="fecharModalMVP(true)" style="width:100%;padding:11px;border-radius:12px;background:none;border:1px solid var(--bo2);color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:border-color .15s" onmouseover="this.style.borderColor='var(--bo3)'" onmouseout="this.style.borderColor='var(--bo2)'">
+        Agora não
+      </button>
+      <div id="mvp-ok" style="display:none;text-align:center;font-size:12px;color:var(--g);font-family:'DM Mono',monospace">✓ Votos registrados!</div>
+    </div>
+  </div>
+</div>
+
 <div id="modal-partida-salva" style="
   position:fixed;inset:0;z-index:9000;
   display:flex;align-items:center;justify-content:center;
