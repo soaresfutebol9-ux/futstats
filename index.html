@@ -528,30 +528,32 @@ body.light .ah::after{
 }
 
 /* Painel de notificações */
+/* Overlay que fica atrás do painel mas na frente de tudo */
+#notif-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:999990;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  animation:notifOverlayIn .2s ease forwards;
+}
+#notif-overlay.open{display:block;}
+@keyframes notifOverlayIn{from{opacity:0}to{opacity:1}}
 #notif-panel{
   position:fixed;
   top:50%;left:50%;
   transform:translate(-50%,-50%) scale(.97);
-  width:min(380px, calc(100vw - 32px));
-  max-height:75vh;
+  width:min(400px, calc(100vw - 32px));
+  max-height:78vh;
   background:var(--bg2);border:1px solid var(--bo2);
-  border-radius:16px;
-  box-shadow:0 16px 60px rgba(0,0,0,.65),0 2px 12px rgba(0,0,0,.4);
-  z-index:1200;
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.8),0 2px 12px rgba(0,0,0,.5);
+  z-index:999999;
   display:none;flex-direction:column;
   overflow:hidden;
-  animation:notifPanelIn .22s cubic-bezier(.34,1.56,.64,1) forwards;
-}
-/* Overlay escuro atrás do painel */
-#notif-panel::before{
-  content:'';
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.45);
-  z-index:-1;
-  pointer-events:none;
+  animation:notifPanelIn .24s cubic-bezier(.34,1.56,.64,1) forwards;
 }
 @keyframes notifPanelIn{
-  from{opacity:0;transform:translate(-50%,-50%) scale(.94)}
+  from{opacity:0;transform:translate(-50%,-50%) scale(.93)}
   to{opacity:1;transform:translate(-50%,-50%) scale(1)}
 }
 #notif-panel.open{display:flex;}
@@ -1979,6 +1981,8 @@ body::before{
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-badge" id="notif-badge"></div>
     </div>
+    <!-- Overlay de notificações -->
+    <div id="notif-overlay" onclick="toggleNotifPanel()"></div>
     <!-- Painel de notificações -->
     <div id="notif-panel">
       <div class="notif-panel-header">
@@ -2233,13 +2237,24 @@ body::before{
 
       <!-- Apelido no grupo -->
       <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
-        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">🏷️ Apelido no grupo</div>
-        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Só você pode editar. Aparece no ranking abaixo do seu nome.</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="apelido-input" placeholder="Ex: O Matador, Senhor das Assistências…" maxlength="30" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;border-radius:10px;color:var(--tx);padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s" onfocus="this.style.borderColor='var(--g)';this.style.boxShadow='0 0 0 3px rgba(77,255,176,.12)'" onblur="this.style.borderColor='#b7b8b6';this.style.boxShadow='none'">
-          <button onclick="salvarApelido()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3)" onmouseover="this.style.filter='brightness(1.1)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">Salvar</button>
+        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">🏷️ Título no ranking</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Escolha uma conquista desbloqueada para exibir abaixo do seu nome.</div>
+        <!-- Grid de conquistas desbloqueadas -->
+        <div id="apelido-conquistas-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
+        <div id="apelido-vazio" style="display:none;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:10px;padding:10px;background:var(--bg4);border-radius:10px;text-align:center">
+          🔒 Desbloqueie conquistas para escolher seu título
         </div>
-        <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Apelido salvo!</div>
+        <!-- Preview do título atual -->
+        <div id="apelido-preview" style="display:none;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx2);margin-bottom:10px;padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2)">
+          Título atual: <span id="apelido-preview-txt" style="color:var(--g)"></span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="salvarApelido()" id="apelido-salvar-btn" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);display:none" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Usar este título</button>
+          <button onclick="removerApelido()" id="apelido-remover-btn" style="background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Remover</button>
+        </div>
+        <!-- input hidden para guardar o valor selecionado -->
+        <input type="hidden" id="apelido-input">
+        <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
         <div id="apelido-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
       </div>
 
@@ -2961,12 +2976,7 @@ window.deleteMatchAndRefresh=async gi=>{
 
 window.openPerfilPanel=()=>{
   renderPanPerfilAvatar();renderPerfilPanelStats();openP('pperfil');
-  // Preenche o campo de apelido com o valor atual
-  const apelidoInput=$('apelido-input');
-  if(apelidoInput && gd && currentUser){
-    const mb=(gd.members||[]).find(m=>m.uid===currentUser.uid);
-    apelidoInput.value = mb?.apelido || '';
-  }
+  _renderApelidoGrid();
 };
 
 window.salvarNovoNome=async()=>{
@@ -2989,7 +2999,7 @@ window.salvarNovoNome=async()=>{
   }catch(e){errEl.textContent='Erro ao salvar.';errEl.style.display='block';}
 };
 
-// ── APELIDO NO GRUPO ────────────────────────────────────────────
+// ── APELIDO NO GRUPO (baseado em conquistas) ─────────────────────
 // Helper: retorna apelido do membro pelo uid (busca em gd.members)
 function getApelido(uid){
   if(!gd||!uid)return'';
@@ -2998,12 +3008,88 @@ function getApelido(uid){
 }
 window.getApelido=getApelido;
 
+// Renderiza o grid de conquistas desbloqueadas para escolha de apelido
+window._renderApelidoGrid = function(){
+  const grid=$('apelido-conquistas-grid');
+  const vazio=$('apelido-vazio');
+  const preview=$('apelido-preview');
+  const previewTxt=$('apelido-preview-txt');
+  const salvarBtn=$('apelido-salvar-btn');
+  const removerBtn=$('apelido-remover-btn');
+  const hiddenInput=$('apelido-input');
+  if(!grid||!currentUser||!gd) return;
+
+  // Conquistas desbloqueadas do usuário atual
+  const calcCq = window._calcConquistas ? window._calcConquistas(currentUser.uid, gd) : {};
+  const desbloqueadas = (window._CONQUISTAS||[]).filter(c => calcCq[c.id]&&calcCq[c.id].achieved);
+
+  // Apelido atual
+  const mb=(gd.members||[]).find(m=>m.uid===currentUser.uid);
+  const apelidoAtual = mb?.apelido||'';
+  if(hiddenInput) hiddenInput.value = apelidoAtual;
+
+  // Mostra preview se tiver apelido
+  if(apelidoAtual && preview && previewTxt){
+    preview.style.display='block';
+    previewTxt.textContent=apelidoAtual;
+    if(removerBtn) removerBtn.style.display='block';
+  } else {
+    if(preview) preview.style.display='none';
+    if(removerBtn) removerBtn.style.display='none';
+  }
+
+  if(!desbloqueadas.length){
+    grid.style.display='none';
+    if(vazio) vazio.style.display='block';
+    if(salvarBtn) salvarBtn.style.display='none';
+    return;
+  }
+  if(vazio) vazio.style.display='none';
+  grid.style.display='flex';
+
+  grid.innerHTML = desbloqueadas.map(c=>{
+    const selecionado = apelidoAtual === (c.icon+' '+c.nome);
+    return `<div onclick="_selecionarConquistaApelido('${c.id}')"
+      data-cq-id="${c.id}"
+      style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:10px;cursor:pointer;
+        border:1.5px solid ${selecionado?'var(--g)':'var(--bo2)'};
+        background:${selecionado?'rgba(77,255,176,.1)':'var(--bg4)'};
+        transition:all .15s;font-family:'DM Mono',monospace;font-size:11px;color:var(--tx)">
+      <span style="font-size:15px">${c.icon}</span>
+      <span style="${selecionado?'color:var(--g)':''}">${c.nome}</span>
+    </div>`;
+  }).join('');
+};
+
+window._selecionarConquistaApelido = function(cqId){
+  const cq=(window._CONQUISTAS||[]).find(c=>c.id===cqId);
+  if(!cq) return;
+  const valor = cq.icon+' '+cq.nome;
+  const hiddenInput=$('apelido-input');
+  if(hiddenInput) hiddenInput.value = valor;
+
+  // Atualiza visual dos chips
+  const grid=$('apelido-conquistas-grid');
+  if(grid){
+    grid.querySelectorAll('[data-cq-id]').forEach(el=>{
+      const sel = el.dataset.cqId === cqId;
+      el.style.borderColor = sel?'var(--g)':'var(--bo2)';
+      el.style.background  = sel?'rgba(77,255,176,.1)':'var(--bg4)';
+      const span=el.querySelector('span:last-child');
+      if(span) span.style.color = sel?'var(--g)':'';
+    });
+  }
+
+  const salvarBtn=$('apelido-salvar-btn');
+  if(salvarBtn) salvarBtn.style.display='block';
+};
+
 window.salvarApelido=async()=>{
   const input=$('apelido-input');
   const okEl=$('apelido-ok'),errEl=$('apelido-err');
   if(!input)return;
   okEl.style.display='none';errEl.style.display='none';
-  const valor=input.value.trim().slice(0,30);
+  const valor=input.value.trim().slice(0,40);
   if(!gd||!currentUser)return;
   try{
     const snap=await getDoc(doc(db,'groups',groupId));
@@ -3014,10 +3100,30 @@ window.salvarApelido=async()=>{
     mbs[idx].apelido=valor;
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
-    input.value=valor;
     okEl.style.display='block';setTimeout(()=>okEl.style.display='none',2500);
+    _renderApelidoGrid();
     renderRanking();
   }catch(e){errEl.textContent='Erro ao salvar.';errEl.style.display='block';}
+};
+
+window.removerApelido=async()=>{
+  const input=$('apelido-input');
+  if(input) input.value='';
+  const okEl=$('apelido-ok'),errEl=$('apelido-err');
+  okEl.style.display='none';errEl.style.display='none';
+  if(!gd||!currentUser)return;
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const mbs=cur.members||[];
+    const idx=mbs.findIndex(m=>m.uid===currentUser.uid);
+    if(idx===-1)return;
+    mbs[idx].apelido='';
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    _renderApelidoGrid();
+    renderRanking();
+  }catch(e){errEl.textContent='Erro ao remover.';errEl.style.display='block';}
 };
 // ── FIM APELIDO ──────────────────────────────────────────────────
 
@@ -3201,19 +3307,27 @@ function _updateNotifBadge(){
 
 window.toggleNotifPanel=()=>{
   const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
   if(!panel)return;
   const isOpen=panel.classList.contains('open');
-  if(isOpen){ panel.classList.remove('open'); return; }
+  if(isOpen){
+    panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
+    return;
+  }
   _renderNotifPanel();
   panel.classList.add('open');
+  if(overlay) overlay.classList.add('open');
 };
 
 // Fechar painel ao clicar fora
 document.addEventListener('click',e=>{
   const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
   const btn=document.getElementById('notif-btn');
   if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!btn?.contains(e.target)){
     panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
   }
 });
 
