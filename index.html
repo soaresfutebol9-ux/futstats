@@ -2363,6 +2363,7 @@ body::before{
       <!-- Ações -->
       <div style="display:flex;flex-direction:column;gap:8px">
         <button class="btn bs" onclick="doLogoutKeepGroup()">🔓 Deslogar (manter grupo)</button>
+        <button class="bg2btn" onclick="resetarVotos()" style="background:rgba(255,90,122,.12);border:1px solid rgba(255,90,122,.35);color:#FF5A7A">🗑️ Resetar todos os votos</button>
         <button class="bg2btn" onclick="leaveGroupPerfil()">🚪 Sair do grupo</button>
       </div>
     </div>
@@ -2832,6 +2833,29 @@ window.doLogin=async()=>{
   try{await signInWithEmailAndPassword(auth,email,pass);}
   catch(e){showErr('lerr',fbErrMsg(e.code));setBtn('btn-login',false,'Entrar');}
 };
+window.resetarVotos = async function(){
+  if(!gd||!currentUser||!groupId) return;
+  if(!confirm('Tem certeza? Isso vai apagar todos os votos de Craque da Rodada e MVP do Mês.')) return;
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur = snap.data();
+    delete cur.craqueVotos;
+    delete cur.mvpVotos;
+    delete cur.mvpMes;
+    delete cur.craqueFeedPublicado;
+    // Remove notifs de craque_rodada e mvp_mes de todos os membros
+    if(cur.notifs){
+      Object.keys(cur.notifs).forEach(uid => {
+        cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n => n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes');
+      });
+    }
+    await setDoc(doc(db,'groups',groupId), cur);
+    gd = cur;
+    alert('✅ Votos resetados com sucesso!');
+    closeP('pperfil');
+  } catch(e){ alert('Erro ao resetar: '+e.message); }
+};
+
 window.doLogout=async()=>{if(unsubGroup){unsubGroup();unsubGroup=null;}await signOut(auth);};
 window.doLogoutKeepGroup=async()=>{
   if(!confirm('Deslogar? Você volta ao grupo quando entrar de novo.'))return;
@@ -3376,6 +3400,9 @@ window._craqueJaVotou = function(partidaTs){
 // Abre modal de votação Craque da Rodada
 window.abrirModalMVP = function(partidaTs){
   if(!gd||!currentUser) return;
+  // Bloqueia re-votação
+  const _chaveVerif = _craqueKey(partidaTs || Date.now());
+  if(gd.craqueVotos && gd.craqueVotos[_chaveVerif] && gd.craqueVotos[_chaveVerif][currentUser.uid]) return;
   const modal = document.getElementById('modal-mvp');
   const lista = document.getElementById('mvp-players-list');
   if(!modal||!lista) return;
@@ -3449,9 +3476,6 @@ window.salvarVotosMVP = async function(){
       chavesCraque.sort().slice(0, chavesCraque.length - 60).forEach(k => delete cur.craqueVotos[k]);
     }
 
-    // Notifica craque da rodada
-    _notificarCraqueDaRodada(cur, partidaKey);
-
     // ── Agrega notas para MVP do Mês ──
     // Cada voto de craque também conta para o MVP mensal
     if(!cur.mvpVotos) cur.mvpVotos = {};
@@ -3461,8 +3485,17 @@ window.salvarVotosMVP = async function(){
     cur.mvpVotos[mesKey][mvpChaveVotante] = {};
     entradas.forEach(([uid, nota]) => { cur.mvpVotos[mesKey][mvpChaveVotante][uid] = nota; });
 
-    // Recalcula e notifica MVP do mês
-    _calcularENotificarMVP(cur, mesKey);
+    // Verifica se TODOS os membros votaram nesta rodada
+    const totalMembros = (cur.members||[]).length;
+    const totalVotos = Object.keys(cur.craqueVotos[partidaKey]||{}).length;
+    const todosVotaram = totalVotos >= totalMembros;
+
+    if(todosVotaram){
+      // Notifica craque da rodada para todos
+      _notificarCraqueDaRodada(cur, partidaKey);
+      // Recalcula e notifica MVP do mês
+      _calcularENotificarMVP(cur, mesKey);
+    }
 
     await setDoc(doc(db,'groups',groupId), cur);
     gd = cur;
@@ -3471,11 +3504,18 @@ window.salvarVotosMVP = async function(){
     if(okEl) okEl.style.display='block';
     setTimeout(fecharModalMVP, 1400);
 
-    // Publica no feed o craque da rodada
-    const craqueRodada = _getCraqueVencedor(cur, partidaKey);
-    if(craqueRodada){
-      const mb = (cur.members||[]).find(m=>m.uid===craqueRodada.uid);
-      if(mb) await _publishFeed('craque', `⭐ <strong>${mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${craqueRodada.media}!`);
+    // Publica no feed o craque da rodada somente quando todos votaram e ainda não foi publicado
+    if(todosVotaram && !(cur.craqueFeedPublicado && cur.craqueFeedPublicado[partidaKey])){
+      const craqueRodada = _getCraqueVencedor(cur, partidaKey);
+      if(craqueRodada){
+        const mb = (cur.members||[]).find(m=>m.uid===craqueRodada.uid);
+        if(mb){
+          if(!cur.craqueFeedPublicado) cur.craqueFeedPublicado = {};
+          cur.craqueFeedPublicado[partidaKey] = true;
+          await setDoc(doc(db,'groups',groupId), cur);
+          await _publishFeed('craque', `⭐ <strong>${mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${craqueRodada.media}!`);
+        }
+      }
     }
 
   } catch(e){ console.warn('craque save:',e); fecharModalMVP(); }
