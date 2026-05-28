@@ -785,7 +785,8 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   display:none;
   position:fixed;inset:0;z-index:2000;
   background:rgba(0,0,0,.75);
-  align-items:flex-end;justify-content:center;
+  align-items:center;justify-content:center;
+  padding:0 12px;
   animation:none;
 }
 #modal-partidas.open{
@@ -795,12 +796,12 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 @keyframes modalBgIn{from{opacity:0}to{opacity:1}}
 .modal-partidas-inner{
   background:var(--bg2);
-  border-radius:22px 22px 0 0;
-  width:100%;max-width:560px;
-  max-height:88vh;
+  border-radius:20px;
+  width:100%;max-width:520px;
+  max-height:82vh;
   display:flex;flex-direction:column;
-  box-shadow:0 -8px 40px rgba(0,0,0,.5),var(--glow-card);
-  animation:sheetUp .28s cubic-bezier(.32,1,.6,1) forwards;
+  box-shadow:0 8px 40px rgba(0,0,0,.5),var(--glow-card);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
   overflow:hidden;
 }
 @keyframes sheetUp{
@@ -2757,6 +2758,10 @@ window.openP=id=>{
   history.pushState({futstatsBack:id,type:'panel'},'');
 };
 window.closeP=id=>{
+  if(id==='pperfil'&&window.currentUser){
+    document.body.classList.add('duelo-fab-visible','conquistas-fab-visible');
+    const cfab=document.getElementById('conquistas-fab');if(cfab)cfab.style.display='flex';
+  }
   const el=$(id);if(!el)return;
   const pan=el.querySelector('.pan');
   if(pan){
@@ -3200,6 +3205,8 @@ window.deleteMatchAndRefresh=async gi=>{
 window.openPerfilPanel=()=>{
   renderPanPerfilAvatar();renderPerfilPanelStats();openP('pperfil');
   _renderApelidoGrid();
+  document.body.classList.remove('duelo-fab-visible','conquistas-fab-visible');
+  const cfab=document.getElementById('conquistas-fab');if(cfab)cfab.style.display='none';
 };
 
 window.salvarNovoNome=async()=>{
@@ -5679,7 +5686,7 @@ function _buildPlayerProfile(uid){
   <div style="background:#aef2b3;border:1.5px solid #40c960;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
     ${selTotal}
     <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr${cardPB>0?' 1fr':''};gap:8px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
       <div style="background:#dedede;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center">
         <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG}</div>
         <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Gols</div>
@@ -5692,11 +5699,13 @@ function _buildPlayerProfile(uid){
         <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG+cardA}</div>
         <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">G+A</div>
       </div>
-      ${cardPB>0?`<div style="background:#dedede;border:2px solid #b7b8b6;border-radius:10px;padding:12px 8px;text-align:center">
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:\${cardPK/cardPB>=.7?'#1a8a3a':cardPK/cardPB>=.4?'#cc8800':'#cc2222'};line-height:1;margin-top:4px">${cardPK}/${cardPB}</div>
-        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Pênaltis</div>
-      </div>`:''}
     </div>
+    ${cardPB>0?`<div style="margin-top:8px">
+      <div style="background:#dedede;border:2px solid #b7b8b6;border-radius:10px;padding:10px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:\${cardPK/cardPB>=.7?'#1a8a3a':cardPK/cardPB>=.4?'#cc8800':'#cc2222'};line-height:1">${cardPK}/${cardPB}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Pênaltis</div>
+      </div>
+    </div>`:''}
   </div>`;
 
   // Meses do ano ativo (quando __all__ mostra todos)
@@ -5872,7 +5881,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
+    :conquistasCard+medalhasCard+mediaCard+evolCard+sepLabel+monthCards;
 
   // ── Desafios do jogador ──
   const desafiosDoJogador = (gd.desafios||[]).filter(d =>
