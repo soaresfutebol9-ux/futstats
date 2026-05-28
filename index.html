@@ -1765,6 +1765,83 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
   animation:badge-glow 2.5s ease-in-out infinite;
 }
 @keyframes badge-glow{0%,100%{box-shadow:0 0 12px rgba(255,200,0,.2)}50%{box-shadow:0 0 24px rgba(255,200,0,.45)}}
+
+/* ── ANIMAÇÃO DE RESULTADO DO DESAFIO ── */
+#dc-result-overlay{
+  position:fixed;inset:0;z-index:9998;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  animation:dcResultFadeIn .4s ease forwards;
+}
+#dc-result-overlay.show{display:flex;}
+@keyframes dcResultFadeIn{from{opacity:0}to{opacity:1}}
+.dc-result-box{
+  text-align:center;padding:2.2rem 2rem;border-radius:28px;
+  max-width:340px;width:90%;position:relative;overflow:hidden;
+  animation:dcResultBoxIn .5s cubic-bezier(.32,1.6,.5,1) forwards;
+}
+@keyframes dcResultBoxIn{from{transform:scale(.7) translateY(40px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.dc-result-winner{
+  background:linear-gradient(145deg,#0a1a0a,#0e2018);
+  border:2px solid rgba(77,255,176,.4);
+  box-shadow:0 0 60px rgba(77,255,176,.2),0 8px 40px rgba(0,0,0,.6);
+}
+.dc-result-loser{
+  background:linear-gradient(145deg,#1a0a0e,#200e12);
+  border:2px solid rgba(255,90,122,.3);
+  box-shadow:0 0 60px rgba(255,90,122,.15),0 8px 40px rgba(0,0,0,.6);
+}
+.dc-result-emoji{font-size:72px;display:block;margin-bottom:.6rem;animation:dcEmojiPop .6s cubic-bezier(.32,2,.5,1) .3s both;}
+@keyframes dcEmojiPop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+.dc-result-title{
+  font-family:'VarsityTeam',serif;font-size:26px;letter-spacing:.5px;
+  display:block;margin-bottom:.5rem;
+}
+.dc-result-winner .dc-result-title{
+  background:linear-gradient(135deg,#4dffb0,#ffe066,#4dffb0);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:dcGoldShine 2s linear infinite;
+  background-size:200%;
+}
+@keyframes dcGoldShine{0%{background-position:0%}100%{background-position:200%}}
+.dc-result-loser .dc-result-title{color:rgba(255,150,130,.9);}
+.dc-result-msg{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.55;margin-bottom:1.2rem;}
+.dc-result-winner .dc-result-msg{color:rgba(200,255,230,.8);}
+.dc-result-loser .dc-result-msg{color:rgba(255,200,190,.8);}
+.dc-result-score{
+  font-family:'ClassyVogue',sans-serif;font-size:48px;
+  margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.dc-result-score-winner{color:#4dffb0;filter:drop-shadow(0 0 12px rgba(77,255,176,.6));}
+.dc-result-score-loser{color:rgba(255,90,122,.7);}
+.dc-result-vs{font-family:'VarsityTeam',serif;font-size:18px;color:rgba(255,255,255,.3);}
+.dc-result-close{
+  margin-top:.4rem;padding:10px 28px;border-radius:12px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .15s;
+}
+.dc-result-winner .dc-result-close{background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;}
+.dc-result-loser  .dc-result-close{background:rgba(255,90,122,.2);border:1px solid rgba(255,90,122,.5);color:#FF5A7A;}
+.dc-result-confetti{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+
+/* ── ABA HISTÓRICO DE DESAFIOS NO PERFIL ── */
+.dc-hist-tab-bar{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:12px;border:1px solid var(--bo);}
+.dc-hist-tab{flex:1;padding:7px 6px;text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx3);border-radius:8px;cursor:pointer;transition:all .18s;letter-spacing:.04em;}
+.dc-hist-tab.active{background:linear-gradient(135deg,rgba(255,90,122,.8),rgba(200,30,70,.9));color:#fff;box-shadow:0 2px 8px rgba(255,90,122,.3);}
+.dc-hist-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;margin-bottom:6px;border:1px solid var(--bo);}
+.dc-hist-row.win{background:rgba(77,255,176,.06);border-color:rgba(77,255,176,.2);}
+.dc-hist-row.loss{background:rgba(255,90,122,.06);border-color:rgba(255,90,122,.18);}
+.dc-hist-row.draw{background:rgba(138,155,192,.06);border-color:rgba(138,155,192,.18);}
+.dc-hist-row.active-row{background:rgba(255,165,0,.06);border-color:rgba(255,165,0,.25);}
+.dc-hist-outcome{font-size:16px;flex-shrink:0;}
+.dc-hist-info{flex:1;min-width:0;}
+.dc-hist-rival{font-family:'Freshman',sans-serif;font-size:11px;color:var(--tx);letter-spacing:.3px;}
+.dc-hist-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);margin-top:2px;}
+.dc-hist-score{font-family:'ClassyVogue',sans-serif;font-size:22px;flex-shrink:0;}
+.dc-hist-score.win{color:#4dffb0;}
+.dc-hist-score.loss{color:rgba(255,90,122,.7);}
+.dc-hist-score.draw{color:var(--tx2);}
+.dc-hist-score.ongoing{color:var(--am);}
 /* Picker step in create modal */
 .dc-player-btn{
   background:var(--bg3);border:1.5px solid var(--bo2);border-radius:14px;
@@ -2687,8 +2764,8 @@ body::before{
   to{opacity:1;transform:translateY(0)}
 }
 .feed-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 12px;
+  display:flex;flex-direction:column;gap:0;
+  padding:9px 12px 8px;
   background:var(--bg3);
   border:1px solid var(--bo2);
   border-radius:12px;
@@ -2700,6 +2777,7 @@ body::before{
   background:var(--bg4,rgba(255,255,255,.05));
   border-color:var(--bo);
 }
+.feed-item-top{display:flex;align-items:center;gap:10px;}
 .feed-item-icon{
   width:30px;height:30px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -2715,6 +2793,57 @@ body::before{
 .feed-item-text strong{font-weight:700;color:var(--tx)}
 .feed-item-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);margin-top:2px;letter-spacing:.02em}
 .feed-item-new{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0;box-shadow:0 0 5px var(--g)}
+
+/* ── REAÇÕES ── */
+.feed-reactions{
+  display:flex;align-items:center;gap:4px;
+  margin-top:7px;padding-top:6px;
+  border-top:1px solid var(--bo);
+  flex-wrap:wrap;
+}
+.feed-react-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 7px;border-radius:20px;
+  border:1px solid var(--bo2);background:var(--bg4,rgba(255,255,255,.04));
+  font-size:12px;cursor:pointer;transition:all .18s;
+  font-family:'DM Mono',monospace;color:var(--tx2);
+  user-select:none;-webkit-user-select:none;
+  line-height:1.2;
+}
+.feed-react-btn:hover{border-color:var(--bo3);background:rgba(255,255,255,.08);transform:scale(1.08);}
+.feed-react-btn.mine{
+  background:rgba(77,255,176,.12);border-color:rgba(77,255,176,.45);
+  color:var(--g);box-shadow:0 0 8px rgba(77,255,176,.12);
+}
+.feed-react-btn.mine:hover{background:rgba(77,255,176,.18);}
+.feed-react-count{font-size:11px;font-weight:600;min-width:8px;}
+.feed-react-add{
+  padding:3px 7px;border-radius:20px;
+  border:1px dashed var(--bo2);background:transparent;
+  font-size:13px;cursor:pointer;transition:all .18s;
+  color:var(--tx3);line-height:1.2;
+}
+.feed-react-add:hover{border-color:var(--bo3);color:var(--tx);transform:scale(1.1);}
+@keyframes react-pop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.45)}
+  70%{transform:scale(.88)}
+  100%{transform:scale(1)}
+}
+.feed-react-btn.popping{animation:react-pop .32s cubic-bezier(.32,2,.5,1) forwards;}
+/* Emoji picker floating */
+.feed-emoji-picker{
+  display:flex;gap:4px;padding:8px 10px;
+  background:var(--bg2);border:1px solid var(--bo3);border-radius:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3);
+  animation:feed-item-in .18s ease both;
+  flex-wrap:wrap;max-width:200px;
+}
+.feed-emoji-picker button{
+  font-size:22px;background:none;border:none;cursor:pointer;
+  padding:4px;border-radius:8px;transition:transform .15s,background .15s;line-height:1;
+}
+.feed-emoji-picker button:hover{transform:scale(1.3);background:rgba(255,255,255,.08);}
 /* Apelido no ranking */
 .ri-apelido{
   font-family:'DM Mono',monospace;
@@ -2839,6 +2968,7 @@ window.openP=id=>{
   el.style.display='';
   void el.offsetHeight;
   el.classList.add('open');
+  history.pushState({futstatsBack:id,type:'panel'},'');
 };
 window.closeP=id=>{
   const el=$(id);if(!el)return;
@@ -2860,6 +2990,7 @@ window.openPCenter=id=>{
   const el=$(id);if(!el)return;
   void el.offsetHeight;
   el.classList.add('open');
+  history.pushState({futstatsBack:id,type:'panel'},'');
 };
 window.closePCenter=id=>{
   const el=$(id);if(!el)return;
@@ -2877,6 +3008,99 @@ window.closePCenter=id=>{
     if(pan){pan.style.transform='';pan.style.transition='';}
   },260);
 };
+
+// ── BACK NAVIGATION (botão Voltar Android / gesto iOS) ──────────────
+(function(){
+  // Garante que sempre há um estado base na pilha ao iniciar
+  history.replaceState({futstatsBack:null,type:'base'},'');
+
+  // Mapa de fechar por id de painel
+  function _fecharPorId(id){
+    const el=document.getElementById(id);
+    if(!el||!el.classList.contains('open'))return false;
+    // Painéis .ov (openP)
+    if(el.classList.contains('ov')){closeP(id);return true;}
+    // Painéis .ov-center (openPCenter)
+    if(el.classList.contains('ov-center')){closePCenter(id);return true;}
+    return false;
+  }
+
+  // Detecta qual camada está aberta (por prioridade — mais alta primeiro)
+  function _fecharTopoAtual(){
+    // Modais fixos (z-index alto → baixo)
+    if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
+    if(document.getElementById('modal-desafio')?.classList.contains('open')){fecharModalDesafio();return true;}
+    if(document.getElementById('modal-duelo')?.classList.contains('open')){closeDuelo();return true;}
+    if(document.getElementById('modal-mvp')?.classList.contains('open')){fecharModalMVP();return true;}
+    if(document.getElementById('modal-partidas')?.classList.contains('open')){closeModalPartidas();return true;}
+    if(document.getElementById('modal-player')?.classList.contains('open')){closePlayerProfile();return true;}
+    // Painel de notificações
+    if(document.getElementById('notif-panel')?.classList.contains('open')){toggleNotifPanel();return true;}
+    // Conquistas
+    if(document.getElementById('modal-conquistas')?.classList.contains('open')){fecharConquistas();return true;}
+    // Painéis .ov e .ov-center — verifica todos
+    const paineis=['pperfil','pc','pj','pi2','pedit','pnovomes','ppreenchemes','pvermes'];
+    for(const id of paineis){
+      if(_fecharPorId(id))return true;
+    }
+    return false;
+  }
+
+  window.addEventListener('popstate',e=>{
+    // Tenta fechar a camada mais alta aberta
+    const fechou=_fecharTopoAtual();
+    if(fechou){
+      // Reinsere o estado para manter a pilha funcional
+      history.pushState({futstatsBack:null,type:'closed'},'');
+    }
+    // Se não havia nada aberto, deixa o browser navegar normalmente (sai do app)
+  });
+
+  // Hook nos abridores de modais para empurrar estado na pilha
+  const _origOpenPlayer=window.openPlayerProfile;
+  window.openPlayerProfile=function(...args){
+    _origOpenPlayer?.(...args);
+    history.pushState({futstatsBack:'modal-player',type:'modal'},'');
+  };
+
+  const _origOpenPartidas=window.openModalPartidas||null;
+  // modal-partidas é aberto inline — hookamos no close ao abrir
+  const _origModalPartidas=window.closeModalPartidas;
+  // Hook nos modais que não passam por openP
+  ['modal-mvp','modal-duelo','modal-desafio','modal-evol-chart','modal-conquistas','notif-panel'].forEach(id=>{
+    // Observa adição da classe .open e empurra estado
+    const el=document.getElementById(id);
+    if(!el)return;
+    const obs=new MutationObserver(muts=>{
+      muts.forEach(m=>{
+        if(m.type==='attributes'&&m.attributeName==='class'){
+          if(el.classList.contains('open')&&!el._backPushed){
+            el._backPushed=true;
+            history.pushState({futstatsBack:id,type:'modal'},'');
+          } else if(!el.classList.contains('open')){
+            el._backPushed=false;
+          }
+        }
+      });
+    });
+    obs.observe(el,{attributes:true});
+  });
+
+  // modal-partidas usa display, não classe — observer de style
+  const mp=document.getElementById('modal-partidas');
+  if(mp){
+    const obs=new MutationObserver(()=>{
+      if(mp.classList.contains('open')&&!mp._backPushed){
+        mp._backPushed=true;
+        history.pushState({futstatsBack:'modal-partidas',type:'modal'},'');
+      } else if(!mp.classList.contains('open')){
+        mp._backPushed=false;
+      }
+    });
+    obs.observe(mp,{attributes:true});
+  }
+})();
+// ── FIM BACK NAVIGATION ──────────────────────────────────────────────
 function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
@@ -4204,6 +4428,33 @@ function _renderNotifPanel(){
           ${del}
         </div>`;
       }
+      if(n.tipo==='desafio_grupo'){
+        const tl=n.tipoDesafio==='gols'?'⚽ Gols':n.tipoDesafio==='assist'?'👟 Assist.':'🏅 G+A';
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">⚔️</div>
+          <div class="notif-body">
+            <div class="notif-text">Desafio aceito! <strong>${n.de}</strong> vs <strong>${n.contra}</strong> em ${tl}.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='desafio_resultado'){
+        const tl=n.tipoDesafio==='gols'?'gols':n.tipoDesafio==='assist'?'assist.':'G+A';
+        let ico,txt;
+        if(n.empate){ico='🤝';txt=`Empate no desafio <strong>${n.nameA}</strong> vs <strong>${n.nameB}</strong>! ${n.scoreA}×${n.scoreB} em ${tl}.`;}
+        else if(n.isWinner===true){ico='🏆';txt=`Você venceu o desafio contra <strong>${n.loserName}</strong>! ${n.scoreA}×${n.scoreB} em ${tl}. 🔥`;}
+        else if(n.isLoser===true){ico='😅';txt=`Você perdeu o desafio contra <strong>${n.winnerName}</strong>. ${n.scoreA}×${n.scoreB} em ${tl}. Vai treinar! 💪`;}
+        else{ico='📢';txt=`<strong>${n.winnerName}</strong> venceu o desafio contra <strong>${n.loserName}</strong>! ${n.scoreA}×${n.scoreB} em ${tl}.`;}
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">${ico}</div>
+          <div class="notif-body">
+            <div class="notif-text">${txt}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
       if(n.tipo==='mvp_mes'){
         const [ano,mes]=(n.mes||'').split('-');
         const mesNome=mes?['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]:'';
@@ -4324,7 +4575,9 @@ async function _publishFeed(tipo, texto){
     const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7), tipo, texto, uid:currentUser.uid, ts:Date.now()};
     feed.push(ev);
     // Mantém máximo 100 eventos
-    if(feed.length>100) feed.splice(0, feed.length-100);
+    // Remove eventos com mais de 24h
+    const _24h = Date.now() - 24*60*60*1000;
+    feed.splice(0, feed.length, ...feed.filter(e => e.ts > _24h));
     await updateDoc(doc(db,'groups',groupId),{feed});
   } catch(e){ console.warn('feed publish:',e); }
 }
@@ -4561,24 +4814,117 @@ function _notifTimeAgoFeed(ts){
   return `há ${d}d`;
 }
 
+const _FEED_EMOJIS = ['🔥','😂','👑','💀','😤','🐐','👏'];
+
+function _feedReactHTML(ev){
+  if(!ev || !ev.id) return '';
+  const reacoes = ev.reacoes || {};
+  const myUid = currentUser?.uid;
+  // Buttons for existing reactions
+  const existing = _FEED_EMOJIS
+    .filter(e => (reacoes[e]||[]).length > 0)
+    .map(e => {
+      const uids = reacoes[e] || [];
+      const mine = myUid && uids.includes(myUid);
+      const names = uids.map(u => {
+        const mb = (gd.members||[]).find(m=>m.uid===u);
+        return mb ? mb.name : (u===myUid?'Você':'?');
+      }).join(', ');
+      return `<button class="feed-react-btn${mine?' mine':''}" title="${names}" onclick="_feedToggleReacao('${ev.id}','${e}',this)">${e}<span class="feed-react-count">${uids.length}</span></button>`;
+    }).join('');
+  // Add-reaction picker trigger (only show if not all emojis already used)
+  const allUsed = _FEED_EMOJIS.every(e=>(reacoes[e]||[]).includes(myUid));
+  const addBtn = !allUsed
+    ? `<button class="feed-react-add" title="Reagir" onclick="_feedAbrirPicker('${ev.id}',this)">＋</button>`
+    : '';
+  return `<div class="feed-reactions" id="freact-${ev.id}">${existing}${addBtn}</div>`;
+}
+
+window._feedToggleReacao = async function(evId, emoji, btn){
+  if(!currentUser||!groupId||!gd) return;
+  // Optimistic animation
+  if(btn){ btn.classList.add('popping'); setTimeout(()=>btn.classList.remove('popping'),400); }
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur  = snap.data();
+    const feed = cur.feed || [];
+    const idx  = feed.findIndex(e=>e.id===evId);
+    if(idx===-1) return;
+    const ev   = feed[idx];
+    ev.reacoes = ev.reacoes || {};
+    ev.reacoes[emoji] = ev.reacoes[emoji] || [];
+    const pos = ev.reacoes[emoji].indexOf(currentUser.uid);
+    if(pos===-1){ ev.reacoes[emoji].push(currentUser.uid); }
+    else         { ev.reacoes[emoji].splice(pos,1); }
+    // Cleanup empty
+    if(!ev.reacoes[emoji].length) delete ev.reacoes[emoji];
+    await updateDoc(doc(db,'groups',groupId),{feed});
+    gd = cur;
+    // Re-render only this reaction row (fast, no full re-render)
+    const el = document.getElementById('freact-'+evId);
+    if(el){ el.outerHTML = _feedReactHTML(ev); }
+  }catch(e){ console.warn('reacao:',e); }
+};
+
+window._feedAbrirPicker = function(evId, triggerBtn){
+  // Remove any existing picker
+  document.querySelectorAll('.feed-emoji-picker').forEach(p=>p.remove());
+  const ev = (gd?.feed||[]).find(e=>e.id===evId);
+  if(!ev||!currentUser) return;
+  const reacoes = ev.reacoes || {};
+  const unused = _FEED_EMOJIS.filter(e=>!(reacoes[e]||[]).includes(currentUser.uid));
+  if(!unused.length) return;
+  const picker = document.createElement('div');
+  picker.className = 'feed-emoji-picker';
+  picker.innerHTML = unused.map(e=>`<button onclick="_feedPickEmoji('${evId}','${e}',this)">${e}</button>`).join('');
+  // Position near trigger
+  const rect = triggerBtn.getBoundingClientRect();
+  picker.style.cssText=`position:fixed;z-index:9990;bottom:${window.innerHeight-rect.top+6}px;left:${Math.min(rect.left,window.innerWidth-200)}px;`;
+  document.body.appendChild(picker);
+  // Close on outside click
+  setTimeout(()=>document.addEventListener('click',function h(ev){
+    if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',h);}
+  }),10);
+};
+
+window._feedPickEmoji = function(evId, emoji, btn){
+  document.querySelectorAll('.feed-emoji-picker').forEach(p=>p.remove());
+  const row = document.querySelector(`#freact-${evId} .feed-react-btn[onclick*="${emoji}"]`);
+  _feedToggleReacao(evId, emoji, row||btn);
+};
+
 function renderFeedCard(){
-  // Feed de atividade do grupo desativado
-  return;
   const card = document.getElementById('feed-card');
   const itemsEl = document.getElementById('feed-items');
   if(!card || !itemsEl || !gd) return;
 
-  const feed = (gd.feed || []).slice().reverse().slice(0, 20);
-  if(!feed.length){ card.style.display='none'; return; }
+  const _24h = Date.now() - 24*60*60*1000;
+  const feed = (gd.feed || []).filter(e => e.ts > _24h).slice().reverse().slice(0, 20);
+  if(!feed.length){
+    card.style.display='none';
+    card.style.visibility='hidden';
+    card.style.height='0';
+    card.style.overflow='hidden';
+    card.style.margin='0';
+    return;
+  }
+
+  // Show the card
+  card.style.display='';
+  card.style.visibility='';
+  card.style.height='';
+  card.style.overflow='';
+  card.style.marginTop='1.25rem';
 
   const lidas = JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
 
   const iconMap = {
-    partida: { cls:'partida', emoji:'⚽' },
+    partida:   { cls:'partida',   emoji:'⚽' },
     conquista: { cls:'conquista', emoji:'🏆' },
-    meta: { cls:'meta', emoji:'🎯' },
-    membro: { cls:'membro', emoji:'👋' },
-    nota: { cls:'nota', emoji:'📌' },
+    meta:      { cls:'meta',      emoji:'🎯' },
+    membro:    { cls:'membro',    emoji:'👋' },
+    nota:      { cls:'nota',      emoji:'📌' },
+    craque:    { cls:'conquista', emoji:'⭐' },
   };
 
   const MAX_COLLAPSED = 3;
@@ -4588,12 +4934,15 @@ function renderFeedCard(){
     const ic = iconMap[ev.tipo] || { cls:'nota', emoji:'📌' };
     const unread = !lidas.includes(ev.id) && ev.uid !== currentUser?.uid;
     return `<div class="feed-item" style="animation-delay:${i*45}ms">
-      <div class="feed-item-icon ${ic.cls}">${ic.emoji}</div>
-      <div class="feed-item-body">
-        <div class="feed-item-text">${ev.texto}</div>
-        <div class="feed-item-time">${_notifTimeAgoFeed(ev.ts)}</div>
+      <div class="feed-item-top">
+        <div class="feed-item-icon ${ic.cls}">${ic.emoji}</div>
+        <div class="feed-item-body">
+          <div class="feed-item-text">${ev.texto}</div>
+          <div class="feed-item-time">${_notifTimeAgoFeed(ev.ts)}</div>
+        </div>
+        ${unread ? '<div class="feed-item-new"></div>' : ''}
       </div>
-      ${unread ? '<div class="feed-item-new"></div>' : ''}
+      ${_feedReactHTML(ev)}
     </div>`;
   }).join('');
 
@@ -4610,12 +4959,10 @@ function renderFeedCard(){
   }
 
   // Adjust max-height for smooth transition
-  const rowH = 52; // approx height per item
+  const rowH = 72;
   itemsEl.style.maxHeight = _feedExpanded
     ? (Math.min(feed.length, 20) * rowH + 20) + 'px'
     : (MAX_COLLAPSED * rowH + 10) + 'px';
-
-  card.style.display = '';
 }
 
 window._toggleFeedExpand = function(){
@@ -4837,6 +5184,7 @@ window._dcAceitar = async function(id){
     d.status='ativo';
     d.startTs=now;
     d.endTs=now+7*24*60*60*1000;
+    const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
     // Notificação para o desafiante (uidA)
     cur.notifs=cur.notifs||{};
     cur.notifs[d.uidA]=cur.notifs[d.uidA]||[];
@@ -4844,9 +5192,18 @@ window._dcAceitar = async function(id){
       id:now+'a', tipo:'desafio_aceito', desafioId:id,
       de:myProfile.displayName, deUid:currentUser.uid, ts:now, lida:false,
     });
+    // Notificação para TODOS os outros membros do grupo
+    (cur.members||[]).forEach(m=>{
+      if(m.uid===d.uidA||m.uid===d.uidB) return;
+      cur.notifs[m.uid]=cur.notifs[m.uid]||[];
+      cur.notifs[m.uid].push({
+        id:now+'g'+m.uid, tipo:'desafio_grupo', desafioId:id,
+        de:d.nameA, deUid:d.uidA, contra:d.nameB, contraUid:d.uidB,
+        tipoDesafio:d.tipo, ts:now, lida:false,
+      });
+    });
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
-    const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
     await _publishFeed('nota','⚔️ <strong>'+myProfile.displayName+'</strong> aceitou o desafio de <strong>'+d.nameA+'</strong>! Briga por mais '+tipoLabel+' começa agora.');
     renderRanking();
     _updateNotifBadge();
@@ -4873,8 +5230,139 @@ window._dcCancelar = async function(id){
 function _dcCheckEncerrar(){
   if(!gd||!gd.desafios) return;
   const now=Date.now(); let changed=false;
-  (gd.desafios||[]).forEach(d=>{ if(d.status==='ativo'&&now>d.endTs){d.status='encerrado';changed=true;} });
-  if(changed) setDoc(doc(db,'groups',groupId),gd).catch(()=>{});
+  const recemEncerrados=[];
+  (gd.desafios||[]).forEach(d=>{
+    if(d.status==='ativo'&&now>d.endTs){
+      d.status='encerrado';
+      changed=true;
+      // Só notifica uma vez (marca flag)
+      if(!d._notificadoResultado){
+        d._notificadoResultado=true;
+        recemEncerrados.push({...d});
+      }
+    }
+  });
+  if(changed){
+    setDoc(doc(db,'groups',groupId),gd).catch(()=>{});
+    recemEncerrados.forEach(d=>_dcNotificarResultado(d));
+  }
+}
+
+async function _dcNotificarResultado(d){
+  if(!gd||!currentUser) return;
+  const scoreA=_dcGetScore(d.uidA,d);
+  const scoreB=_dcGetScore(d.uidB,d);
+  let winnerUid=null,loserUid=null,winnerName='',loserName='';
+  if(scoreA>scoreB){winnerUid=d.uidA;loserUid=d.uidB;winnerName=d.nameA;loserName=d.nameB;}
+  else if(scoreB>scoreA){winnerUid=d.uidB;loserUid=d.uidA;winnerName=d.nameB;loserName=d.nameA;}
+  const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
+  const now=Date.now();
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    cur.notifs=cur.notifs||{};
+    // Notifica todos os membros do resultado
+    (cur.members||[]).forEach(m=>{
+      const isWinner=m.uid===winnerUid;
+      const isLoser=m.uid===loserUid;
+      const isParticipant=isWinner||isLoser;
+      cur.notifs[m.uid]=cur.notifs[m.uid]||[];
+      cur.notifs[m.uid].push({
+        id:now+'res'+m.uid, tipo:'desafio_resultado',
+        desafioId:d.id, scoreA, scoreB,
+        uidA:d.uidA, nameA:d.nameA, uidB:d.uidB, nameB:d.nameB,
+        winnerUid, winnerName, loserName, tipoDesafio:d.tipo,
+        isWinner:isParticipant?isWinner:null, isLoser:isParticipant?isLoser:null,
+        empate:!winnerUid, ts:now, lida:false,
+      });
+    });
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    _updateNotifBadge();
+    // Publica no feed
+    if(winnerUid){
+      await _publishFeed('conquista',`🏆 <strong>${winnerName}</strong> venceu o desafio contra <strong>${loserName}</strong>! (${scoreA}×${scoreB} em ${tipoLabel})`);
+    } else {
+      await _publishFeed('nota',`🤝 Empate no desafio entre <strong>${d.nameA}</strong> e <strong>${d.nameB}</strong>! (${scoreA}×${scoreB} em ${tipoLabel})`);
+    }
+    // Mostra animação se o usuário atual for participante
+    if(currentUser.uid===winnerUid||currentUser.uid===loserUid){
+      const eu=currentUser.uid===winnerUid;
+      const rival=eu?loserName:winnerName;
+      const myScore=currentUser.uid===d.uidA?scoreA:scoreB;
+      const rivalScore=currentUser.uid===d.uidA?scoreB:scoreA;
+      _dcMostrarResultadoAnimacao(eu,rival,myScore,rivalScore,tipoLabel,!winnerUid);
+    }
+    renderRanking();
+  }catch(e){console.error(e);}
+}
+
+const _dcVitoriasMsgs=[
+  'Você é IMBATÍVEL! 🔥','Tá voando alto, craque!','Campeão absoluto! 👑','Você nasceu pra isso! ⚽','MVP do desafio! 🏆','Dominação TOTAL! 💪','Ninguém te para! 🚀'];
+const _dcDerrotasMsgs=[
+  'Vai pra treinar, tá? 😅','Quase... quase... 😂','Próxima vez chega mais cedo! 🐌','Força, guerreiro! A luta continua 💀','Pelo menos você tentou 👻','Desafio aceito... resultado não 🫡','Já tá reservando desculpas pro próximo? 😏'];
+
+function _dcMostrarResultadoAnimacao(vitoria, rival, meuScore, rivalScore, tipoLabel, empate){
+  let overlay=document.getElementById('dc-result-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='dc-result-overlay';
+    overlay.innerHTML='<div class="dc-result-box" id="dc-result-box"><canvas class="dc-result-confetti" id="dc-confetti"></canvas><span class="dc-result-emoji" id="dc-res-emoji"></span><span class="dc-result-title" id="dc-res-title"></span><div class="dc-result-score" id="dc-res-score"></div><p class="dc-result-msg" id="dc-res-msg"></p><button class="dc-result-close" onclick="document.getElementById(\'dc-result-overlay\').classList.remove(\'show\')">Fechar</button></div>';
+    document.body.appendChild(overlay);
+  }
+  const box=document.getElementById('dc-result-box');
+  const emoji=document.getElementById('dc-res-emoji');
+  const title=document.getElementById('dc-res-title');
+  const scoreEl=document.getElementById('dc-res-score');
+  const msg=document.getElementById('dc-res-msg');
+  if(empate){
+    box.className='dc-result-box dc-result-loser';
+    emoji.textContent='🤝';
+    title.textContent='Empatou!';
+    scoreEl.innerHTML=`<span class="dc-result-score-loser">${meuScore}</span><span class="dc-result-vs">×</span><span class="dc-result-score-loser">${rivalScore}</span>`;
+    msg.textContent=`Empate com ${rival} em ${tipoLabel}. Ninguém venceu, ninguém perdeu!`;
+  } else if(vitoria){
+    box.className='dc-result-box dc-result-winner';
+    emoji.textContent=['🏆','👑','🥇','⚡','🔥'][Math.floor(Math.random()*5)];
+    title.textContent='Você Venceu!';
+    scoreEl.innerHTML=`<span class="dc-result-score-winner">${meuScore}</span><span class="dc-result-vs">×</span><span class="dc-result-score-loser">${rivalScore}</span>`;
+    msg.textContent=_dcVitoriasMsgs[Math.floor(Math.random()*_dcVitoriasMsgs.length)]+'\nVenceu o desafio contra '+rival+' em '+tipoLabel+'!';
+    _dcLancarConfetti();
+  } else {
+    box.className='dc-result-box dc-result-loser';
+    emoji.textContent=['😅','💀','😭','🫡','👻'][Math.floor(Math.random()*5)];
+    title.textContent='Perdeu…';
+    scoreEl.innerHTML=`<span class="dc-result-score-loser">${meuScore}</span><span class="dc-result-vs">×</span><span class="dc-result-score-winner">${rivalScore}</span>`;
+    msg.textContent=_dcDerrotasMsgs[Math.floor(Math.random()*_dcDerrotasMsgs.length)]+'\nVoce perdeu o desafio contra '+rival+' em '+tipoLabel+'.';
+  }
+  overlay.classList.add('show');
+}
+
+function _dcLancarConfetti(){
+  const canvas=document.getElementById('dc-confetti');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||300;
+  canvas.height=canvas.offsetHeight||400;
+  const pieces=Array.from({length:60},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height-canvas.height,
+    r:Math.random()*5+3, c:['#4dffb0','#FFD166','#FF5A7A','#a78bfa','#60a5fa'][Math.floor(Math.random()*5)],
+    sp:Math.random()*3+1.5, sw:Math.random()*2-1, rx:Math.random()*2-1,
+  }));
+  let frame=0;
+  const draw=()=>{
+    if(frame>180){ctx.clearRect(0,0,canvas.width,canvas.height);return;}
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c;ctx.fill();
+      p.y+=p.sp;p.x+=p.sw;p.r=Math.max(0,p.r-.01);
+      if(p.y>canvas.height) p.y=-5;
+    });
+    frame++;
+    requestAnimationFrame(draw);
+  };
+  draw();
 }
 
 function _showSimpleToast(msg){
@@ -6439,18 +6927,90 @@ function _buildPlayerProfile(uid){
     ?'<div class="empty">Nenhum dado registrado.</div>'
     :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
-  // ── Desafios do jogador ──
-  const desafiosDoJogador = (gd.desafios||[]).filter(d =>
-    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado')
-  ).slice(-4).reverse();
-  if(desafiosDoJogador.length){
+  // ── Histórico de Desafios do jogador ──
+  const todosDesafios = (gd.desafios||[]).filter(d =>
+    (d.uidA === uid || d.uidB === uid) && d.status !== 'cancelado'
+  ).slice().reverse();
+
+  if(todosDesafios.length){
     const desafioSection = document.createElement('div');
-    desafioSection.style.cssText='margin-top:12px;';
-    desafioSection.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>⚔️</span> Desafios diretos</div>'
-      + desafiosDoJogador.map(d => _dcCardHTML(d, uid)).join('');
+    desafioSection.style.cssText='margin-top:16px;';
+
+    const encerrados = todosDesafios.filter(d=>d.status==='encerrado');
+    const ativos     = todosDesafios.filter(d=>d.status==='ativo'||d.status==='pendente');
+
+    // Calcula W/L/D
+    let wins=0,losses=0,draws=0;
+    encerrados.forEach(d=>{
+      const sA=_dcGetScore(d.uidA,d), sB=_dcGetScore(d.uidB,d);
+      if(sA===sB){draws++;}
+      else{const wuid=sA>sB?d.uidA:d.uidB; if(wuid===uid)wins++; else losses++;}
+    });
+
+    function buildHistRow(d, uid){
+      const rival = d.uidA===uid ? {name:d.nameB,uid:d.uidB} : {name:d.nameA,uid:d.uidA};
+      const myScore  = _dcGetScore(uid,d);
+      const rivScore = _dcGetScore(rival.uid,d);
+      const tipo = d.tipo==='gols'?'⚽ Gols':d.tipo==='assist'?'👟 Assist.':'🏅 G+A';
+      const ended = d.status==='encerrado';
+      let outcomeClass='draw', outcomeIcon='🤝', scoreClass='draw';
+      if(!ended){
+        outcomeClass='active-row'; outcomeIcon = d.status==='pendente'?'⏳':'🔴'; scoreClass='ongoing';
+      } else if(myScore>rivScore){
+        outcomeClass='win'; outcomeIcon='🏆'; scoreClass='win';
+      } else if(myScore<rivScore){
+        outcomeClass='loss'; outcomeIcon='😅'; scoreClass='loss';
+      }
+      const date = d.endTs ? new Date(d.endTs).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
+      const status = ended?date:(d.status==='pendente'?'Pendente':'Em andamento');
+      return `<div class="dc-hist-row ${outcomeClass}">
+        <span class="dc-hist-outcome">${outcomeIcon}</span>
+        <div class="dc-hist-info">
+          <div class="dc-hist-rival">${rival.name}</div>
+          <div class="dc-hist-meta">${tipo} · ${status}</div>
+        </div>
+        <span class="dc-hist-score ${scoreClass}">${myScore}<span style="font-size:14px;opacity:.5">×</span>${rivScore}</span>
+      </div>`;
+    }
+
+    const allHTML = todosDesafios.map(d=>buildHistRow(d,uid)).join('') || '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Nenhum desafio registrado.</div>';
+    const encHTML  = encerrados.length ? encerrados.map(d=>buildHistRow(d,uid)).join('') : '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Nenhum desafio encerrado.</div>';
+    const ativHTML = ativos.length    ? ativos.map(d=>buildHistRow(d,uid)).join('')     : '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Sem desafios ativos.</div>';
+
+    const wlBadge = encerrados.length
+      ? `<div style="display:flex;gap:6px;margin-bottom:10px">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(77,255,176,.15);border:1px solid rgba(77,255,176,.35);color:#4dffb0">${wins}V</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(255,90,122,.12);border:1px solid rgba(255,90,122,.3);color:#FF5A7A">${losses}D</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(138,155,192,.12);border:1px solid rgba(138,155,192,.25);color:var(--tx2)">${draws}E</span>
+        </div>` : '';
+
+    desafioSection.innerHTML=`
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span>⚔️</span> Desafios diretos
+      </div>
+      ${wlBadge}
+      <div class="dc-hist-tab-bar">
+        <div class="dc-hist-tab active" onclick="_dcHistTab(this,'all','${uid}')">Todos</div>
+        <div class="dc-hist-tab" onclick="_dcHistTab(this,'enc','${uid}')">Histórico</div>
+        <div class="dc-hist-tab" onclick="_dcHistTab(this,'atv','${uid}')">Ativos</div>
+      </div>
+      <div id="dc-hist-all-${uid}">${allHTML}</div>
+      <div id="dc-hist-enc-${uid}" style="display:none">${encHTML}</div>
+      <div id="dc-hist-atv-${uid}" style="display:none">${ativHTML}</div>
+    `;
     document.getElementById('mp-body').appendChild(desafioSection);
   }
 }
+
+window._dcHistTab=function(tabEl,which,uid){
+  const bar=tabEl.closest('.dc-hist-tab-bar');
+  bar.querySelectorAll('.dc-hist-tab').forEach(t=>t.classList.remove('active'));
+  tabEl.classList.add('active');
+  ['all','enc','atv'].forEach(k=>{
+    const el=document.getElementById('dc-hist-'+k+'-'+uid);
+    if(el) el.style.display=k===which?'block':'none';
+  });
+};
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
   if(!gd||!uid)return;
@@ -9386,6 +9946,7 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
 </script>
 <!-- Overlay e Painel de notificações — fora do #sa para escapar do overflow:hidden -->
 <div id="notif-overlay" onclick="toggleNotifPanel()"></div>
+<div id="dc-result-overlay"></div>
 <div id="notif-panel">
   <div class="notif-panel-header">
     <div class="notif-panel-title">🔔 Notificações</div>
