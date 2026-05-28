@@ -2338,97 +2338,6 @@ window.closePCenter=id=>{
   },260);
 };
 
-// ── BACK NAVIGATION (botão Voltar Android / gesto iOS) ──────────────
-(function(){
-  // Garante que sempre há um estado base na pilha ao iniciar
-  history.replaceState({futstatsBack:null,type:'base'},'');
-
-  // Mapa de fechar por id de painel
-  function _fecharPorId(id){
-    const el=document.getElementById(id);
-    if(!el||!el.classList.contains('open'))return false;
-    // Painéis .ov (openP)
-    if(el.classList.contains('ov')){closeP(id);return true;}
-    // Painéis .ov-center (openPCenter)
-    if(el.classList.contains('ov-center')){closePCenter(id);return true;}
-    return false;
-  }
-
-  // Detecta qual camada está aberta (por prioridade — mais alta primeiro)
-  function _fecharTopoAtual(){
-    // Modais fixos (z-index alto → baixo)
-    if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
-    if(document.getElementById('modal-desafio')?.classList.contains('open')){fecharModalDesafio();return true;}
-    if(document.getElementById('modal-duelo')?.classList.contains('open')){closeDuelo();return true;}
-    if(document.getElementById('modal-partidas')?.classList.contains('open')){closeModalPartidas();return true;}
-    if(document.getElementById('modal-player')?.classList.contains('open')){closePlayerProfile();return true;}
-    // Painel de notificações
-    if(document.getElementById('notif-panel')?.classList.contains('open')){toggleNotifPanel();return true;}
-    // Conquistas
-    if(document.getElementById('modal-conquistas')?.classList.contains('open')){fecharConquistas();return true;}
-    // Painéis .ov e .ov-center — verifica todos
-    const paineis=['pperfil','pc','pj','pi2','pedit','pnovomes','ppreenchemes','pvermes'];
-    for(const id of paineis){
-      if(_fecharPorId(id))return true;
-    }
-    return false;
-  }
-
-  window.addEventListener('popstate',e=>{
-    // Tenta fechar a camada mais alta aberta
-    const fechou=_fecharTopoAtual();
-    if(fechou){
-      // Reinsere o estado para manter a pilha funcional
-      history.pushState({futstatsBack:null,type:'closed'},'');
-    }
-    // Se não havia nada aberto, deixa o browser navegar normalmente (sai do app)
-  });
-
-  // Hook nos abridores de modais para empurrar estado na pilha
-  const _origOpenPlayer=window.openPlayerProfile;
-  window.openPlayerProfile=function(...args){
-    _origOpenPlayer?.(...args);
-    history.pushState({futstatsBack:'modal-player',type:'modal'},'');
-  };
-
-  const _origOpenPartidas=window.openModalPartidas||null;
-  // modal-partidas é aberto inline — hookamos no close ao abrir
-  const _origModalPartidas=window.closeModalPartidas;
-  // Hook nos modais que não passam por openP
-  ['modal-duelo','modal-desafio','modal-evol-chart','modal-conquistas','notif-panel'].forEach(id=>{
-    // Observa adição da classe .open e empurra estado
-    const el=document.getElementById(id);
-    if(!el)return;
-    const obs=new MutationObserver(muts=>{
-      muts.forEach(m=>{
-        if(m.type==='attributes'&&m.attributeName==='class'){
-          if(el.classList.contains('open')&&!el._backPushed){
-            el._backPushed=true;
-            history.pushState({futstatsBack:id,type:'modal'},'');
-          } else if(!el.classList.contains('open')){
-            el._backPushed=false;
-          }
-        }
-      });
-    });
-    obs.observe(el,{attributes:true});
-  });
-
-  // modal-partidas usa display, não classe — observer de style
-  const mp=document.getElementById('modal-partidas');
-  if(mp){
-    const obs=new MutationObserver(()=>{
-      if(mp.classList.contains('open')&&!mp._backPushed){
-        mp._backPushed=true;
-        history.pushState({futstatsBack:'modal-partidas',type:'modal'},'');
-      } else if(!mp.classList.contains('open')){
-        mp._backPushed=false;
-      }
-    });
-    obs.observe(mp,{attributes:true});
-  }
-})();
-// ── FIM BACK NAVIGATION ──────────────────────────────────────────────
 function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
@@ -2482,7 +2391,144 @@ window.doLogin=async()=>{
   try{await signInWithEmailAndPassword(auth,email,pass);}
   catch(e){showErr('lerr',fbErrMsg(e.code));setBtn('btn-login',false,'Entrar');}
 };
-window.resetarVotos = async function(){
+
+// ── CORE: AUTH STATE + ENTER APP / LOBBY ─────────────────────────────────────
+
+function listenGroup(gid){
+  if(unsubGroup){unsubGroup();unsubGroup=null;}
+  unsubGroup=onSnapshot(doc(db,'groups',gid),snap=>{
+    if(!snap.exists())return;
+    gd=snap.data();
+    window.gd=gd;
+    _updateNotifBadge();
+    if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
+    renderRanking();
+    if(typeof renderHistTab==='function') renderHistTab();
+    if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar().catch(()=>{});
+  });
+}
+
+async function enterApp(user){
+  currentUser=user;
+  window.currentUser=user;
+  const snap=await getDoc(doc(db,'users',user.uid));
+  if(!snap.exists()) return showScr('sl');
+  myProfile=snap.data();
+  window.myProfile=myProfile;
+  groupId=myProfile.groupId||null;
+  window.groupId=groupId;
+  if(!groupId){
+    showScr('sloby');
+    return;
+  }
+  const gsnap=await getDoc(doc(db,'groups',groupId));
+  if(!gsnap.exists()){
+    // grupo não existe mais — limpa referência
+    await updateDoc(doc(db,'users',user.uid),{groupId:''});
+    myProfile.groupId='';groupId=null;window.groupId=null;
+    showScr('sloby');
+    return;
+  }
+  gd=gsnap.data();
+  window.gd=gd;
+  // Garante que o membro está na lista do grupo
+  const mbs=gd.members||[];
+  const isMember=mbs.some(m=>m.uid===user.uid);
+  if(!isMember){
+    const newMb={uid:user.uid,name:myProfile.displayName||user.email,photo:myProfile.photo||''};
+    mbs.push(newMb);
+    gd.members=mbs;
+    await setDoc(doc(db,'groups',groupId),gd);
+    setTimeout(()=>{ if(typeof _publishFeed==='function') _publishFeed('membro',`<strong>${newMb.name}</strong> entrou no grupo! 👋`); },500);
+  }
+  renderHeaderAvatar();
+  showScr('sa');
+  listenGroup(groupId);
+  if(typeof renderRanking==='function') renderRanking();
+  if(typeof renderHistTab==='function') renderHistTab();
+  _updateNotifBadge();
+}
+
+function enterLobby(){
+  currentUser=null;myProfile=null;gd=null;groupId=null;
+  window.currentUser=null;window.myProfile=null;window.gd=null;window.groupId=null;
+  if(unsubGroup){unsubGroup();unsubGroup=null;}
+  showScr('sl');
+}
+
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    try{ await enterApp(user); }
+    catch(e){ console.error('enterApp error:',e); showScr('sl'); }
+  } else {
+    enterLobby();
+  }
+});
+
+window.enterApp=enterApp;
+window.enterLobby=enterLobby;
+
+window.joinGroup=async()=>{
+  const code=($('join-code-input')?.value||'').trim().toUpperCase();
+  if(!code) return alert('Digite o código do grupo.');
+  const errEl=$('sloby-err');
+  if(errEl){errEl.textContent='';errEl.style.display='none';}
+  try{
+    const snap=await getDoc(doc(db,'groups',code));
+    if(!snap.exists()){
+      if(errEl){errEl.textContent='Grupo não encontrado.';errEl.style.display='block';}
+      return;
+    }
+    const cur=snap.data();
+    const mbs=cur.members||[];
+    if(!mbs.some(m=>m.uid===currentUser.uid)){
+      mbs.push({uid:currentUser.uid,name:myProfile.displayName||currentUser.email,photo:myProfile.photo||''});
+      cur.members=mbs;
+      await setDoc(doc(db,'groups',code),cur);
+    }
+    await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});
+    myProfile.groupId=code;groupId=code;window.groupId=code;
+    gd=cur;window.gd=gd;
+    setTimeout(()=>{ if(typeof _publishFeed==='function') _publishFeed('membro',`<strong>${myProfile.displayName}</strong> entrou no grupo! 👋`); },500);
+    renderHeaderAvatar();
+    showScr('sa');
+    listenGroup(groupId);
+    if(typeof renderRanking==='function') renderRanking();
+    if(typeof renderHistTab==='function') renderHistTab();
+    _updateNotifBadge();
+  }catch(e){ if(errEl){errEl.textContent='Erro ao entrar no grupo: '+e.message;errEl.style.display='block';} }
+};
+
+window.criarGrupo=async()=>{
+  const nome=($('group-name-input')?.value||'').trim();
+  if(!nome) return alert('Digite um nome para o grupo.');
+  const errEl=$('sloby-err');
+  if(errEl){errEl.textContent='';errEl.style.display='none';}
+  try{
+    // Gera código único de 6 chars
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code='';for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+    const now=new Date();
+    const mesKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const newGroup={
+      name:nome,code,createdBy:currentUser.uid,createdAt:serverTimestamp(),
+      mesAtivo:mesKey,members:[{uid:currentUser.uid,name:myProfile.displayName||currentUser.email,photo:myProfile.photo||''}],
+      matches:[],historico:{},feed:[],notifs:{},desafios:[]
+    };
+    await setDoc(doc(db,'groups',code),newGroup);
+    await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});
+    myProfile.groupId=code;groupId=code;window.groupId=code;
+    gd=newGroup;window.gd=gd;
+    renderHeaderAvatar();
+    showScr('sa');
+    listenGroup(groupId);
+    if(typeof renderRanking==='function') renderRanking();
+    if(typeof renderHistTab==='function') renderHistTab();
+    _updateNotifBadge();
+  }catch(e){ if(errEl){errEl.textContent='Erro ao criar grupo: '+e.message;errEl.style.display='block';} }
+};
+
+// ── FIM CORE AUTH ───────────────────────────────────────────────────────────── = async function(){
   if(!gd||!currentUser||!groupId) return;
   if(!confirm('Tem certeza? Isso vai apagar todos os dados do mês atual.')) return;
   try{
@@ -7187,6 +7233,59 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
   const inner = document.getElementById('conquistas-inner');
   if(inner && !inner.contains(e.target)) window.fecharConquistas();
 });
+
+// ── BACK NAVIGATION (botão Voltar Android / gesto iOS) ───────────────
+(function(){
+  history.replaceState({futstatsBack:null,type:'base'},'');
+
+  function _fecharPorId(id){
+    const el=document.getElementById(id);
+    if(!el||!el.classList.contains('open')) return false;
+    if(el.classList.contains('ov')){closeP(id);return true;}
+    if(el.classList.contains('ov-center')){closePCenter(id);return true;}
+    return false;
+  }
+
+  function _fecharTopoAtual(){
+    if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
+    if(document.getElementById('modal-desafio')?.classList.contains('open')){if(typeof fecharModalDesafio==='function')fecharModalDesafio();return true;}
+    if(document.getElementById('modal-duelo')?.classList.contains('open')){if(typeof closeDuelo==='function')closeDuelo();return true;}
+    if(document.getElementById('modal-partidas')?.classList.contains('open')){closeModalPartidas();return true;}
+    if(document.getElementById('modal-player')?.classList.contains('open')){closePlayerProfile();return true;}
+    if(document.getElementById('notif-panel')?.classList.contains('open')){toggleNotifPanel();return true;}
+    if(document.getElementById('modal-conquistas')?.classList.contains('open')){if(typeof fecharConquistas==='function')fecharConquistas();return true;}
+    const paineis=['pperfil','pc','pj','pi2','pedit','pnovomes','ppreenchemes','pvermes'];
+    for(const id of paineis){ if(_fecharPorId(id)) return true; }
+    return false;
+  }
+
+  window.addEventListener('popstate',()=>{
+    const fechou=_fecharTopoAtual();
+    if(fechou) history.pushState({futstatsBack:null,type:'closed'},'');
+  });
+
+  // Observer nos modais para empurrar estado
+  ['modal-duelo','modal-desafio','modal-evol-chart','modal-conquistas','notif-panel','modal-partidas'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    new MutationObserver(()=>{
+      if(el.classList.contains('open')&&!el._backPushed){
+        el._backPushed=true;
+        history.pushState({futstatsBack:id,type:'modal'},'');
+      } else if(!el.classList.contains('open')){
+        el._backPushed=false;
+      }
+    }).observe(el,{attributes:true,attributeFilter:['class']});
+  });
+
+  // Hook no openPlayerProfile para empurrar estado
+  const _origOP=window.openPlayerProfile;
+  window.openPlayerProfile=function(...args){
+    _origOP?.(...args);
+    history.pushState({futstatsBack:'modal-player',type:'modal'},'');
+  };
+})();
+// ── FIM BACK NAVIGATION ──────────────────────────────────────────────
 
 })();
 </script>
