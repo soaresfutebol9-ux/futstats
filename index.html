@@ -3498,25 +3498,33 @@ window._getCraqueVencedor = function(cur, partidaKey){
   return lista[0];
 };
 
-// Notifica o craque da rodada se houver maioria
+// Notifica o craque da rodada para todos os membros do grupo
 window._notificarCraqueDaRodada = function(cur, partidaKey){
   const vencedor = _getCraqueVencedor(cur, partidaKey);
   if(!vencedor) return;
-  const totalMembros = (cur.members||[]).length - 1; // excluindo o próprio
   if(vencedor.count < 1) return;
+  const vencedorMembro = (cur.members||[]).find(m => m.uid === vencedor.uid);
+  const vencedorNome = vencedorMembro ? (vencedorMembro.name||'Jogador') : 'Jogador';
   if(!cur.notifs) cur.notifs = {};
-  if(!cur.notifs[vencedor.uid]) cur.notifs[vencedor.uid] = [];
-  // Atualiza ou cria notif para esta partida
-  cur.notifs[vencedor.uid] = cur.notifs[vencedor.uid].filter(n => !(n.tipo==='craque_rodada' && n.partidaKey===partidaKey));
-  cur.notifs[vencedor.uid].push({
-    id: 'craque_'+partidaKey+'_'+Date.now(),
-    tipo: 'craque_rodada',
-    partidaKey,
-    media: vencedor.media,
-    votos: vencedor.count,
-    ts: Date.now()
+  const agora = Date.now();
+  (cur.members||[]).forEach(membro => {
+    const ehVencedor = membro.uid === vencedor.uid;
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    // Remove notif anterior desta partida para este membro
+    cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n => !(n.tipo==='craque_rodada' && n.partidaKey===partidaKey));
+    cur.notifs[membro.uid].push({
+      id: 'craque_'+partidaKey+'_'+membro.uid+'_'+agora,
+      tipo: 'craque_rodada',
+      partidaKey,
+      media: vencedor.media,
+      votos: vencedor.count,
+      vencedorUid: vencedor.uid,
+      vencedorNome,
+      ehVencedor,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
   });
-  if(cur.notifs[vencedor.uid].length > 20) cur.notifs[vencedor.uid].splice(0, cur.notifs[vencedor.uid].length - 20);
 };
 
 // Verifica se já votou nesta partida (usa ts da última partida salva)
@@ -3554,17 +3562,26 @@ window._calcularENotificarMVP = function(cur, mesKey){
     if(!cur.mvpMes) cur.mvpMes = {};
     cur.mvpMes[mesKey] = { uid: mvpAtual.uid, media: mvpAtual.media };
 
+    const mvpMembro = (cur.members||[]).find(m => m.uid === mvpAtual.uid);
+    const mvpNome = mvpMembro ? (mvpMembro.name||'Jogador') : 'Jogador';
     if(!cur.notifs) cur.notifs = {};
-    if(!cur.notifs[mvpAtual.uid]) cur.notifs[mvpAtual.uid] = [];
-    cur.notifs[mvpAtual.uid] = cur.notifs[mvpAtual.uid].filter(n => !(n.tipo==='mvp_mes' && n.mes===mesKey));
-    cur.notifs[mvpAtual.uid].push({
-      id: 'mvp_'+mesKey+'_'+Date.now(),
-      tipo: 'mvp_mes',
-      mes: mesKey,
-      media: mvpAtual.media,
-      ts: Date.now()
+    const agoraMVP = Date.now();
+    (cur.members||[]).forEach(membro => {
+      const ehMVP = membro.uid === mvpAtual.uid;
+      if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+      cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n => !(n.tipo==='mvp_mes' && n.mes===mesKey));
+      cur.notifs[membro.uid].push({
+        id: 'mvp_'+mesKey+'_'+membro.uid+'_'+agoraMVP,
+        tipo: 'mvp_mes',
+        mes: mesKey,
+        media: mvpAtual.media,
+        mvpUid: mvpAtual.uid,
+        mvpNome,
+        ehMVP,
+        ts: agoraMVP
+      });
+      if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
     });
-    if(cur.notifs[mvpAtual.uid].length > 20) cur.notifs[mvpAtual.uid].splice(0, cur.notifs[mvpAtual.uid].length - 20);
   }
   return medias;
 };
@@ -3720,19 +3737,25 @@ function _renderNotifPanel(){
       if(n.tipo==='mvp_mes'){
         const [ano, mes] = (n.mes||'').split('-');
         const mesNome = mes ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1] : '';
+        const textoMVP = n.ehMVP
+          ? `Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟`
+          : `<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! 🏆`;
         return`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🏆</div>
           <div class="notif-body">
-            <div class="notif-text">Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟</div>
+            <div class="notif-text">${textoMVP}</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
         </div>`;
       }
       if(n.tipo==='craque_rodada'){
+        const textoCraque = n.ehVencedor
+          ? `Você foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
+          : `<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! ⭐`;
         return`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">⭐</div>
           <div class="notif-body">
-            <div class="notif-text">Você foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥</div>
+            <div class="notif-text">${textoCraque}</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
         </div>`;
