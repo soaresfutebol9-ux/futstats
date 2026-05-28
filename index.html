@@ -529,18 +529,31 @@ body.light .ah::after{
 
 /* Painel de notificações */
 #notif-panel{
-  position:fixed;top:56px;right:12px;
-  width:min(340px, calc(100vw - 24px));
-  max-height:70vh;
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.97);
+  width:min(380px, calc(100vw - 32px));
+  max-height:75vh;
   background:var(--bg2);border:1px solid var(--bo2);
   border-radius:16px;
-  box-shadow:0 8px 40px rgba(0,0,0,.45);
+  box-shadow:0 16px 60px rgba(0,0,0,.65),0 2px 12px rgba(0,0,0,.4);
   z-index:1200;
   display:none;flex-direction:column;
   overflow:hidden;
-  animation:notifPanelIn .2s cubic-bezier(.34,1.56,.64,1);
+  animation:notifPanelIn .22s cubic-bezier(.34,1.56,.64,1) forwards;
 }
-@keyframes notifPanelIn{from{opacity:0;transform:translateY(-10px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* Overlay escuro atrás do painel */
+#notif-panel::before{
+  content:'';
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:-1;
+  pointer-events:none;
+}
+@keyframes notifPanelIn{
+  from{opacity:0;transform:translate(-50%,-50%) scale(.94)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
 #notif-panel.open{display:flex;}
 .notif-panel-header{
   display:flex;align-items:center;justify-content:space-between;
@@ -3087,38 +3100,99 @@ function _notifTimeAgo(ts){
   return`há ${d}d`;
 }
 
+function _getMyPersonalNotifs(){
+  // Notificações pessoais de desafio (solicitação e aceite)
+  if(!gd||!currentUser) return [];
+  const mine=(gd.notifs||{})[currentUser.uid]||[];
+  return mine.slice().sort((a,b)=>b.ts-a.ts);
+}
+
 function _renderNotifPanel(){
   const list=document.getElementById('notif-list');
   if(!list)return;
-  const feed=(gd?.feed||[]).slice().reverse(); // mais recentes primeiro
-  const lidas=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const personalNotifs=_getMyPersonalNotifs();
+  const feed=(gd?.feed||[]).slice().reverse();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
+  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
 
-  if(!feed.length){
+  let html='';
+
+  // Seção de notificações pessoais de desafio
+  if(personalNotifs.length){
+    html+='<div style=\"font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px\">Seus desafios</div>';
+    html+=personalNotifs.slice(0,10).map(n=>{
+      const unread=!lidasP.includes(n.id);
+      if(n.tipo==='desafio_solicitacao'){
+        // Encontra o desafio para mostrar botões
+        const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
+        const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
+        const btns=podeResponder
+          ? '<div style="display:flex;gap:6px;margin-top:8px">'
+            +'<button onclick="_dcAceitar(\x27'+n.desafioId+'\x27);document.getElementById(\x27notif-panel\x27).classList.remove(\x27open\x27)" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
+            +'<button onclick="_dcCancelar(\x27'+n.desafioId+'\x27)" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
+            +'</div>'
+          : (d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
+        return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="notif-icon">⚔️</div>
+            <div class="notif-body">
+              <div class="notif-text"><strong>${n.de}</strong> te desafiou!</div>
+              <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+            </div>
+          </div>
+          ${btns}
+        </div>`;
+      }
+      if(n.tipo==='desafio_aceito'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🎉</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio! O jogo começa agora.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      }
+      return'';
+    }).join('');
+    if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
+  }
+
+  // Feed geral do grupo
+  if(!personalNotifs.length&&!feed.length){
     list.innerHTML='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
     return;
   }
 
-  list.innerHTML=feed.slice(0,30).map(ev=>{
-    const unread=!lidas.includes(ev.id);
-    const icon=ev.tipo==='partida'?'⚽':ev.tipo==='conquista'?'🏆':ev.tipo==='meta'?'🎯':ev.tipo==='membro'?'👋':'📌';
-    return`<div class="notif-item${unread?' unread':''}">
-      <div class="notif-icon">${icon}</div>
-      <div class="notif-body">
-        <div class="notif-text">${ev.texto}</div>
-        <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
-      </div>
-    </div>`;
-  }).join('');
+  if(feed.length){
+    html+='<div style=\"font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px\">Atividade do grupo</div>';
+    html+=feed.slice(0,25).map(ev=>{
+      const unread=!lidasF.includes(ev.id);
+      const icon=ev.tipo==='partida'?'⚽':ev.tipo==='conquista'?'🏆':ev.tipo==='meta'?'🎯':ev.tipo==='membro'?'👋':'📌';
+      return`<div class="notif-item${unread?' unread':''}">
+        <div class="notif-icon">${icon}</div>
+        <div class="notif-body">
+          <div class="notif-text">${ev.texto}</div>
+          <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  list.innerHTML=html;
 }
 
 function _updateNotifBadge(){
   const badge=document.getElementById('notif-badge');
   if(!badge)return;
+  const personalNotifs=_getMyPersonalNotifs();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
   const feed=gd?.feed||[];
-  const lidas=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
-  const naoLidas=feed.filter(ev=>!lidas.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
-  if(naoLidas>0){
-    badge.textContent=naoLidas>9?'9+':naoLidas;
+  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const naoLidasP=personalNotifs.filter(n=>!lidasP.includes(n.id)).length;
+  const naoLidasF=feed.filter(ev=>!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
+  const total=naoLidasP+naoLidasF;
+  if(total>0){
+    badge.textContent=total>9?'9+':total;
     badge.style.display='flex';
   } else {
     badge.style.display='none';
@@ -3129,7 +3203,6 @@ window.toggleNotifPanel=()=>{
   const panel=document.getElementById('notif-panel');
   if(!panel)return;
   const isOpen=panel.classList.contains('open');
-  // Fecha ao clicar fora
   if(isOpen){ panel.classList.remove('open'); return; }
   _renderNotifPanel();
   panel.classList.add('open');
@@ -3145,9 +3218,12 @@ document.addEventListener('click',e=>{
 });
 
 window.marcarTodasLidas=()=>{
+  const personalNotifs=_getMyPersonalNotifs();
+  const idsP=personalNotifs.map(n=>n.id);
+  localStorage.setItem('notif_pers_lidas_'+groupId, JSON.stringify(idsP));
   const feed=gd?.feed||[];
-  const ids=feed.map(ev=>ev.id);
-  localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(ids));
+  const idsF=feed.map(ev=>ev.id);
+  localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(idsF));
   _updateNotifBadge();
   _renderNotifPanel();
 };
@@ -3488,7 +3564,7 @@ function _dcGetScore(uid, challenge){
 function _dcGetForUid(uid){
   if(!gd) return [];
   return (gd.desafios||[]).filter(d =>
-    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado')
+    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado' || d.status === 'pendente')
   );
 }
 
@@ -3496,11 +3572,44 @@ function _dcCardHTML(challenge, perspectiveUid){
   const mbA = (gd.members||[]).find(m => m.uid === challenge.uidA);
   const mbB = (gd.members||[]).find(m => m.uid === challenge.uidB);
   if(!mbA || !mbB) return '';
+  const isPending = challenge.status === 'pendente';
+  const tipoLabel = challenge.tipo==='gols'?'\u26bd Gols':challenge.tipo==='assist'?'\ud83d\udc5f Assist.':'\ud83c\udfc5 G+A';
+
+  // Card de desafio PENDENTE
+  if(isPending){
+    const euSouDesafiado = challenge.uidB === currentUser?.uid;
+    const euSouDesafiante = challenge.uidA === currentUser?.uid;
+    const aceitarBtn = euSouDesafiado
+      ? '<button onclick=\"_dcAceitar(\\x27'+challenge.id+'\\x27)\" style=\"flex:1;padding:8px;border-radius:10px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:700;cursor:pointer\">✅ Aceitar</button>'
+      : '';
+    const recusarBtn = (euSouDesafiado || euSouDesafiante)
+      ? '<button onclick=\"_dcCancelar(\\x27'+challenge.id+'\\x27)\" style=\"flex:1;padding:8px;border-radius:10px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:600;cursor:pointer\">'+(euSouDesafiado?'❌ Recusar':'🚫 Cancelar')+'</button>'
+      : '';
+    const aguardandoLabel = euSouDesafiante ? '<span style=\"font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3)\">⏳ Aguardando aceite…</span>' : '';
+    return '<div class=\"desafio-card\" style=\"border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.04)\">'
+      +'<div class=\"desafio-card-title\"><div class=\"desafio-live-dot\" style=\"background:#FFD166;box-shadow:0 0 6px #FFD166\"></div>Desafio pendente</div>'
+      +'<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:10px\">'
+      +avatarHTML(mbA.name,32,mbA.uid)
+      +'<div style=\"flex:1;min-width:0\"><div style=\"font-family:\'Freshman\',sans-serif;font-size:12px;color:var(--tx)\">'+(euSouDesafiante?'Você':mbA.name)+'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:9px;color:var(--tx3)\">desafiante</div></div>'
+      +'<div style=\"font-family:\'VarsityTeam\',serif;font-size:16px;color:rgba(255,90,122,.6)\">VS</div>'
+      +'<div style=\"flex:1;min-width:0;text-align:right\">'
+      +'<div style=\"font-family:\'Freshman\',sans-serif;font-size:12px;color:var(--tx)\">'+(euSouDesafiado?'Você':mbB.name)+'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:9px;color:var(--tx3)\">desafiado</div></div>'
+      +avatarHTML(mbB.name,32,mbB.uid)
+      +'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:8px\">'
+      +'Stat: <span style=\"color:rgba(255,200,0,.8)\">'+(challenge.tipo==='gols'?'⚽ Gols':challenge.tipo==='assist'?'👟 Assistências':'🏅 G+A')+'</span> · 7 dias</div>'
+      +(aguardandoLabel?'<div style=\"margin-bottom:8px\">'+aguardandoLabel+'</div>':'')
+      +(aceitarBtn||recusarBtn?'<div style=\"display:flex;gap:8px;margin-top:4px\">'+aceitarBtn+recusarBtn+'</div>':'')
+      +'</div>';
+  }
+
+  // Card de desafio ATIVO / ENCERRADO
   const scoreA = _dcGetScore(challenge.uidA, challenge);
   const scoreB = _dcGetScore(challenge.uidB, challenge);
   const time   = _dcTimeLeft(challenge.endTs);
   const ended  = time.ended || challenge.status === 'encerrado';
-  const tipoLabel = challenge.tipo==='gols'?'\u26bd Gols':challenge.tipo==='assist'?'\ud83d\udc5f Assist.':'\ud83c\udfc5 G+A';
   const clsA = scoreA > scoreB ? 'winning' : scoreA < scoreB ? 'losing' : 'tied';
   const clsB = scoreB > scoreA ? 'winning' : scoreB < scoreA ? 'losing' : 'tied';
   let winnerUID = null;
@@ -3537,12 +3646,12 @@ function _dcRenderCriarBody(){
   const el = document.getElementById('desafio-body');
   if(!el || !gd) return;
   const mbs = (gd.members||[]).filter(m => m.uid !== currentUser?.uid);
-  const ativos = _dcGetForUid(currentUser?.uid).filter(d => d.status === 'ativo');
+  const ativos = _dcGetForUid(currentUser?.uid).filter(d => d.status === 'ativo' || d.status === 'pendente');
   const euJaEmDesafio = ativos.length > 0;
 
   // Conjunto de UIDs que já estão em desafio ativo
   const uidsEmDesafio = new Set();
-  (gd.desafios||[]).filter(d => d.status==='ativo').forEach(d => {
+  (gd.desafios||[]).filter(d => d.status==='ativo'||d.status==='pendente').forEach(d => {
     uidsEmDesafio.add(d.uidA);
     uidsEmDesafio.add(d.uidB);
   });
@@ -3590,12 +3699,12 @@ window._dcConfirmar = async function(){
   if(!currentUser||!groupId||!gd) return;
   // Verifica se o usuário atual já tem desafio ativo
   const euJaAtivo = (gd.desafios||[]).some(d =>
-    d.status==='ativo' && (d.uidA===currentUser.uid || d.uidB===currentUser.uid)
+    (d.status==='ativo'||d.status==='pendente') && (d.uidA===currentUser.uid || d.uidB===currentUser.uid)
   );
   if(euJaAtivo){ if(errEl){errEl.textContent='Você já está em um desafio ativo. Cancele-o antes de criar outro.';errEl.style.display='block';} return; }
   // Verifica se o rival já tem desafio ativo
   const rivalJaAtivo = (gd.desafios||[]).some(d =>
-    d.status==='ativo' && (d.uidA===_dc.rivalUid || d.uidB===_dc.rivalUid)
+    (d.status==='ativo'||d.status==='pendente') && (d.uidA===_dc.rivalUid || d.uidB===_dc.rivalUid)
   );
   if(rivalJaAtivo){ if(errEl){errEl.textContent='Esse jogador já está em outro desafio ativo.';errEl.style.display='block';} return; }
   const rival = (gd.members||[]).find(m => m.uid===_dc.rivalUid);
@@ -3604,8 +3713,8 @@ window._dcConfirmar = async function(){
     id: now+'_'+Math.random().toString(36).slice(2,6),
     uidA: currentUser.uid, nameA: myProfile.displayName,
     uidB: _dc.rivalUid,    nameB: rival?.name||'?',
-    tipo: _dc.tipo, startTs: now, endTs: now+7*24*60*60*1000,
-    status: 'ativo', createdAt: now,
+    tipo: _dc.tipo, startTs: null, endTs: null,
+    status: 'pendente', createdAt: now,
   };
   try{
     const snap = await getDoc(doc(db,'groups',groupId));
@@ -3613,15 +3722,51 @@ window._dcConfirmar = async function(){
     cur.desafios = cur.desafios||[];
     if(cur.desafios.length>=50) cur.desafios.splice(0,cur.desafios.length-49);
     cur.desafios.push(desafio);
+    // Notificação pessoal para o desafiado
+    cur.notifs = cur.notifs||{};
+    cur.notifs[_dc.rivalUid] = cur.notifs[_dc.rivalUid]||[];
+    cur.notifs[_dc.rivalUid].push({
+      id: now+'n', tipo:'desafio_solicitacao', desafioId: desafio.id,
+      de: myProfile.displayName, deUid: currentUser.uid, ts: now, lida: false,
+    });
     await setDoc(doc(db,'groups',groupId),cur);
     gd = cur;
-    const tipoLabel = desafio.tipo==='gols'?'gols':desafio.tipo==='assist'?'assist\u00eancias':'G+A';
-    await _publishFeed('nota','\u2694\ufe0f <strong>'+myProfile.displayName+'</strong> desafiou <strong>'+(rival?.name||'?')+'</strong>: quem faz mais '+tipoLabel+' em 7 dias?');
     fecharModalDesafio();
     renderRanking();
-    _showSimpleToast('\u2694\ufe0f Desafio lan\u00e7ado para '+(rival?.name||'?')+'!');
+    _updateNotifBadge();
+    _showSimpleToast('⚔️ Solicitação enviada para '+(rival?.name||'?')+'! Aguardando aceite.');
   }catch(e){ if(errEl){errEl.textContent='Erro ao criar desafio.';errEl.style.display='block';} }
 };
+
+window._dcAceitar = async function(id){
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const idx=(cur.desafios||[]).findIndex(d=>d.id===id);
+    if(idx===-1) return;
+    const d=cur.desafios[idx];
+    const now=Date.now();
+    d.status='ativo';
+    d.startTs=now;
+    d.endTs=now+7*24*60*60*1000;
+    // Notificação para o desafiante (uidA)
+    cur.notifs=cur.notifs||{};
+    cur.notifs[d.uidA]=cur.notifs[d.uidA]||[];
+    cur.notifs[d.uidA].push({
+      id:now+'a', tipo:'desafio_aceito', desafioId:id,
+      de:myProfile.displayName, deUid:currentUser.uid, ts:now, lida:false,
+    });
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
+    await _publishFeed('nota','⚔️ <strong>'+myProfile.displayName+'</strong> aceitou o desafio de <strong>'+d.nameA+'</strong>! Briga por mais '+tipoLabel+' começa agora.');
+    renderRanking();
+    _updateNotifBadge();
+    if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')) _buildPlayerProfile(_mpUid);
+    _showSimpleToast('⚔️ Desafio aceito! Que comecem os jogos!');
+  }catch(e){ console.error(e); }
+};
+
 
 window._dcCancelar = async function(id){
   if(!confirm('Cancelar este desafio?')) return;
