@@ -2086,7 +2086,7 @@ body::before{
       <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
 
       <!-- ══ FEED DE ATIVIDADE ══ -->
-      <div id="feed-card" style="margin-top:1.25rem;display:none">
+      <div id="feed-card" style="margin-top:1.25rem;display:none;visibility:hidden;height:0;overflow:hidden;margin:0">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:7px">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 6px var(--g);animation:feed-pulse 2s ease-in-out infinite"></div>
@@ -3069,6 +3069,37 @@ function renderPerfilPanelStats(){
   const todasPartidas = gd.matches||[];
   const ultimaPartida = todasPartidas.length ? todasPartidas[todasPartidas.length-1] : null;
   const ultimaCraqueKey = ultimaPartida ? _craqueKey(ultimaPartida.ts) : null;
+
+  // Auto-encerra votação expirada que ainda não foi processada
+  if(ultimaCraqueKey && window._craqueVotacaoEncerrada && window._craqueTempoRestante){
+    const _jaEncerrada = _craqueVotacaoEncerrada(gd, ultimaCraqueKey);
+    const _prazo = _craqueTempoRestante(ultimaCraqueKey);
+    const _jaPublicado = gd.craqueFeedPublicado && gd.craqueFeedPublicado[ultimaCraqueKey];
+    if(_jaEncerrada && !_jaPublicado && Object.keys((gd.craqueVotos||{})[ultimaCraqueKey]||{}).length > 0){
+      // Processa em background sem bloquear a UI
+      (async () => {
+        try {
+          const _snap = await getDoc(doc(db,'groups',groupId));
+          const _cur = _snap.data();
+          const _mesKey = _cur.mesAtivo || _mesAtual();
+          _notificarCraqueDaRodada(_cur, ultimaCraqueKey);
+          _calcularENotificarMVP(_cur, _mesKey);
+          const _cr = _getCraqueVencedor(_cur, ultimaCraqueKey);
+          if(_cr){
+            const _mb = (_cur.members||[]).find(m=>m.uid===_cr.uid);
+            if(_mb){
+              if(!_cur.craqueFeedPublicado) _cur.craqueFeedPublicado = {};
+              _cur.craqueFeedPublicado[ultimaCraqueKey] = true;
+              await setDoc(doc(db,'groups',groupId), _cur);
+              await _publishFeed('craque', `⭐ <strong>${_mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${_cr.media}!`);
+              gd = _cur;
+            }
+          }
+        } catch(e){ console.warn('auto-close craque:', e); }
+      })();
+    }
+  }
+
   const craqueAtual = ultimaCraqueKey && window._getCraqueVencedor ? _getCraqueVencedor(gd, ultimaCraqueKey) : null;
   const craqueMembro = craqueAtual ? (gd.members||[]).find(m=>m.uid===craqueAtual.uid) : null;
   const euSouCraque = craqueAtual && craqueAtual.uid === currentUser.uid;
@@ -3091,13 +3122,45 @@ function renderPerfilPanelStats(){
 
     // ── Craque da Rodada ──
     if(ultimaPartida){
+      const _votacaoEncerrada = window._craqueVotacaoEncerrada ? _craqueVotacaoEncerrada(gd, ultimaCraqueKey) : false;
+      const _msRestante = window._craqueTempoRestante ? _craqueTempoRestante(ultimaCraqueKey) : 0;
+      const _prazoExpirou = _msRestante === 0;
+      const _totalVotos = Object.keys((gd.craqueVotos||{})[ultimaCraqueKey]||{}).length;
+      const _totalMembros = (gd.members||[]).length;
+
+      // Formata tempo restante
+      let _tempoLabel = '';
+      if(!_prazoExpirou && !jaVoteiCraque){
+        const _horas = Math.floor(_msRestante / 3600000);
+        const _mins = Math.floor((_msRestante % 3600000) / 60000);
+        _tempoLabel = _horas > 0 ? `${_horas}h ${_mins}min restantes` : `${_mins}min restantes`;
+      }
+
+      // Botão direito do header
+      let _headerRight = '';
+      if(jaVoteiCraque){
+        _headerRight = `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">✓ Você votou</div>`;
+      } else if(_prazoExpirou){
+        _headerRight = `<div style="font-size:10px;font-family:'DM Mono',monospace;color:#FF5A7A">⏰ Prazo encerrado</div>`;
+      } else {
+        _headerRight = `<div style="display:flex;align-items:center;gap:6px">
+          <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--tx3)">${_tempoLabel}</div>
+          <button onclick="abrirModalMVP(${ultimaPartida.ts})" style="background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Mono',monospace">Votar</button>
+        </div>`;
+      }
+
+      // Progresso de votos (só enquanto aberta)
+      let _progressoHtml = '';
+      if(!_votacaoEncerrada){
+        _progressoHtml = `<div style="margin-bottom:8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">${_totalVotos} de ${_totalMembros} vote${_totalMembros!==1?'s':''}</div>`;
+      }
+
       mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.25);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">⭐ Craque da Rodada</div>
-          ${jaVoteiCraque
-            ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">✓ Você votou</div>`
-            : `<button onclick="abrirModalMVP(${ultimaPartida.ts})" style="background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Mono',monospace">Votar</button>`}
+          ${_headerRight}
         </div>
+        ${_progressoHtml}
         ${craqueMembro
           ? `<div style="display:flex;align-items:center;gap:10px">
               <div style="font-size:24px">${euSouCraque?'🌟':'⭐'}</div>
@@ -3106,7 +3169,7 @@ function renderPerfilPanelStats(){
                 <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${craqueAtual.media} · ${craqueAtual.votos} voto${craqueAtual.votos!==1?'s':''}</div>
               </div>
             </div>`
-          : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Ainda sem votos nesta rodada.</div>`}
+          : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">${_votacaoEncerrada ? 'Nenhum voto registrado.' : 'Aguardando votos...'}</div>`}
         ${euSouCraque ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">🌟 Você é o Craque desta rodada!</div>`:''}
       </div>`;
     }
@@ -3485,12 +3548,15 @@ window.salvarVotosMVP = async function(){
     cur.mvpVotos[mesKey][mvpChaveVotante] = {};
     entradas.forEach(([uid, nota]) => { cur.mvpVotos[mesKey][mvpChaveVotante][uid] = nota; });
 
-    // Verifica se TODOS os membros votaram nesta rodada
-    const totalMembros = (cur.members||[]).length;
-    const totalVotos = Object.keys(cur.craqueVotos[partidaKey]||{}).length;
-    const todosVotaram = totalVotos >= totalMembros;
+    // Verifica se a votação está encerrada (todos votaram OU prazo de 24h expirou)
+    const _tsPartida = parseInt(partidaKey.replace('p_',''));
+    const _prazoExpirou = (Date.now() - _tsPartida) >= 24 * 60 * 60 * 1000;
+    const _votosObj = cur.craqueVotos[partidaKey]||{};
+    const _totalVotos = Object.keys(_votosObj).length;
+    const _totalMembros = (cur.members||[]).length;
+    const _todosVotaram = _totalVotos >= _totalMembros || _prazoExpirou;
 
-    if(todosVotaram){
+    if(_todosVotaram){
       // Notifica craque da rodada para todos
       _notificarCraqueDaRodada(cur, partidaKey);
       // Recalcula e notifica MVP do mês
@@ -3504,8 +3570,8 @@ window.salvarVotosMVP = async function(){
     if(okEl) okEl.style.display='block';
     setTimeout(fecharModalMVP, 1400);
 
-    // Publica no feed o craque da rodada somente quando todos votaram e ainda não foi publicado
-    if(todosVotaram && !(cur.craqueFeedPublicado && cur.craqueFeedPublicado[partidaKey])){
+    // Publica no feed quando votação encerrada e ainda não foi publicado
+    if(_todosVotaram && !(cur.craqueFeedPublicado && cur.craqueFeedPublicado[partidaKey])){
       const craqueRodada = _getCraqueVencedor(cur, partidaKey);
       if(craqueRodada){
         const mb = (cur.members||[]).find(m=>m.uid===craqueRodada.uid);
@@ -3519,6 +3585,22 @@ window.salvarVotosMVP = async function(){
     }
 
   } catch(e){ console.warn('craque save:',e); fecharModalMVP(); }
+};
+
+// Verifica se votação desta rodada está encerrada (todos votaram OU 24h desde a partida)
+window._craqueVotacaoEncerrada = function(cur, partidaKey){
+  const tsPartida = parseInt(partidaKey.replace('p_',''));
+  const prazoExpirou = (Date.now() - tsPartida) >= 24 * 60 * 60 * 1000;
+  if(prazoExpirou) return true;
+  const totalVotos = Object.keys((cur.craqueVotos||{})[partidaKey]||{}).length;
+  return totalVotos >= (cur.members||[]).length;
+};
+
+// Retorna ms restantes para encerrar votação (0 se já encerrada)
+window._craqueTempoRestante = function(partidaKey){
+  const tsPartida = parseInt(partidaKey.replace('p_',''));
+  const restante = (tsPartida + 24 * 60 * 60 * 1000) - Date.now();
+  return Math.max(0, restante);
 };
 
 // Calcula o vencedor do Craque da Rodada de uma partida
@@ -3806,25 +3888,12 @@ function _renderNotifPanel(){
   }
 
   // Feed geral do grupo
-  if(!personalNotifs.length&&!feed.length){
+  if(!personalNotifs.length){
     list.innerHTML='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
     return;
   }
 
-  if(feed.length){
-    html+='<div style=\"font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px\">Atividade do grupo</div>';
-    html+=feed.slice(0,25).map(ev=>{
-      const unread=!lidasF.includes(ev.id);
-      const icon=ev.tipo==='partida'?'⚽':ev.tipo==='conquista'?'🏆':ev.tipo==='meta'?'🎯':ev.tipo==='membro'?'👋':ev.tipo==='mvp'?'⭐':'📌';
-      return`<div class="notif-item${unread?' unread':''}">
-        <div class="notif-icon">${icon}</div>
-        <div class="notif-body">
-          <div class="notif-text">${ev.texto}</div>
-          <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
+  // Feed de atividade do grupo removido — notificações pessoais cobrem tudo
 
   list.innerHTML=html;
 }
@@ -4132,6 +4201,8 @@ function _notifTimeAgoFeed(ts){
 }
 
 function renderFeedCard(){
+  // Feed de atividade do grupo desativado
+  return;
   const card = document.getElementById('feed-card');
   const itemsEl = document.getElementById('feed-items');
   if(!card || !itemsEl || !gd) return;
@@ -6645,7 +6716,7 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL DESAFIO DIRETO ══ -->
-<div id="modal-desafio">
+<div id="modal-desafio" style="display:none">
   <div class="desafio-inner">
     <div class="desafio-header">
       <div class="desafio-title">⚔️ Desafio Direto</div>
@@ -6656,7 +6727,7 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- Welcome card -->
-<div id="wc-overlay">
+<div id="wc-overlay" style="display:none">
   <div id="wc-box">
     <div id="wc-title">Bem-vindo de volta</div>
     <div id="wc-name"></div>
@@ -6672,6 +6743,7 @@ window.irParaRankingGA=()=>{
     const name=playerName||'Jogador';
     document.getElementById('wc-name').textContent=name+'!';
     const overlay=document.getElementById('wc-overlay');
+    overlay.style.display='flex';
     overlay.classList.add('wc-show');
     let s=5;
     document.getElementById('wc-countdown').textContent='some em '+s+'s';
@@ -6686,7 +6758,9 @@ window.irParaRankingGA=()=>{
     wcDismiss();
   };
   function wcDismiss(){
-    document.getElementById('wc-overlay').classList.remove('wc-show');
+    const _wco=document.getElementById('wc-overlay');
+    _wco.classList.remove('wc-show');
+    setTimeout(()=>{ _wco.style.display='none'; }, 300);
     const tabRank=document.querySelector('.tab[data-id="tr"]');
     if(tabRank)tabRank.click();
     // Sinaliza wc fechado e dispara contadores pendentes
@@ -8671,7 +8745,7 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
 <div id="notif-overlay" onclick="toggleNotifPanel()"></div>
 <div id="notif-panel">
   <div class="notif-panel-header">
-    <div class="notif-panel-title">🔔 Atividade do grupo</div>
+    <div class="notif-panel-title">🔔 Notificações</div>
     <button class="notif-mark-all" onclick="marcarTodasLidas()">Marcar tudo como lido</button>
   </div>
   <div class="notif-list" id="notif-list">
