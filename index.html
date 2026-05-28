@@ -1981,18 +1981,6 @@ body::before{
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-badge" id="notif-badge"></div>
     </div>
-    <!-- Overlay de notificações -->
-    <div id="notif-overlay" onclick="toggleNotifPanel()"></div>
-    <!-- Painel de notificações -->
-    <div id="notif-panel">
-      <div class="notif-panel-header">
-        <div class="notif-panel-title">🔔 Atividade do grupo</div>
-        <button class="notif-mark-all" onclick="marcarTodasLidas()">Marcar tudo como lido</button>
-      </div>
-      <div class="notif-list" id="notif-list">
-        <div class="notif-empty">Nenhuma atividade ainda.</div>
-      </div>
-    </div>
     <!-- Avatar perfil (direita) -->
     <div class="ah-right" onclick="openPerfilPanel()">
       <div class="ah-name" id="ah-uname">—</div>
@@ -8090,5 +8078,16 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
 
 })();
 </script>
+<!-- Overlay e Painel de notificações — fora do #sa para escapar do overflow:hidden -->
+<div id="notif-overlay" onclick="toggleNotifPanel()"></div>
+<div id="notif-panel">
+  <div class="notif-panel-header">
+    <div class="notif-panel-title">🔔 Atividade do grupo</div>
+    <button class="notif-mark-all" onclick="marcarTodasLidas()">Marcar tudo como lido</button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div class="notif-empty">Nenhuma atividade ainda.</div>
+  </div>
+</div>
 </body>
 </html>
