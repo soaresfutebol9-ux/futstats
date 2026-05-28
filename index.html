@@ -1617,7 +1617,7 @@ body.conquistas-fab-visible .conquistas-fab{display:flex;}
 .cq-card.bloqueada .cq-card-icon{filter:grayscale(1) opacity(.4)}
 .cq-card-nome{font-family:'VarsityTeam',serif;font-size:13px;letter-spacing:.3px;color:var(--tx);line-height:1.2}
 .cq-card.bloqueada .cq-card-nome{color:var(--tx3)}
-.cq-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.03em;line-height:1.3}
+.cq-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:#403f3f;letter-spacing:.03em;line-height:1.3}
 .cq-card-data{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.6);margin-top:2px}
 .cq-nova-tag{
   position:absolute;top:6px;right:6px;
@@ -6358,18 +6358,19 @@ const CONQUISTAS = [
   { id:'ultimo_acum_10', cat:'💀 Último Lugar Acumulativo', nome:'Morador do Último Lugar',desc:'10 últimos acumulados', icon:'🕳️',tipo:'ultimo_acum', val:10 },
   { id:'ultimo_acum_20', cat:'💀 Último Lugar Acumulativo', nome:'Patrimônio da Derrota', desc:'20 últimos acumulados', icon:'🪦', tipo:'ultimo_acum', val:20 },
   // ── GOLS ──────────────────────────────────────────────────
-  { id:'gols_15', cat:'⚽ Gols', nome:'Yuri Alberto',  desc:'15 gols em um mês', icon:'🇧🇷', tipo:'gols_mes', val:15 },
-  { id:'gols_20', cat:'⚽ Gols', nome:'Fred',            desc:'20 gols em um mês', icon:'💪', tipo:'gols_mes', val:20 },
-  { id:'gols_25', cat:'⚽ Gols', nome:'Karim Benzema',   desc:'25 gols em um mês', icon:'🥇', tipo:'gols_mes', val:25 },
-  { id:'gols_30', cat:'⚽ Gols', nome:'Luis Suárez',     desc:'30 gols em um mês', icon:'🦷', tipo:'gols_mes', val:30 },
-  { id:'gols_35', cat:'⚽ Gols', nome:'Lewandowski',     desc:'35 gols em um mês', icon:'🔥', tipo:'gols_mes', val:35 },
-  { id:'gols_40', cat:'⚽ Gols', nome:'Harry Kane',      desc:'40 gols em um mês', icon:'👑', tipo:'gols_mes', val:40 },
+  { id:'gols_10', cat:'⚽ Gols', nome:'Aprendiz',        desc:'10 gols em um mês', icon:'😁', tipo:'gols_mes', val:10 },
+  { id:'gols_15', cat:'⚽ Gols', nome:'Juvenil',  desc:'15 gols em um mês', icon:'🇧🇷', tipo:'gols_mes', val:15 },
+  { id:'gols_20', cat:'⚽ Gols', nome:'Artilheiro',    desc:'20 gols em um mês', icon:'⚽', tipo:'gols_mes', val:20 },
+  { id:'gols_25', cat:'⚽ Gols', nome:'Goleador',      desc:'25 gols em um mês', icon:'🎯', tipo:'gols_mes', val:25 },
+  { id:'gols_30', cat:'⚽ Gols', nome:'Sniper',        desc:'30 gols em um mês', icon:'💥', tipo:'gols_mes', val:30 },
+  { id:'gols_35', cat:'⚽ Gols', nome:'Máquina de Gols', desc:'35 gols em um mês', icon:'🤖', tipo:'gols_mes', val:35 },
+  { id:'gols_40', cat:'⚽ Gols', nome:'Predador',      desc:'40 gols em um mês', icon:'🦅', tipo:'gols_mes', val:40 },
   // ── ASSISTÊNCIAS ────────────────────────────────────────────
-  { id:'assist_10', cat:'👟 Assistências', nome:'Olise',                  desc:'10 assistências em um mês', icon:'🪄', tipo:'assist_mes', val:10 },
-  { id:'assist_15', cat:'👟 Assistências', nome:'Iniesta',                desc:'15 assistências em um mês', icon:'🎩', tipo:'assist_mes', val:15 },
-  { id:'assist_20', cat:'👟 Assistências', nome:'Yamal',                  desc:'20 assistências em um mês', icon:'⚡', tipo:'assist_mes', val:20 },
-  { id:'assist_25', cat:'👟 Assistências', nome:'Kevin De Bruyne',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
-  { id:'assist_30', cat:'👟 Assistências', nome:'MESSIII',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
+  { id:'assist_10', cat:'👟 Assistências', nome:'Garçom',                  desc:'10 assistências em um mês', icon:'🪄', tipo:'assist_mes', val:10 },
+  { id:'assist_15', cat:'👟 Assistências', nome:'Maestro',                desc:'15 assistências em um mês', icon:'🎩', tipo:'assist_mes', val:15 },
+  { id:'assist_20', cat:'👟 Assistências', nome:'Visão de Jogo',                  desc:'20 assistências em um mês', icon:'⚡', tipo:'assist_mes', val:20 },
+  { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
+  { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
   // ── G+A MÊS ──────────────────────────────────────────────
   { id:'ga_30',  cat:'⚡ G+A no Mês', nome:'Participativo', desc:'30 G+A em um mês', icon:'🌱', tipo:'ga_mes', val:30 },
   { id:'ga_35',  cat:'⚡ G+A no Mês', nome:'Decisivo',      desc:'35 G+A em um mês', icon:'🎲', tipo:'ga_mes', val:35 },
@@ -6378,6 +6379,20 @@ const CONQUISTAS = [
   { id:'ga_50',  cat:'⚡ G+A no Mês', nome:'Craque',        desc:'50 G+A em um mês', icon:'🌟', tipo:'ga_mes', val:50 },
   { id:'ga_55',  cat:'⚡ G+A no Mês', nome:'Fenômeno',      desc:'55 G+A em um mês', icon:'🚀', tipo:'ga_mes', val:55 },
   { id:'ga_60',  cat:'⚡ G+A no Mês', nome:'Extraterrestre',desc:'60 G+A em um mês', icon:'🛸', tipo:'ga_mes', val:60 },
+  // ── GOLS NO ANO ─────────────────────────────────────────────
+  { id:'gols_ano_150', cat:'📅 Gols no Ano', nome:'Cavani',         desc:'150 gols em um ano', icon:'🇺🇾', tipo:'gols_ano', val:150 },
+  { id:'gols_ano_200', cat:'📅 Gols no Ano', nome:'Kylian Mbappé',  desc:'200 gols em um ano', icon:'⚡', tipo:'gols_ano', val:200 },
+  { id:'gols_ano_250', cat:'📅 Gols no Ano', nome:'Harry Kane',     desc:'250 gols em um ano', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tipo:'gols_ano', val:250 },
+  { id:'gols_ano_300', cat:'📅 Gols no Ano', nome:'Karim Benzema',  desc:'300 gols em um ano', icon:'🥇', tipo:'gols_ano', val:300 },
+  // ── GOLS GERAL ──────────────────────────────────────────────
+  { id:'gols_total_300',  cat:'💀 Gols Geral', nome:'Zlatan Ibrahimović', desc:'300 gols no total', icon:'🦁', tipo:'gols_total', val:300  },
+  { id:'gols_total_350',  cat:'💀 Gols Geral', nome:'Luis Suárez',        desc:'350 gols no total', icon:'🦷', tipo:'gols_total', val:350  },
+  { id:'gols_total_400',  cat:'💀 Gols Geral', nome:'Gerd Müller',        desc:'400 gols no total', icon:'🇩🇪', tipo:'gols_total', val:400  },
+  { id:'gols_total_500',  cat:'💀 Gols Geral', nome:'Lewandowski',        desc:'500 gols no total', icon:'🔥', tipo:'gols_total', val:500  },
+  { id:'gols_total_600',  cat:'💀 Gols Geral', nome:'Romário',            desc:'600 gols no total', icon:'🇧🇷', tipo:'gols_total', val:600  },
+  { id:'gols_total_700',  cat:'💀 Gols Geral', nome:'Pelé',               desc:'700 gols no total', icon:'👑', tipo:'gols_total', val:700  },
+  { id:'gols_total_800',  cat:'💀 Gols Geral', nome:'Messi',              desc:'800 gols no total', icon:'🐐', tipo:'gols_total', val:800  },
+  { id:'gols_total_1000', cat:'💀 Gols Geral', nome:'CR7',                desc:'1000 gols no total',icon:'🚀', tipo:'gols_total', val:1000 },
 ];
 
 // ── Cálculo de conquistas para um jogador ──────────────────────
@@ -6470,6 +6485,20 @@ function calcConquistas(uid, gd){
     return months.filter(m=>{ const v=campo==='ga'?m.gols+m.assist:m[campo]; return v>=threshold; }).length;
   }
 
+  // --- Gols por ano e gols total ---
+  const anoAtualKey = new Date().getFullYear().toString();
+  // gols por ano: agrupa todos os meses por ano e soma gols do jogador
+  const golsPorAno = {};
+  allMonths.forEach(m=>{
+    const ano = (m.key||'').substring(0,4);
+    if(!ano) return;
+    golsPorAno[ano] = (golsPorAno[ano]||0) + m.gols;
+  });
+  const golsAnoAtual  = golsPorAno[anoAtualKey] || 0;
+  const golsAnoMelhor = Math.max(0, ...Object.values(golsPorAno));
+  // gols total: soma de todos os meses
+  const golsTotal = allMonths.reduce((s,m)=>s+m.gols, 0);
+
   // --- Avaliação ---
   const unlocked = {};
   CONQUISTAS.forEach(cq=>{
@@ -6506,6 +6535,15 @@ function calcConquistas(uid, gd){
       count = countMesThreshold(allMonths, 'ga', cq.val);
       achieved = count > 0;
       progress = Math.min(totalGAMelhorMes, cq.val);
+    } else if(cq.tipo==='gols_ano'){
+      // conta quantos anos o jogador atingiu o threshold
+      count = Object.values(golsPorAno).filter(v=>v>=cq.val).length;
+      achieved = count > 0;
+      progress = Math.min(golsAnoMelhor, cq.val);
+    } else if(cq.tipo==='gols_total'){
+      count = countAcumThreshold(golsTotal, cq.val);
+      achieved = count > 0;
+      progress = Math.min(golsTotal, cq.val);
     }
     unlocked[cq.id] = { achieved, progress, max, count };
   });
