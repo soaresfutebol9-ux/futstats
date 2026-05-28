@@ -4084,7 +4084,6 @@ window.salvarMeta=async()=>{
   const ai=$('meta-assist-input');
   const alvoGols  =Math.max(0,Math.min(999,parseInt(gi?.value)||0));
   const alvoAssist=Math.max(0,Math.min(999,parseInt(ai?.value)||0));
-  const mesKey=gd?.mesAtivo||mesAtual();
   const meta={alvoGols,alvoAssist,mesKey};
   myProfile.meta=meta;
   try{
