@@ -1179,6 +1179,592 @@ body.light .mes-vigente-titulo{
 .av-you-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--g);animation:youRingPulse 2s ease-in-out infinite;pointer-events:none;z-index:1}
 @keyframes youRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.5),inset 0 0 0 0 rgba(77,255,176,.0);opacity:1}50%{box-shadow:0 0 0 4px rgba(77,255,176,.0),inset 0 0 8px rgba(77,255,176,.08);opacity:.7}}
 
+/* ── ANEL MVP (dourado) ── */
+.av-mvp-ring{position:relative;display:inline-flex;flex-shrink:0}
+.av-mvp-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid #FFD700;animation:mvpRingPulse 2.2s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes mvpRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.6),0 0 12px rgba(255,185,0,.3);opacity:1}50%{box-shadow:0 0 0 5px rgba(255,215,0,.0),0 0 22px rgba(255,185,0,.5);opacity:.8}}
+
+/* ── BANNER MVP ── */
+.mvp-banner{
+  position:relative;overflow:hidden;
+  background:linear-gradient(120deg,#E8520A 0%,#F0820A 40%,#F5B800 100%);
+  border:1.5px solid rgba(255,120,0,.6);
+  border-radius:14px;
+  padding:12px 16px;
+  margin-bottom:1.1rem;
+  display:flex;flex-direction:row;align-items:center;
+  gap:14px;
+  box-shadow:0 0 36px rgba(232,82,10,.45),0 0 18px rgba(240,184,0,.25),0 4px 20px rgba(0,0,0,.5);
+}
+.mvp-banner::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);
+  pointer-events:none;
+}
+.mvp-banner::after{content:none}
+.mvp-crown{display:none}
+.mvp-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.mvp-label{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(255,255,255,.65);
+  display:flex;align-items:center;gap:6px;
+}
+.mvp-streak-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,.25);border-radius:99px;
+  padding:2px 9px;font-family:'DM Mono',monospace;
+  font-size:12px;font-weight:700;color:#fff;letter-spacing:.02em;flex-shrink:0;
+  animation:streak-pulse 1.6s ease-in-out infinite;
+  transform-origin:center;
+}
+@keyframes streak-pulse{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0px #ff8c00)}
+  40%{transform:scale(1.18);filter:drop-shadow(0 0 6px #ff6b00) drop-shadow(0 0 12px rgba(255,140,0,.5))}
+  60%{transform:scale(1.12);filter:drop-shadow(0 0 4px #ff8c00)}
+}
+.mvp-name{
+  font-family:'VarsityTeam',serif;font-size:18px;font-weight:bold;
+  color:#fff;
+  letter-spacing:.4px;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 6px rgba(0,0,0,.5);
+}
+.mvp-streak{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:rgba(255,255,255,.65);letter-spacing:.03em;
+}
+.mvp-months{
+  display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;
+}
+.mvp-month-badge{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.03em;
+  background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.2);
+  border-radius:5px;padding:2px 6px;color:rgba(255,255,255,.8);
+}
+/* ── RANKING PÊNALTIS ── */
+.pen-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pen-bar-track{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden;width:100%}
+.pen-bar-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.pen-pct{font-family:'ClassyVogue',sans-serif;font-size:19px;font-weight:normal;min-width:48px;text-align:right}
+.pen-detail{font-size:12px;color:var(--tx3);font-family:'ClassyVogue',sans-serif}
+.ri-pen{
+  display:grid;grid-template-columns:32px 50px 1fr auto;align-items:center;gap:14px;
+  padding:20px 20px;border-radius:16px;
+  background:#e0dedc;border:1px solid var(--bo);
+  box-shadow:var(--glow-card);
+  transition:border-color .2s,transform .15s;
+  position:relative;overflow:hidden;
+}
+.ri-pen::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 50%)}
+.ri-pen.ri-me{border-color:rgba(77,255,176,.35);background:linear-gradient(135deg,rgba(77,255,176,.08) 0%,var(--bg2) 70%);box-shadow:0 0 0 1px rgba(77,255,176,.15),var(--glow-card)}
+
+/* ── SUB-TABS PÊNALTIS ── */
+.pen-subtabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;border:1px solid var(--bo)}
+.pen-subtab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.pen-subtab.active{background:linear-gradient(135deg,rgba(255,90,122,.85) 0%,rgba(200,30,70,.9) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700}
+
+/* ── CARD PÊNALTI GRANDE (estilo G+A) ── */
+.ri-pen-card{
+  border-radius:20px;
+  background:#e0dedc;border:1px solid var(--bo);
+  box-shadow:var(--glow-card);
+  transition:border-color .2s,box-shadow .2s,transform .15s;
+  position:relative;overflow:hidden;
+  margin-bottom:10px;
+  padding:20px 20px 18px;
+}
+.ri-pen-card::before{content:'';position:absolute;top:0;left:-80%;width:40%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.05) 50%,transparent 100%);transform:skewX(-18deg);pointer-events:none;border-radius:inherit;z-index:1;opacity:0}
+.ri-pen-card.pen-p1::before{animation:pen-shine 5s ease-in-out infinite;animation-delay:0.5s}
+.ri-pen-card.pen-p2::before{animation:pen-shine 5s ease-in-out infinite;animation-delay:2s}
+.ri-pen-card.pen-p3::before{animation:pen-shine 5s ease-in-out infinite;animation-delay:3.5s}
+.ri-pen-card.pen-p1::before,.ri-pen-card.pen-p2::before,.ri-pen-card.pen-p3::before{
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 50%,transparent 100%);
+}
+@keyframes pen-shine{
+  0%,100%{left:-80%;opacity:0}
+  8%{opacity:1}
+  38%{left:135%;opacity:0}
+  39%,99%{left:-80%;opacity:0}
+}
+.ri-pen-card:hover{transform:translateY(-2px);box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255,.07)}
+.ri-pen-card.ri-me{border-color:rgba(77,255,176,.35);background:linear-gradient(135deg,rgba(77,255,176,.08) 0%,var(--bg2) 70%);box-shadow:0 0 0 1px rgba(77,255,176,.15),var(--glow-card)}
+.pen-card-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.pen-card-rank{font-family:'DM Mono',monospace;font-size:18px;color:var(--tx3);text-align:center;min-width:32px}
+.pen-card-info{flex:1;min-width:0}
+.pen-card-name{font-family:'Freshman',sans-serif;font-size:17px;letter-spacing:.5px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.pen-card-body{display:flex;align-items:center;gap:20px}
+.pen-pizza-wrap{position:relative;flex-shrink:0;width:90px;height:90px}
+.pen-pizza-canvas{width:90px;height:90px;display:block}
+.pen-pizza-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.pen-pizza-pct{font-family:'ClassyVogue',sans-serif;font-size:14px;font-weight:normal;line-height:1}
+.pen-stats-col{flex:1;display:flex;flex-direction:column;gap:8px}
+.pen-stat-row{display:flex;align-items:center;gap:8px;font-size:14px}
+.pen-stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pen-bar-track2{height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;flex:1;margin-top:6px}
+.pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+/* ── RANKING GERAL BANNER ── */
+.geral-banner{
+  background:#56B4E9;
+  border:1.5px solid #2E8FC5;
+  border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1.25rem;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 0 36px rgba(86,180,233,.5),0 4px 20px rgba(0,0,0,.4);
+  position:relative;overflow:hidden;
+}
+.geral-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 55%);pointer-events:none}
+.geral-banner-label{font-family:'DM Mono',monospace;font-size:11px;color:rgba(0,0,0,.55);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.geral-banner-titulo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#07090d;letter-spacing:-.5px;text-shadow:none}
+.geral-banner-sub{font-size:11px;color:rgba(0,0,0,.5);font-family:'DM Mono',monospace;margin-top:2px}
+.geral-banner-icon{font-size:32px;opacity:1}
+
+/* ── PARTIDAS ── */
+.mr{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--bo)}
+.mr:last-child{border-bottom:none}
+.md{font-size:12px;color:var(--tx3);min-width:44px;font-family:'DM Mono',monospace;padding-top:2px}
+.mt2{font-size:15px;font-weight:500}
+.mp{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pi{font-size:12px;padding:3px 10px;border-radius:99px;font-family:'DM Mono',monospace}
+.pg{background:rgba(111,207,151,.15);color:#6FCF97}
+.pb2{background:rgba(86,204,242,.15);color:#56CCF2}
+.pa{background:rgba(242,201,76,.15);color:#c8a200}
+body.light .pa{color:#b08000}
+.pp{background:var(--bg3);color:var(--tx2)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{grid-template-columns:1fr 1fr 1fr}
+.ms{display:flex;gap:7px;flex-wrap:wrap}
+.ms2{background:var(--bg3);border-radius:8px;padding:5px 12px;font-size:13px;color:var(--tx2);border:1px solid var(--bo)}
+.ms2 strong{color:var(--tx);font-weight:700}
+.pc{background:var(--bg2);border:1px solid var(--bo);border-radius:var(--rl);padding:1.1rem 1.2rem;margin-bottom:.8rem;transition:border-color .2s;box-shadow:var(--shadow)}
+.pc:hover{border-color:var(--bo2)}
+.ph{display:flex;align-items:center;gap:12px;margin-bottom:.85rem}
+.ib{background:var(--bg3);border-radius:var(--r);padding:14px 16px;font-size:14px;color:var(--tx2);margin-bottom:1rem;border:1px solid var(--bo)}
+.ib strong{color:var(--tx)}
+.codebox{background:var(--bg3);border:1px solid var(--bo2);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:1rem}
+.ma-actions{display:flex;gap:7px;margin-left:auto;padding-top:2px}
+.ma-btn{background:var(--bg3);border:1px solid var(--bo);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--tx2);font-family:'DM Sans',sans-serif;transition:all .15s}
+.ma-btn:hover{border-color:var(--bo3);color:var(--tx)}
+.ma-btn.del:hover{border-color:var(--re);color:var(--re)}
+
+/* ── FORM ── */
+.field-row{display:flex;align-items:center;gap:16px;padding:15px 0;border-bottom:1px solid var(--bo)}
+.field-row:last-of-type{border-bottom:none}
+.field-icon{font-size:22px;width:32px;text-align:center;flex-shrink:0}
+.field-body{flex:1;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.field-label{font-size:15px;font-weight:500;white-space:nowrap}
+.field-input{background:var(--bg3);border:1px solid var(--bo2);border-radius:var(--r);color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Sans',sans-serif;width:170px;transition:border-color .15s}
+.field-input:focus{outline:none;border-color:var(--g)}
+.field-divider{height:1px;background:var(--bo2);margin:4px 0}
+.counter-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--bo2);border-radius:var(--r);overflow:hidden}
+.counter-btn{background:none;border:none;color:var(--tx2);font-size:22px;width:42px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.counter-btn:hover{background:var(--bg4);color:var(--tx)}
+.counter-input{width:52px;background:none;border:none;border-left:1px solid var(--bo);border-right:1px solid var(--bo);color:var(--tx);text-align:center;font-size:17px;font-family:'Syne',sans-serif;font-weight:700;padding:7px 0;-moz-appearance:textfield}
+.counter-input:focus{outline:none}
+.counter-input::-webkit-outer-spin-button,.counter-input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── PIZZA ── */
+.pizza-wrap{display:flex;align-items:center;gap:24px;padding:10px 0}
+.pizza-canvas{flex-shrink:0}
+.pizza-legend{display:flex;flex-direction:column;gap:10px;flex:1}
+.pizza-item{display:flex;align-items:center;gap:10px;font-size:14px}
+.pizza-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+/* ── OVERLAYS ── */
+/* Todos os panels agora são centralizados */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;will-change:opacity;transition:opacity .18s ease}
+.ov.open{opacity:1;pointer-events:all}
+.ov .pan{transform:translateY(14px);transition:transform .2s cubic-bezier(.32,1,.4,1);will-change:transform}
+.ov.open .pan{transform:translateY(0)}
+.pan{background:var(--bg2);border-radius:20px;border:1px solid var(--bo2);padding:1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.6)}
+.pt{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:1.4rem;letter-spacing:-.5px}
+.ov-center{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;will-change:opacity;transition:opacity .18s ease}
+.ov-center.open{opacity:1;pointer-events:all}
+.ov-center .pan-center{transform:translateY(14px);transition:transform .2s cubic-bezier(.32,1,.4,1);will-change:transform}
+.ov-center.open .pan-center{transform:translateY(0)}
+.pan-center{background:var(--bg2);border-radius:20px;border:1px solid var(--bo2);padding:1.75rem;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.6)}
+
+/* ── HISTÓRICO ── */
+.hist-mes-card{background:var(--bg2);border:1px solid var(--bo);border-radius:var(--rl);padding:1.1rem 1.2rem;margin-bottom:.8rem;transition:border-color .2s;box-shadow:var(--shadow)}
+
+.hist-mes-card:hover{border-color:var(--bo2)}
+.hist-mes-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.hist-mes-nome{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.hist-mes-badge{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);background:var(--bg3);border:1px solid var(--bo);border-radius:6px;padding:4px 10px}
+.hist-mes-players{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:.85rem}
+.hist-mes-player{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--bo);border-radius:10px;padding:6px 12px}
+.hist-mes-stat{font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace}
+.hist-mes-stat strong{color:var(--tx);font-size:13px}
+.hist-mes-pen{font-size:11px;color:var(--am);font-family:'DM Mono',monospace;margin-top:1px}
+.hist-mes-actions{display:flex;gap:7px}
+.hist-mes-btn{background:var(--bg3);border:1px solid var(--bo);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;color:var(--tx2);font-family:'DM Sans',sans-serif;transition:all .15s;flex:1;text-align:center}
+.hist-mes-btn:hover{border-color:var(--bo3);color:var(--tx)}
+.hist-mes-btn.del:hover{border-color:var(--re);color:var(--re)}
+.player-form-row{background:var(--bg3);border:1px solid var(--bo);border-radius:12px;padding:1rem 1.1rem;margin-bottom:.7rem}
+.player-form-header{display:flex;align-items:center;gap:12px;margin-bottom:.85rem}
+.player-form-fields{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
+.pf-ig{display:flex;flex-direction:column;gap:5px}
+.pf-ig label{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.05em;text-transform:uppercase}
+.pf-ig input{background:var(--bg4);border:1px solid var(--bo2);border-radius:8px;color:var(--tx);padding:8px 10px;font-size:16px;font-family:'Syne',sans-serif;font-weight:700;text-align:center;width:100%;transition:border-color .15s}
+.pf-ig input:focus{outline:none;border-color:var(--g)}
+
+/* aviso sem limites */
+.no-limit-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(111,207,151,.1);border:1px solid rgba(111,207,151,.25);border-radius:99px;padding:5px 14px;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-bottom:1rem}
+
+/* ── MISC ── */
+.spin{display:inline-block;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ld{color:var(--tx3);font-size:14px;padding:2rem 0;text-align:center;font-family:'DM Mono',monospace}
+.divider{height:1px;background:var(--bo);margin:1.1rem 0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:99px}
+select option{background:var(--bg3)}
+
+/* ── MODAL PERFIL JOGADOR ── */
+#modal-player{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+#modal-player.open{opacity:1;pointer-events:all}
+.modal-player-inner{background:#ebebeb;border-radius:22px 22px 0 0;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(60px);transition:transform .22s cubic-bezier(.32,1,.5,1)}
+#modal-player.open .modal-player-inner{transform:translateY(0)}
+.mp-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid #b7b8b6;flex-shrink:0;background:#ebebeb}
+.mp-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;transition:all .15s}
+.mp-close:hover{background:var(--re);color:#fff;border-color:transparent}
+.mp-body{overflow-y:auto;padding:1rem 1.1rem 1.5rem;flex:1;background:#ebebeb}
+.mp-body::-webkit-scrollbar{width:3px}
+.mp-body::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px}
+.mp-mes-card{border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #b7b8b6;position:relative;overflow:hidden}
+.mp-mes-card.pos-1{background:linear-gradient(160deg,#f5ec60 0%,#c8ba00 22%,#e8df2c 42%,#f5ed70 55%,#d0c200 72%,#e8df2c 100%);border-color:#c8ba00;box-shadow:0 2px 10px rgba(0,0,0,.15),0 1px 0 rgba(255,255,255,.7) inset,0 -1px 0 rgba(0,0,0,.1) inset}
+.mp-mes-card.pos-2{background:linear-gradient(160deg,#f0efed 0%,#9ea8b4 22%,#d0d8e0 42%,#ffffff 55%,#a8b4c0 72%,#c0c8d0 100%);border-color:#8090a0;box-shadow:0 2px 10px rgba(0,0,0,.15),0 1px 0 rgba(255,255,255,.8) inset,0 -1px 0 rgba(0,0,0,.1) inset}
+.mp-mes-card.pos-3{background:linear-gradient(160deg,#e8a87c 0%,#8b4513 22%,#cd7f32 42%,#f4a460 55%,#9a5520 72%,#bf9658 100%);border-color:#7a3810;box-shadow:0 2px 10px rgba(0,0,0,.15),0 1px 0 rgba(255,200,130,.5) inset,0 -1px 0 rgba(0,0,0,.1) inset}
+.mp-mes-card.pos-other{background:linear-gradient(160deg,#f59090 0%,#c83030 22%,#eb7373 42%,#f89090 55%,#d04040 72%,#eb7373 100%);border-color:#c03030;box-shadow:0 2px 10px rgba(0,0,0,.15),0 1px 0 rgba(255,180,180,.5) inset,0 -1px 0 rgba(0,0,0,.1) inset}
+.mp-mes-card.pos-1::after,.mp-mes-card.pos-2::after,.mp-mes-card.pos-3::after{content:'';position:absolute;top:0;left:-80%;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-15deg);animation:mes-shine 4s ease-in-out infinite;pointer-events:none}
+.mp-mes-card.pos-1::after{animation-delay:0s}
+.mp-mes-card.pos-2::after{animation-delay:1.3s}
+.mp-mes-card.pos-3::after{animation-delay:2.6s}
+@keyframes mes-shine{0%,100%{left:-80%;opacity:0}8%{opacity:1}42%{left:130%;opacity:0}43%,99%{left:-80%;opacity:0}}
+@keyframes bar-shine{0%,100%{transform:translateX(-100%)}60%{transform:translateX(200%)}}
+.mp-mes-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.mp-mes-stats{display:flex;gap:10px}
+.mp-stat-box{flex:1;background:#dedede;border-radius:8px;padding:8px 10px;text-align:center}
+.mp-stat-val{font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;line-height:1}
+.mp-stat-lbl{font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.ri-av-click{cursor:pointer;transition:transform .15s}
+.ri-av-click:hover{transform:scale(1.1)}
+/* ── CROWN CONFETTI ── */
+#crown-canvas{
+  position:fixed;inset:0;z-index:9998;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+#crown-canvas.active{opacity:1;}
+.crown-toast{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.7);
+  z-index:9999;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,209,102,.25) 0%,rgba(255,185,0,.1) 100%);
+  border:2px solid rgba(255,209,102,.7);
+  border-radius:28px;padding:28px 36px 22px;
+  text-align:center;
+  box-shadow:0 0 80px rgba(255,185,0,.4),0 24px 60px rgba(0,0,0,.7);
+  opacity:0;
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .38s cubic-bezier(.22,1,.36,1);
+  min-width:240px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.crown-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.crown-toast-icon{font-size:52px;line-height:1;margin-bottom:10px;display:block;animation:crownBounce .6s cubic-bezier(.34,1.56,.64,1) .1s both;}
+@keyframes crownBounce{from{transform:scale(.3) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.crown-toast-name{font-family:'VarsityTeam',serif;font-size:24px;font-weight:bold;background:linear-gradient(135deg,#FFE066 0%,#FFB800 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 10px rgba(255,185,0,.5));margin-bottom:4px;}
+.crown-toast-sub{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,209,102,.8);letter-spacing:.1em;text-transform:uppercase;}
+
+/* ── DUELO BTN ── */
+.duelo-fab{
+  position:fixed;bottom:90px;right:16px;z-index:500;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#FF5A7A 0%,#c01040 100%);
+  border:none;cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 4px 20px rgba(255,90,122,.5),0 2px 8px rgba(0,0,0,.4);
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+}
+.duelo-fab:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(255,90,122,.6),0 2px 8px rgba(0,0,0,.4);}
+.duelo-fab:active{transform:scale(.92);}
+body.duelo-fab-visible .duelo-fab{display:flex;}
+
+/* ── MODAL MVP VOTAÇÃO ── */
+#modal-mvp{
+  position:fixed;inset:0;z-index:9100;
+  display:flex;align-items:center;justify-content:center;
+  padding:1.5rem;
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  transition:background .35s ease;
+}
+#modal-mvp.open{background:rgba(0,0,0,.72);pointer-events:all;}
+#modal-mvp-card{
+  width:100%;max-width:380px;
+  background:var(--bg2);
+  border:1.5px solid rgba(255,209,102,.35);
+  border-radius:28px;
+  padding:0;
+  box-shadow:0 0 80px rgba(255,209,102,.18),0 24px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07);
+  position:relative;overflow:hidden;
+  opacity:0;transform:scale(.88) translateY(24px);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),transform .38s cubic-bezier(.22,1,.36,1);
+  max-height:90vh;display:flex;flex-direction:column;
+}
+#modal-mvp.open #modal-mvp-card{opacity:1;transform:scale(1) translateY(0);}
+.mvp-header{
+  padding:1.5rem 1.5rem 0;text-align:center;flex-shrink:0;
+}
+.mvp-players-list{
+  overflow-y:auto;padding:.75rem 1.25rem;flex:1;
+  display:flex;flex-direction:column;gap:10px;
+}
+.mvp-players-list::-webkit-scrollbar{width:3px;}
+.mvp-players-list::-webkit-scrollbar-thumb{background:var(--bo2);border-radius:99px;}
+.mvp-player-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg3);border-radius:14px;
+  padding:10px 12px;border:1px solid var(--bo2);
+  transition:border-color .15s;
+}
+.mvp-player-row:hover{border-color:rgba(255,209,102,.3);}
+.mvp-player-photo{
+  width:38px;height:38px;border-radius:50%;object-fit:cover;
+  border:1.5px solid var(--bo2);flex-shrink:0;
+  background:var(--bg4);display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.mvp-player-name{
+  flex:1;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--tx);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mvp-stars{display:flex;gap:4px;align-items:center;flex-shrink:0;}
+.mvp-star-btn{
+  background:none;border:none;cursor:pointer;
+  font-size:20px;line-height:1;padding:2px;
+  transition:transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mvp-star-btn:active{transform:scale(.82);}
+.mvp-nota-label{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  min-width:22px;text-align:center;color:var(--am);
+}
+.mvp-footer{padding:0 1.25rem 1.5rem;flex-shrink:0;}
+
+/* MVP badge no perfil */
+.mvp-badge-perfil{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,140,0,.12));
+  border:1px solid rgba(255,209,102,.45);
+  border-radius:10px;padding:5px 10px;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  color:#FFD166;
+}
+
+/* MODAL DUELO ── */
+#modal-duelo{
+  display:none;
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(0,0,0,.8);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#modal-duelo.open{display:flex;animation:modalBgIn .25s ease forwards;}
+.duelo-inner{
+  background:var(--bg2);
+  border-radius:24px;
+  width:92%;max-width:560px;
+  max-height:92vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+.duelo-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.2rem .9rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(255,90,122,.1) 0%,transparent 70%);
+}
+.duelo-title{font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px;background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.duelo-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;transition:all .15s;}
+.duelo-close:hover{background:var(--re);color:#fff;border-color:transparent;}
+.duelo-body{overflow-y:auto;padding:.9rem 1.1rem 1.5rem;flex:1;}
+.duelo-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.duelo-player-btn{
+  background:var(--bg3);border:1.5px solid var(--bo2);border-radius:16px;
+  padding:14px 10px;cursor:pointer;text-align:center;
+  transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.duelo-player-btn.selected{border-color:rgba(255,90,122,.6);background:linear-gradient(135deg,rgba(255,90,122,.15) 0%,rgba(255,90,122,.04) 100%);box-shadow:0 0 20px rgba(255,90,122,.2);}
+.duelo-player-btn:hover{border-color:var(--bo3);}
+.duelo-player-name{font-family:'Freshman',sans-serif;font-size:13px;letter-spacing:.4px;color:var(--tx);margin-top:2px;word-break:break-word;overflow-wrap:break-word;line-height:1.25;text-align:center;}
+.duelo-player-ga{font-family:'ClassyVogue',sans-serif;font-size:20px;color:var(--tx2);}
+.duelo-vs{
+  text-align:center;margin-bottom:1.25rem;
+  font-family:'VarsityTeam',serif;font-size:28px;font-weight:bold;
+  background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.duelo-compare{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:10px;}
+.duelo-col{display:flex;flex-direction:column;gap:0;}
+.duelo-stat-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--bo);}
+.duelo-stat-row:last-child{border-bottom:none;}
+.duelo-stat-val{font-family:'ClassyVogue',sans-serif;font-size:26px;line-height:1;text-align:center;}
+.duelo-stat-val.win{color:#40c960;}
+.duelo-stat-val.lose{color:var(--re);opacity:.7;}
+.duelo-stat-val.tie{color:var(--tx2);}
+.duelo-stat-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);text-align:center;text-transform:uppercase;letter-spacing:.08em;}
+.duelo-winner-banner{
+  background:linear-gradient(135deg,rgba(255,209,102,.2) 0%,rgba(255,185,0,.06) 100%);
+  border:1.5px solid rgba(255,209,102,.5);
+  border-radius:14px;padding:16px;text-align:center;margin-bottom:10px;
+  box-shadow:0 0 30px rgba(255,185,0,.15);
+}
+.duelo-scope-tabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;border:1px solid var(--bo);}
+.duelo-scope-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;}
+.duelo-scope-tab.active{background:linear-gradient(135deg,rgba(255,90,122,.85),rgba(200,30,70,.9));color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700;}
+
+/* ── MODAL GRÁFICO EXPANDIDO ── */
+#modal-evol-chart{
+  display:none;position:fixed;inset:0;z-index:4500;
+  background:rgba(0,0,0,.92);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+#modal-evol-chart.open{display:flex;animation:modalBgIn .22s ease forwards;}
+#evol-chart-inner{
+  background:#141720;
+  border:1px solid rgba(64,201,96,.3);
+  border-radius:20px;
+  width:96vw;max-width:960px;
+  max-height:92vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 12px 60px rgba(0,0,0,.9),0 0 0 1px rgba(64,201,96,.12),0 0 80px rgba(64,201,96,.05);
+  animation:modalIn .25s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+/* Landscape: aproveita largura total */
+@media (orientation:landscape) and (max-height:520px){
+  #evol-chart-inner{
+    width:98vw;max-width:100vw;
+    max-height:96vh;
+    border-radius:14px;
+  }
+  #evol-chart-header{ padding:8px 16px 7px; }
+  #evol-chart-body{ padding:10px 16px 12px; }
+}
+#evol-chart-inner.fullscreen-landscape{
+  width:100vw!important;max-width:100vw!important;
+  height:100vh!important;max-height:100vh!important;
+  border-radius:0!important;
+}
+#evol-chart-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 12px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(64,201,96,.1) 0%,rgba(64,201,96,.02) 60%,transparent 100%);
+}
+#evol-chart-body{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:20px;flex:1;
+}
+/* Botão tela cheia */
+#evol-fullscreen-btn{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(64,201,96,.12);
+  border:1px solid rgba(64,201,96,.35);
+  color:#40c960;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;margin-left:8px;
+}
+#evol-fullscreen-btn:hover{ background:rgba(64,201,96,.25); }
+/* Stats resumo no topo do modal */
+.evol-summary-bar{
+  display:flex;gap:10px;flex-wrap:wrap;
+  padding:12px 20px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.2);
+  flex-shrink:0;
+}
+.evol-stat-pill{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  padding:6px 14px;
+  min-width:60px;
+  flex:1;
+}
+.evol-stat-pill-val{
+  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#fff;line-height:1.1;
+}
+.evol-stat-pill-lbl{
+  font-family:'DM Mono',monospace;font-size:8px;
+  color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;
+}
+.evol-stat-pill.green .evol-stat-pill-val{ color:#40c960; }
+.evol-stat-pill.red .evol-stat-pill-val{ color:#FF5A7A; }
+.evol-stat-pill.gold .evol-stat-pill-val{ color:#FFD166; }
+.evol-tooltip{
+  position:absolute;
+  background:rgba(20,24,36,.97);
+  border:1px solid rgba(64,201,96,.4);
+  border-radius:10px;
+  padding:8px 12px;
+  font-family:'DM Mono',monospace;
+  font-size:12px;
+  color:#fff;
+  pointer-events:none;
+  white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  z-index:10;
+  transform:translate(-50%,-110%);
+  transition:opacity .1s;
+}
+/* ── DESAFIO DIRETO ── */
+#modal-desafio{display:none;position:fixed;inset:0;z-index:3100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+#modal-desafio.open{display:flex;animation:modalBgIn .25s ease forwards;}
+.desafio-inner{background:var(--bg2);border-radius:24px;width:92%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 8px 48px rgba(0,0,0,.7),0 0 0 1px rgba(255,90,122,.15);animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;overflow:hidden;}
+.desafio-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid var(--bo);flex-shrink:0;background:linear-gradient(135deg,rgba(255,90,122,.12) 0%,rgba(255,180,0,.06) 60%,transparent 100%);}
+.desafio-title{font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px;background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 60%,#FF5A7A 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.desafio-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem 1.1rem 1.4rem;flex:1;}
+/* Live challenge card shown in profiles/ranking */
+.desafio-card{
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  background:linear-gradient(135deg,rgba(255,90,122,.13) 0%,rgba(255,180,0,.07) 100%);
+  border:1.5px solid rgba(255,90,122,.4);
+  box-shadow:0 0 24px rgba(255,90,122,.12);
+  position:relative;overflow:hidden;
+}
+.desafio-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);pointer-events:none;}
+.desafio-card-title{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,100,130,.9);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.desafio-card-title::before{content:'⚔️';font-size:11px;}
+.desafio-live-dot{width:6px;height:6px;border-radius:50%;background:#FF5A7A;box-shadow:0 0 6px #FF5A7A;animation:feed-pulse 1.8s ease-in-out infinite;flex-shrink:0;}
+.desafio-players-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.desafio-player-col{flex:1;text-align:center;}
+.desafio-player-name{font-family:'Freshman',sans-serif;font-size:12px;letter-spacing:.4px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.desafio-player-score{font-family:'ClassyVogue',sans-serif;font-size:30px;line-height:1;margin-top:4px;}
+.desafio-player-score.winning{color:#4dffb0;filter:drop-shadow(0 0 8px rgba(77,255,176,.5));}
+.desafio-player-score.losing{color:rgba(255,90,122,.7);}
+.desafio-player-score.tied{color:var(--tx2);}
+.desafio-vs-divider{font-family:'VarsityTeam',serif;font-size:18px;color:rgba(255,90,122,.6);flex-shrink:0;}
+.desafio-meta-row{display:flex;align-items:center;justify-content:space-between;}
+.desafio-tipo-badge{font-family:'DM Mono',monospace;font-size:10px;background:rgba(255,90,122,.18);border:1px solid rgba(255,90,122,.3);border-radius:6px;padding:3px 8px;color:rgba(255,150,160,.9);}
+.desafio-countdown{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.04em;}
+.desafio-countdown.urgent{color:#FF5A7A;animation:feed-pulse 1.5s ease-in-out infinite;}
+/* Winner badge in profile */
+.desafio-winner-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,180,0,.1));
+  border:1.5px solid rgba(255,215,0,.6);
+  border-radius:10px;padding:5px 10px;
+  font-family:'DM Mono',monospace;font-size:11px;color:#FFD700;
+  box-shadow:0 0 16px rgba(255,200,0,.2);
+  animation:badge-glow 2.5s ease-in-out infinite;
+}
+@keyframes badge-glow{0%,100%{box-shadow:0 0 12px rgba(255,200,0,.2)}50%{box-shadow:0 0 24px rgba(255,200,0,.45)}}
 /* Picker step in create modal */
 .dc-player-btn{
   background:var(--bg3);border:1.5px solid var(--bo2);border-radius:14px;
@@ -2012,69 +2598,77 @@ body::before{
 <div id="ultrap-toast" style="
   display:none;
   position:fixed;
-  inset:0;
+  top:0;left:0;right:0;bottom:0;
   z-index:9995;
-  align-items:center;
+  pointer-events:none;
+  align-items:flex-start;
   justify-content:center;
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  padding:24px;
+  padding-top:env(safe-area-inset-top,0px);
 ">
   <div id="ultrap-toast-box" style="
-    background:#ededed;
-    border:1.5px solid #46e353;
-    border-radius:24px;
-    padding:28px 24px 20px;
-    width:100%;max-width:320px;
-    box-shadow:0 0 0 1px #61f26d,0 12px 40px #61f26d,0 32px 60px #61f26d;
-    transform:scale(.88) translateY(20px);opacity:0;
-    transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);
+    margin-top:calc(env(safe-area-inset-top,0px) + 14px);
+    background:linear-gradient(145deg,rgba(15,18,32,.97) 0%,rgba(25,20,45,.97) 100%);
+    border:1.5px solid rgba(255,80,110,.55);
+    border-radius:20px;
+    padding:16px 20px 14px;
+    min-width:290px;max-width:340px;
+    box-shadow:0 0 0 1px rgba(255,80,110,.15),0 8px 40px rgba(255,50,90,.25),0 24px 60px rgba(0,0,0,.7);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    transform:translateY(-80px) scale(.92);opacity:0;
+    transition:opacity .4s cubic-bezier(.22,1,.36,1),transform .4s cubic-bezier(.22,1,.36,1);
+    pointer-events:all;
     position:relative;overflow:hidden;
   ">
+    <!-- shimmer stripe -->
     <div style="
       position:absolute;top:0;left:-100%;width:60%;height:100%;
-      background:rgba(255,255,255,.06);
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
       animation:ultrap-shimmer 2.2s ease-in-out 0.5s forwards;
       pointer-events:none;
     "></div>
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#1d9637;border-radius:24px 24px 0 0"></div>
-    <div style="
-      font-family:'DM Mono',monospace;font-size:9px;
-      color:#000000;letter-spacing:.16em;
-      text-transform:uppercase;margin-bottom:16px;text-align:center;
-    ">🚨 Você foi ultrapassado!</div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+    <!-- red glow bar top -->
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,80,110,.9),transparent);border-radius:20px 20px 0 0"></div>
+
+    <div style="display:flex;align-items:flex-start;gap:13px">
+      <!-- icon -->
       <div id="ultrap-toast-avatar" style="
-        width:64px;height:64px;border-radius:50%;flex-shrink:0;
-        background:#a6a6a6;border:2px solid #000000;
+        width:46px;height:46px;border-radius:50%;flex-shrink:0;
+        background:rgba(255,80,110,.2);border:2px solid rgba(255,80,110,.45);
         display:flex;align-items:center;justify-content:center;
-        font-size:30px;line-height:1;
-        box-shadow:0 0 0 2px #000000;
+        font-size:22px;line-height:1;
+        box-shadow:0 0 20px rgba(255,60,90,.3);
       ">⚡</div>
-      <div>
+      <!-- text -->
+      <div style="flex:1;min-width:0">
+        <div style="
+          font-family:'DM Mono',monospace;font-size:9px;
+          color:rgba(255,100,130,.9);letter-spacing:.14em;
+          text-transform:uppercase;margin-bottom:4px;
+        ">🚨 Você foi ultrapassado!</div>
         <div id="ultrap-toast-msg" style="
-          font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;
-          color:#000000;line-height:1.35;margin-bottom:6px;
+          font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+          color:#fff;line-height:1.4;
+          text-shadow:0 1px 4px rgba(0,0,0,.5);
         "></div>
         <div id="ultrap-toast-sub" style="
           font-family:'DM Mono',monospace;font-size:11px;
-          color:#000000;letter-spacing:.02em;
+          color:rgba(200,200,220,.65);margin-top:5px;letter-spacing:.02em;
         "></div>
       </div>
+      <!-- close -->
+      <button onclick="_fecharUltrapToast()" style="
+        width:24px;height:24px;border-radius:50%;
+        background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+        color:rgba(255,255,255,.5);font-size:14px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        flex-shrink:0;transition:all .15s;pointer-events:all;
+        line-height:1;
+      " onmouseover="this.style.background='rgba(255,80,110,.25)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.5)'">×</button>
     </div>
-    <button onclick="_fecharUltrapToast()" style="
-      display:flex;align-items:center;justify-content:center;
-      width:100%;margin-top:20px;padding:11px;
-      border-radius:12px;border:1px solid #1d9637;
-      background:#ededed;
-      color:#000000;font-size:13px;font-weight:600;
-      font-family:'DM Sans',sans-serif;cursor:pointer;
-      transition:all .15s;
-    " onmouseover="this.style.background='#177cbf';this.style.color='#fff'" onmouseout="this.style.background='#ededed';this.style.color='#000000'">
-      Fechar
-    </button>
-    <div style="margin-top:12px;height:2px;background:rgba(0,0,0,.1);border-radius:2px;overflow:hidden">
-      <div id="ultrap-toast-progress" style="height:100%;width:100%;background:#6cab6f;border-radius:2px;transition:width linear"></div>
+
+    <!-- progress bar (auto-dismiss) -->
+    <div style="margin-top:12px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden">
+      <div id="ultrap-toast-progress" style="height:100%;width:100%;background:linear-gradient(90deg,rgba(255,80,110,.8),rgba(255,140,80,.6));border-radius:2px;transition:width linear"></div>
     </div>
   </div>
 </div>
@@ -2093,8 +2687,8 @@ body::before{
   to{opacity:1;transform:translateY(0)}
 }
 .feed-item{
-  display:flex;flex-direction:column;gap:0;
-  padding:9px 12px 8px;
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;
   background:var(--bg3);
   border:1px solid var(--bo2);
   border-radius:12px;
@@ -2106,7 +2700,6 @@ body::before{
   background:var(--bg4,rgba(255,255,255,.05));
   border-color:var(--bo);
 }
-.feed-item-top{display:flex;align-items:center;gap:10px;}
 .feed-item-icon{
   width:30px;height:30px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -2122,57 +2715,6 @@ body::before{
 .feed-item-text strong{font-weight:700;color:var(--tx)}
 .feed-item-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);margin-top:2px;letter-spacing:.02em}
 .feed-item-new{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0;box-shadow:0 0 5px var(--g)}
-
-/* ── REAÇÕES ── */
-.feed-reactions{
-  display:flex;align-items:center;gap:4px;
-  margin-top:7px;padding-top:6px;
-  border-top:1px solid var(--bo);
-  flex-wrap:wrap;
-}
-.feed-react-btn{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:3px 7px;border-radius:20px;
-  border:1px solid var(--bo2);background:var(--bg4,rgba(255,255,255,.04));
-  font-size:12px;cursor:pointer;transition:all .18s;
-  font-family:'DM Mono',monospace;color:var(--tx2);
-  user-select:none;-webkit-user-select:none;
-  line-height:1.2;
-}
-.feed-react-btn:hover{border-color:var(--bo3);background:rgba(255,255,255,.08);transform:scale(1.08);}
-.feed-react-btn.mine{
-  background:rgba(77,255,176,.12);border-color:rgba(77,255,176,.45);
-  color:var(--g);box-shadow:0 0 8px rgba(77,255,176,.12);
-}
-.feed-react-btn.mine:hover{background:rgba(77,255,176,.18);}
-.feed-react-count{font-size:11px;font-weight:600;min-width:8px;}
-.feed-react-add{
-  padding:3px 7px;border-radius:20px;
-  border:1px dashed var(--bo2);background:transparent;
-  font-size:13px;cursor:pointer;transition:all .18s;
-  color:var(--tx3);line-height:1.2;
-}
-.feed-react-add:hover{border-color:var(--bo3);color:var(--tx);transform:scale(1.1);}
-@keyframes react-pop{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.45)}
-  70%{transform:scale(.88)}
-  100%{transform:scale(1)}
-}
-.feed-react-btn.popping{animation:react-pop .32s cubic-bezier(.32,2,.5,1) forwards;}
-/* Emoji picker floating */
-.feed-emoji-picker{
-  display:flex;gap:4px;padding:8px 10px;
-  background:var(--bg2);border:1px solid var(--bo3);border-radius:16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3);
-  animation:feed-item-in .18s ease both;
-  flex-wrap:wrap;max-width:200px;
-}
-.feed-emoji-picker button{
-  font-size:22px;background:none;border:none;cursor:pointer;
-  padding:4px;border-radius:8px;transition:transform .15s,background .15s;line-height:1;
-}
-.feed-emoji-picker button:hover{transform:scale(1.3);background:rgba(255,255,255,.08);}
 /* Apelido no ranking */
 .ri-apelido{
   font-family:'DM Mono',monospace;
@@ -2291,267 +2833,6 @@ function avC(name){let h=0;for(let c of(name||'?'))h=(h*31+c.charCodeAt(0))&0xff
 function ini(name){return(name||'?').trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
 function showErr(id,msg){const e=$(id);e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',5000)}
 
-// ── STATS DO MÊS ATUAL ──────────────────────────────────────────────────────
-function getSt(uidOrName, mesKey, byUid){
-  if(!gd) return {gols:0,assist:0,penBat:0,penOk:0,n:0};
-  const src = gd.matches||[];
-  const ms = src.filter(x=> byUid ? x.uid===uidOrName : x.player===uidOrName);
-  return {
-    gols:   ms.reduce((s,x)=>s+(x.gols||0),0),
-    assist: ms.reduce((s,x)=>s+(x.assist||0),0),
-    penBat: ms.reduce((s,x)=>s+(x.penBat||0),0),
-    penOk:  ms.reduce((s,x)=>s+(x.penOk||0),0),
-    n:      ms.length,
-  };
-}
-
-// ── STATS GERAIS (todos os meses) ────────────────────────────────────────────
-function getStGeral(mb){
-  if(!gd||!mb) return {gols:0,assist:0,penBat:0,penOk:0,n:0};
-  const hist = gd.historico||{};
-  let gols=0,assist=0,penBat=0,penOk=0,n=0;
-  Object.values(hist).forEach(h=>{
-    const ms=(h.matches||[]).filter(x=>m_uid_match(x,mb));
-    gols+=ms.reduce((s,x)=>s+(x.gols||0),0);
-    assist+=ms.reduce((s,x)=>s+(x.assist||0),0);
-    penBat+=ms.reduce((s,x)=>s+(x.penBat||0),0);
-    penOk+=ms.reduce((s,x)=>s+(x.penOk||0),0);
-    n+=ms.length;
-  });
-  // Mês atual
-  const cur=(gd.matches||[]).filter(x=>m_uid_match(x,mb));
-  gols+=cur.reduce((s,x)=>s+(x.gols||0),0);
-  assist+=cur.reduce((s,x)=>s+(x.assist||0),0);
-  penBat+=cur.reduce((s,x)=>s+(x.penBat||0),0);
-  penOk+=cur.reduce((s,x)=>s+(x.penOk||0),0);
-  n+=cur.length;
-  return {gols,assist,penBat,penOk,n};
-}
-
-// ── SISTEMA DE NOTIFICAÇÕES ──────────────────────────────────────────────────
-function _notifTimeAgo(ts){
-  const diff=Date.now()-ts;
-  const m=Math.floor(diff/60000);
-  if(m<1) return'agora mesmo';
-  if(m<60) return`há ${m} min`;
-  const h=Math.floor(m/60);
-  if(h<24) return`há ${h}h`;
-  return`há ${Math.floor(h/24)}d`;
-}
-
-function _getMyPersonalNotifs(){
-  if(!gd||!currentUser) return [];
-  return ((gd.notifs||{})[currentUser.uid]||[]).slice().sort((a,b)=>b.ts-a.ts);
-}
-
-function _btnDel(id){
-  return`<button onclick="_apagarNotif('${id}')" title="Apagar" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s" onmouseover="this.style.background='rgba(255,90,122,.35)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'">×</button>`;
-}
-
-function _corNota(v){ return v<=4.5?'#e53e3e':v<=7.0?'#f97316':'#2f9e44'; }
-
-window._apagarNotif=async function(id){
-  if(!gd||!currentUser||!groupId) return;
-  try{
-    const snap=await getDoc(doc(db,'groups',groupId));
-    const cur=snap.data();
-    if(cur.notifs&&cur.notifs[currentUser.uid]){
-      cur.notifs[currentUser.uid]=cur.notifs[currentUser.uid].filter(n=>n.id!==id);
-      await setDoc(doc(db,'groups',groupId),cur);
-      gd=cur;
-      _renderNotifPanel();
-      _updateNotifBadge();
-    }
-  }catch(e){ console.warn('apagarNotif:',e); }
-};
-
-function _renderNotifPanel(){
-  const list=document.getElementById('notif-list');
-  if(!list) return;
-  const personalNotifs=_getMyPersonalNotifs();
-  const feed=(gd?.feed||[]).slice().reverse();
-  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
-  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
-
-  let html='';
-
-  if(personalNotifs.length){
-    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Suas notificações</div>';
-    html+=personalNotifs.slice(0,20).map(n=>{
-      const unread=!lidasP.includes(n.id);
-      const del=_btnDel(n.id);
-
-      if(n.tipo==='desafio_solicitacao'){
-        const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
-        const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
-        const btns=podeResponder
-          ?'<div style="display:flex;gap:6px;margin-top:8px">'
-            +'<button onclick="_dcAceitar(\''+n.desafioId+'\');document.getElementById(\'notif-panel\').classList.remove(\'open\')" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#40c960,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
-            +'<button onclick="_dcCancelar(\''+n.desafioId+'\')" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
-            +'</div>'
-          :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
-        return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
-          <div style="display:flex;align-items:center;gap:8px;width:100%">
-            <div class="notif-icon">⚔️</div>
-            <div class="notif-body">
-              <div class="notif-text"><strong>${n.de}</strong> te desafiou!</div>
-              <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-            </div>${del}
-          </div>${btns}
-        </div>`;
-      }
-      if(n.tipo==='desafio_aceito'){
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">🎉</div>
-          <div class="notif-body">
-            <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio!</div>
-            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>${del}
-        </div>`;
-      }
-      if(n.tipo==='desafio_resultado'){
-        const isParticipant=n.meuScore!==undefined;
-        const icon=n.isDraw?'🤝':isParticipant?(n.resultado==='win'?'🏆':'😤'):'⚔️';
-        const txt=n.isDraw
-          ?`Desafio encerrado: <strong>${n.nomeA}</strong> vs <strong>${n.nomeB}</strong> — Empate ${n.sA}×${n.sB}`
-          :isParticipant
-            ?(n.resultado==='win'?`Você venceu o desafio contra <strong>${n.rivalNome}</strong>! ${n.meuScore}×${n.rivalScore} (${n.tipoLbl})`:`<strong>${n.rivalNome}</strong> venceu o desafio contra você. ${n.rivalScore}×${n.meuScore} (${n.tipoLbl})`)
-            :`<strong>${n.winnerNome}</strong> venceu o desafio contra <strong>${n.loserNome}</strong>! ${n.sA>n.sB?n.sA:n.sB}×${n.sA>n.sB?n.sB:n.sA}`;
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">${icon}</div>
-          <div class="notif-body">
-            <div class="notif-text">${txt}</div>
-            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>${del}
-        </div>`;
-      }
-      if(n.tipo==='mvp_mes'){
-        const [ano,mes]=(n.mes||'').split('-');
-        const mesNome=mes?['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]:'';
-        const mc=_corNota(parseFloat(n.media));
-        const txt=n.ehMVP
-          ?`Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🌟`
-          :`<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🏆`;
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">🏆</div>
-          <div class="notif-body"><div class="notif-text">${txt}</div><div class="notif-time">${_notifTimeAgo(n.ts)}</div></div>${del}
-        </div>`;
-      }
-      if(n.tipo==='craque_rodada'){
-        const mc=_corNota(parseFloat(n.media));
-        const txt=n.ehVencedor
-          ?`Você foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
-          :`<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong>! ⭐`;
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">⭐</div>
-          <div class="notif-body"><div class="notif-text">${txt}</div><div class="notif-time">${_notifTimeAgo(n.ts)}</div></div>${del}
-        </div>`;
-      }
-      if(n.tipo==='nota_recebida'){
-        const cor=_corNota(parseFloat(n.media));
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">📊</div>
-          <div class="notif-body">
-            <div class="notif-text">Sua nota na rodada: <strong style="color:${cor};font-size:16px">${n.media}</strong> · ${n.totalVotantes} avaliador${n.totalVotantes!==1?'es':''}</div>
-            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>${del}
-        </div>`;
-      }
-      return'';
-    }).join('');
-    if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
-  }
-
-  // Feed do grupo
-  if(feed.length){
-    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Feed do grupo</div>';
-    const icons={partida:'⚽',conquista:'🏆',nota:'📋',craque:'⭐',membro:'👋',meta:'🎯'};
-    html+=feed.slice(0,30).map(ev=>{
-      const unread=!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid;
-      return`<div class="notif-item${unread?' unread':''}">
-        <div class="notif-icon">${icons[ev.tipo]||'📢'}</div>
-        <div class="notif-body">
-          <div class="notif-text">${ev.texto}</div>
-          <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  if(!html) html='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
-  list.innerHTML=html;
-}
-
-function _updateNotifBadge(){
-  const badge=document.getElementById('notif-badge');
-  if(!badge) return;
-  const personalNotifs=_getMyPersonalNotifs();
-  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
-  const feed=gd?.feed||[];
-  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
-  const naoLidasP=personalNotifs.filter(n=>!lidasP.includes(n.id)).length;
-  const naoLidasF=feed.filter(ev=>!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
-  const total=naoLidasP+naoLidasF;
-  badge.textContent=total>9?'9+':total;
-  badge.style.display=total>0?'flex':'none';
-}
-
-window.toggleNotifPanel=()=>{
-  const panel=document.getElementById('notif-panel');
-  const overlay=document.getElementById('notif-overlay');
-  if(!panel) return;
-  const isOpen=panel.classList.contains('open');
-  if(isOpen){
-    panel.classList.remove('open');
-    if(overlay) overlay.classList.remove('open');
-    return;
-  }
-  _renderNotifPanel();
-  // Marcar feed como lido ao abrir
-  const feed=gd?.feed||[];
-  const idsF=feed.map(ev=>ev.id);
-  localStorage.setItem('notif_lidas_'+groupId,JSON.stringify(idsF));
-  panel.classList.add('open');
-  if(overlay) overlay.classList.add('open');
-  _updateNotifBadge();
-};
-
-document.addEventListener('click',e=>{
-  const panel=document.getElementById('notif-panel');
-  const overlay=document.getElementById('notif-overlay');
-  const btn=document.getElementById('notif-btn');
-  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!btn?.contains(e.target)){
-    panel.classList.remove('open');
-    if(overlay) overlay.classList.remove('open');
-  }
-});
-
-window.marcarTodasLidas=()=>{
-  const personalNotifs=_getMyPersonalNotifs();
-  localStorage.setItem('notif_pers_lidas_'+groupId,JSON.stringify(personalNotifs.map(n=>n.id)));
-  const feed=gd?.feed||[];
-  localStorage.setItem('notif_lidas_'+groupId,JSON.stringify(feed.map(ev=>ev.id)));
-  _updateNotifBadge();
-  _renderNotifPanel();
-};
-
-async function _publishFeed(tipo, texto){
-  if(!groupId||!currentUser) return;
-  try{
-    const snap=await getDoc(doc(db,'groups',groupId));
-    const cur=snap.data();
-    const feed=cur.feed||[];
-    const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7),tipo,texto,uid:currentUser.uid,ts:Date.now()};
-    feed.push(ev);
-    if(feed.length>100) feed.splice(0,feed.length-100);
-    await updateDoc(doc(db,'groups',groupId),{feed});
-  }catch(e){ console.warn('feed publish:',e); }
-}
-window._publishFeed=_publishFeed;
-window._updateNotifBadge=_updateNotifBadge;
-window._renderNotifPanel=_renderNotifPanel;
-// ── FIM NOTIFICAÇÕES ──────────────────────────────────────────────────────────
-
 /* ── PREMIUM PANEL OPEN/CLOSE ── */
 window.openP=id=>{
   const el=$(id);if(!el)return;
@@ -2599,6 +2880,98 @@ window.closePCenter=id=>{
   },260);
 };
 
+// ── BACK NAVIGATION (botão Voltar Android / gesto iOS) ──────────────
+(function(){
+  // Garante que sempre há um estado base na pilha ao iniciar
+  history.replaceState({futstatsBack:null,type:'base'},'');
+
+  // Mapa de fechar por id de painel
+  function _fecharPorId(id){
+    const el=document.getElementById(id);
+    if(!el||!el.classList.contains('open'))return false;
+    // Painéis .ov (openP)
+    if(el.classList.contains('ov')){closeP(id);return true;}
+    // Painéis .ov-center (openPCenter)
+    if(el.classList.contains('ov-center')){closePCenter(id);return true;}
+    return false;
+  }
+
+  // Detecta qual camada está aberta (por prioridade — mais alta primeiro)
+  function _fecharTopoAtual(){
+    // Modais fixos (z-index alto → baixo)
+    if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
+    if(document.getElementById('modal-desafio')?.classList.contains('open')){fecharModalDesafio();return true;}
+    if(document.getElementById('modal-duelo')?.classList.contains('open')){closeDuelo();return true;}
+    if(document.getElementById('modal-mvp')?.classList.contains('open')){fecharModalMVP();return true;}
+    if(document.getElementById('modal-partidas')?.classList.contains('open')){closeModalPartidas();return true;}
+    if(document.getElementById('modal-player')?.classList.contains('open')){closePlayerProfile();return true;}
+    // Painel de notificações
+    if(document.getElementById('notif-panel')?.classList.contains('open')){toggleNotifPanel();return true;}
+    // Conquistas
+    if(document.getElementById('modal-conquistas')?.classList.contains('open')){fecharConquistas();return true;}
+    // Painéis .ov e .ov-center — verifica todos
+    const paineis=['pperfil','pc','pj','pi2','pedit','pnovomes','ppreenchemes','pvermes'];
+    for(const id of paineis){
+      if(_fecharPorId(id))return true;
+    }
+    return false;
+  }
+
+  window.addEventListener('popstate',e=>{
+    // Tenta fechar a camada mais alta aberta
+    const fechou=_fecharTopoAtual();
+    if(fechou){
+      // Reinsere o estado para manter a pilha funcional
+      history.pushState({futstatsBack:null,type:'closed'},'');
+    }
+    // Se não havia nada aberto, deixa o browser navegar normalmente (sai do app)
+  });
+
+  // Hook nos abridores de modais para empurrar estado na pilha
+  const _origOpenPlayer=window.openPlayerProfile;
+  window.openPlayerProfile=function(...args){
+    _origOpenPlayer?.(...args);
+    history.pushState({futstatsBack:'modal-player',type:'modal'},'');
+  };
+
+  const _origOpenPartidas=window.openModalPartidas||null;
+  // modal-partidas é aberto inline — hookamos no close ao abrir
+  const _origModalPartidas=window.closeModalPartidas;
+  // Hook nos modais que não passam por openP
+  ['modal-mvp','modal-duelo','modal-desafio','modal-evol-chart','modal-conquistas','notif-panel'].forEach(id=>{
+    // Observa adição da classe .open e empurra estado
+    const el=document.getElementById(id);
+    if(!el)return;
+    const obs=new MutationObserver(muts=>{
+      muts.forEach(m=>{
+        if(m.type==='attributes'&&m.attributeName==='class'){
+          if(el.classList.contains('open')&&!el._backPushed){
+            el._backPushed=true;
+            history.pushState({futstatsBack:id,type:'modal'},'');
+          } else if(!el.classList.contains('open')){
+            el._backPushed=false;
+          }
+        }
+      });
+    });
+    obs.observe(el,{attributes:true});
+  });
+
+  // modal-partidas usa display, não classe — observer de style
+  const mp=document.getElementById('modal-partidas');
+  if(mp){
+    const obs=new MutationObserver(()=>{
+      if(mp.classList.contains('open')&&!mp._backPushed){
+        mp._backPushed=true;
+        history.pushState({futstatsBack:'modal-partidas',type:'modal'},'');
+      } else if(!mp.classList.contains('open')){
+        mp._backPushed=false;
+      }
+    });
+    obs.observe(mp,{attributes:true});
+  }
+})();
+// ── FIM BACK NAVIGATION ──────────────────────────────────────────────
 function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
@@ -2652,155 +3025,23 @@ window.doLogin=async()=>{
   try{await signInWithEmailAndPassword(auth,email,pass);}
   catch(e){showErr('lerr',fbErrMsg(e.code));setBtn('btn-login',false,'Entrar');}
 };
-
-// ── CORE: AUTH STATE + ENTER APP / LOBBY ─────────────────────────────────────
-
-function listenGroup(gid){
-  if(unsubGroup){unsubGroup();unsubGroup=null;}
-  unsubGroup=onSnapshot(doc(db,'groups',gid),snap=>{
-    if(!snap.exists())return;
-    gd=snap.data();
-    window.gd=gd;
-    _updateNotifBadge();
-    if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
-    renderRanking();
-    if(typeof renderHistTab==='function') renderHistTab();
-    if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar().catch(()=>{});
-  });
-}
-
-async function enterApp(user){
-  currentUser=user;
-  window.currentUser=user;
-  const snap=await getDoc(doc(db,'users',user.uid));
-  if(!snap.exists()) return showScr('sl');
-  myProfile=snap.data();
-  window.myProfile=myProfile;
-  groupId=myProfile.groupId||null;
-  window.groupId=groupId;
-  if(!groupId){
-    showScr('sloby');
-    return;
-  }
-  const gsnap=await getDoc(doc(db,'groups',groupId));
-  if(!gsnap.exists()){
-    // grupo não existe mais — limpa referência
-    await updateDoc(doc(db,'users',user.uid),{groupId:''});
-    myProfile.groupId='';groupId=null;window.groupId=null;
-    showScr('sloby');
-    return;
-  }
-  gd=gsnap.data();
-  window.gd=gd;
-  // Garante que o membro está na lista do grupo
-  const mbs=gd.members||[];
-  const isMember=mbs.some(m=>m.uid===user.uid);
-  if(!isMember){
-    const newMb={uid:user.uid,name:myProfile.displayName||user.email,photo:myProfile.photo||''};
-    mbs.push(newMb);
-    gd.members=mbs;
-    await setDoc(doc(db,'groups',groupId),gd);
-    setTimeout(()=>{ if(typeof _publishFeed==='function') _publishFeed('membro',`<strong>${newMb.name}</strong> entrou no grupo! 👋`); },500);
-  }
-  renderHeaderAvatar();
-  showScr('sa');
-  listenGroup(groupId);
-  if(typeof renderRanking==='function') renderRanking();
-  if(typeof renderHistTab==='function') renderHistTab();
-  _updateNotifBadge();
-}
-
-function enterLobby(){
-  currentUser=null;myProfile=null;gd=null;groupId=null;
-  window.currentUser=null;window.myProfile=null;window.gd=null;window.groupId=null;
-  if(unsubGroup){unsubGroup();unsubGroup=null;}
-  showScr('sl');
-}
-
-onAuthStateChanged(auth,async user=>{
-  if(user){
-    try{ await enterApp(user); }
-    catch(e){ console.error('enterApp error:',e); showScr('sl'); }
-  } else {
-    enterLobby();
-  }
-});
-
-window.enterApp=enterApp;
-window.enterLobby=enterLobby;
-
-window.joinGroup=async()=>{
-  const code=($('join-code-input')?.value||'').trim().toUpperCase();
-  if(!code) return alert('Digite o código do grupo.');
-  const errEl=$('sloby-err');
-  if(errEl){errEl.textContent='';errEl.style.display='none';}
-  try{
-    const snap=await getDoc(doc(db,'groups',code));
-    if(!snap.exists()){
-      if(errEl){errEl.textContent='Grupo não encontrado.';errEl.style.display='block';}
-      return;
-    }
-    const cur=snap.data();
-    const mbs=cur.members||[];
-    if(!mbs.some(m=>m.uid===currentUser.uid)){
-      mbs.push({uid:currentUser.uid,name:myProfile.displayName||currentUser.email,photo:myProfile.photo||''});
-      cur.members=mbs;
-      await setDoc(doc(db,'groups',code),cur);
-    }
-    await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});
-    myProfile.groupId=code;groupId=code;window.groupId=code;
-    gd=cur;window.gd=gd;
-    setTimeout(()=>{ if(typeof _publishFeed==='function') _publishFeed('membro',`<strong>${myProfile.displayName}</strong> entrou no grupo! 👋`); },500);
-    renderHeaderAvatar();
-    showScr('sa');
-    listenGroup(groupId);
-    if(typeof renderRanking==='function') renderRanking();
-    if(typeof renderHistTab==='function') renderHistTab();
-    _updateNotifBadge();
-  }catch(e){ if(errEl){errEl.textContent='Erro ao entrar no grupo: '+e.message;errEl.style.display='block';} }
-};
-
-window.criarGrupo=async()=>{
-  const nome=($('group-name-input')?.value||'').trim();
-  if(!nome) return alert('Digite um nome para o grupo.');
-  const errEl=$('sloby-err');
-  if(errEl){errEl.textContent='';errEl.style.display='none';}
-  try{
-    // Gera código único de 6 chars
-    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code='';for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
-    const now=new Date();
-    const mesKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const newGroup={
-      name:nome,code,createdBy:currentUser.uid,createdAt:serverTimestamp(),
-      mesAtivo:mesKey,members:[{uid:currentUser.uid,name:myProfile.displayName||currentUser.email,photo:myProfile.photo||''}],
-      matches:[],historico:{},feed:[],notifs:{},desafios:[]
-    };
-    await setDoc(doc(db,'groups',code),newGroup);
-    await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});
-    myProfile.groupId=code;groupId=code;window.groupId=code;
-    gd=newGroup;window.gd=gd;
-    renderHeaderAvatar();
-    showScr('sa');
-    listenGroup(groupId);
-    if(typeof renderRanking==='function') renderRanking();
-    if(typeof renderHistTab==='function') renderHistTab();
-    _updateNotifBadge();
-  }catch(e){ if(errEl){errEl.textContent='Erro ao criar grupo: '+e.message;errEl.style.display='block';} }
-};
-
-// ── FIM CORE AUTH ─────────────────────────────────────────────────────────────
-
 window.resetarVotos = async function(){
   if(!gd||!currentUser||!groupId) return;
-  if(!confirm('Tem certeza? Isso vai apagar todos os dados do mês atual.')) return;
+  if(!confirm('Tem certeza? Isso vai apagar todos os votos de Craque da Rodada e MVP do Mês.')) return;
   try{
     const snap = await getDoc(doc(db,'groups',groupId));
     const cur = snap.data();
+    delete cur.craqueVotos;
+    delete cur.mvpVotos;
+    delete cur.mvpMes;
+    delete cur.craqueFeedPublicado;
+    // Remove notifs de craque_rodada, mvp_mes e voto_registrado de todos os membros
     if(cur.notifs){
       Object.keys(cur.notifs).forEach(uid => {
         cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n =>
-          n.tipo !== 'voto_registrado' && n.tipo !== 'nota_recebida' && n.tipo !== 'craque_rodada'
+          n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes' &&
+          n.tipo !== 'voto_registrado' && n.tipo !== 'nota_individual' &&
+          n.tipo !== 'nota_recebida'
         );
       });
     }
@@ -3047,6 +3288,192 @@ function renderPerfilPanelStats(){
     </div>`;
   }
 
+  // ── Card MVP do mês + Craque da Rodada ──
+  const mesKeyMVP = gd.mesAtivo || mesAtual();
+  const mediasProPerfil = window._getMVPMedias ? _getMVPMedias(mesKeyMVP) : [];
+  const minhaMVP = mediasProPerfil.find(x => x.uid === currentUser.uid);
+  const euSouMVP = mediasProPerfil.length > 0 && mediasProPerfil[0].uid === currentUser.uid;
+  const jaVoteiMVP = _mvpJaVotou ? _mvpJaVotou() : false;
+
+  // Craque da última rodada (última partida do grupo)
+  const todasPartidas = gd.matches||[];
+  const ultimaPartida = todasPartidas.length ? todasPartidas[todasPartidas.length-1] : null;
+  const ultimaCraqueKey = ultimaPartida ? _craqueKey(ultimaPartida.ts) : null;
+
+  // Auto-encerra votação expirada que ainda não foi processada
+  if(ultimaCraqueKey && window._craqueVotacaoEncerrada && window._craqueTempoRestante){
+    const _jaEncerrada = _craqueVotacaoEncerrada(gd, ultimaCraqueKey);
+    const _prazo = _craqueTempoRestante(ultimaCraqueKey);
+    const _jaPublicado = gd.craqueFeedPublicado && gd.craqueFeedPublicado[ultimaCraqueKey];
+    if(_jaEncerrada && !_jaPublicado && Object.keys((gd.craqueVotos||{})[ultimaCraqueKey]||{}).length > 0){
+      // Processa em background sem bloquear a UI
+      (async () => {
+        try {
+          const _snap = await getDoc(doc(db,'groups',groupId));
+          const _cur = _snap.data();
+          const _mesKey = _cur.mesAtivo || _mesAtual();
+          _notificarCraqueDaRodada(_cur, ultimaCraqueKey);
+          // Envia a cada jogador a sua própria nota recebida (anônima)
+          _notificarNotaRecebida(_cur, ultimaCraqueKey);
+          // Incrementa contador de Craque para o vencedor
+          const _crAuto = _getCraqueVencedor(_cur, ultimaCraqueKey);
+          if(_crAuto){ const _crMbAuto=(_cur.members||[]).find(m=>m.uid===_crAuto.uid); if(_crMbAuto)_crMbAuto.qtdCraque=(_crMbAuto.qtdCraque||0)+1; }
+          const _cr = _getCraqueVencedor(_cur, ultimaCraqueKey);
+          if(_cr){
+            const _mb = (_cur.members||[]).find(m=>m.uid===_cr.uid);
+            if(_mb){
+              if(!_cur.craqueFeedPublicado) _cur.craqueFeedPublicado = {};
+              _cur.craqueFeedPublicado[ultimaCraqueKey] = true;
+              await setDoc(doc(db,'groups',groupId), _cur);
+              await _publishFeed('craque', `⭐ <strong>${_mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${_cr.media}!`);
+              gd = _cur;
+            }
+          }
+        } catch(e){ console.warn('auto-close craque:', e); }
+      })();
+    }
+  }
+
+  const craqueAtual = ultimaCraqueKey && window._getCraqueVencedor ? _getCraqueVencedor(gd, ultimaCraqueKey) : null;
+  const craqueMembro = craqueAtual ? (gd.members||[]).find(m=>m.uid===craqueAtual.uid) : null;
+  const euSouCraque = craqueAtual && craqueAtual.uid === currentUser.uid;
+  const jaVoteiCraque = ultimaPartida && window._craqueJaVotou ? _craqueJaVotou(ultimaPartida.ts) : false;
+
+  const totalVotantes = Object.keys((gd.mvpVotos||{})[mesKeyMVP]||{}).length;
+
+  const totalEl2 = $('pperfil-stats-total');
+  if(totalEl2){
+    const mvpCardId = 'pperfil-mvp-card';
+    let mvpCardEl = $(mvpCardId);
+    if(!mvpCardEl){
+      mvpCardEl = document.createElement('div');
+      mvpCardEl.id = mvpCardId;
+      mvpCardEl.style.marginBottom = '1rem';
+      totalEl2.parentNode.insertBefore(mvpCardEl, totalEl2.nextSibling);
+    }
+
+    let mvpHtml = `<div style="display:flex;flex-direction:column;gap:10px">`;
+
+    // ── Craque da Rodada ──
+    if(ultimaPartida){
+      const _votacaoEncerrada = window._craqueVotacaoEncerrada ? _craqueVotacaoEncerrada(gd, ultimaCraqueKey) : false;
+      const _msRestante = window._craqueTempoRestante ? _craqueTempoRestante(ultimaCraqueKey) : 0;
+      const _prazoExpirou = _msRestante === 0;
+      const _totalVotos = Object.keys((gd.craqueVotos||{})[ultimaCraqueKey]||{}).length;
+      const _totalMembros = (gd.members||[]).length;
+
+      // Formata tempo restante
+      let _tempoLabel = '';
+      if(!_prazoExpirou && !jaVoteiCraque){
+        const _horas = Math.floor(_msRestante / 3600000);
+        const _mins = Math.floor((_msRestante % 3600000) / 60000);
+        _tempoLabel = _horas > 0 ? `${_horas}h ${_mins}min restantes` : `${_mins}min restantes`;
+      }
+
+      // Botão direito do header
+      let _headerRight = '';
+      if(jaVoteiCraque){
+        _headerRight = `<div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">✓ Você votou</div>`;
+      } else if(_prazoExpirou){
+        _headerRight = `<div style="font-size:10px;font-family:'DM Mono',monospace;color:#FF5A7A">⏰ Prazo encerrado</div>`;
+      } else {
+        _headerRight = `<div style="display:flex;align-items:center;gap:6px">
+          <div style="font-size:9px;font-family:'DM Mono',monospace;color:var(--tx3)">${_tempoLabel}</div>
+          <button onclick="abrirModalMVP(${ultimaPartida.ts})" style="background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Mono',monospace">Votar</button>
+        </div>`;
+      }
+
+      // Progresso de votos (só enquanto aberta)
+      let _progressoHtml = '';
+      if(!_votacaoEncerrada){
+        _progressoHtml = `<div style="margin-bottom:8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">${_totalVotos} de ${_totalMembros} vote${_totalMembros!==1?'s':''}</div>`;
+      }
+
+      mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.25);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">⭐ Craque da Rodada</div>
+          ${_headerRight}
+        </div>
+        ${_progressoHtml}
+        ${_votacaoEncerrada && craqueMembro
+          ? `<div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:24px">${euSouCraque?'🌟':'⭐'}</div>
+              <div>
+                <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${craqueMembro.name}</div>
+                <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${craqueAtual.media} · ${craqueAtual.votos} voto${craqueAtual.votos!==1?'s':''}</div>
+              </div>
+            </div>`
+          : _votacaoEncerrada
+            ? `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Nenhum voto registrado.</div>`
+            : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">🔒 Resultado após encerrar a votação.</div>`}
+        ${_votacaoEncerrada && euSouCraque ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">🌟 Você foi o Craque desta rodada!</div>`:''}
+      </div>`;
+    }
+
+    // ── MVP do Mês ──
+    // Só revela o MVP se o mês está fechado (existe em gd.historico)
+    const mesKeyMVPFechado = Object.keys(gd.historico||{}).sort().reverse()[0] || null;
+    const mesAtivoCurrent  = gd.mesAtivo || mesAtual();
+    const mesFechado = mesKeyMVPFechado && mesKeyMVPFechado !== mesAtivoCurrent;
+    // Notas do mês fechado para exibição do MVP revelado
+    const mvpFechadoData = mesFechado && gd.mvpMes && gd.mvpMes[mesKeyMVPFechado]
+      ? gd.mvpMes[mesKeyMVPFechado] : null;
+    const mvpFechadoMembro = mvpFechadoData
+      ? (gd.members||[]).find(m=>m.uid===mvpFechadoData.uid) : null;
+    // Minha nota do mês ATIVO (só para mim, enquanto votação aberta)
+    const minhaNota = minhaMVP ? minhaMVP.media : null;
+    const mesLabel = mesAtivoCurrent ? getMesLabel(mesAtivoCurrent) : '';
+
+    mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.2);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏆 MVP do mês</div>
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">${totalVotantes} avaliação${totalVotantes!==1?'ões':''}</div>
+      </div>
+      ${mvpFechadoMembro
+        ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-size:24px">🥇</div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${mvpFechadoMembro.name}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">MVP de ${getMesLabel(mesKeyMVPFechado)} · Média ${mvpFechadoData.media}</div>
+            </div>
+          </div>`
+        : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:6px">🔒 Resultado revelado ao fechar o mês.</div>`}
+      ${minhaNota !== null
+        ? `<div style="padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2);display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--tx2)">Sua média este mês (${mesLabel})</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:18px;color:#FFD166">${minhaNota}</div>
+          </div>`
+        : ''
+      }
+    </div>`;
+
+    // ── Contadores de Craque da Rodada e MVP ──
+    const mb_me = (gd.members||[]).find(m=>m.uid===currentUser.uid);
+    const qtdCraque = mb_me?.qtdCraque || 0;
+    const qtdMVP    = mb_me?.qtdMVP    || 0;
+    if(qtdCraque > 0 || qtdMVP > 0){
+      mvpHtml += `<div style="display:flex;gap:8px">
+        ${qtdCraque > 0 ? `<div style="flex:1;background:var(--bg3);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px">
+          <div style="font-size:20px">⭐</div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">Craque</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:22px;color:#FFD166;line-height:1">${qtdCraque}x</div>
+          </div>
+        </div>` : ''}
+        ${qtdMVP > 0 ? `<div style="flex:1;background:var(--bg3);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px">
+          <div style="font-size:20px">🏆</div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">MVP</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:22px;color:#FFD166;line-height:1">${qtdMVP}x</div>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }
+
+    mvpHtml += `</div>`;
+    mvpCardEl.innerHTML = mvpHtml;
+  }
+
   // ── Últimas partidas ──
   const allMatches=gd.matches||[];
   const myMatches=allMatches.map((m,i)=>({...m,_gi:i})).filter(m=>m.uid===currentUser.uid||m.player===myProfile.displayName).sort((a,b)=>b.ts-a.ts).slice(0,5);
@@ -3279,48 +3706,1593 @@ window.removerApelido=async()=>{
 };
 // ── FIM APELIDO ──────────────────────────────────────────────────
 
+// ── CRAQUE DA RODADA + MVP DO MÊS ────────────────────────────────
+// Estrutura no Firestore:
+//   craqueVotos[partidaKey][votanteUid] = { uid: nota, ... }  → Craque da Rodada (por partida)
+//   mvpVotos[mesKey][votanteUid] = { uid: nota, ... }         → MVP do Mês (agregado mensal)
+//   mvpMes[mesKey] = { uid, media }                            → cache do líder mensal
 
+let _craqueNotas = {}; // notas em andamento no modal
+let _craquePartidaKey = ''; // chave da partida atual sendo avaliada
 
-// ── MVP STREAK ───────────────────────────────────────────────────────────────
-let mvp = null; // calculado em renderRanking
+function _mesAtual(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
 
-function _calcMvpStreak(){
-  if(!gd) return null;
-  const hist = gd.historico||{};
-  const meses = Object.keys(hist).sort();
-  if(meses.length < 2) return null;
-  // Para cada membro, calcula quantos meses consecutivos foi 1º em G+A
-  const mbs = gd.members||[];
-  let bestUid=null, bestStreak=0, bestMonths=[];
-  mbs.forEach(mb=>{
-    let streak=0, months=[], cur=[];
-    meses.forEach(k=>{
-      const h=hist[k];
-      const ranked=[...( h.members||[] )].map(mm=>{
-        const ms=(h.matches||[]).filter(x=>m_uid_match(x,mm));
-        return{uid:mm.uid,ga:ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0)};
-      }).sort((a,b)=>b.ga-a.ga);
-      if(ranked.length && ranked[0].uid===mb.uid && ranked[0].ga>0){
-        streak++;
-        const [y,m]=k.split('-');
-        const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1];
-        cur.push(mn+'/'+y);
-      } else {
-        if(streak>bestStreak){bestStreak=streak;bestUid=mb.uid;bestMonths=[...cur];}
-        streak=0;cur=[];
+// ── CRAQUE DA RODADA ─────────────────────────────────────────────
+
+// Gera chave única para uma partida (ts do registro)
+window._craqueKey = function(ts){ return 'p_'+ts; };
+
+// Verifica se o usuário já avaliou esta partida
+window._craqueJaVotou = function(partidaTs){
+  if(!gd||!currentUser) return false;
+  const key = _craqueKey(partidaTs);
+  return !!(gd.craqueVotos && gd.craqueVotos[key] && gd.craqueVotos[key][currentUser.uid]);
+};
+
+// Abre modal de votação Craque da Rodada
+window.abrirModalMVP = function(partidaTs){
+  if(!gd||!currentUser) return;
+  // Bloqueia re-votação
+  const _chaveVerif = _craqueKey(partidaTs || Date.now());
+  if(gd.craqueVotos && gd.craqueVotos[_chaveVerif] && gd.craqueVotos[_chaveVerif][currentUser.uid]) return;
+  const modal = document.getElementById('modal-mvp');
+  const lista = document.getElementById('mvp-players-list');
+  if(!modal||!lista) return;
+
+  _craqueNotas = {};
+  _craquePartidaKey = _craqueKey(partidaTs || Date.now());
+
+  const colegas = (gd.members||[]).filter(m => m.uid !== currentUser.uid);
+  if(!colegas.length) return;
+
+  lista.innerHTML = colegas.map(m => {
+    const foto = m.photo
+      ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid var(--bo2);flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const avatar = `<div style="width:38px;height:38px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--bo2);display:${m.photo?'none':'flex'};align-items:center;justify-content:center;font-size:16px;flex-shrink:0">👤</div>`;
+    return `<div class="mvp-player-row" id="mvp-row-${m.uid}">
+      ${foto}${avatar}
+      <div class="mvp-player-name">${m.name||'Jogador'}</div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',-0.5)">‹</button>
+        <div class="mvp-nota-label" id="mvp-nota-${m.uid}">—</div>
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',0.5)">›</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const okEl = document.getElementById('mvp-ok');
+  if(okEl) okEl.style.display='none';
+  modal.classList.add('open');
+};
+
+window._craqueAjustarNota = function(uid, delta){
+  const atual = _craqueNotas[uid] === undefined ? null : _craqueNotas[uid];
+  const nova = atual === null ? 5 : Math.round(Math.max(0, Math.min(10, atual + delta)) * 2) / 2;
+  _craqueNotas[uid] = nova;
+  const el = document.getElementById('mvp-nota-'+uid);
+  if(el){
+    el.textContent = nova % 1 === 0 ? nova.toFixed(0) : nova.toFixed(1);
+    el.style.color = nova >= 8 ? '#4dffb0' : nova >= 5 ? '#FFD166' : '#FF5A7A';
+  }
+  const row = document.getElementById('mvp-row-'+uid);
+  if(row) row.style.borderColor = nova >= 8 ? 'rgba(77,255,176,.4)' : nova >= 5 ? 'rgba(255,209,102,.4)' : 'rgba(255,90,122,.3)';
+};
+
+window.fecharModalMVP = function(){
+  const modal = document.getElementById('modal-mvp');
+  if(modal) modal.classList.remove('open');
+};
+
+window.salvarVotosMVP = async function(){
+  if(!gd||!currentUser||!groupId) return;
+  const entradas = Object.entries(_craqueNotas);
+  if(!entradas.length){ fecharModalMVP(); return; }
+
+  const mesKey = gd.mesAtivo || _mesAtual();
+  const partidaKey = _craquePartidaKey;
+
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur = snap.data();
+
+    // ── Salva Craque da Rodada ──
+    if(!cur.craqueVotos) cur.craqueVotos = {};
+    if(!cur.craqueVotos[partidaKey]) cur.craqueVotos[partidaKey] = {};
+    cur.craqueVotos[partidaKey][currentUser.uid] = {};
+    entradas.forEach(([uid, nota]) => { cur.craqueVotos[partidaKey][currentUser.uid][uid] = nota; });
+
+    // Mantém máximo de 60 partidas no histórico de craque
+    const chavesCraque = Object.keys(cur.craqueVotos);
+    if(chavesCraque.length > 60){
+      chavesCraque.sort().slice(0, chavesCraque.length - 60).forEach(k => delete cur.craqueVotos[k]);
+    }
+
+    // ── Agrega notas para MVP do Mês ──
+    // Cada voto de craque também conta para o MVP mensal
+    if(!cur.mvpVotos) cur.mvpVotos = {};
+    if(!cur.mvpVotos[mesKey]) cur.mvpVotos[mesKey] = {};
+    // Usa chave composta votante+partida para não sobrescrever votos de outras rodadas
+    const mvpChaveVotante = currentUser.uid + '_' + partidaKey;
+    cur.mvpVotos[mesKey][mvpChaveVotante] = {};
+    entradas.forEach(([uid, nota]) => { cur.mvpVotos[mesKey][mvpChaveVotante][uid] = nota; });
+
+    // Voto anulado se grupo tem <= 2 membros
+    const _totalMembros = (cur.members||[]).length;
+    if(_totalMembros <= 2){
+      await setDoc(doc(db,'groups',groupId), cur);
+      gd = cur;
+      const okEl2 = document.getElementById('mvp-ok');
+      if(okEl2) okEl2.style.display='block';
+      setTimeout(fecharModalMVP, 1400);
+      return;
+    }
+
+    // Voto anônimo — sem notificação de quem votou ou de notas individuais
+
+    // Verifica se a votação está encerrada (todos votaram OU prazo de 24h expirou)
+    const _tsPartida = parseInt(partidaKey.replace('p_',''));
+    const _prazoExpirou = (Date.now() - _tsPartida) >= 24 * 60 * 60 * 1000;
+    const _votosObj = cur.craqueVotos[partidaKey]||{};
+    const _totalVotos = Object.keys(_votosObj).length;
+    const _todosVotaram = _totalVotos >= _totalMembros || _prazoExpirou;
+
+    if(_todosVotaram){
+      // Notifica craque da rodada para todos (anunciado imediatamente)
+      _notificarCraqueDaRodada(cur, partidaKey);
+      // Envia a cada jogador a sua própria nota recebida (anônima)
+      _notificarNotaRecebida(cur, partidaKey);
+      // Incrementa contador de Craque da Rodada no membro vencedor
+      const _crVenc = _getCraqueVencedor(cur, partidaKey);
+      if(_crVenc){
+        const _crMb = (cur.members||[]).find(m=>m.uid===_crVenc.uid);
+        if(_crMb){ _crMb.qtdCraque = (_crMb.qtdCraque||0) + 1; }
       }
+      // MVP do mês: NÃO revela aqui — só ao fechar o mês
+    }
+
+    await setDoc(doc(db,'groups',groupId), cur);
+    gd = cur;
+
+    const okEl = document.getElementById('mvp-ok');
+    if(okEl) okEl.style.display='block';
+    setTimeout(fecharModalMVP, 1400);
+
+    // Publica no feed quando votação encerrada e ainda não foi publicado
+    if(_todosVotaram && !(cur.craqueFeedPublicado && cur.craqueFeedPublicado[partidaKey])){
+      const craqueRodada = _getCraqueVencedor(cur, partidaKey);
+      if(craqueRodada){
+        const mb = (cur.members||[]).find(m=>m.uid===craqueRodada.uid);
+        if(mb){
+          if(!cur.craqueFeedPublicado) cur.craqueFeedPublicado = {};
+          cur.craqueFeedPublicado[partidaKey] = true;
+          await setDoc(doc(db,'groups',groupId), cur);
+          await _publishFeed('craque', `⭐ <strong>${mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${craqueRodada.media}!`);
+        }
+      }
+    }
+
+  } catch(e){ console.warn('craque save:',e); fecharModalMVP(); }
+};
+
+// Verifica se votação desta rodada está encerrada (todos votaram OU 24h desde a partida)
+window._craqueVotacaoEncerrada = function(cur, partidaKey){
+  const tsPartida = parseInt(partidaKey.replace('p_',''));
+  const prazoExpirou = (Date.now() - tsPartida) >= 24 * 60 * 60 * 1000;
+  if(prazoExpirou) return true;
+  const totalVotos = Object.keys((cur.craqueVotos||{})[partidaKey]||{}).length;
+  return totalVotos >= (cur.members||[]).length;
+};
+
+// Retorna ms restantes para encerrar votação (0 se já encerrada)
+window._craqueTempoRestante = function(partidaKey){
+  const tsPartida = parseInt(partidaKey.replace('p_',''));
+  const restante = (tsPartida + 24 * 60 * 60 * 1000) - Date.now();
+  return Math.max(0, restante);
+};
+
+// Calcula o vencedor do Craque da Rodada de uma partida
+window._getCraqueVencedor = function(cur, partidaKey){
+  const votos = (cur.craqueVotos||{})[partidaKey];
+  if(!votos) return null;
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
     });
-    if(streak>bestStreak){bestStreak=streak;bestUid=mb.uid;bestMonths=[...cur];}
   });
-  if(bestStreak < 2) return null;
-  const mb=mbs.find(m=>m.uid===bestUid);
-  if(!mb) return null;
-  return {uid:bestUid, name:mb.name, streak:bestStreak, months:bestMonths};
+  const lista = Object.entries(totais).map(([uid,{soma,count}]) => ({uid, media:+(soma/count).toFixed(1), count}));
+  if(!lista.length) return null;
+  lista.sort((a,b) => b.media - a.media);
+  return lista[0];
+};
+
+// Notifica todos os outros membros que um jogador votou
+window._notificarVotoRegistrado = function(cur, partidaKey, votanteUid){
+  const votante = (cur.members||[]).find(m => m.uid === votanteUid);
+  const votanteNome = votante ? (votante.name||'Jogador') : 'Jogador';
+  const totalVotos = Object.keys((cur.craqueVotos||{})[partidaKey]||{}).length;
+  const totalMembros = (cur.members||[]).length;
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  (cur.members||[]).forEach(membro => {
+    if(membro.uid === votanteUid) return; // não notifica quem votou
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    cur.notifs[membro.uid].push({
+      id: 'voto_'+partidaKey+'_'+votanteUid+'_'+agora,
+      tipo: 'voto_registrado',
+      partidaKey,
+      votanteNome,
+      totalVotos,
+      totalMembros,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
+  });
+};
+
+// Notifica o craque da rodada para todos os membros do grupo
+window._notificarCraqueDaRodada = function(cur, partidaKey){
+  const vencedor = _getCraqueVencedor(cur, partidaKey);
+  if(!vencedor) return;
+  if(vencedor.count < 1) return;
+  const vencedorMembro = (cur.members||[]).find(m => m.uid === vencedor.uid);
+  const vencedorNome = vencedorMembro ? (vencedorMembro.name||'Jogador') : 'Jogador';
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  (cur.members||[]).forEach(membro => {
+    const ehVencedor = membro.uid === vencedor.uid;
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    // Remove notif anterior desta partida para este membro
+    cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n => !(n.tipo==='craque_rodada' && n.partidaKey===partidaKey));
+    cur.notifs[membro.uid].push({
+      id: 'craque_'+partidaKey+'_'+membro.uid+'_'+agora,
+      tipo: 'craque_rodada',
+      partidaKey,
+      media: vencedor.media,
+      votos: vencedor.count,
+      vencedorUid: vencedor.uid,
+      vencedorNome,
+      ehVencedor,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
+  });
+};
+
+// Verifica se já votou nesta partida (usa ts da última partida salva)
+window._mvpJaVotou = function(){
+  if(!gd||!currentUser) return false;
+  // Pega o ts da última partida do usuário atual
+  const minhasPartidas = (gd.matches||[]).filter(m=>m.uid===currentUser.uid);
+  if(!minhasPartidas.length) return true;
+  const ultima = minhasPartidas[minhasPartidas.length-1];
+  return _craqueJaVotou(ultima.ts);
+};
+
+// ── MVP DO MÊS ───────────────────────────────────────────────────
+
+// Calcula médias mensais e notifica MVP do mês se mudou
+window._calcularENotificarMVP = function(cur, mesKey){
+  if(!cur.mvpVotos||!cur.mvpVotos[mesKey]) return;
+  const votos = cur.mvpVotos[mesKey];
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
+    });
+  });
+  const medias = Object.entries(totais).map(([uid,{soma,count}]) => ({
+    uid, media:+(soma/count).toFixed(2), count
+  })).filter(x=>x.count>=1).sort((a,b)=>b.media-a.media);
+  if(!medias.length) return medias;
+
+  const mvpAtual = medias[0];
+  const prevMvp = cur.mvpMes && cur.mvpMes[mesKey];
+
+  if(!prevMvp || prevMvp.uid !== mvpAtual.uid){
+    if(!cur.mvpMes) cur.mvpMes = {};
+    cur.mvpMes[mesKey] = { uid: mvpAtual.uid, media: mvpAtual.media };
+
+    const mvpMembro = (cur.members||[]).find(m => m.uid === mvpAtual.uid);
+    const mvpNome = mvpMembro ? (mvpMembro.name||'Jogador') : 'Jogador';
+    if(!cur.notifs) cur.notifs = {};
+    const agoraMVP = Date.now();
+    (cur.members||[]).forEach(membro => {
+      const ehMVP = membro.uid === mvpAtual.uid;
+      if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+      cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n => !(n.tipo==='mvp_mes' && n.mes===mesKey));
+      cur.notifs[membro.uid].push({
+        id: 'mvp_'+mesKey+'_'+membro.uid+'_'+agoraMVP,
+        tipo: 'mvp_mes',
+        mes: mesKey,
+        media: mvpAtual.media,
+        mvpUid: mvpAtual.uid,
+        mvpNome,
+        ehMVP,
+        ts: agoraMVP
+      });
+      if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
+    });
+  }
+  return medias;
+};
+
+// Retorna médias MVP do mês para exibição
+window._getMVPMedias = function(mesKey){
+  if(!gd||!gd.mvpVotos||!gd.mvpVotos[mesKey]) return [];
+  const votos = gd.mvpVotos[mesKey];
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = {soma:0, count:0};
+      totais[uid].soma += nota; totais[uid].count++;
+    });
+  });
+  return Object.entries(totais).map(([uid,{soma,count}]) => ({
+    uid, media:+(soma/count).toFixed(1), count
+  })).sort((a,b)=>b.media-a.media);
+};
+// Notifica cada jogador com a sua própria nota média recebida na rodada (anônimo)
+window._notificarNotaRecebida = function(cur, partidaKey){
+  const votos = (cur.craqueVotos||{})[partidaKey];
+  if(!votos) return;
+
+  // Agrega notas recebidas por cada jogador (soma e contagem)
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = { soma: 0, count: 0 };
+      totais[uid].soma  += nota;
+      totais[uid].count += 1;
+    });
+  });
+
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  const totalVotantes = Object.keys(votos).length;
+
+  (cur.members||[]).forEach(membro => {
+    const t = totais[membro.uid];
+    if(!t) return; // não recebeu nenhum voto nesta rodada
+    const media = +(t.soma / t.count).toFixed(1);
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    // Remove notif anterior desta partida para este membro (evita duplicata)
+    cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n =>
+      !(n.tipo === 'nota_recebida' && n.partidaKey === partidaKey)
+    );
+    cur.notifs[membro.uid].push({
+      id: 'nota_recv_' + partidaKey + '_' + membro.uid + '_' + agora,
+      tipo: 'nota_recebida',
+      partidaKey,
+      media,
+      totalVotantes,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 30)
+      cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 30);
+  });
+};
+
+// ── FIM CRAQUE / MVP ──────────────────────────────────────────────
+
+// Envia notificação privada de nota individual para cada jogador avaliado
+window._notificarNotasIndividuais = function(cur, partidaKey, votanteUid, notas){
+  const votante = (cur.members||[]).find(m=>m.uid===votanteUid);
+  const votanteNome = votante ? (votante.name||'Jogador') : 'Jogador';
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  Object.entries(notas).forEach(([avUid, nota]) => {
+    if(avUid === votanteUid) return; // não notifica a si mesmo
+    if(!cur.notifs[avUid]) cur.notifs[avUid] = [];
+    // Remove notif anterior deste votante para esta partida (evita duplicata)
+    cur.notifs[avUid] = cur.notifs[avUid].filter(n =>
+      !(n.tipo==='nota_individual' && n.partidaKey===partidaKey && n.votanteUid===votanteUid)
+    );
+    cur.notifs[avUid].push({
+      id: 'nota_'+partidaKey+'_'+votanteUid+'_'+avUid+'_'+agora,
+      tipo: 'nota_individual',
+      partidaKey,
+      votanteUid,
+      votanteNome,
+      nota,
+      ts: agora
+    });
+    if(cur.notifs[avUid].length > 30) cur.notifs[avUid].splice(0, cur.notifs[avUid].length - 30);
+  });
+};
+
+// Revela o MVP do mês ao fechar o mês (chamada pelo admin / virada de mês)
+// Incrementa qtdMVP no membro vencedor
+window._revelarMVPMes = function(cur, mesKey){
+  const medias = _calcularENotificarMVP(cur, mesKey);
+  if(!medias || !medias.length) return;
+  const mvpVenc = medias[0];
+  const mvpMb = (cur.members||[]).find(m=>m.uid===mvpVenc.uid);
+  if(mvpMb){ mvpMb.qtdMVP = (mvpMb.qtdMVP||0) + 1; }
+};
+
+window.copyCodePerfil=()=>{
+  navigator.clipboard.writeText(groupId).then(()=>{const b=$('copy-code-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));
+};
+
+// ── METAS PESSOAIS ──────────────────────────────────────────────
+let _metaTipoAtual='ga';
+
+window.abrirEditarMeta=()=>{
+  const box=$('meta-edit-box');
+  if(!box)return;
+  const mesKey=gd?.mesAtivo||mesAtual();
+  // Verificação de prazo (dupla proteção no JS)
+  const hoje=new Date();
+  const [mkAno,mkMes]=mesKey.split('-').map(Number);
+  const ehMesAtual=hoje.getFullYear()===mkAno&&(hoje.getMonth()+1)===mkMes;
+  const prazoExpirou=ehMesAtual&&hoje.getDate()>3;
+  const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
+  const temMeta=metaSalva&&(metaSalva.alvoGols>0||metaSalva.alvoAssist>0);
+  if(prazoExpirou){
+    // Mostra toast de aviso em vez de abrir
+    const t=document.createElement('div');
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-family:DM Mono,monospace;font-size:12px;padding:10px 18px;border-radius:10px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;border:1px solid rgba(255,90,122,.4)';
+    t.textContent='🔒 Prazo encerrado. Meta disponível a partir do dia 1.';
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(),2800);
+    return;
+  }
+  const metaSalvaVal=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
+  const gi=$('meta-gols-input');
+  const ai=$('meta-assist-input');
+  if(gi) gi.value=metaSalvaVal?.alvoGols||0;
+  if(ai) ai.value=metaSalvaVal?.alvoAssist||0;
+  box.style.display='block';
+  setTimeout(()=>{if(gi)gi.focus();},80);
+};
+
+window.fecharEditarMeta=()=>{
+  const box=$('meta-edit-box');if(box)box.style.display='none';
+};
+
+window.stepMeta=(campo,d)=>{
+  const inp=$(campo==='gols'?'meta-gols-input':'meta-assist-input');
+  if(!inp)return;
+  let v=parseInt(inp.value)||0;
+  v=Math.max(0,Math.min(999,v+d));
+  inp.value=v;
+};
+
+window.salvarMeta=async()=>{
+  if(!currentUser)return;
+  // Verificação de prazo
+  const mesKey=gd?.mesAtivo||mesAtual();
+  const hoje=new Date();
+  const [mkAno,mkMes]=mesKey.split('-').map(Number);
+  const ehMesAtual=hoje.getFullYear()===mkAno&&(hoje.getMonth()+1)===mkMes;
+  const prazoExpirou=ehMesAtual&&hoje.getDate()>3;
+  const metaExistente=myProfile.meta&&myProfile.meta.mesKey===mesKey&&(myProfile.meta.alvoGols>0||myProfile.meta.alvoAssist>0);
+  if(prazoExpirou){fecharEditarMeta();return;}
+  const gi=$('meta-gols-input');
+  const ai=$('meta-assist-input');
+  const alvoGols  =Math.max(0,Math.min(999,parseInt(gi?.value)||0));
+  const alvoAssist=Math.max(0,Math.min(999,parseInt(ai?.value)||0));
+  const meta={alvoGols,alvoAssist,mesKey};
+  myProfile.meta=meta;
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid),{meta});
+  }catch(e){console.warn('meta save:',e);}
+  fecharEditarMeta();
+  renderPerfilPanelStats();
+  // Verifica se já atingiu a meta recém-definida e publica no feed
+  setTimeout(async()=>{
+    const s=getSt(currentUser.uid,(gd?.matches||[]),true);
+    const partes=[];
+    if(alvoGols>0&&s.gols>=alvoGols) partes.push(`meta de gols (${alvoGols}⚽)`);
+    if(alvoAssist>0&&s.assist>=alvoAssist) partes.push(`meta de assistências (${alvoAssist}👟)`);
+    if(partes.length) await _publishFeed('meta',`<strong>${myProfile.displayName}</strong> atingiu a ${partes.join(' e ')} do mês! 🎯`);
+  },300);
+};
+
+window.removerMeta=async()=>{
+  if(!currentUser)return;
+  myProfile.meta=null;
+  try{await updateDoc(doc(db,'users',currentUser.uid),{meta:null});}catch(e){}
+  fecharEditarMeta();
+  renderPerfilPanelStats();
+};
+// ── FIM METAS ────────────────────────────────────────────────────
+
+
+// ── SISTEMA DE NOTIFICAÇÕES ─────────────────────────────────────────────────
+
+function _notifTimeAgo(ts){
+  const diff=Date.now()-ts;
+  const m=Math.floor(diff/60000);
+  if(m<1)return'agora mesmo';
+  if(m<60)return`há ${m} min`;
+  const h=Math.floor(m/60);
+  if(h<24)return`há ${h}h`;
+  const d=Math.floor(h/24);
+  return`há ${d}d`;
+}
+
+function _getMyPersonalNotifs(){
+  // Notificações pessoais de desafio (solicitação e aceite)
+  if(!gd||!currentUser) return [];
+  const mine=(gd.notifs||{})[currentUser.uid]||[];
+  return mine.slice().sort((a,b)=>b.ts-a.ts);
+}
+
+// Cor da nota conforme faixa definida
+function _corNota(v){
+  if(v <= 4.5) return '#e53e3e';   // vermelho
+  if(v <= 7.0) return '#f97316';   // laranja
+  return '#2f9e44';                // verde escuro
+}
+
+// Apaga notificação pessoal pelo id (persiste no Firestore)
+window._apagarNotif = async function(id){
+  if(!gd||!currentUser||!groupId) return;
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur  = snap.data();
+    if(cur.notifs&&cur.notifs[currentUser.uid]){
+      cur.notifs[currentUser.uid] = cur.notifs[currentUser.uid].filter(n=>n.id!==id);
+      await setDoc(doc(db,'groups',groupId),cur);
+      gd = cur;
+      _renderNotifPanel();
+      _updateNotifBadge();
+    }
+  }catch(e){ console.warn('apagarNotif:',e); }
+};
+
+function _btnDel(id){
+  return `<button onclick="_apagarNotif('${id}')" title="Apagar" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s" onmouseover="this.style.background='rgba(255,90,122,.35)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'">×</button>`;
+}
+
+function _renderNotifPanel(){
+  const list=document.getElementById('notif-list');
+  if(!list)return;
+  const personalNotifs=_getMyPersonalNotifs();
+  const feed=(gd?.feed||[]).slice().reverse();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
+
+  let html='';
+
+  if(personalNotifs.length){
+    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Suas notificações</div>';
+    html+=personalNotifs.slice(0,20).map(n=>{
+      const unread=!lidasP.includes(n.id);
+      const del=_btnDel(n.id);
+
+      if(n.tipo==='desafio_solicitacao'){
+        const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
+        const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
+        const btns=podeResponder
+          ?'<div style="display:flex;gap:6px;margin-top:8px">'
+            +'<button onclick="_dcAceitar(\u0027'+n.desafioId+'\u0027);document.getElementById(\u0027notif-panel\u0027).classList.remove(\u0027open\u0027)" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
+            +'<button onclick="_dcCancelar(\u0027'+n.desafioId+'\u0027)" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
+            +'</div>'
+          :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
+        return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
+          <div style="display:flex;align-items:center;gap:8px;width:100%">
+            <div class="notif-icon">⚔️</div>
+            <div class="notif-body">
+              <div class="notif-text"><strong>${n.de}</strong> te desafiou!</div>
+              <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+            </div>
+            ${del}
+          </div>
+          ${btns}
+        </div>`;
+      }
+      if(n.tipo==='desafio_aceito'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🎉</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio! O jogo começa agora.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='mvp_mes'){
+        const [ano,mes]=(n.mes||'').split('-');
+        const mesNome=mes?['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]:'';
+        const mc=_corNota(parseFloat(n.media));
+        const textoMVP=n.ehMVP
+          ?`Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟`
+          :`<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🏆`;
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🏆</div>
+          <div class="notif-body">
+            <div class="notif-text">${textoMVP}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='voto_registrado') return '';
+      if(n.tipo==='craque_rodada'){
+        const mc=_corNota(parseFloat(n.media));
+        const textoCraque=n.ehVencedor
+          ?`Você foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
+          :`<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! ⭐`;
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">⭐</div>
+          <div class="notif-body">
+            <div class="notif-text">${textoCraque}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='nota_individual') return '';
+      if(n.tipo==='nota_recebida'){
+        const cor=_corNota(parseFloat(n.media));
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">📊</div>
+          <div class="notif-body">
+            <div class="notif-text">Sua nota na rodada: <strong style="color:${cor};font-size:16px">${n.media}</strong> · avaliado por ${n.totalVotantes} jogador${n.totalVotantes!==1?'es':''}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      return'';
+    }).join('');
+    if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
+  }
+
+  if(!personalNotifs.length){
+    list.innerHTML='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
+    return;
+  }
+
+  list.innerHTML=html;
+}
+function _updateNotifBadge(){
+  const badge=document.getElementById('notif-badge');
+  if(!badge)return;
+  const personalNotifs=_getMyPersonalNotifs();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
+  const feed=gd?.feed||[];
+  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const naoLidasP=personalNotifs.filter(n=>!lidasP.includes(n.id)).length;
+  const naoLidasF=feed.filter(ev=>!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
+  const total=naoLidasP+naoLidasF;
+  if(total>0){
+    badge.textContent=total>9?'9+':total;
+    badge.style.display='flex';
+  } else {
+    badge.style.display='none';
+  }
+}
+
+window.toggleNotifPanel=()=>{
+  const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
+  if(!panel)return;
+  const isOpen=panel.classList.contains('open');
+  if(isOpen){
+    panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
+    return;
+  }
+  _renderNotifPanel();
+  panel.classList.add('open');
+  if(overlay) overlay.classList.add('open');
+};
+
+// Fechar painel ao clicar fora
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
+  const btn=document.getElementById('notif-btn');
+  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!btn?.contains(e.target)){
+    panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
+  }
+});
+
+window.marcarTodasLidas=()=>{
+  const personalNotifs=_getMyPersonalNotifs();
+  const idsP=personalNotifs.map(n=>n.id);
+  localStorage.setItem('notif_pers_lidas_'+groupId, JSON.stringify(idsP));
+  const feed=gd?.feed||[];
+  const idsF=feed.map(ev=>ev.id);
+  localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(idsF));
+  _updateNotifBadge();
+  _renderNotifPanel();
+};
+
+// Publica evento no feed do grupo
+async function _publishFeed(tipo, texto){
+  if(!groupId||!currentUser) return;
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const feed=cur.feed||[];
+    const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7), tipo, texto, uid:currentUser.uid, ts:Date.now()};
+    feed.push(ev);
+    // Mantém máximo 100 eventos
+    if(feed.length>100) feed.splice(0, feed.length-100);
+    await updateDoc(doc(db,'groups',groupId),{feed});
+  } catch(e){ console.warn('feed publish:',e); }
+}
+
+// Expõe para uso externo
+window._publishFeed=_publishFeed;
+window._updateNotifBadge=_updateNotifBadge;
+
+// ── FIM NOTIFICAÇÕES ──────────────────────────────────────────────────────────
+
+window.copyInviteLinkPerfil=()=>{
+  const link=location.href.split('?')[0]+'?join='+groupId;
+  navigator.clipboard.writeText(link).then(()=>{const b=$('copy-link-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));
+};
+window.leaveGroupPerfil=async()=>{
+  if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
+  await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pperfil');enterLobby();
+};
+
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    currentUser=user;
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()){
+      myProfile=snap.data();
+      if(!myProfile.photo&&user.photoURL){myProfile.photo=user.photoURL;await updateDoc(doc(db,'users',user.uid),{photo:user.photoURL});}
+      if(!myProfile.displayName&&user.displayName){myProfile.displayName=user.displayName;await updateDoc(doc(db,'users',user.uid),{displayName:user.displayName});}
+    }else{
+      myProfile={displayName:user.displayName||user.email,email:user.email,photo:user.photoURL||'',groupId:''};
+      await setDoc(doc(db,'users',user.uid),{...myProfile,createdAt:serverTimestamp()});
+    }
+    enterLobby();
+  }else{
+    currentUser=null;myProfile=null;gd=null;groupId=null;
+    if(unsubGroup){unsubGroup();unsubGroup=null;}
+    showScr('sl');setBtn('btn-login',false,'Entrar');setBtn('btn-register',false,'Criar conta');
+    const btn=$('btn-google');if(btn){btn.disabled=false;btn.innerHTML=googleIconHTML;}
+  }
+});
+
+function enterLobby(){
+  $('lobby-name').textContent=myProfile.displayName;
+  const params=new URLSearchParams(location.search);const joinCode=params.get('join');
+  if(joinCode){showScr('sloby');$('jcode').value=joinCode;openPCenter('pj');return;}
+  if(myProfile.groupId){loadGroup(myProfile.groupId);return;}
+  showScr('sloby');
+}
+async function loadGroup(gid){
+  // Mostra skeleton imediatamente enquanto o Firestore responde
+  const rl=$('rl');if(rl)rl.innerHTML=`<div class="sk-podium">${[46,46,46].map(s=>`<div class="sk-podium-item"><div class="sk-pulse sk-line" style="width:40px;height:10px"></div><div class="sk-pulse sk-av" style="width:${s}px;height:${s}px;border-radius:50%"></div><div class="sk-pulse sk-line" style="width:60px;height:10px"></div><div class="sk-pulse sk-line" style="width:32px;height:22px"></div></div>`).join('')}</div><div class="rank-list">${[1,2,3].map(()=>`<div class="sk-ri"><div class="sk-pulse sk-line" style="width:24px;height:14px"></div><div class="sk-pulse sk-av" style="width:50px;height:50px;border-radius:50%"></div><div class="sk-ri-info"><div class="sk-pulse sk-line" style="width:55%;height:13px"></div><div class="sk-pulse sk-line" style="width:40%;height:11px"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="sk-pulse sk-line" style="width:38px;height:22px"></div><div class="sk-pulse sk-line" style="width:24px;height:9px"></div></div></div>`).join('')}</div>`;
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
+}
+window.createGroup=async()=>{
+  const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
+  try{
+    const ma=mesAtual();const member={uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()};
+    const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp()};
+    const ref=await addDoc(collection(db,'groups'),data);
+    groupId=ref.id;gd=data;await updateDoc(doc(db,'users',currentUser.uid),{groupId:ref.id});myProfile.groupId=ref.id;
+    closeP('pc');enterApp();subscribeGroup();
+  }catch(e){showErr('cerr','Erro: '+e.message)}
+};
+window.joinGroup=async()=>{
+  const code=$('jcode').value.trim();if(!code)return showErr('jerr','Digite o código do grupo.');
+  try{
+    const snap=await getDoc(doc(db,'groups',code));if(!snap.exists())return showErr('jerr','Código inválido.');
+    let data=snap.data();data=await checkMesViradaWith(code,data);
+    const already=(data.members||[]).some(m=>m.uid===currentUser.uid);
+    if(!already){data.members=[...(data.members||[]),{uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()}];await setDoc(doc(db,'groups',code),data);}
+    groupId=code;gd=data;await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});myProfile.groupId=code;
+    closePCenter('pj');enterApp();subscribeGroup();
+    // Publica no feed que novo jogador entrou
+    setTimeout(()=>_publishFeed('membro',`<strong>${myProfile.displayName}</strong> entrou no grupo! 👋`),500);
+  }catch(e){showErr('jerr','Código não encontrado ou erro de conexão.')}
+};
+function subscribeGroup(){
+  if(unsubGroup){unsubGroup();unsubGroup=null;}
+  let _firstFire=true;
+  // Snapshot do ranking anterior para detecção de ultrapassagem
+  let _prevRankSnapshot=null;
+  unsubGroup=onSnapshot(doc(db,'groups',groupId),snap=>{
+    if(!snap.exists())return;
+    const prevGd=gd;
+    gd=snap.data();
+    // Primeiro disparo é o cache local, já tratado pelo enterApp — ignora
+    if(_firstFire){
+      _firstFire=false;
+      // Salva snapshot inicial do ranking para comparação futura
+      _prevRankSnapshot=_buildRankSnapshot(gd);
+      return;
+    }
+    // ── Verifica ultrapassagem ─────────────────────────────────
+    if(currentUser && _prevRankSnapshot!==null){
+      _checkUltrapassagem(_prevRankSnapshot, gd);
+    }
+    _prevRankSnapshot=_buildRankSnapshot(gd);
+    // ──────────────────────────────────────────────────────────
+    // Atualiza badge de notificações
+    _updateNotifBadge();
+    // Re-renderiza painel se aberto
+    const panel=document.getElementById('notif-panel');
+    if(panel&&panel.classList.contains('open')) _renderNotifPanel();
+    // Atualiza card de feed inline
+    renderFeedCard();
+    const a=document.querySelector('.tv.active');if(!a)return;
+    if(a.id==='tr'){showRankingSkeleton();setTimeout(()=>renderRanking(),80);}
+    else if(a.id==='thist')renderHistTab();
+  });
+}
+// ══════════════════════════════════════════
+// ALERTA DE ULTRAPASSAGEM
+// ══════════════════════════════════════════
+
+// Constrói mapa uid→{pos, ga} do ranking atual
+function _buildRankSnapshot(data){
+  if(!data||!data.members)return{};
+  const ranked=(data.members||[]).map(m=>{
+    const ms=(data.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name);
+    const ga=ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0);
+    return{uid:m.uid,name:m.name,ga};
+  }).sort((a,b)=>b.ga-a.ga);
+  const snap={};
+  ranked.forEach((r,i)=>{snap[r.uid]={pos:i+1,ga:r.ga,name:r.name};});
+  return snap;
+}
+
+// Compara snapshot anterior vs novo e dispara toast se o usuário foi ultrapassado
+function _checkUltrapassagem(prevSnap, newData){
+  if(!currentUser||!newData)return;
+  const newSnap=_buildRankSnapshot(newData);
+  const myUid=currentUser.uid;
+  const prev=prevSnap[myUid];
+  const curr=newSnap[myUid];
+  if(!prev||!curr)return;
+  // Só dispara se a posição piorou (número maior = posição pior)
+  if(curr.pos<=prev.pos)return;
+  // Encontra quem passou na frente (quem estava atrás e agora está à frente)
+  const passantes=[];
+  Object.entries(newSnap).forEach(([uid,ns])=>{
+    if(uid===myUid)return;
+    const ps=prevSnap[uid];
+    if(!ps)return;
+    // estava atrás ou empatado, agora está na frente
+    if(ps.pos>=prev.pos && ns.pos<curr.pos){
+      passantes.push({uid,name:ns.name,ga:ns.ga});
+    }
+  });
+  if(!passantes.length)return;
+  // Mostra o passante com mais G+A (quem ultrapassou mais)
+  passantes.sort((a,b)=>b.ga-a.ga);
+  const rival=passantes[0];
+  _mostrarUltrapToast(rival.name, rival.ga, curr.ga);
+}
+
+let _ultrapToastTimer=null;
+let _ultrapProgressTimer=null;
+
+function _mostrarUltrapToast(rivalName, rivalGA, myGA){
+  const toast=document.getElementById('ultrap-toast');
+  const box=document.getElementById('ultrap-toast-box');
+  const msg=document.getElementById('ultrap-toast-msg');
+  const sub=document.getElementById('ultrap-toast-sub');
+  const prog=document.getElementById('ultrap-toast-progress');
+  const avatar=document.getElementById('ultrap-toast-avatar');
+  if(!toast||!box)return;
+
+  // Cancela timer anterior se tiver
+  if(_ultrapToastTimer){clearTimeout(_ultrapToastTimer);_ultrapToastTimer=null;}
+  if(_ultrapProgressTimer){clearInterval(_ultrapProgressTimer);_ultrapProgressTimer=null;}
+
+  // Preenche conteúdo
+  const diff=rivalGA-myGA;
+  msg.textContent=`${rivalName} acabou de te ultrapassar`;
+  sub.textContent=`Ele tem ${rivalGA} G+A · você tem ${myGA} G+A (−${diff})`;
+  // Avatar emoji baseado no nome (determinístico)
+  const emojis=['🔥','⚡','💥','🏃','😤','🐆','🦅','🎯'];
+  let h=0;for(const c of rivalName)h=(h*31+c.charCodeAt(0))&0xff;
+  avatar.textContent=emojis[h%emojis.length];
+
+  // Reset visual
+  box.style.transform='translateY(-80px) scale(.92)';
+  box.style.opacity='0';
+  prog.style.transition='none';
+  prog.style.width='100%';
+
+  toast.style.display='flex';
+
+  // Vibração (se suportada)
+  if(navigator.vibrate)navigator.vibrate([60,40,80]);
+
+  // Animate in
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    box.style.transform='translateY(0) scale(1)';
+    box.style.opacity='1';
+  }));
+
+  // Progress bar drain
+  const DURATION=6000;
+  setTimeout(()=>{
+    prog.style.transition=`width ${DURATION}ms linear`;
+    prog.style.width='0%';
+  },80);
+
+  _ultrapToastTimer=setTimeout(()=>_fecharUltrapToast(),DURATION+200);
+}
+
+window._fecharUltrapToast=function(){
+  const toast=document.getElementById('ultrap-toast');
+  const box=document.getElementById('ultrap-toast-box');
+  if(!toast||!box)return;
+  if(_ultrapToastTimer){clearTimeout(_ultrapToastTimer);_ultrapToastTimer=null;}
+  box.style.transform='translateY(-24px) scale(.94)';
+  box.style.opacity='0';
+  setTimeout(()=>{toast.style.display='none';},380);
+};
+
+// ── FIM ALERTA DE ULTRAPASSAGEM ─────────────────────────────────────
+
+// ══════════════════════════════════════════
+// FEED DE ATIVIDADE DO GRUPO
+// ══════════════════════════════════════════
+
+let _feedExpanded = false;
+
+function _notifTimeAgoFeed(ts){
+  if(!ts) return '';
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if(m < 1) return 'agora mesmo';
+  if(m < 60) return `há ${m} min`;
+  const h = Math.floor(m/60);
+  if(h < 24) return `há ${h}h`;
+  const d = Math.floor(h/24);
+  return `há ${d}d`;
+}
+
+function renderFeedCard(){
+  // Feed de atividade do grupo desativado
+  return;
+  const card = document.getElementById('feed-card');
+  const itemsEl = document.getElementById('feed-items');
+  if(!card || !itemsEl || !gd) return;
+
+  const feed = (gd.feed || []).slice().reverse().slice(0, 20);
+  if(!feed.length){ card.style.display='none'; return; }
+
+  const lidas = JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+
+  const iconMap = {
+    partida: { cls:'partida', emoji:'⚽' },
+    conquista: { cls:'conquista', emoji:'🏆' },
+    meta: { cls:'meta', emoji:'🎯' },
+    membro: { cls:'membro', emoji:'👋' },
+    nota: { cls:'nota', emoji:'📌' },
+  };
+
+  const MAX_COLLAPSED = 3;
+  const items = feed.slice(0, _feedExpanded ? 20 : MAX_COLLAPSED);
+
+  itemsEl.innerHTML = items.map((ev, i) => {
+    const ic = iconMap[ev.tipo] || { cls:'nota', emoji:'📌' };
+    const unread = !lidas.includes(ev.id) && ev.uid !== currentUser?.uid;
+    return `<div class="feed-item" style="animation-delay:${i*45}ms">
+      <div class="feed-item-icon ${ic.cls}">${ic.emoji}</div>
+      <div class="feed-item-body">
+        <div class="feed-item-text">${ev.texto}</div>
+        <div class="feed-item-time">${_notifTimeAgoFeed(ev.ts)}</div>
+      </div>
+      ${unread ? '<div class="feed-item-new"></div>' : ''}
+    </div>`;
+  }).join('');
+
+  // show/hide toggle
+  const toggleBtn = document.getElementById('feed-toggle-btn');
+  const toggleLbl = document.getElementById('feed-toggle-label');
+  const toggleIcon = document.getElementById('feed-toggle-icon');
+  if(feed.length > MAX_COLLAPSED){
+    if(toggleBtn) toggleBtn.style.display = 'flex';
+    if(toggleLbl) toggleLbl.textContent = _feedExpanded ? 'ver menos' : 'ver mais';
+    if(toggleIcon) toggleIcon.style.transform = _feedExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+  } else {
+    if(toggleBtn) toggleBtn.style.display = 'none';
+  }
+
+  // Adjust max-height for smooth transition
+  const rowH = 52; // approx height per item
+  itemsEl.style.maxHeight = _feedExpanded
+    ? (Math.min(feed.length, 20) * rowH + 20) + 'px'
+    : (MAX_COLLAPSED * rowH + 10) + 'px';
+
+  card.style.display = '';
+}
+
+window._toggleFeedExpand = function(){
+  _feedExpanded = !_feedExpanded;
+  renderFeedCard();
+};
+
+// ── FIM FEED DE ATIVIDADE ────────────────────────────────────────
+// ══════════════════════════════════════════
+// DESAFIO DIRETO — sistema completo
+// ══════════════════════════════════════════
+
+let _dc = { rivalUid: null, tipo: 'gols' };
+
+function _dcTimeLeft(endTs){
+  const diff = endTs - Date.now();
+  if(diff <= 0) return { label:'Encerrado', urgent: false, ended: true };
+  const h = Math.floor(diff / 3600000);
+  const d = Math.floor(h / 24);
+  if(d >= 1) return { label: d+'d restante'+(d>1?'s':''), urgent: d<=1, ended: false };
+  if(h >= 1) return { label: h+'h restante'+(h>1?'s':''), urgent: true, ended: false };
+  const m = Math.floor(diff / 60000);
+  return { label: m+'min', urgent: true, ended: false };
+}
+
+function _dcGetScore(uid, challenge){
+  if(!gd || !uid) return 0;
+  const src = (gd.matches||[]).filter(x => x.uid === uid && x.ts >= challenge.startTs && x.ts <= challenge.endTs);
+  if(challenge.tipo === 'gols')   return src.reduce((s,x) => s+(x.gols||0), 0);
+  if(challenge.tipo === 'assist') return src.reduce((s,x) => s+(x.assist||0), 0);
+  return src.reduce((s,x) => s+(x.gols||0)+(x.assist||0), 0);
+}
+
+function _dcGetForUid(uid){
+  if(!gd) return [];
+  return (gd.desafios||[]).filter(d =>
+    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado' || d.status === 'pendente')
+  );
+}
+
+function _dcCardHTML(challenge, perspectiveUid){
+  const mbA = (gd.members||[]).find(m => m.uid === challenge.uidA);
+  const mbB = (gd.members||[]).find(m => m.uid === challenge.uidB);
+  if(!mbA || !mbB) return '';
+  const isPending = challenge.status === 'pendente';
+  const tipoLabel = challenge.tipo==='gols'?'\u26bd Gols':challenge.tipo==='assist'?'\ud83d\udc5f Assist.':'\ud83c\udfc5 G+A';
+
+  // Card de desafio PENDENTE
+  if(isPending){
+    const euSouDesafiado = challenge.uidB === currentUser?.uid;
+    const euSouDesafiante = challenge.uidA === currentUser?.uid;
+    const aceitarBtn = euSouDesafiado
+      ? '<button onclick=\"_dcAceitar(\\x27'+challenge.id+'\\x27)\" style=\"flex:1;padding:8px;border-radius:10px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:700;cursor:pointer\">✅ Aceitar</button>'
+      : '';
+    const recusarBtn = (euSouDesafiado || euSouDesafiante)
+      ? '<button onclick=\"_dcCancelar(\\x27'+challenge.id+'\\x27)\" style=\"flex:1;padding:8px;border-radius:10px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:600;cursor:pointer\">'+(euSouDesafiado?'❌ Recusar':'🚫 Cancelar')+'</button>'
+      : '';
+    const aguardandoLabel = euSouDesafiante ? '<span style=\"font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3)\">⏳ Aguardando aceite…</span>' : '';
+    return '<div class=\"desafio-card\" style=\"border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.04)\">'
+      +'<div class=\"desafio-card-title\"><div class=\"desafio-live-dot\" style=\"background:#FFD166;box-shadow:0 0 6px #FFD166\"></div>Desafio pendente</div>'
+      +'<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:10px\">'
+      +avatarHTML(mbA.name,32,mbA.uid)
+      +'<div style=\"flex:1;min-width:0\"><div style=\"font-family:\'Freshman\',sans-serif;font-size:12px;color:var(--tx)\">'+(euSouDesafiante?'Você':mbA.name)+'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:9px;color:var(--tx3)\">desafiante</div></div>'
+      +'<div style=\"font-family:\'VarsityTeam\',serif;font-size:16px;color:rgba(255,90,122,.6)\">VS</div>'
+      +'<div style=\"flex:1;min-width:0;text-align:right\">'
+      +'<div style=\"font-family:\'Freshman\',sans-serif;font-size:12px;color:var(--tx)\">'+(euSouDesafiado?'Você':mbB.name)+'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:9px;color:var(--tx3)\">desafiado</div></div>'
+      +avatarHTML(mbB.name,32,mbB.uid)
+      +'</div>'
+      +'<div style=\"font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:8px\">'
+      +'Stat: <span style=\"color:rgba(255,200,0,.8)\">'+(challenge.tipo==='gols'?'⚽ Gols':challenge.tipo==='assist'?'👟 Assistências':'🏅 G+A')+'</span> · 7 dias</div>'
+      +(aguardandoLabel?'<div style=\"margin-bottom:8px\">'+aguardandoLabel+'</div>':'')
+      +(aceitarBtn||recusarBtn?'<div style=\"display:flex;gap:8px;margin-top:4px\">'+aceitarBtn+recusarBtn+'</div>':'')
+      +'</div>';
+  }
+
+  // Card de desafio ATIVO / ENCERRADO
+  const scoreA = _dcGetScore(challenge.uidA, challenge);
+  const scoreB = _dcGetScore(challenge.uidB, challenge);
+  const time   = _dcTimeLeft(challenge.endTs);
+  const ended  = time.ended || challenge.status === 'encerrado';
+  const clsA = scoreA > scoreB ? 'winning' : scoreA < scoreB ? 'losing' : 'tied';
+  const clsB = scoreB > scoreA ? 'winning' : scoreB < scoreA ? 'losing' : 'tied';
+  let winnerUID = null;
+  if(ended){ if(scoreA > scoreB) winnerUID = challenge.uidA; else if(scoreB > scoreA) winnerUID = challenge.uidB; }
+  const winnerBadge = winnerUID ? '<div style="text-align:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,215,0,.2)"><span class=\"desafio-winner-badge\">\ud83d\udc51 '+(winnerUID===challenge.uidA?mbA.name:mbB.name)+' venceu!</span></div>' : '';
+  const cancelBtn = (!ended && (challenge.uidA === currentUser?.uid || challenge.uidB === currentUser?.uid))
+    ? '<button onclick=\"_dcCancelar(\\x27' + challenge.id + '\\x27)\" style=\"margin-top:8px;font-size:10px;font-family:\'DM Mono\',monospace;background:none;border:1px solid rgba(255,90,122,.3);color:rgba(255,90,122,.7);border-radius:8px;padding:4px 10px;cursor:pointer;float:right\">cancelar</button>' : '';
+  return '<div class=\"desafio-card\"><div class=\"desafio-card-title\"><div class=\"desafio-live-dot\"'+(ended?' style=\"background:#888;box-shadow:none;animation:none\"':'')+' ></div>Desafio direto'+(ended?' \u00b7 Encerrado':'')+cancelBtn+'</div><div class=\"desafio-players-row\"><div class=\"desafio-player-col\">' + avatarHTML(mbA.name,38,mbA.uid) + '<div class=\"desafio-player-name\">' + mbA.name + '</div><div class=\"desafio-player-score '+clsA+'\">' + scoreA + '</div></div><div class=\"desafio-vs-divider\">VS</div><div class=\"desafio-player-col\">' + avatarHTML(mbB.name,38,mbB.uid) + '<div class=\"desafio-player-name\">' + mbB.name + '</div><div class=\"desafio-player-score '+clsB+'\">' + scoreB + '</div></div></div><div class=\"desafio-meta-row\"><span class=\"desafio-tipo-badge\">' + tipoLabel + '</span><span class=\"desafio-countdown'+(time.urgent && !ended?' urgent':'')+'\">' + (ended?'Encerrado':time.label) + '</span></div>' + winnerBadge + '</div>';
+}
+
+window._dcRenderInProfile = function(uid, containerEl){
+  if(!containerEl || !gd){ return; }
+  const desafios = _dcGetForUid(uid);
+  if(!desafios.length){ containerEl.innerHTML = ''; return; }
+  containerEl.innerHTML = desafios.map(d => _dcCardHTML(d, uid)).join('');
+};
+
+window.abrirCriarDesafio = function(preSelectUid){
+  _dc = { rivalUid: preSelectUid || null, tipo: 'gols' };
+  _dcRenderCriarBody();
+  const modal = document.getElementById('modal-desafio');
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => modal.classList.add('open'));
+  const dm = document.getElementById('modal-duelo');
+  if(dm){ dm.classList.remove('open'); setTimeout(()=>{dm.style.display='none';},300); }
+};
+window.fecharModalDesafio = function(){
+  const modal = document.getElementById('modal-desafio');
+  modal.classList.remove('open');
+  setTimeout(() => { modal.style.display = 'none'; }, 300);
+};
+
+function _dcRenderCriarBody(){
+  const el = document.getElementById('desafio-body');
+  if(!el || !gd) return;
+  const mbs = (gd.members||[]).filter(m => m.uid !== currentUser?.uid);
+  const ativos = _dcGetForUid(currentUser?.uid).filter(d => d.status === 'ativo' || d.status === 'pendente');
+  const euJaEmDesafio = ativos.length > 0;
+
+  // Conjunto de UIDs que já estão em desafio ativo
+  const uidsEmDesafio = new Set();
+  (gd.desafios||[]).filter(d => d.status==='ativo'||d.status==='pendente').forEach(d => {
+    uidsEmDesafio.add(d.uidA);
+    uidsEmDesafio.add(d.uidB);
+  });
+
+  const ativosHTML = ativos.length
+    ? '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Em andamento</div>' + ativos.map(d => _dcCardHTML(d, currentUser.uid)).join('') + '<div style="height:1px;background:var(--bo);margin:14px 0"></div>'
+    : '';
+  const tipoOpts = [{val:'gols',label:'\u26bd Gols'},{val:'assist',label:'\ud83d\udc5f Assist.'},{val:'ga',label:'\ud83c\udfc5 G+A'}];
+
+  const bloqueioMsg = euJaEmDesafio
+    ? '<div style="background:rgba(255,90,122,.1);border:1px solid rgba(255,90,122,.35);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-family:\'DM Mono\',monospace;font-size:11px;color:rgba(255,120,140,.9);display:flex;align-items:center;gap:7px"><span>⚠️</span><span>Você já está em um desafio ativo. Encerre-o antes de criar outro.</span></div>'
+    : '';
+
+  el.innerHTML = ativosHTML
+    + bloqueioMsg
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Escolha o adversário</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:1.25rem">'
+    + mbs.map(m => {
+        const rivalBusy = uidsEmDesafio.has(m.uid);
+        const isSelected = _dc.rivalUid === m.uid;
+        const cls = 'dc-player-btn' + (isSelected ? ' selected' : '') + (rivalBusy ? ' busy' : '');
+        const clickHandler = (euJaEmDesafio || rivalBusy) ? '' : 'onclick="_dcSelectRival(\'' + m.uid + '\')"';
+        const busyBadge = rivalBusy ? '<div class="dc-busy-badge">em desafio</div>' : '';
+        return '<div class="' + cls + '" ' + clickHandler + '>' + busyBadge + avatarHTML(m.name,36,m.uid) + '<div style="font-family:\'Freshman\',sans-serif;font-size:11px;letter-spacing:.4px;color:var(--tx);word-break:break-word;text-align:center;line-height:1.2">' + m.name + '</div></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Stat do desafio</div>'
+    + '<div style="display:flex;gap:8px;margin-bottom:1.25rem">'
+    + tipoOpts.map(t => '<button class="dc-tipo-btn'+(_dc.tipo===t.val?' selected':'')+'" onclick="_dcSelectTipo(\'' + t.val + '\')">' + t.label + '</button>').join('')
+    + '</div>'
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:10px">Duração: <strong style="color:var(--tx)">7 dias</strong> a partir de agora</div>'
+    + '<div id="dc-err" style="display:none;font-size:12px;color:var(--re);font-family:\'DM Mono\',monospace;margin-bottom:8px"></div>'
+    + (euJaEmDesafio
+        ? '<button disabled style="width:100%;padding:14px;border-radius:14px;border:none;background:rgba(120,120,120,.25);color:rgba(255,255,255,.35);font-family:\'DM Sans\',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;letter-spacing:.04em;">\u2694\ufe0f Você já tem um desafio ativo</button>'
+        : '<button onclick="_dcConfirmar()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#FF5A7A,#FF9A3C);color:#fff;font-family:\'DM Sans\',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 20px rgba(255,90,122,.35);transition:filter .15s" onmouseover="this.style.filter=\'brightness(1.08)\'" onmouseout="this.style.filter=\'\'">\u2694\ufe0f Lan\u00e7ar desafio</button>');
+}
+
+window._dcSelectRival = function(uid){ _dc.rivalUid = uid; _dcRenderCriarBody(); };
+window._dcSelectTipo  = function(tipo){ _dc.tipo = tipo; _dcRenderCriarBody(); };
+
+window._dcConfirmar = async function(){
+  const errEl = document.getElementById('dc-err');
+  if(errEl) errEl.style.display='none';
+  if(!_dc.rivalUid){ if(errEl){errEl.textContent='Escolha um adversário.';errEl.style.display='block';} return; }
+  if(!currentUser||!groupId||!gd) return;
+  // Verifica se o usuário atual já tem desafio ativo
+  const euJaAtivo = (gd.desafios||[]).some(d =>
+    (d.status==='ativo'||d.status==='pendente') && (d.uidA===currentUser.uid || d.uidB===currentUser.uid)
+  );
+  if(euJaAtivo){ if(errEl){errEl.textContent='Você já está em um desafio ativo. Cancele-o antes de criar outro.';errEl.style.display='block';} return; }
+  // Verifica se o rival já tem desafio ativo
+  const rivalJaAtivo = (gd.desafios||[]).some(d =>
+    (d.status==='ativo'||d.status==='pendente') && (d.uidA===_dc.rivalUid || d.uidB===_dc.rivalUid)
+  );
+  if(rivalJaAtivo){ if(errEl){errEl.textContent='Esse jogador já está em outro desafio ativo.';errEl.style.display='block';} return; }
+  const rival = (gd.members||[]).find(m => m.uid===_dc.rivalUid);
+  const now   = Date.now();
+  const desafio = {
+    id: now+'_'+Math.random().toString(36).slice(2,6),
+    uidA: currentUser.uid, nameA: myProfile.displayName,
+    uidB: _dc.rivalUid,    nameB: rival?.name||'?',
+    tipo: _dc.tipo, startTs: null, endTs: null,
+    status: 'pendente', createdAt: now,
+  };
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur  = snap.data();
+    cur.desafios = cur.desafios||[];
+    if(cur.desafios.length>=50) cur.desafios.splice(0,cur.desafios.length-49);
+    cur.desafios.push(desafio);
+    // Notificação pessoal para o desafiado
+    cur.notifs = cur.notifs||{};
+    cur.notifs[_dc.rivalUid] = cur.notifs[_dc.rivalUid]||[];
+    cur.notifs[_dc.rivalUid].push({
+      id: now+'n', tipo:'desafio_solicitacao', desafioId: desafio.id,
+      de: myProfile.displayName, deUid: currentUser.uid, ts: now, lida: false,
+    });
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd = cur;
+    fecharModalDesafio();
+    renderRanking();
+    _updateNotifBadge();
+    _showSimpleToast('⚔️ Solicitação enviada para '+(rival?.name||'?')+'! Aguardando aceite.');
+  }catch(e){ if(errEl){errEl.textContent='Erro ao criar desafio.';errEl.style.display='block';} }
+};
+
+window._dcAceitar = async function(id){
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const idx=(cur.desafios||[]).findIndex(d=>d.id===id);
+    if(idx===-1) return;
+    const d=cur.desafios[idx];
+    const now=Date.now();
+    d.status='ativo';
+    d.startTs=now;
+    d.endTs=now+7*24*60*60*1000;
+    // Notificação para o desafiante (uidA)
+    cur.notifs=cur.notifs||{};
+    cur.notifs[d.uidA]=cur.notifs[d.uidA]||[];
+    cur.notifs[d.uidA].push({
+      id:now+'a', tipo:'desafio_aceito', desafioId:id,
+      de:myProfile.displayName, deUid:currentUser.uid, ts:now, lida:false,
+    });
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
+    await _publishFeed('nota','⚔️ <strong>'+myProfile.displayName+'</strong> aceitou o desafio de <strong>'+d.nameA+'</strong>! Briga por mais '+tipoLabel+' começa agora.');
+    renderRanking();
+    _updateNotifBadge();
+    if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')) _buildPlayerProfile(_mpUid);
+    _showSimpleToast('⚔️ Desafio aceito! Que comecem os jogos!');
+  }catch(e){ console.error(e); }
+};
+
+
+window._dcCancelar = async function(id){
+  if(!confirm('Cancelar este desafio?')) return;
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const idx=(cur.desafios||[]).findIndex(d=>d.id===id);
+    if(idx!==-1) cur.desafios[idx].status='cancelado';
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    renderRanking();
+    if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')) _buildPlayerProfile(_mpUid);
+  }catch(e){}
+};
+
+function _dcCheckEncerrar(){
+  if(!gd||!gd.desafios) return;
+  const now=Date.now(); let changed=false;
+  (gd.desafios||[]).forEach(d=>{ if(d.status==='ativo'&&now>d.endTs){d.status='encerrado';changed=true;} });
+  if(changed) setDoc(doc(db,'groups',groupId),gd).catch(()=>{});
+}
+
+function _showSimpleToast(msg){
+  let t=document.getElementById('_simple-toast');
+  if(!t){
+    t=document.createElement('div');t.id='_simple-toast';
+    t.style.cssText='position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:rgba(20,25,40,.95);border:1px solid rgba(77,255,176,.35);border-radius:12px;padding:10px 18px;font-family:\"DM Sans\",sans-serif;font-size:14px;color:#fff;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:opacity .3s ease;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{ t.style.opacity='0'; },2800);
+}
+
+function renderDesafiosRanking(){
+  let el=document.getElementById('desafios-ranking-section');
+  if(!el){
+    const feedCard=document.getElementById('feed-card');
+    if(!feedCard) return;
+    el=document.createElement('div');
+    el.id='desafios-ranking-section';el.style.cssText='margin-top:1rem';
+    feedCard.parentNode.insertBefore(el,feedCard.nextSibling);
+  }
+  if(!gd){el.innerHTML='';return;}
+  _dcCheckEncerrar();
+  const uid=currentUser?.uid;
+  if(!uid){el.innerHTML='';return;}
+  const meus=_dcGetForUid(uid);
+  if(!meus.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:6px;height:6px;border-radius:50%;background:#FF5A7A;box-shadow:0 0 6px #FF5A7A;animation:feed-pulse 1.8s ease-in-out infinite"></div><div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase">Seus desafios</div><button onclick="abrirCriarDesafio()" style="margin-left:auto;font-size:10px;font-family:\'DM Mono\',monospace;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.4);color:#FF5A7A;border-radius:8px;padding:3px 10px;cursor:pointer">+ novo</button></div>' + meus.map(d=>_dcCardHTML(d,uid)).join('');
+}
+
+// ── FIM DESAFIO DIRETO ───────────────────────────────────────────
+
+
+async function checkMesVirada(cur){return checkMesViradaWith(groupId,cur)}
+async function checkMesViradaWith(gid,cur){
+  const ma=mesAtual();if(!cur.mesAtivo)cur.mesAtivo=ma;
+  if(cur.mesAtivo!==ma){
+    const mesEncerrado = cur.mesAtivo;
+    if(!cur.historico)cur.historico={};
+    cur.historico[mesEncerrado]={matches:[...(cur.matches||[])],members:[...(cur.members||[])]};
+    // Revela MVP do mês encerrado e incrementa contador do vencedor
+    if(window._revelarMVPMes) _revelarMVPMes(cur, mesEncerrado);
+    cur.matches=[];cur.mesAtivo=ma;
+    await setDoc(doc(db,'groups',gid),cur);
+    // Publica no feed sobre encerramento do mês
+    try{
+      const mvpRev = cur.mvpMes && cur.mvpMes[mesEncerrado];
+      const mvpMbRev = mvpRev ? (cur.members||[]).find(m=>m.uid===mvpRev.uid) : null;
+      if(mvpMbRev){
+        await _publishFeed('conquista',`🏆 <strong>${mvpMbRev.name}</strong> é o <strong>MVP de ${getMesLabel(mesEncerrado)}</strong> com média ${mvpRev.media}!`);
+      } else {
+        await _publishFeed('nota',`📅 Mês <strong>${getMesLabel(mesEncerrado)}</strong> encerrado! Confira o ranking final.`);
+      }
+    }catch(e){}
+  }
+  return cur;
+}
+function enterApp(){
+  const _hn=$('hname');if(_hn)_hn.textContent=gd.name;
+  // Mostra sino e atualiza badge
+  const nb=document.getElementById('notif-btn');
+  if(nb) nb.style.display='flex';
+  setTimeout(_updateNotifBadge, 200);
+  const mesLabel=getMesLabel(gd.mesAtivo||mesAtual());
+  $('rank-mes-titulo').textContent=mesLabel.split(' ')[0].toUpperCase();
+  $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
+  $('fdate').value=new Date().toISOString().split('T')[0];
+  renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();setTimeout(renderFeedCard,300);
+  // Mostra FABs
+  document.body.classList.add('duelo-fab-visible');
+  document.body.classList.add('conquistas-fab-visible');
+  const cfab=$('conquistas-fab');if(cfab)cfab.style.display='flex';
+  // Crown check com delay para renderização completa
+  setTimeout(()=>maybeFiraCrown(),900);
+  // Conquistas check após carregar dados
+  setTimeout(async()=>{
+    if(window._checkConquistas && currentUser && gd){
+      const novas = await window._checkConquistas(db, currentUser, gd);
+      if(novas && novas.length > 0){
+        const badge=$('conquistas-fab-badge');
+        if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
+        window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
+      } else {
+        // Verifica se há não vistas para mostrar badge
+        _checkBadgeConquistas();
+      }
+    }
+  }, 1500);
+}
+async function _checkBadgeConquistas(){
+  if(!currentUser||!gd) return;
+  try {
+    const snap=await getDoc(doc(db,'users',currentUser.uid));
+    if(!snap.exists()) return;
+    const data=snap.data();
+    const desb=data.conquistasDesbloqueadas||{};
+    const vistas=data.conquistasVistas||[];
+    const naoVistas=Object.keys(desb).filter(id=>!vistas.includes(id));
+    if(naoVistas.length>0){
+      const badge=$('conquistas-fab-badge');
+      if(badge){ badge.textContent=naoVistas.length; badge.style.display='flex'; }
+    }
+  }catch(e){}
+}
+
+window.leaveGroup=async()=>{
+  if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
+  await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterLobby();
+};
+window.copyCode=()=>{navigator.clipboard.writeText(groupId).then(()=>{const b=$('copybtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));};
+window.copyInviteLink=()=>{const link=location.href.split('?')[0]+'?join='+groupId;navigator.clipboard.writeText(link).then(()=>{const b=$('linkbtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));};
+
+window.stepField=(id,delta)=>{const el=$(id);el.value=Math.max(0,(parseInt(el.value)||0)+delta);};
+window.addMatch=async()=>{
+  const date=$('fdate').value;if(!date)return showErr('aerr','Selecione a data.');
+  const name=$('fname').value.trim()||'Pelada',gols=parseInt($('fgols').value)||0,assist=parseInt($('fassist').value)||0,pb=parseInt($('fpb').value)||0,pk=Math.min(parseInt($('fpk').value)||0,pb);
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));const cur=snap.data();if(!cur.matches)cur.matches=[];
+    cur.matches.push({player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()});
+    const already=(cur.members||[]).some(m=>m.uid===currentUser.uid);
+    if(!already)cur.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
+    await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+    const _partidaTs = cur.matches[cur.matches.length-1].ts;
+    ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
+    showPartidaSalvaModal();
+    // Abre modal Craque da Rodada após fechar o modal de partida salva
+    setTimeout(()=>{
+      if(!window._craqueJaVotou || !_craqueJaVotou(_partidaTs)){
+        abrirModalMVP(_partidaTs);
+      }
+    }, 5200);
+    // Publica no feed
+    (async()=>{
+      const partes=[];
+      if(gols>0) partes.push(`${gols}⚽`);
+      if(assist>0) partes.push(`${assist}👟`);
+      const statsStr=partes.length?` (${partes.join(' ')})`:'';
+      const nomePartida=name&&name!=='Pelada'?` em <strong>${name}</strong>`:'';
+      await _publishFeed('partida',`<strong>${myProfile.displayName}</strong> registrou uma partida${nomePartida}${statsStr}`);
+    })();
+    // Verifica conquistas após salvar partida
+    setTimeout(async()=>{
+      if(window._checkConquistas && currentUser && gd){
+        const novas=await window._checkConquistas(db,currentUser,gd);
+        if(novas&&novas.length>0){
+          const badge=$('conquistas-fab-badge');
+          if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
+          window._mostrarToastConquistas&&window._mostrarToastConquistas(novas);
+          // Publica conquistas no feed
+          for(const cq of novas){
+            await _publishFeed('conquista',`<strong>${myProfile.displayName}</strong> desbloqueou a conquista <strong>${cq.icon} ${cq.nome}</strong>!`);
+          }
+        }
+      }
+    },800);
+  }catch(e){showErr('aerr','Erro: '+e.message)}
+};
+window.openEdit=gi=>{const m=(gd.matches||[])[gi];if(!m)return;editIdx=gi;$('edate').value=m.date||'';$('ename').value=m.name||'';$('egols').value=m.gols||0;$('eassist').value=m.assist||0;$('epb').value=m.penBat||0;$('epk').value=m.penOk||0;openP('pedit');};
+window.saveEdit=async()=>{
+  if(editIdx===null)return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return showErr('eerr','Erro.');
+  const cur=snap.data();const m=cur.matches[editIdx];if(!m)return;
+  m.date=$('edate').value;m.name=$('ename').value.trim()||'Pelada';m.gols=parseInt($('egols').value)||0;m.assist=parseInt($('eassist').value)||0;m.penBat=parseInt($('epb').value)||0;m.penOk=Math.min(parseInt($('epk').value)||0,m.penBat);
+  await setDoc(doc(db,'groups',groupId),cur);gd=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
+};
+window.deleteMatch=async gi=>{
+  if(!confirm('Deletar essa partida?'))return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return;
+  const cur=snap.data();cur.matches.splice(gi,1);await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+};
+
+function getSt(nameOrUid,matches,byUid){
+  const ms=(matches||(gd.matches||[])).filter(m=>byUid?m.uid===nameOrUid:m.player===nameOrUid);
+  return{n:ms.length,matches:ms,gols:ms.reduce((s,m)=>s+(m.gols||0),0),assist:ms.reduce((s,m)=>s+(m.assist||0),0),penBat:ms.reduce((s,m)=>s+(m.penBat||0),0),penOk:ms.reduce((s,m)=>s+(m.penOk||0),0)};
+}
+function _getThemeBg(){
+  return document.body.classList.contains('light')?'#ffffff':'#0e1219';
+}
+
+function _getCanvasBg(canvas){
+  // Sobe na árvore até achar um elemento com fundo sólido real
+  let el=canvas.parentElement;
+  while(el&&el!==document.body){
+    const bg=getComputedStyle(el).backgroundColor;
+    // Ignora transparent / rgba(0,0,0,0)
+    if(bg&&bg!=='rgba(0, 0, 0, 0)'&&bg!=='transparent')return bg;
+    el=el.parentElement;
+  }
+  return _getThemeBg();
+}
+
+function drawPizza(canvasId,ok,bat){
+  const canvas=$(canvasId);if(!canvas)return;
+  canvas._ok=ok;canvas._bat=bat;
+  const ctx=canvas.getContext('2d');const s=canvas.width/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(bat===0){
+    ctx.beginPath();ctx.arc(s,s,s-2,0,Math.PI*2);
+    ctx.fillStyle=document.body.classList.contains('light')?'rgba(0,0,0,.07)':'rgba(255,255,255,.06)';
+    ctx.fill();return;
+  }
+  const bgClr=_getThemeBg();
+  const pOk=ok/bat;const start=-Math.PI/2;
+  ctx.beginPath();ctx.moveTo(s,s);ctx.arc(s,s,s-2,start,start+pOk*Math.PI*2);ctx.closePath();ctx.fillStyle='#6FCF97';ctx.fill();
+  if(ok<bat){ctx.beginPath();ctx.moveTo(s,s);ctx.arc(s,s,s-2,start+pOk*Math.PI*2,start+Math.PI*2);ctx.closePath();ctx.fillStyle='#EB5757';ctx.fill()}
+  ctx.beginPath();ctx.arc(s,s,s-2,0,Math.PI*2);ctx.strokeStyle=bgClr;ctx.lineWidth=2;ctx.stroke();
+}
+
+function drawPizzaPen(canvasId,ok,bat){
+  const canvas=document.getElementById(canvasId);if(!canvas)return;
+  canvas._ok=ok;canvas._bat=bat;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx=W/2,cy=H/2;
+  const outerR=cx-3;
+  const innerR=cx*0.42;
+  ctx.clearRect(0,0,W,H);
+  const bgClr=_getCanvasBg(canvas);
+  if(bat===0){
+    ctx.beginPath();ctx.arc(cx,cy,outerR,0,Math.PI*2);
+    ctx.fillStyle=document.body.classList.contains('light')?'rgba(0,0,0,.07)':'rgba(255,255,255,.06)';
+    ctx.fill();return;
+  }
+  const start=-Math.PI/2;
+  const pOk=ok/bat;
+  const endOk=start+pOk*Math.PI*2;
+  const endErr=start+Math.PI*2;
+  if(ok>0){
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,outerR,start,endOk);ctx.closePath();
+    ctx.fillStyle='#6FCF97';ctx.fill();
+  }
+  if(ok<bat){
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,outerR,endOk,endErr);ctx.closePath();
+    ctx.fillStyle='#EB5757';ctx.fill();
+  }
+  // Centro do donut na cor real do card pai
+  ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);ctx.fillStyle=bgClr;ctx.fill();
+  // Separadores finos na cor do card (sem borda preta externa)
+  ctx.beginPath();ctx.arc(cx,cy,outerR,0,Math.PI*2);ctx.strokeStyle=bgClr;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);ctx.strokeStyle=bgClr;ctx.lineWidth=1.5;ctx.stroke();
+}
+
+window.setPenSubTab=sub=>{
+  window._penSubTab=sub;
+  const rl=$('rl');
+  rl.classList.add('switching');
+  setTimeout(()=>{renderRanking();rl.classList.remove('switching');},120);
+};
+
+function penColor(pct){
+  if(pct<=50)return'#EB5757';
+  if(pct<=65)return'#F2994A';
+  if(pct<=75)return'#F2C94C';
+  return'#6FCF97';
+}
+
+// Coleta stats de todos os meses (histórico + mês atual) para um membro
+function getStGeral(m){
+  // Somente o ano vigente (temporada atual)
+  const anoAtual=new Date().getFullYear().toString();
+  const allSources=[];
+  // mês atual
+  allSources.push(...(gd.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
+  // histórico somente do ano atual
+  Object.entries(gd.historico||{}).forEach(([k,h])=>{
+    if(k.startsWith(anoAtual)){
+      allSources.push(...(h.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
+    }
+  });
+  return{
+    n:allSources.length,
+    gols:allSources.reduce((s,x)=>s+(x.gols||0),0),
+    assist:allSources.reduce((s,x)=>s+(x.assist||0),0),
+    penBat:allSources.reduce((s,x)=>s+(x.penBat||0),0),
+    penOk:allSources.reduce((s,x)=>s+(x.penOk||0),0),
+  };
+}
+
+
+// ── MVP: calcula quem lidera consecutivamente no histórico fechado ──
+function getMvpStreak(){
+  if(!gd)return null;
+  const hist=gd.historico||{};
+  const keys=Object.keys(hist).sort(); // ordenados cronologicamente
+  if(keys.length<2)return null;
+
+  // Para cada mês fechado, descobre o 1º lugar (sem empate)
+  const monthWinners=keys.map(k=>{
+    const h=hist[k];
+    const mbs=h.members||[];
+    const ranked=mbs.map(mm=>{
+      const ms=(h.matches||[]).filter(x=>mm.uid?x.uid===mm.uid:x.player===mm.name);
+      return{uid:mm.uid,name:mm.name,ga:ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0)};
+    }).sort((a,b)=>b.ga-a.ga);
+    // Empate no topo = sem MVP naquele mês
+    if(ranked.length>=2&&ranked[0].ga===ranked[1].ga)return{key:k,uid:null};
+    return{key:k,uid:ranked[0]?.uid||null,name:ranked[0]?.name||null};
+  }).filter(m=>m.uid); // remove meses sem vencedor claro
+
+  if(!monthWinners.length)return null;
+
+  // Calcula a sequência consecutiva mais recente
+  let streak=1;
+  const last=monthWinners[monthWinners.length-1];
+  for(let i=monthWinners.length-2;i>=0;i--){
+    if(monthWinners[i].uid===last.uid)streak++;
+    else break;
+  }
+
+  if(streak<2)return null;
+
+  // Meses da sequência (os últimos `streak` meses)
+  const streakMonths=monthWinners.slice(-streak).map(m=>getMesLabel(m.key));
+
+  // Encontra a foto do membro
+  const mb=(gd.members||[]).find(m=>m.uid===last.uid);
+
+  return{uid:last.uid,name:last.name,photo:mb?.photo||null,streak,months:streakMonths};
 }
 
 function renderMvpBanner(){
-  mvp = _calcMvpStreak();
-  if(!mvp) return '';
+  const mvp=getMvpStreak();
+  if(!mvp)return'';
   const isMe=mvp.uid===currentUser?.uid;
   const avHTML=`<div class="av-mvp-ring">${avatarHTML(mvp.name,42,mvp.uid)}</div>`;
   const monthBadges=mvp.months.map(m=>`<span class="mvp-month-badge">${m}</span>`).join('');
@@ -3333,7 +5305,6 @@ function renderMvpBanner(){
     </div>
   </div>`;
 }
-// ── FIM MVP STREAK ────────────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════
 // GRÁFICO EXPANDIDO — tela cheia horizontal
@@ -3661,68 +5632,6 @@ function showRankingSkeleton(){
 }
 // ── FIM SKELETON LOADERS ─────────────────────────────────────────
 
-function renderFeedCard(){
-  const card=document.getElementById('feed-card');
-  const feedItems=document.getElementById('feed-items');
-  if(!card||!feedItems)return;
-  const feed=(gd&&gd.feed)||[];
-  if(!feed.length){
-    card.style.display='none';
-    card.style.visibility='hidden';
-    card.style.height='0';
-    card.style.overflow='hidden';
-    card.style.margin='0';
-    return;
-  }
-  // Mostrar card
-  card.style.display='';
-  card.style.visibility='';
-  card.style.height='';
-  card.style.overflow='';
-  card.style.margin='';
-  // Ordenar do mais recente para mais antigo
-  const sorted=[...feed].sort((a,b)=>(b.ts||0)-(a.ts||0));
-  const iconMap={gol:'⚽',assist:'🅰️',partida:'🎮',membro:'👋',meta:'🎯',desafio:'⚔️',desafio_resultado:'🏆',default:'📌'};
-  feedItems.innerHTML=sorted.map(ev=>{
-    const icon=iconMap[ev.tipo]||iconMap.default;
-    const ts=ev.ts?_timeAgo(ev.ts):'';
-    const mem=gd&&gd.members&&gd.members.find(m=>m.uid===ev.uid);
-    const nome=mem?mem.name:'';
-    return`<div style="display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--bo)">
-      <div style="font-size:15px;margin-top:1px;flex-shrink:0">${icon}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;color:var(--tx);line-height:1.4">${ev.texto||''}</div>
-        ${ts?`<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:3px">${ts}</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-function _timeAgo(ts){
-  const diff=Date.now()-ts;
-  const m=Math.floor(diff/60000);
-  if(m<1)return'agora';
-  if(m<60)return m+'min atrás';
-  const h=Math.floor(m/60);
-  if(h<24)return h+'h atrás';
-  const d=Math.floor(h/24);
-  return d+'d atrás';
-}
-window._toggleFeedExpand=function(){
-  const items=document.getElementById('feed-items');
-  const label=document.getElementById('feed-toggle-label');
-  const icon=document.getElementById('feed-toggle-icon');
-  if(!items)return;
-  const expanded=items.style.maxHeight==='none'||parseInt(items.style.maxHeight)>200;
-  if(expanded){
-    items.style.maxHeight='172px';
-    if(label)label.textContent='ver mais';
-    if(icon)icon.style.transform='';
-  }else{
-    items.style.maxHeight='none';
-    if(label)label.textContent='ver menos';
-    if(icon)icon.style.transform='rotate(180deg)';
-  }
-};
 function renderRanking(){
   if(!gd)return;const mbs=gd.members||[];
   const rsb=$('rank-share-btn');if(rsb)rsb.style.display=rankStat==='recordes'?'none':'flex';
@@ -4301,6 +6210,20 @@ function _buildPlayerProfile(uid){
   const _mbApelido=mb.apelido||'';
   if(_mpApelidoEl){_mpApelidoEl.textContent=_mbApelido?`🏷️ ${_mbApelido}`:'';_mpApelidoEl.style.display=_mbApelido?'block':'none';}
 
+  // Contadores Craque / MVP no header do perfil individual
+  const _mpCountEl = document.getElementById('mp-counters');
+  if(_mpCountEl){
+    const _qtdCr = mb.qtdCraque||0;
+    const _qtdMv = mb.qtdMVP||0;
+    if(_qtdCr > 0 || _qtdMv > 0){
+      _mpCountEl.innerHTML = (_qtdCr > 0 ? `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,209,102,.15);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:11px;color:#FFD166;margin-right:6px">⭐ ${_qtdCr}x Craque</span>` : '')
+                           + (_qtdMv > 0 ? `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,209,102,.15);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">🏆 ${_qtdMv}x MVP</span>` : '');
+      _mpCountEl.style.display = 'block';
+    } else {
+      _mpCountEl.innerHTML = '';
+      _mpCountEl.style.display = 'none';
+    }
+  }
 
   // Badge temporário de campeão de desafio (últimos 7 dias)
   const _mpSubEl=document.getElementById('mp-sub');
@@ -4611,90 +6534,18 @@ function _buildPlayerProfile(uid){
     ?'<div class="empty">Nenhum dado registrado.</div>'
     :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
-  // ── Histórico de Desafios do jogador ──
-  const todosDesafios = (gd.desafios||[]).filter(d =>
-    (d.uidA === uid || d.uidB === uid) && d.status !== 'cancelado'
-  ).slice().reverse();
-
-  if(todosDesafios.length){
+  // ── Desafios do jogador ──
+  const desafiosDoJogador = (gd.desafios||[]).filter(d =>
+    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado')
+  ).slice(-4).reverse();
+  if(desafiosDoJogador.length){
     const desafioSection = document.createElement('div');
-    desafioSection.style.cssText='margin-top:16px;';
-
-    const encerrados = todosDesafios.filter(d=>d.status==='encerrado');
-    const ativos     = todosDesafios.filter(d=>d.status==='ativo'||d.status==='pendente');
-
-    // Calcula W/L/D
-    let wins=0,losses=0,draws=0;
-    encerrados.forEach(d=>{
-      const sA=_dcGetScore(d.uidA,d), sB=_dcGetScore(d.uidB,d);
-      if(sA===sB){draws++;}
-      else{const wuid=sA>sB?d.uidA:d.uidB; if(wuid===uid)wins++; else losses++;}
-    });
-
-    function buildHistRow(d, uid){
-      const rival = d.uidA===uid ? {name:d.nameB,uid:d.uidB} : {name:d.nameA,uid:d.uidA};
-      const myScore  = _dcGetScore(uid,d);
-      const rivScore = _dcGetScore(rival.uid,d);
-      const tipo = d.tipo==='gols'?'⚽ Gols':d.tipo==='assist'?'👟 Assist.':'🏅 G+A';
-      const ended = d.status==='encerrado';
-      let outcomeClass='draw', outcomeIcon='🤝', scoreClass='draw';
-      if(!ended){
-        outcomeClass='active-row'; outcomeIcon = d.status==='pendente'?'⏳':'🔴'; scoreClass='ongoing';
-      } else if(myScore>rivScore){
-        outcomeClass='win'; outcomeIcon='🏆'; scoreClass='win';
-      } else if(myScore<rivScore){
-        outcomeClass='loss'; outcomeIcon='😅'; scoreClass='loss';
-      }
-      const date = d.endTs ? new Date(d.endTs).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
-      const status = ended?date:(d.status==='pendente'?'Pendente':'Em andamento');
-      return `<div class="dc-hist-row ${outcomeClass}">
-        <span class="dc-hist-outcome">${outcomeIcon}</span>
-        <div class="dc-hist-info">
-          <div class="dc-hist-rival">${rival.name}</div>
-          <div class="dc-hist-meta">${tipo} · ${status}</div>
-        </div>
-        <span class="dc-hist-score ${scoreClass}">${myScore}<span style="font-size:14px;opacity:.5">×</span>${rivScore}</span>
-      </div>`;
-    }
-
-    const allHTML = todosDesafios.map(d=>buildHistRow(d,uid)).join('') || '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Nenhum desafio registrado.</div>';
-    const encHTML  = encerrados.length ? encerrados.map(d=>buildHistRow(d,uid)).join('') : '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Nenhum desafio encerrado.</div>';
-    const ativHTML = ativos.length    ? ativos.map(d=>buildHistRow(d,uid)).join('')     : '<div style="font-size:12px;color:var(--tx3);font-family:DM Mono,monospace;padding:8px 0">Sem desafios ativos.</div>';
-
-    const wlBadge = encerrados.length
-      ? `<div style="display:flex;gap:6px;margin-bottom:10px">
-          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(77,255,176,.15);border:1px solid rgba(77,255,176,.35);color:#4dffb0">${wins}V</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(255,90,122,.12);border:1px solid rgba(255,90,122,.3);color:#FF5A7A">${losses}D</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:7px;background:rgba(138,155,192,.12);border:1px solid rgba(138,155,192,.25);color:var(--tx2)">${draws}E</span>
-        </div>` : '';
-
-    desafioSection.innerHTML=`
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-        <span>⚔️</span> Desafios diretos
-      </div>
-      ${wlBadge}
-      <div class="dc-hist-tab-bar">
-        <div class="dc-hist-tab active" onclick="_dcHistTab(this,'all','${uid}')">Todos</div>
-        <div class="dc-hist-tab" onclick="_dcHistTab(this,'enc','${uid}')">Histórico</div>
-        <div class="dc-hist-tab" onclick="_dcHistTab(this,'atv','${uid}')">Ativos</div>
-      </div>
-      <div id="dc-hist-all-${uid}">${allHTML}</div>
-      <div id="dc-hist-enc-${uid}" style="display:none">${encHTML}</div>
-      <div id="dc-hist-atv-${uid}" style="display:none">${ativHTML}</div>
-    `;
+    desafioSection.style.cssText='margin-top:12px;';
+    desafioSection.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>⚔️</span> Desafios diretos</div>'
+      + desafiosDoJogador.map(d => _dcCardHTML(d, uid)).join('');
     document.getElementById('mp-body').appendChild(desafioSection);
   }
 }
-
-window._dcHistTab=function(tabEl,which,uid){
-  const bar=tabEl.closest('.dc-hist-tab-bar');
-  bar.querySelectorAll('.dc-hist-tab').forEach(t=>t.classList.remove('active'));
-  tabEl.classList.add('active');
-  ['all','enc','atv'].forEach(k=>{
-    const el=document.getElementById('dc-hist-'+k+'-'+uid);
-    if(el) el.style.display=k===which?'block':'none';
-  });
-};
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
   if(!gd||!uid)return;
@@ -5431,6 +7282,33 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL PARTIDA SALVA ══ -->
+<!-- ── MODAL MVP VOTAÇÃO ── -->
+<div id="modal-mvp">
+  <div id="modal-mvp-card">
+    <!-- Glow overlay -->
+    <div style="position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(160deg,rgba(255,209,102,.1) 0%,transparent 55%);z-index:0"></div>
+
+    <div class="mvp-header" style="position:relative;z-index:1">
+      <div style="font-size:40px;line-height:1;margin-bottom:.6rem">⭐</div>
+      <div style="font-family:'VarsityTeam',serif;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FFE066,#FFB800);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.3rem">Craque da Rodada</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--tx2);line-height:1.5;margin-bottom:.75rem">Dê uma nota de 0 a 10 para os colegas desta partida.</div>
+    </div>
+
+    <div class="mvp-players-list" id="mvp-players-list" style="position:relative;z-index:1">
+      <!-- preenchido por JS -->
+    </div>
+
+    <div class="mvp-footer" style="position:relative;z-index:1;display:flex;flex-direction:column;gap:8px">
+      <button id="mvp-salvar-btn" onclick="salvarVotosMVP()" style="width:100%;padding:14px 20px;border-radius:14px;background:linear-gradient(135deg,#FFE066,#FFB800);color:#07090d;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 20px rgba(255,180,0,.4);transition:filter .15s,transform .15s" onmouseover="this.style.filter='brightness(1.08)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">
+        ⭐ Enviar votos
+      </button>
+      <button onclick="fecharModalMVP(true)" style="width:100%;padding:11px;border-radius:12px;background:none;border:1px solid var(--bo2);color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:border-color .15s" onmouseover="this.style.borderColor='var(--bo3)'" onmouseout="this.style.borderColor='var(--bo2)'">
+        Agora não
+      </button>
+      <div id="mvp-ok" style="display:none;text-align:center;font-size:12px;color:var(--g);font-family:'DM Mono',monospace">✓ Votos registrados!</div>
+    </div>
+  </div>
+</div>
 
 <div id="modal-partida-salva" style="
   position:fixed;inset:0;z-index:9000;
@@ -7143,7 +9021,7 @@ const CONQUISTAS = [
   { id:'ga_35',  cat:'⚡ G+A no Mês', nome:'Decisivo',      desc:'35 G+A em um mês', icon:'🎲', tipo:'ga_mes', val:35 },
   { id:'ga_40',  cat:'⚡ G+A no Mês', nome:'Protagonista',  desc:'40 G+A em um mês', icon:'🎬', tipo:'ga_mes', val:40 },
   { id:'ga_45',  cat:'⚡ G+A no Mês', nome:'Estrela',       desc:'45 G+A em um mês', icon:'⭐', tipo:'ga_mes', val:45 },
-  { id:'ga_50',  cat:'⚡ G+A no Mês', nome:'Lendário',      desc:'50 G+A em um mês', icon:'🌟', tipo:'ga_mes', val:50 },
+  { id:'ga_50',  cat:'⚡ G+A no Mês', nome:'Craque',        desc:'50 G+A em um mês', icon:'🌟', tipo:'ga_mes', val:50 },
   { id:'ga_55',  cat:'⚡ G+A no Mês', nome:'Fenômeno',      desc:'55 G+A em um mês', icon:'🚀', tipo:'ga_mes', val:55 },
   { id:'ga_60',  cat:'⚡ G+A no Mês', nome:'Extraterrestre',desc:'60 G+A em um mês', icon:'🛸', tipo:'ga_mes', val:60 },
   // ── GOLS NO ANO ─────────────────────────────────────────────
@@ -7599,64 +9477,10 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
   if(inner && !inner.contains(e.target)) window.fecharConquistas();
 });
 
-// ── BACK NAVIGATION (botão Voltar Android / gesto iOS) ───────────────
-(function(){
-  history.replaceState({futstatsBack:null,type:'base'},'');
-
-  function _fecharPorId(id){
-    const el=document.getElementById(id);
-    if(!el||!el.classList.contains('open')) return false;
-    if(el.classList.contains('ov')){closeP(id);return true;}
-    if(el.classList.contains('ov-center')){closePCenter(id);return true;}
-    return false;
-  }
-
-  function _fecharTopoAtual(){
-    if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
-    if(document.getElementById('modal-desafio')?.classList.contains('open')){if(typeof fecharModalDesafio==='function')fecharModalDesafio();return true;}
-    if(document.getElementById('modal-duelo')?.classList.contains('open')){if(typeof closeDuelo==='function')closeDuelo();return true;}
-    if(document.getElementById('modal-partidas')?.classList.contains('open')){closeModalPartidas();return true;}
-    if(document.getElementById('modal-player')?.classList.contains('open')){closePlayerProfile();return true;}
-    if(document.getElementById('notif-panel')?.classList.contains('open')){toggleNotifPanel();return true;}
-    if(document.getElementById('modal-conquistas')?.classList.contains('open')){if(typeof fecharConquistas==='function')fecharConquistas();return true;}
-    const paineis=['pperfil','pc','pj','pi2','pedit','pnovomes','ppreenchemes','pvermes'];
-    for(const id of paineis){ if(_fecharPorId(id)) return true; }
-    return false;
-  }
-
-  window.addEventListener('popstate',()=>{
-    const fechou=_fecharTopoAtual();
-    if(fechou) history.pushState({futstatsBack:null,type:'closed'},'');
-  });
-
-  // Observer nos modais para empurrar estado
-  ['modal-duelo','modal-desafio','modal-evol-chart','modal-conquistas','notif-panel','modal-partidas'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    new MutationObserver(()=>{
-      if(el.classList.contains('open')&&!el._backPushed){
-        el._backPushed=true;
-        history.pushState({futstatsBack:id,type:'modal'},'');
-      } else if(!el.classList.contains('open')){
-        el._backPushed=false;
-      }
-    }).observe(el,{attributes:true,attributeFilter:['class']});
-  });
-
-  // Hook no openPlayerProfile para empurrar estado
-  const _origOP=window.openPlayerProfile;
-  window.openPlayerProfile=function(...args){
-    _origOP?.(...args);
-    history.pushState({futstatsBack:'modal-player',type:'modal'},'');
-  };
-})();
-// ── FIM BACK NAVIGATION ──────────────────────────────────────────────
-
 })();
 </script>
 <!-- Overlay e Painel de notificações — fora do #sa para escapar do overflow:hidden -->
 <div id="notif-overlay" onclick="toggleNotifPanel()"></div>
-<div id="dc-result-overlay"></div>
 <div id="notif-panel">
   <div class="notif-panel-header">
     <div class="notif-panel-title">🔔 Notificações</div>
