@@ -3281,7 +3281,46 @@ window.removerApelido=async()=>{
 
 
 
+// ── MVP STREAK ───────────────────────────────────────────────────────────────
+let mvp = null; // calculado em renderRanking
+
+function _calcMvpStreak(){
+  if(!gd) return null;
+  const hist = gd.historico||{};
+  const meses = Object.keys(hist).sort();
+  if(meses.length < 2) return null;
+  // Para cada membro, calcula quantos meses consecutivos foi 1º em G+A
+  const mbs = gd.members||[];
+  let bestUid=null, bestStreak=0, bestMonths=[];
+  mbs.forEach(mb=>{
+    let streak=0, months=[], cur=[];
+    meses.forEach(k=>{
+      const h=hist[k];
+      const ranked=[...( h.members||[] )].map(mm=>{
+        const ms=(h.matches||[]).filter(x=>m_uid_match(x,mm));
+        return{uid:mm.uid,ga:ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0)};
+      }).sort((a,b)=>b.ga-a.ga);
+      if(ranked.length && ranked[0].uid===mb.uid && ranked[0].ga>0){
+        streak++;
+        const [y,m]=k.split('-');
+        const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1];
+        cur.push(mn+'/'+y);
+      } else {
+        if(streak>bestStreak){bestStreak=streak;bestUid=mb.uid;bestMonths=[...cur];}
+        streak=0;cur=[];
+      }
+    });
+    if(streak>bestStreak){bestStreak=streak;bestUid=mb.uid;bestMonths=[...cur];}
+  });
+  if(bestStreak < 2) return null;
+  const mb=mbs.find(m=>m.uid===bestUid);
+  if(!mb) return null;
+  return {uid:bestUid, name:mb.name, streak:bestStreak, months:bestMonths};
+}
+
 function renderMvpBanner(){
+  mvp = _calcMvpStreak();
+  if(!mvp) return '';
   const isMe=mvp.uid===currentUser?.uid;
   const avHTML=`<div class="av-mvp-ring">${avatarHTML(mvp.name,42,mvp.uid)}</div>`;
   const monthBadges=mvp.months.map(m=>`<span class="mvp-month-badge">${m}</span>`).join('');
@@ -3294,6 +3333,7 @@ function renderMvpBanner(){
     </div>
   </div>`;
 }
+// ── FIM MVP STREAK ────────────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════
 // GRÁFICO EXPANDIDO — tela cheia horizontal
