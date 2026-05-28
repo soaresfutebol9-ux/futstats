@@ -2845,7 +2845,11 @@ window.resetarVotos = async function(){
     // Remove notifs de craque_rodada, mvp_mes e voto_registrado de todos os membros
     if(cur.notifs){
       Object.keys(cur.notifs).forEach(uid => {
-        cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n => n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes' && n.tipo !== 'voto_registrado');
+        cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n =>
+          n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes' &&
+          n.tipo !== 'voto_registrado' && n.tipo !== 'nota_individual' &&
+          n.tipo !== 'nota_recebida'
+        );
       });
     }
     await setDoc(doc(db,'groups',groupId), cur);
@@ -3082,7 +3086,11 @@ function renderPerfilPanelStats(){
           const _cur = _snap.data();
           const _mesKey = _cur.mesAtivo || _mesAtual();
           _notificarCraqueDaRodada(_cur, ultimaCraqueKey);
-          _calcularENotificarMVP(_cur, _mesKey);
+          // Envia a cada jogador a sua própria nota recebida (anônima)
+          _notificarNotaRecebida(_cur, ultimaCraqueKey);
+          // Incrementa contador de Craque para o vencedor
+          const _crAuto = _getCraqueVencedor(_cur, ultimaCraqueKey);
+          if(_crAuto){ const _crMbAuto=(_cur.members||[]).find(m=>m.uid===_crAuto.uid); if(_crMbAuto)_crMbAuto.qtdCraque=(_crMbAuto.qtdCraque||0)+1; }
           const _cr = _getCraqueVencedor(_cur, ultimaCraqueKey);
           if(_cr){
             const _mb = (_cur.members||[]).find(m=>m.uid===_cr.uid);
@@ -3160,7 +3168,7 @@ function renderPerfilPanelStats(){
           ${_headerRight}
         </div>
         ${_progressoHtml}
-        ${craqueMembro
+        ${_votacaoEncerrada && craqueMembro
           ? `<div style="display:flex;align-items:center;gap:10px">
               <div style="font-size:24px">${euSouCraque?'🌟':'⭐'}</div>
               <div>
@@ -3168,34 +3176,72 @@ function renderPerfilPanelStats(){
                 <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${craqueAtual.media} · ${craqueAtual.votos} voto${craqueAtual.votos!==1?'s':''}</div>
               </div>
             </div>`
-          : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">${_votacaoEncerrada ? 'Nenhum voto registrado.' : 'Aguardando votos...'}</div>`}
-        ${euSouCraque ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">🌟 Você é o Craque desta rodada!</div>`:''}
+          : _votacaoEncerrada
+            ? `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Nenhum voto registrado.</div>`
+            : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">🔒 Resultado após encerrar a votação.</div>`}
+        ${_votacaoEncerrada && euSouCraque ? `<div style="margin-top:8px;padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">🌟 Você foi o Craque desta rodada!</div>`:''}
       </div>`;
     }
 
     // ── MVP do Mês ──
-    const topMVP = mediasProPerfil[0];
-    const topMembro = topMVP ? (gd.members||[]).find(m=>m.uid===topMVP.uid) : null;
+    // Só revela o MVP se o mês está fechado (existe em gd.historico)
+    const mesKeyMVPFechado = Object.keys(gd.historico||{}).sort().reverse()[0] || null;
+    const mesAtivoCurrent  = gd.mesAtivo || mesAtual();
+    const mesFechado = mesKeyMVPFechado && mesKeyMVPFechado !== mesAtivoCurrent;
+    // Notas do mês fechado para exibição do MVP revelado
+    const mvpFechadoData = mesFechado && gd.mvpMes && gd.mvpMes[mesKeyMVPFechado]
+      ? gd.mvpMes[mesKeyMVPFechado] : null;
+    const mvpFechadoMembro = mvpFechadoData
+      ? (gd.members||[]).find(m=>m.uid===mvpFechadoData.uid) : null;
+    // Minha nota do mês ATIVO (só para mim, enquanto votação aberta)
+    const minhaNota = minhaMVP ? minhaMVP.media : null;
+    const mesLabel = mesAtivoCurrent ? getMesLabel(mesAtivoCurrent) : '';
+
     mvpHtml += `<div style="background:var(--bg3);border:1.5px solid rgba(255,209,102,.2);border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div style="font-size:10px;color:#a07a00;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏆 MVP do mês</div>
         <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--tx3)">${totalVotantes} avaliação${totalVotantes!==1?'ões':''}</div>
       </div>
-      ${topMembro
-        ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:${minhaMVP&&!euSouMVP?'10px':'0'}">
+      ${mvpFechadoMembro
+        ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
             <div style="font-size:24px">🥇</div>
             <div>
-              <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${topMembro.name}</div>
-              <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">Média ${topMVP.media}</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx)">${mvpFechadoMembro.name}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">MVP de ${getMesLabel(mesKeyMVPFechado)} · Média ${mvpFechadoData.media}</div>
             </div>
           </div>`
-        : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace">Ainda sem avaliações este mês.</div>`}
-      ${minhaMVP && !euSouMVP ? `<div style="padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--tx2)">Sua média</div>
-        <div style="font-family:'VarsityTeam',serif;font-size:18px;color:#FFD166">${minhaMVP.media}</div>
-      </div>` : ''}
-      ${euSouMVP ? `<div style="margin-top:${topMembro?'8px':'0'};padding:7px 12px;background:rgba(255,209,102,.12);border-radius:10px;border:1px solid rgba(255,209,102,.3);text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#FFD166;font-weight:700">⭐ Você é o MVP deste mês! Média ${minhaMVP.media}</div>` : ''}
+        : `<div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:6px">🔒 Resultado revelado ao fechar o mês.</div>`}
+      ${minhaNota !== null
+        ? `<div style="padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2);display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--tx2)">Sua média este mês (${mesLabel})</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:18px;color:#FFD166">${minhaNota}</div>
+          </div>`
+        : ''
+      }
     </div>`;
+
+    // ── Contadores de Craque da Rodada e MVP ──
+    const mb_me = (gd.members||[]).find(m=>m.uid===currentUser.uid);
+    const qtdCraque = mb_me?.qtdCraque || 0;
+    const qtdMVP    = mb_me?.qtdMVP    || 0;
+    if(qtdCraque > 0 || qtdMVP > 0){
+      mvpHtml += `<div style="display:flex;gap:8px">
+        ${qtdCraque > 0 ? `<div style="flex:1;background:var(--bg3);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px">
+          <div style="font-size:20px">⭐</div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">Craque</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:22px;color:#FFD166;line-height:1">${qtdCraque}x</div>
+          </div>
+        </div>` : ''}
+        ${qtdMVP > 0 ? `<div style="flex:1;background:var(--bg3);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px">
+          <div style="font-size:20px">🏆</div>
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">MVP</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:22px;color:#FFD166;line-height:1">${qtdMVP}x</div>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }
 
     mvpHtml += `</div>`;
     mvpCardEl.innerHTML = mvpHtml;
@@ -3558,8 +3604,7 @@ window.salvarVotosMVP = async function(){
       return;
     }
 
-    // Notifica todos os outros que este jogador votou
-    _notificarVotoRegistrado(cur, partidaKey, currentUser.uid);
+    // Voto anônimo — sem notificação de quem votou ou de notas individuais
 
     // Verifica se a votação está encerrada (todos votaram OU prazo de 24h expirou)
     const _tsPartida = parseInt(partidaKey.replace('p_',''));
@@ -3569,10 +3614,17 @@ window.salvarVotosMVP = async function(){
     const _todosVotaram = _totalVotos >= _totalMembros || _prazoExpirou;
 
     if(_todosVotaram){
-      // Notifica craque da rodada para todos
+      // Notifica craque da rodada para todos (anunciado imediatamente)
       _notificarCraqueDaRodada(cur, partidaKey);
-      // Recalcula e notifica MVP do mês
-      _calcularENotificarMVP(cur, mesKey);
+      // Envia a cada jogador a sua própria nota recebida (anônima)
+      _notificarNotaRecebida(cur, partidaKey);
+      // Incrementa contador de Craque da Rodada no membro vencedor
+      const _crVenc = _getCraqueVencedor(cur, partidaKey);
+      if(_crVenc){
+        const _crMb = (cur.members||[]).find(m=>m.uid===_crVenc.uid);
+        if(_crMb){ _crMb.qtdCraque = (_crMb.qtdCraque||0) + 1; }
+      }
+      // MVP do mês: NÃO revela aqui — só ao fechar o mês
     }
 
     await setDoc(doc(db,'groups',groupId), cur);
@@ -3759,7 +3811,84 @@ window._getMVPMedias = function(mesKey){
     uid, media:+(soma/count).toFixed(1), count
   })).sort((a,b)=>b.media-a.media);
 };
+// Notifica cada jogador com a sua própria nota média recebida na rodada (anônimo)
+window._notificarNotaRecebida = function(cur, partidaKey){
+  const votos = (cur.craqueVotos||{})[partidaKey];
+  if(!votos) return;
+
+  // Agrega notas recebidas por cada jogador (soma e contagem)
+  const totais = {};
+  Object.values(votos).forEach(notasDoVotante => {
+    Object.entries(notasDoVotante).forEach(([uid, nota]) => {
+      if(!totais[uid]) totais[uid] = { soma: 0, count: 0 };
+      totais[uid].soma  += nota;
+      totais[uid].count += 1;
+    });
+  });
+
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  const totalVotantes = Object.keys(votos).length;
+
+  (cur.members||[]).forEach(membro => {
+    const t = totais[membro.uid];
+    if(!t) return; // não recebeu nenhum voto nesta rodada
+    const media = +(t.soma / t.count).toFixed(1);
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    // Remove notif anterior desta partida para este membro (evita duplicata)
+    cur.notifs[membro.uid] = cur.notifs[membro.uid].filter(n =>
+      !(n.tipo === 'nota_recebida' && n.partidaKey === partidaKey)
+    );
+    cur.notifs[membro.uid].push({
+      id: 'nota_recv_' + partidaKey + '_' + membro.uid + '_' + agora,
+      tipo: 'nota_recebida',
+      partidaKey,
+      media,
+      totalVotantes,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 30)
+      cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 30);
+  });
+};
+
 // ── FIM CRAQUE / MVP ──────────────────────────────────────────────
+
+// Envia notificação privada de nota individual para cada jogador avaliado
+window._notificarNotasIndividuais = function(cur, partidaKey, votanteUid, notas){
+  const votante = (cur.members||[]).find(m=>m.uid===votanteUid);
+  const votanteNome = votante ? (votante.name||'Jogador') : 'Jogador';
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  Object.entries(notas).forEach(([avUid, nota]) => {
+    if(avUid === votanteUid) return; // não notifica a si mesmo
+    if(!cur.notifs[avUid]) cur.notifs[avUid] = [];
+    // Remove notif anterior deste votante para esta partida (evita duplicata)
+    cur.notifs[avUid] = cur.notifs[avUid].filter(n =>
+      !(n.tipo==='nota_individual' && n.partidaKey===partidaKey && n.votanteUid===votanteUid)
+    );
+    cur.notifs[avUid].push({
+      id: 'nota_'+partidaKey+'_'+votanteUid+'_'+avUid+'_'+agora,
+      tipo: 'nota_individual',
+      partidaKey,
+      votanteUid,
+      votanteNome,
+      nota,
+      ts: agora
+    });
+    if(cur.notifs[avUid].length > 30) cur.notifs[avUid].splice(0, cur.notifs[avUid].length - 30);
+  });
+};
+
+// Revela o MVP do mês ao fechar o mês (chamada pelo admin / virada de mês)
+// Incrementa qtdMVP no membro vencedor
+window._revelarMVPMes = function(cur, mesKey){
+  const medias = _calcularENotificarMVP(cur, mesKey);
+  if(!medias || !medias.length) return;
+  const mvpVenc = medias[0];
+  const mvpMb = (cur.members||[]).find(m=>m.uid===mvpVenc.uid);
+  if(mvpMb){ mvpMb.qtdMVP = (mvpMb.qtdMVP||0) + 1; }
+};
 
 window.copyCodePerfil=()=>{
   navigator.clipboard.writeText(groupId).then(()=>{const b=$('copy-code-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));
@@ -3847,38 +3976,65 @@ function _getMyPersonalNotifs(){
   return mine.slice().sort((a,b)=>b.ts-a.ts);
 }
 
+// Cor da nota conforme faixa definida
+function _corNota(v){
+  if(v <= 4.5) return '#e53e3e';   // vermelho
+  if(v <= 7.0) return '#f97316';   // laranja
+  return '#2f9e44';                // verde escuro
+}
+
+// Apaga notificação pessoal pelo id (persiste no Firestore)
+window._apagarNotif = async function(id){
+  if(!gd||!currentUser||!groupId) return;
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur  = snap.data();
+    if(cur.notifs&&cur.notifs[currentUser.uid]){
+      cur.notifs[currentUser.uid] = cur.notifs[currentUser.uid].filter(n=>n.id!==id);
+      await setDoc(doc(db,'groups',groupId),cur);
+      gd = cur;
+      _renderNotifPanel();
+      _updateNotifBadge();
+    }
+  }catch(e){ console.warn('apagarNotif:',e); }
+};
+
+function _btnDel(id){
+  return `<button onclick="_apagarNotif('${id}')" title="Apagar" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s" onmouseover="this.style.background='rgba(255,90,122,.35)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'">×</button>`;
+}
+
 function _renderNotifPanel(){
   const list=document.getElementById('notif-list');
   if(!list)return;
   const personalNotifs=_getMyPersonalNotifs();
   const feed=(gd?.feed||[]).slice().reverse();
   const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
-  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
 
   let html='';
 
-  // Seção de notificações pessoais de desafio
   if(personalNotifs.length){
-    html+='<div style=\"font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px\">Seus desafios</div>';
-    html+=personalNotifs.slice(0,10).map(n=>{
+    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Suas notificações</div>';
+    html+=personalNotifs.slice(0,20).map(n=>{
       const unread=!lidasP.includes(n.id);
+      const del=_btnDel(n.id);
+
       if(n.tipo==='desafio_solicitacao'){
-        // Encontra o desafio para mostrar botões
         const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
         const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
         const btns=podeResponder
-          ? '<div style="display:flex;gap:6px;margin-top:8px">'
-            +'<button onclick="_dcAceitar(\x27'+n.desafioId+'\x27);document.getElementById(\x27notif-panel\x27).classList.remove(\x27open\x27)" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
-            +'<button onclick="_dcCancelar(\x27'+n.desafioId+'\x27)" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
+          ?'<div style="display:flex;gap:6px;margin-top:8px">'
+            +'<button onclick="_dcAceitar(''+n.desafioId+'');document.getElementById('notif-panel').classList.remove('open')" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#4dffb0,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
+            +'<button onclick="_dcCancelar(''+n.desafioId+'')" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
             +'</div>'
-          : (d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
+          :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
         return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
-          <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;width:100%">
             <div class="notif-icon">⚔️</div>
             <div class="notif-body">
               <div class="notif-text"><strong>${n.de}</strong> te desafiou!</div>
               <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
             </div>
+            ${del}
           </div>
           ${btns}
         </div>`;
@@ -3890,41 +4046,50 @@ function _renderNotifPanel(){
             <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio! O jogo começa agora.</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
+          ${del}
         </div>`;
       }
       if(n.tipo==='mvp_mes'){
-        const [ano, mes] = (n.mes||'').split('-');
-        const mesNome = mes ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1] : '';
-        const textoMVP = n.ehMVP
-          ? `Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟`
-          : `<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong>${n.media}</strong>! 🏆`;
+        const [ano,mes]=(n.mes||'').split('-');
+        const mesNome=mes?['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]:'';
+        const mc=_corNota(parseFloat(n.media));
+        const textoMVP=n.ehMVP
+          ?`Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! Os colegas reconheceram seu jogo. 🌟`
+          :`<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🏆`;
         return`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🏆</div>
           <div class="notif-body">
             <div class="notif-text">${textoMVP}</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
+          ${del}
         </div>`;
       }
-      if(n.tipo==='voto_registrado'){
-        return`<div class="notif-item${unread?' unread':''}">
-          <div class="notif-icon">🗳️</div>
-          <div class="notif-body">
-            <div class="notif-text"><strong>${n.votanteNome}</strong> votou no Craque da Rodada · ${n.totalVotos}/${n.totalMembros} votos</div>
-            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-        </div>`;
-      }
+      if(n.tipo==='voto_registrado') return '';
       if(n.tipo==='craque_rodada'){
-        const textoCraque = n.ehVencedor
-          ? `Você foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
-          : `<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong>${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! ⭐`;
+        const mc=_corNota(parseFloat(n.media));
+        const textoCraque=n.ehVencedor
+          ?`Você foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
+          :`<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! ⭐`;
         return`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">⭐</div>
           <div class="notif-body">
             <div class="notif-text">${textoCraque}</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='nota_individual') return '';
+      if(n.tipo==='nota_recebida'){
+        const cor=_corNota(parseFloat(n.media));
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">📊</div>
+          <div class="notif-body">
+            <div class="notif-text">Sua nota na rodada: <strong style="color:${cor};font-size:16px">${n.media}</strong> · avaliado por ${n.totalVotantes} jogador${n.totalVotantes!==1?'es':''}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
         </div>`;
       }
       return'';
@@ -3932,17 +4097,13 @@ function _renderNotifPanel(){
     if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
   }
 
-  // Feed geral do grupo
   if(!personalNotifs.length){
     list.innerHTML='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
     return;
   }
 
-  // Feed de atividade do grupo removido — notificações pessoais cobrem tudo
-
   list.innerHTML=html;
 }
-
 function _updateNotifBadge(){
   const badge=document.getElementById('notif-badge');
   if(!badge)return;
@@ -4597,7 +4758,25 @@ function renderDesafiosRanking(){
 async function checkMesVirada(cur){return checkMesViradaWith(groupId,cur)}
 async function checkMesViradaWith(gid,cur){
   const ma=mesAtual();if(!cur.mesAtivo)cur.mesAtivo=ma;
-  if(cur.mesAtivo!==ma){if(!cur.historico)cur.historico={};cur.historico[cur.mesAtivo]={matches:[...(cur.matches||[])],members:[...(cur.members||[])]};cur.matches=[];cur.mesAtivo=ma;await setDoc(doc(db,'groups',gid),cur);}
+  if(cur.mesAtivo!==ma){
+    const mesEncerrado = cur.mesAtivo;
+    if(!cur.historico)cur.historico={};
+    cur.historico[mesEncerrado]={matches:[...(cur.matches||[])],members:[...(cur.members||[])]};
+    // Revela MVP do mês encerrado e incrementa contador do vencedor
+    if(window._revelarMVPMes) _revelarMVPMes(cur, mesEncerrado);
+    cur.matches=[];cur.mesAtivo=ma;
+    await setDoc(doc(db,'groups',gid),cur);
+    // Publica no feed sobre encerramento do mês
+    try{
+      const mvpRev = cur.mvpMes && cur.mvpMes[mesEncerrado];
+      const mvpMbRev = mvpRev ? (cur.members||[]).find(m=>m.uid===mvpRev.uid) : null;
+      if(mvpMbRev){
+        await _publishFeed('conquista',`🏆 <strong>${mvpMbRev.name}</strong> é o <strong>MVP de ${getMesLabel(mesEncerrado)}</strong> com média ${mvpRev.media}!`);
+      } else {
+        await _publishFeed('nota',`📅 Mês <strong>${getMesLabel(mesEncerrado)}</strong> encerrado! Confira o ranking final.`);
+      }
+    }catch(e){}
+  }
   return cur;
 }
 function enterApp(){
@@ -5555,6 +5734,21 @@ function _buildPlayerProfile(uid){
   const _mpApelidoEl=document.getElementById('mp-apelido');
   const _mbApelido=mb.apelido||'';
   if(_mpApelidoEl){_mpApelidoEl.textContent=_mbApelido?`🏷️ ${_mbApelido}`:'';_mpApelidoEl.style.display=_mbApelido?'block':'none';}
+
+  // Contadores Craque / MVP no header do perfil individual
+  const _mpCountEl = document.getElementById('mp-counters');
+  if(_mpCountEl){
+    const _qtdCr = mb.qtdCraque||0;
+    const _qtdMv = mb.qtdMVP||0;
+    if(_qtdCr > 0 || _qtdMv > 0){
+      _mpCountEl.innerHTML = (_qtdCr > 0 ? `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,209,102,.15);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:11px;color:#FFD166;margin-right:6px">⭐ ${_qtdCr}x Craque</span>` : '')
+                           + (_qtdMv > 0 ? `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,209,102,.15);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:11px;color:#FFD166">🏆 ${_qtdMv}x MVP</span>` : '');
+      _mpCountEl.style.display = 'block';
+    } else {
+      _mpCountEl.innerHTML = '';
+      _mpCountEl.style.display = 'none';
+    }
+  }
 
   // Badge temporário de campeão de desafio (últimos 7 dias)
   const _mpSubEl=document.getElementById('mp-sub');
@@ -6581,6 +6775,7 @@ window.irParaRankingGA=()=>{
         <div>
           <div id="mp-nome" style="font-family:'Freshman',sans-serif;font-size:16px;letter-spacing:.5px;color:#000000"></div>
           <div id="mp-apelido" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--g);margin-top:1px;letter-spacing:.04em;display:none"></div>
+          <div id="mp-counters" style="margin-top:5px;display:none"></div>
           <div id="mp-sub" style="font-size:11px;color:#3d3d3d;font-family:'DM Mono',monospace;margin-top:2px"></div>
         </div>
       </div>
