@@ -3661,6 +3661,68 @@ function showRankingSkeleton(){
 }
 // ── FIM SKELETON LOADERS ─────────────────────────────────────────
 
+function renderFeedCard(){
+  const card=document.getElementById('feed-card');
+  const feedItems=document.getElementById('feed-items');
+  if(!card||!feedItems)return;
+  const feed=(gd&&gd.feed)||[];
+  if(!feed.length){
+    card.style.display='none';
+    card.style.visibility='hidden';
+    card.style.height='0';
+    card.style.overflow='hidden';
+    card.style.margin='0';
+    return;
+  }
+  // Mostrar card
+  card.style.display='';
+  card.style.visibility='';
+  card.style.height='';
+  card.style.overflow='';
+  card.style.margin='';
+  // Ordenar do mais recente para mais antigo
+  const sorted=[...feed].sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const iconMap={gol:'⚽',assist:'🅰️',partida:'🎮',membro:'👋',meta:'🎯',desafio:'⚔️',desafio_resultado:'🏆',default:'📌'};
+  feedItems.innerHTML=sorted.map(ev=>{
+    const icon=iconMap[ev.tipo]||iconMap.default;
+    const ts=ev.ts?_timeAgo(ev.ts):'';
+    const mem=gd&&gd.members&&gd.members.find(m=>m.uid===ev.uid);
+    const nome=mem?mem.name:'';
+    return`<div style="display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--bo)">
+      <div style="font-size:15px;margin-top:1px;flex-shrink:0">${icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--tx);line-height:1.4">${ev.texto||''}</div>
+        ${ts?`<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:3px">${ts}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function _timeAgo(ts){
+  const diff=Date.now()-ts;
+  const m=Math.floor(diff/60000);
+  if(m<1)return'agora';
+  if(m<60)return m+'min atrás';
+  const h=Math.floor(m/60);
+  if(h<24)return h+'h atrás';
+  const d=Math.floor(h/24);
+  return d+'d atrás';
+}
+window._toggleFeedExpand=function(){
+  const items=document.getElementById('feed-items');
+  const label=document.getElementById('feed-toggle-label');
+  const icon=document.getElementById('feed-toggle-icon');
+  if(!items)return;
+  const expanded=items.style.maxHeight==='none'||parseInt(items.style.maxHeight)>200;
+  if(expanded){
+    items.style.maxHeight='172px';
+    if(label)label.textContent='ver mais';
+    if(icon)icon.style.transform='';
+  }else{
+    items.style.maxHeight='none';
+    if(label)label.textContent='ver menos';
+    if(icon)icon.style.transform='rotate(180deg)';
+  }
+};
 function renderRanking(){
   if(!gd)return;const mbs=gd.members||[];
   const rsb=$('rank-share-btn');if(rsb)rsb.style.display=rankStat==='recordes'?'none':'flex';
