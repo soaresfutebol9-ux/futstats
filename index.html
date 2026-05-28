@@ -2842,10 +2842,10 @@ window.resetarVotos = async function(){
     delete cur.mvpVotos;
     delete cur.mvpMes;
     delete cur.craqueFeedPublicado;
-    // Remove notifs de craque_rodada e mvp_mes de todos os membros
+    // Remove notifs de craque_rodada, mvp_mes e voto_registrado de todos os membros
     if(cur.notifs){
       Object.keys(cur.notifs).forEach(uid => {
-        cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n => n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes');
+        cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n => n.tipo !== 'craque_rodada' && n.tipo !== 'mvp_mes' && n.tipo !== 'voto_registrado');
       });
     }
     await setDoc(doc(db,'groups',groupId), cur);
@@ -3484,9 +3484,9 @@ window.abrirModalMVP = function(partidaTs){
       ${foto}${avatar}
       <div class="mvp-player-name">${m.name||'Jogador'}</div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',-1)">‹</button>
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',-0.5)">‹</button>
         <div class="mvp-nota-label" id="mvp-nota-${m.uid}">—</div>
-        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',1)">›</button>
+        <button class="mvp-star-btn" onclick="_craqueAjustarNota('${m.uid}',0.5)">›</button>
       </div>
     </div>`;
   }).join('');
@@ -3498,11 +3498,11 @@ window.abrirModalMVP = function(partidaTs){
 
 window._craqueAjustarNota = function(uid, delta){
   const atual = _craqueNotas[uid] === undefined ? null : _craqueNotas[uid];
-  const nova = atual === null ? 5 : Math.max(0, Math.min(10, atual + delta));
+  const nova = atual === null ? 5 : Math.round(Math.max(0, Math.min(10, atual + delta)) * 2) / 2;
   _craqueNotas[uid] = nova;
   const el = document.getElementById('mvp-nota-'+uid);
   if(el){
-    el.textContent = nova;
+    el.textContent = nova % 1 === 0 ? nova.toFixed(0) : nova.toFixed(1);
     el.style.color = nova >= 8 ? '#4dffb0' : nova >= 5 ? '#FFD166' : '#FF5A7A';
   }
   const row = document.getElementById('mvp-row-'+uid);
@@ -3547,12 +3547,25 @@ window.salvarVotosMVP = async function(){
     cur.mvpVotos[mesKey][mvpChaveVotante] = {};
     entradas.forEach(([uid, nota]) => { cur.mvpVotos[mesKey][mvpChaveVotante][uid] = nota; });
 
+    // Voto anulado se grupo tem <= 2 membros
+    const _totalMembros = (cur.members||[]).length;
+    if(_totalMembros <= 2){
+      await setDoc(doc(db,'groups',groupId), cur);
+      gd = cur;
+      const okEl2 = document.getElementById('mvp-ok');
+      if(okEl2) okEl2.style.display='block';
+      setTimeout(fecharModalMVP, 1400);
+      return;
+    }
+
+    // Notifica todos os outros que este jogador votou
+    _notificarVotoRegistrado(cur, partidaKey, currentUser.uid);
+
     // Verifica se a votação está encerrada (todos votaram OU prazo de 24h expirou)
     const _tsPartida = parseInt(partidaKey.replace('p_',''));
     const _prazoExpirou = (Date.now() - _tsPartida) >= 24 * 60 * 60 * 1000;
     const _votosObj = cur.craqueVotos[partidaKey]||{};
     const _totalVotos = Object.keys(_votosObj).length;
-    const _totalMembros = (cur.members||[]).length;
     const _todosVotaram = _totalVotos >= _totalMembros || _prazoExpirou;
 
     if(_todosVotaram){
@@ -3617,6 +3630,30 @@ window._getCraqueVencedor = function(cur, partidaKey){
   if(!lista.length) return null;
   lista.sort((a,b) => b.media - a.media);
   return lista[0];
+};
+
+// Notifica todos os outros membros que um jogador votou
+window._notificarVotoRegistrado = function(cur, partidaKey, votanteUid){
+  const votante = (cur.members||[]).find(m => m.uid === votanteUid);
+  const votanteNome = votante ? (votante.name||'Jogador') : 'Jogador';
+  const totalVotos = Object.keys((cur.craqueVotos||{})[partidaKey]||{}).length;
+  const totalMembros = (cur.members||[]).length;
+  if(!cur.notifs) cur.notifs = {};
+  const agora = Date.now();
+  (cur.members||[]).forEach(membro => {
+    if(membro.uid === votanteUid) return; // não notifica quem votou
+    if(!cur.notifs[membro.uid]) cur.notifs[membro.uid] = [];
+    cur.notifs[membro.uid].push({
+      id: 'voto_'+partidaKey+'_'+votanteUid+'_'+agora,
+      tipo: 'voto_registrado',
+      partidaKey,
+      votanteNome,
+      totalVotos,
+      totalMembros,
+      ts: agora
+    });
+    if(cur.notifs[membro.uid].length > 20) cur.notifs[membro.uid].splice(0, cur.notifs[membro.uid].length - 20);
+  });
 };
 
 // Notifica o craque da rodada para todos os membros do grupo
@@ -3865,6 +3902,15 @@ function _renderNotifPanel(){
           <div class="notif-icon">🏆</div>
           <div class="notif-body">
             <div class="notif-text">${textoMVP}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      }
+      if(n.tipo==='voto_registrado'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🗳️</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>${n.votanteNome}</strong> votou no Craque da Rodada · ${n.totalVotos}/${n.totalMembros} votos</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
         </div>`;
