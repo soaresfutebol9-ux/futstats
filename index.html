@@ -2491,6 +2491,7 @@ window.resetarVotos = async function(){
     if(cur.notifs){
       Object.keys(cur.notifs).forEach(uid => {
         cur.notifs[uid] = (cur.notifs[uid]||[]).filter(n =>
+          n.tipo !== 'voto_registrado' && n.tipo !== 'nota_recebida' && n.tipo !== 'craque_rodada'
         );
       });
     }
