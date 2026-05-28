@@ -1306,16 +1306,16 @@ body.light .mes-vigente-titulo{
 .geral-banner{
   background:#56B4E9;
   border:1.5px solid #2E8FC5;
-  border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1.25rem;
+  border-radius:var(--rl);padding:.65rem 1rem;margin-bottom:1.25rem;
   display:flex;align-items:center;justify-content:space-between;
   box-shadow:0 0 36px rgba(86,180,233,.5),0 4px 20px rgba(0,0,0,.4);
   position:relative;overflow:hidden;
 }
 .geral-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 55%);pointer-events:none}
-.geral-banner-label{font-family:'DM Mono',monospace;font-size:11px;color:rgba(0,0,0,.55);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-.geral-banner-titulo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#07090d;letter-spacing:-.5px;text-shadow:none}
-.geral-banner-sub{font-size:11px;color:rgba(0,0,0,.5);font-family:'DM Mono',monospace;margin-top:2px}
-.geral-banner-icon{font-size:32px;opacity:1}
+.geral-banner-label{font-family:'DM Mono',monospace;font-size:10px;color:rgba(0,0,0,.55);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.geral-banner-titulo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#07090d;letter-spacing:-.5px;text-shadow:none;white-space:nowrap}
+.geral-banner-sub{font-size:10px;color:rgba(0,0,0,.5);font-family:'DM Mono',monospace;margin-top:2px}
+.geral-banner-icon{font-size:26px;opacity:1;flex-shrink:0}
 
 /* ── PARTIDAS ── */
 .mr{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--bo)}
@@ -1418,9 +1418,9 @@ body.light .pa{color:#b08000}
 select option{background:var(--bg3)}
 
 /* ── MODAL PERFIL JOGADOR ── */
-#modal-player{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+#modal-player{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;padding:0 10px;opacity:0;pointer-events:none;transition:opacity .18s}
 #modal-player.open{opacity:1;pointer-events:all}
-.modal-player-inner{background:#ebebeb;border-radius:22px 22px 0 0;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(60px);transition:transform .22s cubic-bezier(.32,1,.5,1)}
+.modal-player-inner{background:#ebebeb;border-radius:22px 22px 14px 14px;width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(60px);transition:transform .22s cubic-bezier(.32,1,.5,1);margin-bottom:10px}
 #modal-player.open .modal-player-inner{transform:translateY(0)}
 .mp-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid #b7b8b6;flex-shrink:0;background:#ebebeb}
 .mp-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;transition:all .15s}
@@ -1514,7 +1514,7 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
   flex-shrink:0;
   background:linear-gradient(135deg,rgba(255,90,122,.1) 0%,transparent 70%);
 }
-.duelo-title{font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px;background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.duelo-title{font-family:'VarsityTeam',serif;font-size:16px;font-weight:bold;letter-spacing:.3px;background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
 .duelo-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--bo2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;transition:all .15s;}
 .duelo-close:hover{background:var(--re);color:#fff;border-color:transparent;}
 .duelo-body{overflow-y:auto;padding:.9rem 1.1rem 1.5rem;flex:1;}
@@ -2094,7 +2094,7 @@ body::before{
       </div>
       <div id="geral-banner-wrap" style="display:none;margin-bottom:1rem">
         <div class="geral-banner">
-          <div>
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
             <div class="geral-banner-titulo">Temporada Atual</div>
           </div>
           <div class="geral-banner-icon">🏆</div>
@@ -3596,6 +3596,16 @@ function _renderNotifPanel(){
           ${del}
         </div>`;
       }
+      if(n.tipo==='desafio_recusado'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">❌</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>${n.de}</strong> recusou seu desafio.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
       if(n.tipo==='desafio_ganho'){
         return`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🏆</div>
@@ -4242,9 +4252,23 @@ window._dcCancelar = async function(id){
     const snap=await getDoc(doc(db,'groups',groupId));
     const cur=snap.data();
     const idx=(cur.desafios||[]).findIndex(d=>d.id===id);
-    if(idx!==-1) cur.desafios[idx].status='cancelado';
+    if(idx===-1) return;
+    const d=cur.desafios[idx];
+    const foiRecusa = d.status==='pendente' && d.uidB===currentUser.uid;
+    d.status='cancelado';
+    const now=Date.now();
+    // Se foi recusa (desafiado rejeitou), notifica o desafiante
+    if(foiRecusa){
+      cur.notifs=cur.notifs||{};
+      cur.notifs[d.uidA]=cur.notifs[d.uidA]||[];
+      cur.notifs[d.uidA].push({
+        id:now+'_dcR_'+id, tipo:'desafio_recusado', desafioId:id,
+        de:myProfile.displayName, deUid:currentUser.uid, ts:now, lida:false,
+      });
+    }
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
+    _updateNotifBadge();
     renderRanking();
     if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')) _buildPlayerProfile(_mpUid);
   }catch(e){}
@@ -4636,29 +4660,37 @@ window.fecharEvolChart = function(){
   setTimeout(()=>{ m.style.display='none'; }, 280);
 };
 
+let _evolCurrentUid = null;
 window.abrirEvolChart = function(uid){
   if(!gd||!uid) return;
+  _evolCurrentUid = uid;
   const m = document.getElementById('modal-evol-chart');
   const body = document.getElementById('evol-chart-body');
   const trendEl = document.getElementById('evol-chart-trend');
   body.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);font-family:DM Mono,monospace">Carregando...</div>';
   m.style.display = 'flex';
-  requestAnimationFrame(()=>{ m.classList.add('open'); _renderEvolChartExpanded(uid, body, trendEl); });
+  requestAnimationFrame(()=>{ m.classList.add('open'); _renderEvolChartExpanded(uid, body, trendEl, '__all__'); });
+};
+window._evolFiltrarAno = function(ano){
+  if(!_evolCurrentUid) return;
+  const body = document.getElementById('evol-chart-body');
+  const trendEl = document.getElementById('evol-chart-trend');
+  _renderEvolChartExpanded(_evolCurrentUid, body, trendEl, ano);
 };
 
-function _renderEvolChartExpanded(uid, body, trendEl){
+function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   const mb = (gd.members||[]).find(m=>m.uid===uid);
   if(!mb){ body.innerHTML='<div style="color:#fff;padding:20px">Membro não encontrado.</div>'; return; }
 
   // Coleta todos os meses (histórico + ativo)
   const mesAtivoCur = gd.mesAtivo || mesAtual();
-  const allData = {}; // mesKey → {g, a, pb, pk, partidas}
+  const allDataFull = {}; // mesKey → {g, a, pb, pk, partidas}
 
   // Histórico fechado
   Object.entries(gd.historico||{}).forEach(([mesKey, h])=>{
     const ms = (h.matches||[]).filter(x=>x.uid===uid);
     if(!ms.length) return;
-    allData[mesKey] = {
+    allDataFull[mesKey] = {
       g:  ms.reduce((s,x)=>s+(x.gols||0),0),
       a:  ms.reduce((s,x)=>s+(x.assist||0),0),
       pb: ms.reduce((s,x)=>s+(x.penBat||0),0),
@@ -4670,7 +4702,7 @@ function _renderEvolChartExpanded(uid, body, trendEl){
   // Mês ativo
   const msAtivo = (gd.matches||[]).filter(x=>x.uid===uid);
   if(msAtivo.length){
-    allData[mesAtivoCur] = {
+    allDataFull[mesAtivoCur] = {
       g:  msAtivo.reduce((s,x)=>s+(x.gols||0),0),
       a:  msAtivo.reduce((s,x)=>s+(x.assist||0),0),
       pb: msAtivo.reduce((s,x)=>s+(x.penBat||0),0),
@@ -4679,6 +4711,21 @@ function _renderEvolChartExpanded(uid, body, trendEl){
       current: true,
     };
   }
+
+  // Populate year selector
+  const anosDisp = [...new Set(Object.keys(allDataFull).map(k=>k.split('-')[0]))].sort();
+  const sel = document.getElementById('evol-ano-select');
+  if(sel){
+    const curVal = filtroAno||'__all__';
+    sel.innerHTML = '<option value="__all__">Geral</option>' + anosDisp.map(a=>`<option value="${a}">${a}</option>`).join('');
+    sel.value = curVal;
+  }
+
+  // Apply year filter
+  const allData = {};
+  Object.entries(allDataFull).forEach(([k,v])=>{
+    if(!filtroAno||filtroAno==='__all__'||k.startsWith(filtroAno)) allData[k]=v;
+  });
 
   const keys = Object.keys(allData).sort();
   if(keys.length < 2){ body.innerHTML='<div style="color:rgba(255,255,255,.5);font-family:DM Mono,monospace;padding:40px;text-align:center">Dados insuficientes para o gráfico.</div>'; return; }
@@ -4797,12 +4844,7 @@ function _renderEvolChartExpanded(uid, body, trendEl){
     summaryBar.style.display='flex';
     summaryBar.innerHTML=`
       <div class="evol-stat-pill green"><div class="evol-stat-pill-val">${totalGA}</div><div class="evol-stat-pill-lbl">G+A Total</div></div>
-      <div class="evol-stat-pill"><div class="evol-stat-pill-val">${totalGols}</div><div class="evol-stat-pill-lbl">Gols</div></div>
-      <div class="evol-stat-pill"><div class="evol-stat-pill-val">${totalAssist}</div><div class="evol-stat-pill-lbl">Assists</div></div>
-      <div class="evol-stat-pill gold"><div class="evol-stat-pill-val">${melhorGA}</div><div class="evol-stat-pill-lbl">Melhor (${mMesNome})</div></div>
       <div class="evol-stat-pill"><div class="evol-stat-pill-val">${mediaGA}</div><div class="evol-stat-pill-lbl">Média/Mês</div></div>
-      <div class="evol-stat-pill"><div class="evol-stat-pill-val">${totalJogos}</div><div class="evol-stat-pill-lbl">Jogos</div></div>
-      ${streak>1?`<div class="evol-stat-pill green"><div class="evol-stat-pill-val">${streak}🔥</div><div class="evol-stat-pill-lbl">Sequência</div></div>`:''}
     `;
   }
 
@@ -5517,7 +5559,7 @@ function _buildPlayerProfile(uid){
   const totalPB=allMonths.reduce((s,m)=>s+m.pb,0);
   const totalPK=allMonths.reduce((s,m)=>s+m.pk,0);
 
-  document.getElementById('mp-sub').textContent=`${anos.length} temporada${anos.length!==1?'s':''} · ${totalG+totalA} G+A total`;
+  document.getElementById('mp-sub').textContent=`${anos.length} temporada${anos.length!==1?'s':''}`;
   // Apelido no header do perfil
   const _mpApelidoEl=document.getElementById('mp-apelido');
   const _mbApelido=mb.apelido||'';
@@ -6386,12 +6428,12 @@ function _renderDueloBody(){
     <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-bottom:8px;align-items:center">
       <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
         ${avatarHTML(mbA.name,44,mbA.uid)}
-        <div style="font-family:'Freshman',sans-serif;font-size:13px;letter-spacing:.4px;color:var(--g);text-align:center;max-width:120px;word-break:break-word;overflow-wrap:break-word;line-height:1.25">${mbA.name}</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:13px;letter-spacing:.4px;color:#1a1a1a;text-align:center;max-width:120px;word-break:break-word;overflow-wrap:break-word;line-height:1.25">${mbA.name}</div>
       </div>
       <div style="font-family:'VarsityTeam',serif;font-size:22px;font-weight:bold;background:linear-gradient(135deg,#FF5A7A 0%,#FFD166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding:0 8px">VS</div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
         ${avatarHTML(mbB.name,44,mbB.uid)}
-        <div style="font-family:'Freshman',sans-serif;font-size:13px;letter-spacing:.4px;color:#60a5fa;text-align:center;max-width:120px;word-break:break-word;overflow-wrap:break-word;line-height:1.25">${mbB.name}</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:13px;letter-spacing:.4px;color:#1a1a1a;text-align:center;max-width:120px;word-break:break-word;overflow-wrap:break-word;line-height:1.25">${mbB.name}</div>
       </div>
     </div>
     <div style="background:var(--bg3);border:1px solid var(--bo);border-radius:14px;overflow:hidden;margin-bottom:10px">
@@ -6412,12 +6454,12 @@ function _renderDueloBody(){
           <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px">
             <div style="text-align:center">
               <div class="${useCount?'duelo-count':''}" data-val="${s.a}" data-suf="${suf}" style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${colorA}">${useCount?'0':s.a+suf}</div>
-              ${clsA==='win'?'<div style="font-size:9px;color:#4dffb0;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsA==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
+              ${clsA==='win'?'<div style="font-size:9px;color:#40c960;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsA==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
             </div>
             <div style="height:40px;width:2px;background:var(--bo2)"></div>
             <div style="text-align:center">
               <div class="${useCount?'duelo-count':''}" data-val="${s.b}" data-suf="${suf}" style="font-family:'ClassyVogue',sans-serif;font-size:28px;line-height:1;color:${colorB}">${useCount?'0':s.b+suf}</div>
-              ${clsB==='win'?'<div style="font-size:9px;color:#4dffb0;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsB==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
+              ${clsB==='win'?'<div style="font-size:9px;color:#40c960;font-family:\'DM Mono\',monospace;margin-top:2px">▲ WIN</div>':clsB==='lose'?'<div style="font-size:9px;color:#FF5A7A;font-family:\'DM Mono\',monospace;margin-top:2px">▼ LOSE</div>':''}
             </div>
           </div>
           <div style="display:flex;height:4px;border-radius:99px;overflow:hidden;margin-top:8px;gap:2px">
@@ -6475,6 +6517,11 @@ window.showTab=(n,btn,e)=>{
   if(fab){
     if(n==='r')document.body.classList.add('duelo-fab-visible');
     else document.body.classList.remove('duelo-fab-visible');
+  }
+  const cfab=document.getElementById('conquistas-fab');
+  if(cfab){
+    if(n==='r'){document.body.classList.add('conquistas-fab-visible');cfab.style.display='flex';}
+    else{document.body.classList.remove('conquistas-fab-visible');cfab.style.display='none';}
   }
 };
 
@@ -6700,7 +6747,7 @@ window.irParaRankingGA=()=>{
 <div id="modal-duelo">
   <div class="duelo-inner">
     <div class="duelo-header">
-      <div class="duelo-title">⚔️ Modo Duelo</div>
+      <div class="duelo-title" style="display:flex;align-items:center;white-space:nowrap">⚔️ Modo Duelo</div>
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="abrirCriarDesafio()" title="Criar desafio com prazo" style="background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:10px;padding:6px 12px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">+ Desafiar</button>
         <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
@@ -6717,13 +6764,14 @@ window.irParaRankingGA=()=>{
 <div id="modal-evol-chart">
   <div id="evol-chart-inner">
     <div id="evol-chart-header">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="font-size:14px;font-family:'DM Mono',monospace;color:#40c960;letter-spacing:.1em;text-transform:uppercase">📈 Evolução G+A Mensal</div>
-        <div id="evol-chart-trend" style="font-size:12px;font-family:'DM Mono',monospace;font-weight:700"></div>
+      <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
+        <div style="font-size:12px;font-family:'DM Mono',monospace;color:#40c960;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">📈 Evolução G+A</div>
+        <div id="evol-chart-trend" style="font-size:11px;font-family:'DM Mono',monospace;font-weight:700;flex-shrink:0"></div>
+        <select id="evol-ano-select" onchange="_evolFiltrarAno(this.value)" style="margin-left:4px;background:rgba(64,201,96,.1);border:1px solid rgba(64,201,96,.35);border-radius:6px;color:#40c960;font-family:'DM Mono',monospace;font-size:10px;padding:3px 5px;cursor:pointer;outline:none;flex-shrink:0"></select>
       </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button id="evol-fullscreen-btn" onclick="toggleEvolFullscreen()" title="Tela cheia" style="width:30px;height:30px;border-radius:8px;background:rgba(64,201,96,.12);border:1px solid rgba(64,201,96,.35);color:#40c960;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.25)'" onmouseout="this.style.background='rgba(64,201,96,.12)'">⛶</button>
-        <button onclick="fecharEvolChart()" style="width:30px;height:30px;border-radius:8px;background:rgba(255,90,122,.1);border:1px solid rgba(255,90,122,.28);color:#FF5A7A;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.25)'" onmouseout="this.style.background='rgba(255,90,122,.1)'">✕</button>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <button id="evol-fullscreen-btn" onclick="toggleEvolFullscreen()" title="Tela cheia" style="width:28px;height:28px;border-radius:8px;background:rgba(64,201,96,.12);border:1px solid rgba(64,201,96,.35);color:#40c960;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.25)'" onmouseout="this.style.background='rgba(64,201,96,.12)'">⛶</button>
+        <button onclick="fecharEvolChart()" style="width:28px;height:28px;border-radius:8px;background:rgba(255,90,122,.1);border:1px solid rgba(255,90,122,.28);color:#FF5A7A;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.25)'" onmouseout="this.style.background='rgba(255,90,122,.1)'">✕</button>
       </div>
     </div>
     <div id="evol-summary-bar" class="evol-summary-bar" style="display:none"></div>
