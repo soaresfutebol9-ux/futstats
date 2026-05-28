@@ -3596,6 +3596,36 @@ function _renderNotifPanel(){
           ${del}
         </div>`;
       }
+      if(n.tipo==='desafio_ganho'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🏆</div>
+          <div class="notif-body">
+            <div class="notif-text">Você <strong>venceu</strong> o desafio contra <strong>${n.rival}</strong>! ${n.scoreW}×${n.scoreL} em ${n.tipoLabel}.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='desafio_perdido'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">😤</div>
+          <div class="notif-body">
+            <div class="notif-text">Você <strong>perdeu</strong> o desafio contra <strong>${n.rival}</strong>. Placar: ${n.scoreL}×${n.scoreW} em ${n.tipoLabel}. Da próxima!</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
+      if(n.tipo==='desafio_empate'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🤝</div>
+          <div class="notif-body">
+            <div class="notif-text">Empate no desafio contra <strong>${n.rival}</strong>! ${n.score}×${n.score} em ${n.tipoLabel}. Ninguém venceu dessa vez.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+          ${del}
+        </div>`;
+      }
       if(n.tipo==='voto_registrado'||n.tipo==='craque_rodada'||n.tipo==='mvp_mes'||n.tipo==='nota_individual'||n.tipo==='nota_recebida') return '';
       return'';
     }).join('');
@@ -4223,8 +4253,51 @@ window._dcCancelar = async function(id){
 function _dcCheckEncerrar(){
   if(!gd||!gd.desafios) return;
   const now=Date.now(); let changed=false;
-  (gd.desafios||[]).forEach(d=>{ if(d.status==='ativo'&&now>d.endTs){d.status='encerrado';changed=true;} });
-  if(changed) setDoc(doc(db,'groups',groupId),gd).catch(()=>{});
+  (gd.desafios||[]).forEach(d=>{
+    if(d.status==='ativo'&&now>d.endTs){
+      d.status='encerrado'; changed=true;
+      // Calcula placar final
+      const sA=_dcGetScore(d.uidA,d);
+      const sB=_dcGetScore(d.uidB,d);
+      const winnerUid = sA>sB ? d.uidA : sB>sA ? d.uidB : null;
+      const loserUid  = sA>sB ? d.uidB : sB>sA ? d.uidA : null;
+      const tipoLabel = d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
+      gd.notifs=gd.notifs||{};
+      if(winnerUid && loserUid){
+        // Notificação para o VENCEDOR
+        const winnerName = winnerUid===d.uidA ? d.nameA : d.nameB;
+        const loserName  = loserUid===d.uidA  ? d.nameA : d.nameB;
+        gd.notifs[winnerUid]=gd.notifs[winnerUid]||[];
+        gd.notifs[winnerUid].push({
+          id:now+'_dcW_'+d.id, tipo:'desafio_ganho', desafioId:d.id,
+          rival:loserName, tipoLabel, scoreW:(winnerUid===d.uidA?sA:sB), scoreL:(loserUid===d.uidA?sA:sB),
+          ts:now, lida:false
+        });
+        // Notificação para o PERDEDOR
+        gd.notifs[loserUid]=gd.notifs[loserUid]||[];
+        gd.notifs[loserUid].push({
+          id:now+'_dcL_'+d.id, tipo:'desafio_perdido', desafioId:d.id,
+          rival:winnerName, tipoLabel, scoreW:(winnerUid===d.uidA?sA:sB), scoreL:(loserUid===d.uidA?sA:sB),
+          ts:now, lida:false
+        });
+      } else {
+        // Empate — notificação para ambos
+        [d.uidA, d.uidB].forEach(uid=>{
+          gd.notifs[uid]=gd.notifs[uid]||[];
+          gd.notifs[uid].push({
+            id:now+'_dcE_'+d.id+'_'+uid, tipo:'desafio_empate', desafioId:d.id,
+            rival:(uid===d.uidA?d.nameB:d.nameA), tipoLabel, score:sA,
+            ts:now, lida:false
+          });
+        });
+      }
+    }
+  });
+  if(changed){
+    setDoc(doc(db,'groups',groupId),gd).catch(()=>{});
+    _updateNotifBadge();
+    if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
+  }
 }
 
 function _showSimpleToast(msg){
@@ -6405,8 +6478,8 @@ window.showTab=(n,btn,e)=>{
   }
 };
 
-// Também mostra no início pois começa no ranking
-setTimeout(()=>document.body.classList.add('duelo-fab-visible'),800);
+// Também mostra no início pois começa no ranking — apenas se já estiver logado
+setTimeout(()=>{ if(window.currentUser) document.body.classList.add('duelo-fab-visible'); },800);
 
 // Dispara coroa após carregar o ranking
 const _origRenderRanking=window.renderRanking||(()=>{});
