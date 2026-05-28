@@ -2528,7 +2528,9 @@ window.criarGrupo=async()=>{
   }catch(e){ if(errEl){errEl.textContent='Erro ao criar grupo: '+e.message;errEl.style.display='block';} }
 };
 
-// ── FIM CORE AUTH ───────────────────────────────────────────────────────────── = async function(){
+// ── FIM CORE AUTH ─────────────────────────────────────────────────────────────
+
+window.resetarVotos = async function(){
   if(!gd||!currentUser||!groupId) return;
   if(!confirm('Tem certeza? Isso vai apagar todos os dados do mês atual.')) return;
   try{
