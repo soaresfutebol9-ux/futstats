@@ -2291,6 +2291,267 @@ function avC(name){let h=0;for(let c of(name||'?'))h=(h*31+c.charCodeAt(0))&0xff
 function ini(name){return(name||'?').trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
 function showErr(id,msg){const e=$(id);e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',5000)}
 
+// ── STATS DO MÊS ATUAL ──────────────────────────────────────────────────────
+function getSt(uidOrName, mesKey, byUid){
+  if(!gd) return {gols:0,assist:0,penBat:0,penOk:0,n:0};
+  const src = gd.matches||[];
+  const ms = src.filter(x=> byUid ? x.uid===uidOrName : x.player===uidOrName);
+  return {
+    gols:   ms.reduce((s,x)=>s+(x.gols||0),0),
+    assist: ms.reduce((s,x)=>s+(x.assist||0),0),
+    penBat: ms.reduce((s,x)=>s+(x.penBat||0),0),
+    penOk:  ms.reduce((s,x)=>s+(x.penOk||0),0),
+    n:      ms.length,
+  };
+}
+
+// ── STATS GERAIS (todos os meses) ────────────────────────────────────────────
+function getStGeral(mb){
+  if(!gd||!mb) return {gols:0,assist:0,penBat:0,penOk:0,n:0};
+  const hist = gd.historico||{};
+  let gols=0,assist=0,penBat=0,penOk=0,n=0;
+  Object.values(hist).forEach(h=>{
+    const ms=(h.matches||[]).filter(x=>m_uid_match(x,mb));
+    gols+=ms.reduce((s,x)=>s+(x.gols||0),0);
+    assist+=ms.reduce((s,x)=>s+(x.assist||0),0);
+    penBat+=ms.reduce((s,x)=>s+(x.penBat||0),0);
+    penOk+=ms.reduce((s,x)=>s+(x.penOk||0),0);
+    n+=ms.length;
+  });
+  // Mês atual
+  const cur=(gd.matches||[]).filter(x=>m_uid_match(x,mb));
+  gols+=cur.reduce((s,x)=>s+(x.gols||0),0);
+  assist+=cur.reduce((s,x)=>s+(x.assist||0),0);
+  penBat+=cur.reduce((s,x)=>s+(x.penBat||0),0);
+  penOk+=cur.reduce((s,x)=>s+(x.penOk||0),0);
+  n+=cur.length;
+  return {gols,assist,penBat,penOk,n};
+}
+
+// ── SISTEMA DE NOTIFICAÇÕES ──────────────────────────────────────────────────
+function _notifTimeAgo(ts){
+  const diff=Date.now()-ts;
+  const m=Math.floor(diff/60000);
+  if(m<1) return'agora mesmo';
+  if(m<60) return`há ${m} min`;
+  const h=Math.floor(m/60);
+  if(h<24) return`há ${h}h`;
+  return`há ${Math.floor(h/24)}d`;
+}
+
+function _getMyPersonalNotifs(){
+  if(!gd||!currentUser) return [];
+  return ((gd.notifs||{})[currentUser.uid]||[]).slice().sort((a,b)=>b.ts-a.ts);
+}
+
+function _btnDel(id){
+  return`<button onclick="_apagarNotif('${id}')" title="Apagar" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s" onmouseover="this.style.background='rgba(255,90,122,.35)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'">×</button>`;
+}
+
+function _corNota(v){ return v<=4.5?'#e53e3e':v<=7.0?'#f97316':'#2f9e44'; }
+
+window._apagarNotif=async function(id){
+  if(!gd||!currentUser||!groupId) return;
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    if(cur.notifs&&cur.notifs[currentUser.uid]){
+      cur.notifs[currentUser.uid]=cur.notifs[currentUser.uid].filter(n=>n.id!==id);
+      await setDoc(doc(db,'groups',groupId),cur);
+      gd=cur;
+      _renderNotifPanel();
+      _updateNotifBadge();
+    }
+  }catch(e){ console.warn('apagarNotif:',e); }
+};
+
+function _renderNotifPanel(){
+  const list=document.getElementById('notif-list');
+  if(!list) return;
+  const personalNotifs=_getMyPersonalNotifs();
+  const feed=(gd?.feed||[]).slice().reverse();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
+  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+
+  let html='';
+
+  if(personalNotifs.length){
+    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Suas notificações</div>';
+    html+=personalNotifs.slice(0,20).map(n=>{
+      const unread=!lidasP.includes(n.id);
+      const del=_btnDel(n.id);
+
+      if(n.tipo==='desafio_solicitacao'){
+        const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
+        const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
+        const btns=podeResponder
+          ?'<div style="display:flex;gap:6px;margin-top:8px">'
+            +'<button onclick="_dcAceitar(\''+n.desafioId+'\');document.getElementById(\'notif-panel\').classList.remove(\'open\')" style="flex:1;padding:6px;border-radius:8px;border:none;background:linear-gradient(135deg,#40c960,#26d68a);color:#000;font-size:11px;font-weight:700;cursor:pointer">✅ Aceitar</button>'
+            +'<button onclick="_dcCancelar(\''+n.desafioId+'\')" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
+            +'</div>'
+          :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
+        return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
+          <div style="display:flex;align-items:center;gap:8px;width:100%">
+            <div class="notif-icon">⚔️</div>
+            <div class="notif-body">
+              <div class="notif-text"><strong>${n.de}</strong> te desafiou!</div>
+              <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+            </div>${del}
+          </div>${btns}
+        </div>`;
+      }
+      if(n.tipo==='desafio_aceito'){
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🎉</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio!</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>${del}
+        </div>`;
+      }
+      if(n.tipo==='desafio_resultado'){
+        const isParticipant=n.meuScore!==undefined;
+        const icon=n.isDraw?'🤝':isParticipant?(n.resultado==='win'?'🏆':'😤'):'⚔️';
+        const txt=n.isDraw
+          ?`Desafio encerrado: <strong>${n.nomeA}</strong> vs <strong>${n.nomeB}</strong> — Empate ${n.sA}×${n.sB}`
+          :isParticipant
+            ?(n.resultado==='win'?`Você venceu o desafio contra <strong>${n.rivalNome}</strong>! ${n.meuScore}×${n.rivalScore} (${n.tipoLbl})`:`<strong>${n.rivalNome}</strong> venceu o desafio contra você. ${n.rivalScore}×${n.meuScore} (${n.tipoLbl})`)
+            :`<strong>${n.winnerNome}</strong> venceu o desafio contra <strong>${n.loserNome}</strong>! ${n.sA>n.sB?n.sA:n.sB}×${n.sA>n.sB?n.sB:n.sA}`;
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">${icon}</div>
+          <div class="notif-body">
+            <div class="notif-text">${txt}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>${del}
+        </div>`;
+      }
+      if(n.tipo==='mvp_mes'){
+        const [ano,mes]=(n.mes||'').split('-');
+        const mesNome=mes?['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]:'';
+        const mc=_corNota(parseFloat(n.media));
+        const txt=n.ehMVP
+          ?`Você foi o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🌟`
+          :`<strong>${n.mvpNome||'Um jogador'}</strong> é o <strong>MVP de ${mesNome}/${ano}</strong> com média <strong style="color:${mc}">${n.media}</strong>! 🏆`;
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">🏆</div>
+          <div class="notif-body"><div class="notif-text">${txt}</div><div class="notif-time">${_notifTimeAgo(n.ts)}</div></div>${del}
+        </div>`;
+      }
+      if(n.tipo==='craque_rodada'){
+        const mc=_corNota(parseFloat(n.media));
+        const txt=n.ehVencedor
+          ?`Você foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong> (${n.votos} voto${n.votos!==1?'s':''})! 🔥`
+          :`<strong>${n.vencedorNome||'Um jogador'}</strong> foi eleito o <strong>Craque da Rodada</strong> com média <strong style="color:${mc}">${n.media}</strong>! ⭐`;
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">⭐</div>
+          <div class="notif-body"><div class="notif-text">${txt}</div><div class="notif-time">${_notifTimeAgo(n.ts)}</div></div>${del}
+        </div>`;
+      }
+      if(n.tipo==='nota_recebida'){
+        const cor=_corNota(parseFloat(n.media));
+        return`<div class="notif-item${unread?' unread':''}">
+          <div class="notif-icon">📊</div>
+          <div class="notif-body">
+            <div class="notif-text">Sua nota na rodada: <strong style="color:${cor};font-size:16px">${n.media}</strong> · ${n.totalVotantes} avaliador${n.totalVotantes!==1?'es':''}</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>${del}
+        </div>`;
+      }
+      return'';
+    }).join('');
+    if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
+  }
+
+  // Feed do grupo
+  if(feed.length){
+    html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Feed do grupo</div>';
+    const icons={partida:'⚽',conquista:'🏆',nota:'📋',craque:'⭐',membro:'👋',meta:'🎯'};
+    html+=feed.slice(0,30).map(ev=>{
+      const unread=!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid;
+      return`<div class="notif-item${unread?' unread':''}">
+        <div class="notif-icon">${icons[ev.tipo]||'📢'}</div>
+        <div class="notif-body">
+          <div class="notif-text">${ev.texto}</div>
+          <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  if(!html) html='<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
+  list.innerHTML=html;
+}
+
+function _updateNotifBadge(){
+  const badge=document.getElementById('notif-badge');
+  if(!badge) return;
+  const personalNotifs=_getMyPersonalNotifs();
+  const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
+  const feed=gd?.feed||[];
+  const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const naoLidasP=personalNotifs.filter(n=>!lidasP.includes(n.id)).length;
+  const naoLidasF=feed.filter(ev=>!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
+  const total=naoLidasP+naoLidasF;
+  badge.textContent=total>9?'9+':total;
+  badge.style.display=total>0?'flex':'none';
+}
+
+window.toggleNotifPanel=()=>{
+  const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
+  if(!panel) return;
+  const isOpen=panel.classList.contains('open');
+  if(isOpen){
+    panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
+    return;
+  }
+  _renderNotifPanel();
+  // Marcar feed como lido ao abrir
+  const feed=gd?.feed||[];
+  const idsF=feed.map(ev=>ev.id);
+  localStorage.setItem('notif_lidas_'+groupId,JSON.stringify(idsF));
+  panel.classList.add('open');
+  if(overlay) overlay.classList.add('open');
+  _updateNotifBadge();
+};
+
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
+  const btn=document.getElementById('notif-btn');
+  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!btn?.contains(e.target)){
+    panel.classList.remove('open');
+    if(overlay) overlay.classList.remove('open');
+  }
+});
+
+window.marcarTodasLidas=()=>{
+  const personalNotifs=_getMyPersonalNotifs();
+  localStorage.setItem('notif_pers_lidas_'+groupId,JSON.stringify(personalNotifs.map(n=>n.id)));
+  const feed=gd?.feed||[];
+  localStorage.setItem('notif_lidas_'+groupId,JSON.stringify(feed.map(ev=>ev.id)));
+  _updateNotifBadge();
+  _renderNotifPanel();
+};
+
+async function _publishFeed(tipo, texto){
+  if(!groupId||!currentUser) return;
+  try{
+    const snap=await getDoc(doc(db,'groups',groupId));
+    const cur=snap.data();
+    const feed=cur.feed||[];
+    const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7),tipo,texto,uid:currentUser.uid,ts:Date.now()};
+    feed.push(ev);
+    if(feed.length>100) feed.splice(0,feed.length-100);
+    await updateDoc(doc(db,'groups',groupId),{feed});
+  }catch(e){ console.warn('feed publish:',e); }
+}
+window._publishFeed=_publishFeed;
+window._updateNotifBadge=_updateNotifBadge;
+window._renderNotifPanel=_renderNotifPanel;
+// ── FIM NOTIFICAÇÕES ──────────────────────────────────────────────────────────
+
 /* ── PREMIUM PANEL OPEN/CLOSE ── */
 window.openP=id=>{
   const el=$(id);if(!el)return;
