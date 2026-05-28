@@ -3424,49 +3424,72 @@ function renderPerfilPanelStats(){
   const euSouMVP = mediasProPerfil.length > 0 && mediasProPerfil[0].uid === currentUser.uid;
   const jaVoteiMVP = _mvpJaVotou ? _mvpJaVotou() : false;
 
-  // Craque da última rodada (última partida do grupo)
-  const todasPartidas = gd.matches||[];
-  const ultimaPartida = todasPartidas.length ? todasPartidas[todasPartidas.length-1] : null;
+  // ── Escolhe a votação certa para mostrar ──
+  // Prioridade: votação ativa que o usuário ainda não votou
+  // Fallback: votação mais recente (mesmo que já tenha votado ou encerrada)
+  const todasPartidas = (gd.matches||[]).slice().sort((a,b)=>a.ts-b.ts);
+  // Partidas com votação existente OU dentro do prazo de 24h
+  const agora = Date.now();
+  const partidasComVotacao = todasPartidas.filter(p => {
+    const key = _craqueKey(p.ts);
+    const temVotos = !!(gd.craqueVotos && gd.craqueVotos[key] && Object.keys(gd.craqueVotos[key]).length);
+    const dentroDoPrazo = (agora - p.ts) < 24 * 60 * 60 * 1000;
+    return temVotos || dentroDoPrazo;
+  });
+
+  // Votação pendente = dentro do prazo E usuário ainda não votou
+  const votacaoPendente = partidasComVotacao.slice().reverse().find(p => {
+    const key = _craqueKey(p.ts);
+    const dentroDoPrazo = (agora - p.ts) < 24 * 60 * 60 * 1000;
+    const jaVotou = !!(gd.craqueVotos && gd.craqueVotos[key] && gd.craqueVotos[key][currentUser.uid]);
+    return dentroDoPrazo && !jaVotou;
+  });
+
+  // Partida usada pro card: pendente > mais recente com votos > última partida qualquer
+  const partidaDoCard = votacaoPendente
+    || (partidasComVotacao.length ? partidasComVotacao[partidasComVotacao.length-1] : null)
+    || (todasPartidas.length ? todasPartidas[todasPartidas.length-1] : null);
+
+  const ultimaPartida = partidaDoCard;
   const ultimaCraqueKey = ultimaPartida ? _craqueKey(ultimaPartida.ts) : null;
 
-  // Auto-encerra votação expirada que ainda não foi processada
-  if(ultimaCraqueKey && window._craqueVotacaoEncerrada && window._craqueTempoRestante){
-    const _jaEncerrada = _craqueVotacaoEncerrada(gd, ultimaCraqueKey);
-    const _prazo = _craqueTempoRestante(ultimaCraqueKey);
-    const _jaPublicado = gd.craqueFeedPublicado && gd.craqueFeedPublicado[ultimaCraqueKey];
-    if(_jaEncerrada && !_jaPublicado && Object.keys((gd.craqueVotos||{})[ultimaCraqueKey]||{}).length > 0){
-      // Processa em background sem bloquear a UI
-      (async () => {
-        try {
-          const _snap = await getDoc(doc(db,'groups',groupId));
-          const _cur = _snap.data();
-          const _mesKey = _cur.mesAtivo || _mesAtual();
-          _notificarCraqueDaRodada(_cur, ultimaCraqueKey);
-          // Envia a cada jogador a sua própria nota recebida (anônima)
-          _notificarNotaRecebida(_cur, ultimaCraqueKey);
-          // Incrementa contador de Craque para o vencedor
-          const _crAuto = _getCraqueVencedor(_cur, ultimaCraqueKey);
-          if(_crAuto){ const _crMbAuto=(_cur.members||[]).find(m=>m.uid===_crAuto.uid); if(_crMbAuto)_crMbAuto.qtdCraque=(_crMbAuto.qtdCraque||0)+1; }
-          const _cr = _getCraqueVencedor(_cur, ultimaCraqueKey);
-          if(_cr){
-            const _mb = (_cur.members||[]).find(m=>m.uid===_cr.uid);
-            if(_mb){
-              if(!_cur.craqueFeedPublicado) _cur.craqueFeedPublicado = {};
-              _cur.craqueFeedPublicado[ultimaCraqueKey] = true;
-              await setDoc(doc(db,'groups',groupId), _cur);
-              await _publishFeed('craque', `⭐ <strong>${_mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${_cr.media}!`);
-              gd = _cur;
+  // Auto-encerra votações expiradas que ainda não foram processadas
+  if(window._craqueVotacaoEncerrada && gd.craqueVotos){
+    Object.keys(gd.craqueVotos).forEach(chave => {
+      const _jaEncerrada = _craqueVotacaoEncerrada(gd, chave);
+      const _jaPublicado = gd.craqueFeedPublicado && gd.craqueFeedPublicado[chave];
+      if(_jaEncerrada && !_jaPublicado && Object.keys((gd.craqueVotos||{})[chave]||{}).length > 0){
+        (async () => {
+          try {
+            const _snap = await getDoc(doc(db,'groups',groupId));
+            const _cur = _snap.data();
+            _notificarCraqueDaRodada(_cur, chave);
+            _notificarNotaRecebida(_cur, chave);
+            const _crAuto = _getCraqueVencedor(_cur, chave);
+            if(_crAuto){ const _crMbAuto=(_cur.members||[]).find(m=>m.uid===_crAuto.uid); if(_crMbAuto)_crMbAuto.qtdCraque=(_crMbAuto.qtdCraque||0)+1; }
+            const _cr = _getCraqueVencedor(_cur, chave);
+            if(_cr){
+              const _mb = (_cur.members||[]).find(m=>m.uid===_cr.uid);
+              if(_mb){
+                if(!_cur.craqueFeedPublicado) _cur.craqueFeedPublicado = {};
+                _cur.craqueFeedPublicado[chave] = true;
+                await setDoc(doc(db,'groups',groupId), _cur);
+                await _publishFeed('craque', `⭐ <strong>${_mb.name}</strong> foi eleito o <strong>Craque da Rodada</strong> com média ${_cr.media}!`);
+                gd = _cur;
+              }
             }
-          }
-        } catch(e){ console.warn('auto-close craque:', e); }
-      })();
-    }
+          } catch(e){ console.warn('auto-close craque:', e); }
+        })();
+      }
+    });
   }
 
   const craqueAtual = ultimaCraqueKey && window._getCraqueVencedor ? _getCraqueVencedor(gd, ultimaCraqueKey) : null;
   const craqueMembro = craqueAtual ? (gd.members||[]).find(m=>m.uid===craqueAtual.uid) : null;
   const euSouCraque = craqueAtual && craqueAtual.uid === currentUser.uid;
-  const jaVoteiCraque = ultimaPartida && window._craqueJaVotou ? _craqueJaVotou(ultimaPartida.ts) : false;
+  const jaVoteiCraque = ultimaCraqueKey
+    ? !!(gd.craqueVotos && gd.craqueVotos[ultimaCraqueKey] && gd.craqueVotos[ultimaCraqueKey][currentUser.uid])
+    : false;
 
   const totalVotantes = Object.keys((gd.mvpVotos||{})[mesKeyMVP]||{}).length;
 
