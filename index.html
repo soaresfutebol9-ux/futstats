@@ -1785,6 +1785,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   box-shadow:0 4px 20px rgba(77,255,176,.45),0 2px 8px rgba(0,0,0,.4);
   transition:transform .25s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
   position:relative;color:#07090d;
+  flex-shrink:0;
 }
 .mfab-main:active{transform:scale(.92);}
 .mfab-main.open{transform:rotate(45deg);}
@@ -1797,26 +1798,30 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   animation:badgePulse 1.8s ease-in-out infinite;
 }
 .mfab-items{
-  display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
   overflow:hidden;max-height:0;opacity:0;
-  transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .2s;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s;
   pointer-events:none;
 }
-.mfab-items.open{ max-height:200px;opacity:1;pointer-events:all; }
-.mfab-item-wrap{ display:flex;align-items:center;gap:8px; }
+.mfab-items.open{ max-height:220px;opacity:1;pointer-events:all; }
+.mfab-item-wrap{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+}
 .mfab-item-label{
-  background:var(--bg2);border:1px solid var(--bo2);
-  border-radius:8px;padding:4px 10px;
-  font-family:'DM Mono',monospace;font-size:11px;font-weight:600;
-  color:var(--tx1);white-space:nowrap;
-  box-shadow:0 2px 8px rgba(0,0,0,.3);
+  background:rgba(14,18,30,.88);border:1px solid rgba(255,255,255,.13);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-radius:20px;padding:5px 13px;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  color:#fff;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(0,0,0,.45);
 }
 .mfab-item{
-  width:46px;height:46px;border-radius:50%;
+  width:44px;height:44px;border-radius:50%;
   border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;
-  transition:transform .2s cubic-bezier(.34,1.2,.64,1);
+  font-size:20px;line-height:1;
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+  flex-shrink:0;
 }
 .mfab-item:active{transform:scale(.88);}
 .mfab-item-duelo{
@@ -8542,6 +8547,7 @@ const CONQUISTAS = [
   { id:'assist_20', cat:'👟 Assistências', nome:'Visão de Jogo',                  desc:'20 assistências em um mês', icon:'⚡', tipo:'assist_mes', val:20 },
   { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
   { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
+  { id:'assist_35', cat:'👟 Assistências', nome:'Visão de Águia',           desc:'35 assistências em um mês', icon:'🦅', tipo:'assist_mes', val:35 },
   // ── ASSISTÊNCIAS NO ANO ─────────────────────────────────────
   { id:'assist_ano_100', cat:'📅 Assistências no Ano', nome:'Özil',            desc:'100 assistências em um ano', icon:'🎁',  tipo:'assist_ano', val:100 },
   { id:'assist_ano_150', cat:'📅 Assistências no Ano', nome:'David Beckham',   desc:'150 assistências em um ano', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tipo:'assist_ano', val:150 },
