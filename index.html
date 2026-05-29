@@ -8482,6 +8482,21 @@ const CONQUISTAS = [
   { id:'gols_total_700',  cat:'💀 Gols Geral', nome:'Pelé',               desc:'700 gols no total', icon:'👑', tipo:'gols_total', val:700  },
   { id:'gols_total_800',  cat:'💀 Gols Geral', nome:'Messi',              desc:'800 gols no total', icon:'🐐', tipo:'gols_total', val:800  },
   { id:'gols_total_1000', cat:'💀 Gols Geral', nome:'CR7',                desc:'1000 gols no total',icon:'🚀', tipo:'gols_total', val:1000 },
+  // ── SEQUENCIAL DE GOLS (por partida) ────────────────────────
+  { id:'seq_hattrick',  cat:'🎩 Sequencial de Gols', nome:'Hat-trick',    desc:'3 gols na mesma partida', icon:'🎩', tipo:'seq_gols', val:3 },
+  { id:'seq_poker',     cat:'🎩 Sequencial de Gols', nome:'Poker',        desc:'4 gols na mesma partida', icon:'🃏', tipo:'seq_gols', val:4 },
+  { id:'seq_manita',    cat:'🎩 Sequencial de Gols', nome:'Manita',       desc:'5 gols na mesma partida', icon:'✋', tipo:'seq_gols', val:5 },
+  { id:'seq_hexa',      cat:'🎩 Sequencial de Gols', nome:'Hexa-trick',   desc:'6 gols na mesma partida', icon:'💫', tipo:'seq_gols', val:6 },
+  { id:'seq_hepta',     cat:'🎩 Sequencial de Gols', nome:'Hepta-trick',  desc:'7 gols na mesma partida', icon:'🌪️', tipo:'seq_gols', val:7 },
+  { id:'seq_maradona',  cat:'🎩 Sequencial de Gols', nome:'Modo Maradona',desc:'8 ou mais gols na mesma partida', icon:'🤯', tipo:'seq_gols', val:8 },
+  // ── APROVEITAMENTO DE PÊNALTIS NO ANO ───────────────────────
+  { id:'pen_ano_40', cat:'🥅 Aproveitamento de Pênaltis', nome:'Tremedor',       desc:'40% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😰', tipo:'pen_ano', val:40 },
+  { id:'pen_ano_50', cat:'🥅 Aproveitamento de Pênaltis', nome:'Nervoso',        desc:'50% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😬', tipo:'pen_ano', val:50 },
+  { id:'pen_ano_60', cat:'🥅 Aproveitamento de Pênaltis', nome:'Impreciso',      desc:'60% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😅', tipo:'pen_ano', val:60 },
+  { id:'pen_ano_70', cat:'🥅 Aproveitamento de Pênaltis', nome:'Razoável',       desc:'70% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😐', tipo:'pen_ano', val:70 },
+  { id:'pen_ano_75', cat:'🥅 Aproveitamento de Pênaltis', nome:'Confiante',      desc:'75% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😏', tipo:'pen_ano', val:75 },
+  { id:'pen_ano_80', cat:'🥅 Aproveitamento de Pênaltis', nome:'Especialista',   desc:'80% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'🎯', tipo:'pen_ano', val:80 },
+  { id:'pen_ano_85', cat:'🥅 Aproveitamento de Pênaltis', nome:'Frio como Gelo', desc:'85% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'🧊', tipo:'pen_ano', val:85 },
 ];
 
 // ── Cálculo de conquistas para um jogador ──────────────────────
@@ -8598,6 +8613,38 @@ function calcConquistas(uid, gd){
   const assistAnoMelhor = Math.max(0, ...Object.values(assistPorAno).length ? Object.values(assistPorAno) : [0]);
   const assistTotal = allMonths.reduce((s,m)=>s+m.assist, 0);
 
+  // partidas individuais do jogador (histórico + mês atual)
+  const todasPartidas = [];
+  allMonthKeys.forEach(k=>{
+    const h = hist[k];
+    pMatches(h.matches).forEach(x => todasPartidas.push(x));
+  });
+  pMatches(gd.matches).forEach(x => todasPartidas.push(x));
+  const melhorPartida = Math.max(0, ...todasPartidas.map(x => x.gols||0));
+
+  // pênaltis agrupados por ano
+  const penPorAno = {};
+  allMonthKeys.forEach(k=>{
+    const ano = k.substring(0,4);
+    if(!ano) return;
+    pMatches(hist[k].matches).forEach(x=>{
+      if(!penPorAno[ano]) penPorAno[ano]={bat:0,ok:0};
+      penPorAno[ano].bat += (x.penBat||0);
+      penPorAno[ano].ok  += (x.penOk||0);
+    });
+  });
+  // mês atual
+  const anoAtualPen = anoAtualKey;
+  pMatches(gd.matches).forEach(x=>{
+    if(!penPorAno[anoAtualPen]) penPorAno[anoAtualPen]={bat:0,ok:0};
+    penPorAno[anoAtualPen].bat += (x.penBat||0);
+    penPorAno[anoAtualPen].ok  += (x.penOk||0);
+  });
+  // melhor % anual com mínimo de 5 cobranças
+  const melhorPenPct = Math.max(0, ...Object.values(penPorAno)
+    .filter(p=>p.bat>=5)
+    .map(p=>Math.round(p.ok/p.bat*100)));
+
   // --- Avaliação ---
   const unlocked = {};
   CONQUISTAS.forEach(cq=>{
@@ -8651,6 +8698,20 @@ function calcConquistas(uid, gd){
       count = countAcumThreshold(assistTotal, cq.val);
       achieved = count > 0;
       progress = Math.min(assistTotal, cq.val);
+    } else if(cq.tipo==='seq_gols'){
+      // conquistas acumulam: conta quantas partidas atingiram exatamente esse threshold
+      // (para Maradona: 8+, para os outros: exatamente val ou mais até o próximo)
+      const limSup = cq.val === 8 ? Infinity : (cq.val + 1);
+      count = todasPartidas.filter(x => (x.gols||0) >= cq.val && (cq.val===8 || (x.gols||0) < limSup)).length;
+      // Maradona: qualquer partida com 8+
+      if(cq.val === 8) count = todasPartidas.filter(x => (x.gols||0) >= 8).length;
+      achieved = count > 0;
+      progress = Math.min(melhorPartida, cq.val);
+    } else if(cq.tipo==='pen_ano'){
+      // conta quantos anos o jogador atingiu essa % (com mín. 5 cobranças)
+      count = Object.values(penPorAno).filter(p=>p.bat>=5 && Math.round(p.ok/p.bat*100)>=cq.val).length;
+      achieved = count > 0;
+      progress = Math.min(melhorPenPct, cq.val);
     }
     unlocked[cq.id] = { achieved, progress, max, count };
   });
