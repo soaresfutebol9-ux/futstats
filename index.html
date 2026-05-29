@@ -1473,19 +1473,7 @@ select option{background:var(--bg3)}
 .crown-toast-sub{font-family:'DM Mono',monospace;font-size:12px;color:#1f1f1f;letter-spacing:.1em;text-transform:uppercase;}
 
 /* ── DUELO BTN ── */
-.duelo-fab{
-  position:fixed;bottom:90px;right:16px;z-index:500;
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#FF5A7A 0%,#c01040 100%);
-  border:none;cursor:pointer;
-  display:none;align-items:center;justify-content:center;
-  font-size:22px;
-  box-shadow:0 4px 20px rgba(255,90,122,.5),0 2px 8px rgba(0,0,0,.4);
-  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
-}
-.duelo-fab:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(255,90,122,.6),0 2px 8px rgba(0,0,0,.4);}
-.duelo-fab:active{transform:scale(.92);}
-body.duelo-fab-visible .duelo-fab{display:flex;}
+.duelo-fab{ display:none !important; }
 
 
 
@@ -1776,30 +1764,70 @@ body.duelo-fab-visible .duelo-fab{display:flex;}
   color:var(--tx3);letter-spacing:.08em;
 }
 
-/* ── CONQUISTAS FAB ── */
-.conquistas-fab{
-  position:fixed;bottom:160px;right:16px;z-index:500;
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
-  border:none;cursor:pointer;
-  display:none;align-items:center;justify-content:center;
-  color:#07090d;
-  box-shadow:0 4px 20px rgba(255,180,0,.55),0 2px 8px rgba(0,0,0,.4);
-  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
-  position:fixed;
+/* ── CONQUISTAS FAB ── (oculto — substituido pelo multi-fab) */
+.conquistas-fab{ display:none !important; }
+.conquistas-fab-badge{ display:none !important; }
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,122,.5)}50%{box-shadow:0 0 0 5px rgba(255,90,122,0)}}
+
+/* ── MULTI-FAB ── */
+.mfab-wrap{
+  position:fixed;bottom:90px;right:16px;z-index:500;
+  display:none;flex-direction:column-reverse;align-items:flex-end;gap:10px;
 }
-.conquistas-fab:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(255,180,0,.65),0 2px 8px rgba(0,0,0,.4);}
-.conquistas-fab:active{transform:scale(.92);}
-body.conquistas-fab-visible .conquistas-fab{display:flex;}
-.conquistas-fab-badge{
+body.duelo-fab-visible .mfab-wrap,
+body.conquistas-fab-visible .mfab-wrap{ display:flex; }
+.mfab-main{
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#4dffb0 0%,#00c97a 100%);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 4px 20px rgba(77,255,176,.45),0 2px 8px rgba(0,0,0,.4);
+  transition:transform .25s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+  position:relative;color:#07090d;
+}
+.mfab-main:active{transform:scale(.92);}
+.mfab-main.open{transform:rotate(45deg);}
+.mfab-main-badge{
   position:absolute;top:-3px;right:-3px;
   min-width:18px;height:18px;border-radius:99px;padding:0 5px;
   background:#FF5A7A;border:2px solid #07090d;
   font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
-  color:#fff;display:flex;align-items:center;justify-content:center;
+  color:#fff;display:none;align-items:center;justify-content:center;
   animation:badgePulse 1.8s ease-in-out infinite;
 }
-@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,122,.5)}50%{box-shadow:0 0 0 5px rgba(255,90,122,0)}}
+.mfab-items{
+  display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
+  overflow:hidden;max-height:0;opacity:0;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .2s;
+  pointer-events:none;
+}
+.mfab-items.open{ max-height:200px;opacity:1;pointer-events:all; }
+.mfab-item-wrap{ display:flex;align-items:center;gap:8px; }
+.mfab-item-label{
+  background:var(--bg2);border:1px solid var(--bo2);
+  border-radius:8px;padding:4px 10px;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:600;
+  color:var(--tx1);white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.mfab-item{
+  width:46px;height:46px;border-radius:50%;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1);
+}
+.mfab-item:active{transform:scale(.88);}
+.mfab-item-duelo{
+  background:linear-gradient(135deg,#FF5A7A 0%,#c01040 100%);
+  box-shadow:0 4px 16px rgba(255,90,122,.5),0 2px 6px rgba(0,0,0,.4);
+}
+.mfab-item-conquistas{
+  background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
+  box-shadow:0 4px 16px rgba(255,180,0,.5),0 2px 6px rgba(0,0,0,.4);
+  color:#07090d;
+}
 
 /* ── MODAL CONQUISTAS ── */
 .conquistas-inner{
@@ -2475,11 +2503,7 @@ body::before{
   </div>
 </div>
 
-<!-- ══ CONQUISTAS FAB ══ -->
-<button class="conquistas-fab" id="conquistas-fab" onclick="abrirConquistas()" style="display:none">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-  <div class="conquistas-fab-badge" id="conquistas-fab-badge" style="display:none"></div>
-</button>
+<!-- ══ CONQUISTAS FAB (oculto) ══ -->
 
 <!-- ══ MODAL CONQUISTAS ══ -->
 <div id="modal-conquistas" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.8);align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
@@ -6844,8 +6868,32 @@ window.irParaRankingGA=()=>{
   <div class="crown-toast-sub">Rei do G+A! 🔥</div>
 </div>
 
-<!-- Duelo FAB -->
-<button class="duelo-fab" id="duelo-fab" onclick="openDuelo()" title="⚔️ Modo Duelo">⚔️</button>
+<!-- ══ MULTI-FAB (Duelo + Conquistas) ══ -->
+<div class="mfab-wrap" id="mfab-wrap">
+  <!-- Itens expandíveis -->
+  <div class="mfab-items" id="mfab-items">
+    <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Conquistas</span>
+      <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();abrirConquistas()" title="Conquistas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </button>
+    </div>
+    <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Modo Duelo</span>
+      <button class="mfab-item mfab-item-duelo" onclick="mfabClose();openDuelo()" title="Modo Duelo">⚔️</button>
+    </div>
+  </div>
+  <!-- Botão principal -->
+  <button class="mfab-main" id="mfab-main" onclick="mfabToggle()">
+    <span id="mfab-main-icon">＋</span>
+    <div class="mfab-main-badge" id="mfab-main-badge"></div>
+  </button>
+</div>
+
+<!-- Botões originais ocultos (mantidos para compatibilidade com JS existente) -->
+<button class="conquistas-fab" id="conquistas-fab" style="display:none!important"></button>
+<button class="duelo-fab" id="duelo-fab" style="display:none!important"></button>
+
 
 <!-- Modal Duelo -->
 <div id="modal-duelo">
@@ -6944,7 +6992,53 @@ window.irParaRankingGA=()=>{
 </script>
 
 <script>
-/* ═══════════════════════════════════════════════════════
+// ══ MULTI-FAB ══
+function mfabToggle(){
+  const items = document.getElementById('mfab-items');
+  const main  = document.getElementById('mfab-main');
+  const icon  = document.getElementById('mfab-main-icon');
+  if(!items) return;
+  const open = items.classList.toggle('open');
+  main.classList.toggle('open', open);
+  icon.textContent = open ? '✕' : '＋';
+}
+function mfabClose(){
+  const items = document.getElementById('mfab-items');
+  const main  = document.getElementById('mfab-main');
+  const icon  = document.getElementById('mfab-main-icon');
+  if(!items) return;
+  items.classList.remove('open');
+  main && main.classList.remove('open');
+  if(icon) icon.textContent = '＋';
+}
+// Sincroniza o badge do multi-fab com o badge de conquistas
+(function(){
+  const _orig = document.getElementById.bind(document);
+  // Sobrescreve getElementById para interceptar conquistas-fab-badge
+  const _patchBadge = ()=>{
+    const fakeBadge = document.getElementById('conquistas-fab-badge');
+    if(!fakeBadge) return;
+    const observer = new MutationObserver(()=>{
+      const mainBadge = document.getElementById('mfab-main-badge');
+      if(!mainBadge) return;
+      mainBadge.textContent = fakeBadge.textContent;
+      mainBadge.style.display = fakeBadge.textContent ? 'flex' : 'none';
+    });
+    observer.observe(fakeBadge, {childList:true, attributes:true, attributeFilter:['style']});
+  };
+  setTimeout(_patchBadge, 500);
+})();
+// Fecha o menu ao clicar fora
+document.addEventListener('click', e=>{
+  const wrap = document.getElementById('mfab-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    mfabClose();
+  }
+});
+</script>
+
+<script>
+/*
    FUTSTATS — MÓDULO DE COMPARTILHAMENTO
    Gera cards visuais para ranking (G+A, Geral, Pênaltis)
    e Modo Duelo, e permite baixar ou compartilhar via API.
@@ -8489,6 +8583,11 @@ const CONQUISTAS = [
   { id:'seq_hexa',      cat:'🎩 Sequencial de Gols', nome:'Hexa-trick',   desc:'6 gols na mesma partida', icon:'💫', tipo:'seq_gols', val:6 },
   { id:'seq_hepta',     cat:'🎩 Sequencial de Gols', nome:'Hepta-trick',  desc:'7 gols na mesma partida', icon:'🌪️', tipo:'seq_gols', val:7 },
   { id:'seq_maradona',  cat:'🎩 Sequencial de Gols', nome:'Modo Maradona',desc:'8 ou mais gols na mesma partida', icon:'🤯', tipo:'seq_gols', val:8 },
+  // ── PÊNALTI SEQUENCIAL ──────────────────────────────────────
+  { id:'pen_seq_3',  cat:'🥅 Pênalti Sequencial', nome:'Calibrado',      desc:'3 partidas seguidas convertendo 100% dos pênaltis',  icon:'🎯', tipo:'pen_seq', val:3  },
+  { id:'pen_seq_5',  cat:'🥅 Pênalti Sequencial', nome:'Frieza Clínica', desc:'5 partidas seguidas convertendo 100% dos pênaltis',  icon:'🧊', tipo:'pen_seq', val:5  },
+  { id:'pen_seq_7',  cat:'🥅 Pênalti Sequencial', nome:'Infalível',      desc:'7 partidas seguidas convertendo 100% dos pênaltis',  icon:'💎', tipo:'pen_seq', val:7  },
+  { id:'pen_seq_10', cat:'🥅 Pênalti Sequencial', nome:'Robô de Pênalti',desc:'10 partidas seguidas convertendo 100% dos pênaltis', icon:'🤖', tipo:'pen_seq', val:10 },
   // ── APROVEITAMENTO DE PÊNALTIS NO ANO ───────────────────────
   { id:'pen_ano_40', cat:'🥅 Aproveitamento de Pênaltis', nome:'Tremedor',       desc:'40% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😰', tipo:'pen_ano', val:40 },
   { id:'pen_ano_50', cat:'🥅 Aproveitamento de Pênaltis', nome:'Nervoso',        desc:'50% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😬', tipo:'pen_ano', val:50 },
@@ -8645,6 +8744,20 @@ function calcConquistas(uid, gd){
     .filter(p=>p.bat>=5)
     .map(p=>Math.round(p.ok/p.bat*100)));
 
+  // maior sequência de partidas com 100% de aproveitamento em pênaltis
+  // (apenas partidas onde o jogador cobrou pelo menos 1 pênalti, a partir de 27/05/2026)
+  const PEN_SEQ_INICIO = '2026-05-27';
+  let penSeqAtual = 0, penSeqMax = 0;
+  todasPartidas.filter(x => (x.date||'') >= PEN_SEQ_INICIO).forEach(x => {
+    const bat = x.penBat || 0;
+    const ok  = x.penOk  || 0;
+    if(bat > 0){
+      if(ok === bat){ penSeqAtual++; if(penSeqAtual > penSeqMax) penSeqMax = penSeqAtual; }
+      else { penSeqAtual = 0; }
+    }
+    // partidas sem pênalti não interrompem nem contam a sequência
+  });
+
   // --- Avaliação ---
   const unlocked = {};
   CONQUISTAS.forEach(cq=>{
@@ -8708,6 +8821,11 @@ function calcConquistas(uid, gd){
       if(cq.val === 8) count = partidasValidas.filter(x => (x.gols||0) >= 8).length;
       achieved = count > 0;
       progress = Math.min(melhorPartidaValida, cq.val);
+    } else if(cq.tipo==='pen_seq'){
+      // sequência máxima de partidas com 100% de pênaltis convertidos
+      count = Math.floor(penSeqMax / cq.val); // quantas vezes atingiu o threshold
+      achieved = penSeqMax >= cq.val;
+      progress = Math.min(penSeqMax, cq.val);
     } else if(cq.tipo==='pen_ano'){
       // Só conta anos fechados (histórico), não o ano em curso.
       // O jogador ganha a conquista do tier que corresponde exatamente à sua %
