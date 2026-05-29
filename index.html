@@ -3151,36 +3151,9 @@ function renderPerfilPanelStats(){
     </div>`;
   }
 
-  // ── Card de totais gerais ──
-  const mb=(gd.members||[]).find(m=>m.uid===currentUser.uid);
+  // ── Card de totais gerais removido ──
   const totalEl=$('pperfil-stats-total');
-  if(totalEl&&mb){
-    const hist=gd.historico||{};
-    let tg=s.gols,ta=s.assist;
-    Object.values(hist).forEach(h=>{
-      const ms=(h.matches||[]).filter(x=>m_uid_match(x,mb));
-      tg+=ms.reduce((acc,x)=>acc+(x.gols||0),0);
-      ta+=ms.reduce((acc,x)=>acc+(x.assist||0),0);
-    });
-    totalEl.innerHTML=`
-    <div style="background:#ecedeb;border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
-      <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">📊 Total geral — todos os meses</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-        <div style="background:#ecedeb;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${tg}</div>
-          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Gols</div>
-        </div>
-        <div style="background:#ecedeb;border:2px solid #2a9cc9;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${ta}</div>
-          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Assist.</div>
-        </div>
-        <div style="background:#ecedeb;border:2px solid #88ddeb;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12)">
-          <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${tg+ta}</div>
-          <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px;text-transform:uppercase;letter-spacing:.06em">G+A</div>
-        </div>
-      </div>
-    </div>`;
-  }
+  if(totalEl) totalEl.innerHTML='';
 
 
   // ── Últimas partidas ──
@@ -5882,7 +5855,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :totalCard+conquistasCard+medalhasCard+mediaCard+evolCard+sepLabel+monthCards;
+    :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
   // ── Desafios do jogador ──
   const desafiosDoJogador = (gd.desafios||[]).filter(d =>
