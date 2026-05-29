@@ -5115,9 +5115,12 @@ function renderRanking(){
 
     // ── Seletor de anos passados (apenas na aba "ano", se houver mais de 1) ──
     const anoPickerHTML=(window._penSubTab==='ano'&&anosPassados.length>1)
-      ?`<div style="display:flex;gap:7px;flex-wrap:wrap;padding:4px 1rem 8px">
-          ${anosPassados.map(a=>`<button onclick="setPenAno('${a}')" style="padding:5px 14px;border-radius:99px;border:1.5px solid ${anoSel===a?'var(--g)':\'var(--bo2)\'};background:${anoSel===a?'rgba(77,255,176,.15)':\'var(--bg3)\'};color:${anoSel===a?'var(--g)':\'var(--tx2)\'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">${a}</button>`).join('')}
-        </div>`
+      ?('<div style="display:flex;gap:7px;flex-wrap:wrap;padding:4px 1rem 8px">'+
+          anosPassados.map(a=>{
+            const act=anoSel===a;
+            return '<button onclick="setPenAno(\'' + a + '\')" style="padding:5px 14px;border-radius:99px;border:1.5px solid '+(act?'var(--g)':'var(--bo2)')+';background:'+(act?'rgba(77,255,176,.15)':'var(--bg3)')+';color:'+(act?'var(--g)':'var(--tx2)')+';font-family:\'DM Mono\',monospace;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">'+a+'</button>';
+          }).join('')+
+        '</div>')
       :'';
 
     // ── Sub-abas HTML ──
