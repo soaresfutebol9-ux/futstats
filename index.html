@@ -8700,7 +8700,7 @@ function calcConquistas(uid, gd){
       progress = Math.min(assistTotal, cq.val);
     } else if(cq.tipo==='seq_gols'){
       // Conquista criada em 20/05/2026 — só conta partidas a partir dessa data
-      const SEQ_GOLS_INICIO = '2026-05-20';
+      const SEQ_GOLS_INICIO = '2026-05-27';
       const partidasValidas = todasPartidas.filter(x => (x.date||'') >= SEQ_GOLS_INICIO);
       const melhorPartidaValida = Math.max(0, ...partidasValidas.map(x => x.gols||0));
       const limSup = cq.val === 8 ? Infinity : (cq.val + 1);
