@@ -5503,6 +5503,7 @@ window.deletarMesHist=async key=>{
 let _mpUid=null;
 let _mpAnoAtivo=null;
 let _mpAnoMedalhas=null;
+let _mpAnoTotal=null;
 
 let _mpAnoMedia=null;
 let _mpAnoMeses=null;
@@ -5556,6 +5557,7 @@ function _buildPlayerProfile(uid){
   const anoAtualSys=new Date().getFullYear().toString();
   // Init independent selectors on first open
   if(!_mpAnoMedalhas||!anos.includes(_mpAnoMedalhas)) _mpAnoMedalhas='__all__';
+  if(!_mpAnoTotal||(!['__all__',...anos].includes(_mpAnoTotal))) _mpAnoTotal=_resolveAnoAtivo(anos);
   if(!_mpAnoMeses||(!['__all__',...anos].includes(_mpAnoMeses))) _mpAnoMeses=_resolveAnoAtivo(anos);
   if(!_mpAnoMedia||(!['__all__',...anos].includes(_mpAnoMedia))) _mpAnoMedia='__all__';
 
@@ -5604,6 +5606,15 @@ function _buildPlayerProfile(uid){
     <button onclick="setMpAnoMedalhas('${uid}','__all__')" style="${btnStyleM('__all__',_mpAnoMedalhas==='__all__')}">Geral</button>
   </div>`:'';
 
+  // ── SELETOR INDEPENDENTE: TOTAL ──
+  const isAllTotal=(_mpAnoTotal==='__all__');
+  const btnStyleT=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#40c960':'#b7b8b6'};background:${active?'#aef2b3':'#dedede'};color:${active?'#1a5c2a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
+  const selTotal=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📊 Temporada:</span>
+    ${anos.map(a=>`<button onclick="setMpAnoTotal('${uid}','${a}')" style="${btnStyleT(a,a===_mpAnoTotal&&!isAllTotal)}">${a}</button>`).join('')}
+    <button onclick="setMpAnoTotal('${uid}','__all__')" style="${btnStyleT('__all__',isAllTotal)}">Geral</button>
+  </div>`:'';
+
   // ── SELETOR INDEPENDENTE: MESES ──
   const isAllMeses=(_mpAnoMeses==='__all__');
   const btnStyleMes=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#2a9cc9':'#b7b8b6'};background:${active?'#b0d8f0':'#dedede'};color:${active?'#0a3a5a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
@@ -5612,6 +5623,41 @@ function _buildPlayerProfile(uid){
     ${anos.map(a=>`<button onclick="setMpAnoMeses('${uid}','${a}')" style="${btnStyleMes(a,a===_mpAnoMeses&&!isAllMeses)}">${a}</button>`).join('')}
     <button onclick="setMpAnoMeses('${uid}','__all__')" style="${btnStyleMes('__all__',isAllMeses)}">Todos</button>
   </div>`:'';
+
+  // ── Totais por seleção ──
+  const mesesParaTotal=isAllTotal?allMonths:allMonths.filter(m=>m.ano===_mpAnoTotal);
+  const cardG=mesesParaTotal.reduce((s,m)=>s+m.g,0);
+  const cardA=mesesParaTotal.reduce((s,m)=>s+m.a,0);
+  const cardPB=mesesParaTotal.reduce((s,m)=>s+m.pb,0);
+  const cardPK=mesesParaTotal.reduce((s,m)=>s+m.pk,0);
+  const cardLabel=isAllTotal?'Todos os tempos':`Temporada ${_mpAnoTotal}`;
+
+  // Card totais
+  const totalCard=`
+  <div style="background:#aef2b3;border:1.5px solid #40c960;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    ${selTotal}
+    <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="background:#dedede;border:2px solid #40c960;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Gols</div>
+      </div>
+      <div style="background:#dedede;border:2px solid #2a9cc9;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardA}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Assist.</div>
+      </div>
+      <div style="background:#dedede;border:2px solid #88ddeb;border-radius:10px;padding:12px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG+cardA}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">G+A</div>
+      </div>
+    </div>
+    ${cardPB>0?`<div style="margin-top:8px">
+      <div style="background:#dedede;border:2px solid #b7b8b6;border-radius:10px;padding:10px 8px;text-align:center">
+        <div style="font-family:'ClassyVogue',sans-serif;font-size:22px;color:\${cardPK/cardPB>=.7?'#1a8a3a':cardPK/cardPB>=.4?'#cc8800':'#cc2222'};line-height:1">${cardPK}/${cardPB}</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-top:4px">Pênaltis</div>
+      </div>
+    </div>`:''}
+  </div>`;
 
   // ── CARD DE MEDALHAS ──────────────────────────────
   const mesesDispHistorico=allMonths.filter(m=>!m.current&&(_mpAnoMedalhas==='__all__'||m.ano===_mpAnoMedalhas));
@@ -5836,7 +5882,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :conquistasCard+medalhasCard+mediaCard+evolCard+sepLabel+monthCards;
+    :totalCard+conquistasCard+medalhasCard+mediaCard+evolCard+sepLabel+monthCards;
 
   // ── Desafios do jogador ──
   const desafiosDoJogador = (gd.desafios||[]).filter(d =>
@@ -5867,6 +5913,7 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   window._mpUid=uid;
   _mpAnoAtivo=null;
   _mpAnoMedalhas='__all__';
+  _mpAnoTotal=null;
   _mpAnoMedia=null;
   _mpAnoMeses=null;
   const avEl=document.getElementById('mp-avatar');
@@ -5906,6 +5953,7 @@ window.setMpAno=(uid,ano)=>{
   _buildPlayerProfile(uid);
 };
 window.setMpAnoMedalhas=(uid,ano)=>{_mpAnoMedalhas=ano;_buildPlayerProfile(uid);};
+window.setMpAnoTotal=(uid,ano)=>{_mpAnoTotal=ano;_buildPlayerProfile(uid);};
 window.setMpAnoMedia=(uid,ano)=>{_mpAnoMedia=ano;_buildPlayerProfile(uid);};
 window.setMpAnoMeses=(uid,ano)=>{_mpAnoMeses=ano;_buildPlayerProfile(uid);};
 
