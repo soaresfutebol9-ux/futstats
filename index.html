@@ -485,7 +485,7 @@ body.light .ah::after{
   font-weight:800;
   letter-spacing:-1px;
   line-height:1;
-  pointer-events:none;
+  pointer-events:auto;
   user-select:none;
 }
 .ah-logo .ahl-char{
@@ -1122,7 +1122,7 @@ body.light .mes-vigente-titulo{
 /* ── RECORDES ── */
 .rec-section{margin-bottom:1.5rem}
 .rec-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;gap:10px}
-.rec-section-title{font-family:'VarsityTeam',serif;font-size:20px;font-weight:bold;letter-spacing:.5px;flex:1;min-width:0}
+.rec-section-title{font-family:'VarsityTeam',serif;font-size:15px;font-weight:bold;letter-spacing:.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec-share-btn{background:none;border:1px solid var(--bo2);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--tx2);display:flex;align-items:center;gap:6px;transition:all .15s;flex-shrink:0}
 .rec-share-btn:hover{border-color:var(--g);color:var(--g);background:rgba(77,255,176,.07)}
 .rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:#e0dedc;box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;transition:all .18s}
@@ -2071,7 +2071,7 @@ body::before{
 <div id="sa" class="screen">
   <div class="ah">
     <!-- Logo metálica (esquerda) -->
-    <div class="ah-logo">
+    <div class="ah-logo" onclick="event.preventDefault();event.stopPropagation();" style="cursor:default">
       <span class="ahl-char">F</span><span class="ahl-char">U</span><span class="ahl-char">T</span><span class="ahl-char g">S</span><span class="ahl-char g">T</span><span class="ahl-char g">A</span><span class="ahl-char g">T</span><span class="ahl-char g">S</span>
     </div>
 
@@ -4997,7 +4997,7 @@ function showRankingSkeleton(){
 
 function renderRanking(){
   if(!gd)return;const mbs=gd.members||[];
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=rankStat==='recordes'?'none':'flex';
+  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(rankStat==='recordes'||rankStat==='pen')?'none':'flex';
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
   const geralWrap=document.getElementById('geral-banner-wrap');
@@ -5225,7 +5225,7 @@ window.setRank=(s,el)=>{
   rankStat=s;
   document.querySelectorAll('.ft').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=s==='recordes'?'none':'flex';
+  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(s==='recordes'||s==='pen')?'none':'flex';
   showRankingSkeleton();
   setTimeout(()=>{
     renderRanking();
@@ -8448,6 +8448,18 @@ const CONQUISTAS = [
   { id:'assist_20', cat:'👟 Assistências', nome:'Visão de Jogo',                  desc:'20 assistências em um mês', icon:'⚡', tipo:'assist_mes', val:20 },
   { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
   { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
+  // ── ASSISTÊNCIAS NO ANO ─────────────────────────────────────
+  { id:'assist_ano_100', cat:'📅 Assistências no Ano', nome:'Özil',            desc:'100 assistências em um ano', icon:'🎁',  tipo:'assist_ano', val:100 },
+  { id:'assist_ano_150', cat:'📅 Assistências no Ano', nome:'David Beckham',   desc:'150 assistências em um ano', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tipo:'assist_ano', val:150 },
+  { id:'assist_ano_200', cat:'📅 Assistências no Ano', nome:'Iniesta',         desc:'200 assistências em um ano', icon:'💜',  tipo:'assist_ano', val:200 },
+  { id:'assist_ano_250', cat:'📅 Assistências no Ano', nome:'Luka Modrić',     desc:'250 assistências em um ano', icon:'🌟',  tipo:'assist_ano', val:250 },
+  { id:'assist_ano_300', cat:'📅 Assistências no Ano', nome:'Toni Kroos',      desc:'300 assistências em um ano', icon:'🎯',  tipo:'assist_ano', val:300 },
+  // ── ASSISTÊNCIAS GERAL ──────────────────────────────────────
+  { id:'assist_total_200',  cat:'🌎 Assistências Geral', nome:'Di María',         desc:'200 assistências no total',  icon:'🇦🇷', tipo:'assist_total', val:200  },
+  { id:'assist_total_350',  cat:'🌎 Assistências Geral', nome:'Thomas Müller',    desc:'350 assistências no total',  icon:'🇩🇪', tipo:'assist_total', val:350  },
+  { id:'assist_total_500',  cat:'🌎 Assistências Geral', nome:'Kevin De Bruyne',  desc:'500 assistências no total',  icon:'🔵',  tipo:'assist_total', val:500  },
+  { id:'assist_total_700',  cat:'🌎 Assistências Geral', nome:'Neymar Jr',        desc:'700 assistências no total',  icon:'🇧🇷', tipo:'assist_total', val:700  },
+  { id:'assist_total_1000', cat:'🌎 Assistências Geral', nome:'Messi',            desc:'1000 assistências no total', icon:'🐐',  tipo:'assist_total', val:1000 },
   // ── G+A MÊS ──────────────────────────────────────────────
   { id:'ga_30',  cat:'⚡ G+A no Mês', nome:'Participativo', desc:'30 G+A em um mês', icon:'🌱', tipo:'ga_mes', val:30 },
   { id:'ga_35',  cat:'⚡ G+A no Mês', nome:'Decisivo',      desc:'35 G+A em um mês', icon:'🎲', tipo:'ga_mes', val:35 },
@@ -8576,6 +8588,16 @@ function calcConquistas(uid, gd){
   // gols total: soma de todos os meses
   const golsTotal = allMonths.reduce((s,m)=>s+m.gols, 0);
 
+  // assistências por ano e total
+  const assistPorAno = {};
+  allMonths.forEach(m=>{
+    const ano = (m.key||'').substring(0,4);
+    if(!ano) return;
+    assistPorAno[ano] = (assistPorAno[ano]||0) + m.assist;
+  });
+  const assistAnoMelhor = Math.max(0, ...Object.values(assistPorAno).length ? Object.values(assistPorAno) : [0]);
+  const assistTotal = allMonths.reduce((s,m)=>s+m.assist, 0);
+
   // --- Avaliação ---
   const unlocked = {};
   CONQUISTAS.forEach(cq=>{
@@ -8621,6 +8643,14 @@ function calcConquistas(uid, gd){
       count = countAcumThreshold(golsTotal, cq.val);
       achieved = count > 0;
       progress = Math.min(golsTotal, cq.val);
+    } else if(cq.tipo==='assist_ano'){
+      count = Object.values(assistPorAno).filter(v=>v>=cq.val).length;
+      achieved = count > 0;
+      progress = Math.min(assistAnoMelhor, cq.val);
+    } else if(cq.tipo==='assist_total'){
+      count = countAcumThreshold(assistTotal, cq.val);
+      achieved = count > 0;
+      progress = Math.min(assistTotal, cq.val);
     }
     unlocked[cq.id] = { achieved, progress, max, count };
   });
