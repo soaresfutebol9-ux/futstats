@@ -8584,10 +8584,10 @@ const CONQUISTAS = [
   { id:'seq_hepta',     cat:'🎩 Sequencial de Gols', nome:'Hepta-trick',  desc:'7 gols na mesma partida', icon:'🌪️', tipo:'seq_gols', val:7 },
   { id:'seq_maradona',  cat:'🎩 Sequencial de Gols', nome:'Modo Maradona',desc:'8 ou mais gols na mesma partida', icon:'🤯', tipo:'seq_gols', val:8 },
   // ── PÊNALTI SEQUENCIAL ──────────────────────────────────────
-  { id:'pen_seq_3',  cat:'🥅 Pênalti Sequencial', nome:'Calibrado',      desc:'3 partidas seguidas convertendo 100% dos pênaltis',  icon:'🎯', tipo:'pen_seq', val:3  },
-  { id:'pen_seq_5',  cat:'🥅 Pênalti Sequencial', nome:'Frieza Clínica', desc:'5 partidas seguidas convertendo 100% dos pênaltis',  icon:'🧊', tipo:'pen_seq', val:5  },
-  { id:'pen_seq_7',  cat:'🥅 Pênalti Sequencial', nome:'Infalível',      desc:'7 partidas seguidas convertendo 100% dos pênaltis',  icon:'💎', tipo:'pen_seq', val:7  },
-  { id:'pen_seq_10', cat:'🥅 Pênalti Sequencial', nome:'Robô de Pênalti',desc:'10 partidas seguidas convertendo 100% dos pênaltis', icon:'🤖', tipo:'pen_seq', val:10 },
+  { id:'pen_seq_3',  cat:'🥅 Pênalti Sequencial', nome:'Calibrado',      desc:'3 pênaltis consecutivos convertidos',  icon:'🎯', tipo:'pen_seq', val:3  },
+  { id:'pen_seq_5',  cat:'🥅 Pênalti Sequencial', nome:'Frieza Clínica', desc:'5 pênaltis consecutivos convertidos',  icon:'🧊', tipo:'pen_seq', val:5  },
+  { id:'pen_seq_7',  cat:'🥅 Pênalti Sequencial', nome:'Infalível',      desc:'7 pênaltis consecutivos convertidos',  icon:'💎', tipo:'pen_seq', val:7  },
+  { id:'pen_seq_10', cat:'🥅 Pênalti Sequencial', nome:'Robô de Pênalti',desc:'10 pênaltis consecutivos convertidos', icon:'🤖', tipo:'pen_seq', val:10 },
   // ── APROVEITAMENTO DE PÊNALTIS NO ANO ───────────────────────
   { id:'pen_ano_40', cat:'🥅 Aproveitamento de Pênaltis', nome:'Tremedor',       desc:'40% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😰', tipo:'pen_ano', val:40 },
   { id:'pen_ano_50', cat:'🥅 Aproveitamento de Pênaltis', nome:'Nervoso',        desc:'50% de aproveitamento em pênaltis no ano (mín. 5 cobrados)', icon:'😬', tipo:'pen_ano', val:50 },
@@ -8744,18 +8744,24 @@ function calcConquistas(uid, gd){
     .filter(p=>p.bat>=5)
     .map(p=>Math.round(p.ok/p.bat*100)));
 
-  // maior sequência de partidas com 100% de aproveitamento em pênaltis
-  // (apenas partidas onde o jogador cobrou pelo menos 1 pênalti, a partir de 27/05/2026)
+  // sequência máxima de pênaltis consecutivos convertidos (a partir de 27/05/2026)
+  // cada partida pode contribuir com vários pênaltis; qualquer erro zera a contagem
   const PEN_SEQ_INICIO = '2026-05-27';
   let penSeqAtual = 0, penSeqMax = 0;
   todasPartidas.filter(x => (x.date||'') >= PEN_SEQ_INICIO).forEach(x => {
     const bat = x.penBat || 0;
     const ok  = x.penOk  || 0;
     if(bat > 0){
-      if(ok === bat){ penSeqAtual++; if(penSeqAtual > penSeqMax) penSeqMax = penSeqAtual; }
-      else { penSeqAtual = 0; }
+      if(ok === bat){
+        // converteu todos da partida — soma à sequência
+        penSeqAtual += ok;
+        if(penSeqAtual > penSeqMax) penSeqMax = penSeqAtual;
+      } else {
+        // errou pelo menos 1 — zera sequência
+        penSeqAtual = 0;
+      }
     }
-    // partidas sem pênalti não interrompem nem contam a sequência
+    // partidas sem pênalti não interrompem nem contam
   });
 
   // --- Avaliação ---
