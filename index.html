@@ -5820,7 +5820,17 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   _mpAnoMedia=null;
   _mpAnoMeses=null;
   const avEl=document.getElementById('mp-avatar');
-  if(avEl)avEl.innerHTML=avatarHTML(mb.name,48,uid);
+  if(avEl){
+    avEl.innerHTML=avatarHTML(mb.name,48,uid);
+    const photo=getMemberPhoto(uid);
+    if(photo){
+      avEl.style.cursor='zoom-in';
+      avEl.onclick=()=>openPhotoLightbox(photo, mb.name);
+    } else {
+      avEl.style.cursor='';
+      avEl.onclick=null;
+    }
+  }
   const nomeEl=document.getElementById('mp-nome');
   nomeEl.textContent=mb.name;
   // Reduz fonte progressivamente para nomes longos
@@ -9178,3 +9188,28 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
 </div>
 </body>
 </html>
+<!-- PHOTO LIGHTBOX -->
+<div id="photo-lightbox" onclick="closePhotoLightbox()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+  <div style="position:relative;max-width:92vw;max-height:92vh;display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
+    <img id="photo-lightbox-img" src="" alt="" style="max-width:88vw;max-height:88vh;width:auto;height:auto;border-radius:16px;object-fit:contain;box-shadow:0 8px 60px rgba(0,0,0,.8);display:block">
+    <button onclick="closePhotoLightbox()" style="position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:#222;border:1.5px solid #555;color:#fff;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+  </div>
+</div>
+<script>
+window.openPhotoLightbox = function(src, alt) {
+  if (!src) return;
+  const lb = document.getElementById('photo-lightbox');
+  const img = document.getElementById('photo-lightbox-img');
+  img.src = src;
+  img.alt = alt || '';
+  lb.style.display = 'flex';
+  requestAnimationFrame(() => { lb.style.opacity = '1'; lb.style.transition = 'opacity .2s ease'; });
+};
+window.closePhotoLightbox = function() {
+  const lb = document.getElementById('photo-lightbox');
+  lb.style.opacity = '0';
+  lb.style.transition = 'opacity .18s ease';
+  setTimeout(() => { lb.style.display = 'none'; }, 200);
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoLightbox(); });
+</script>
