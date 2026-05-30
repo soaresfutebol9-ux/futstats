@@ -1855,6 +1855,195 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   gap:16px;max-width:340px;width:100%;
   animation:fadeInUp .35s cubic-bezier(.34,1.2,.64,1);
 }
+
+/* ══ LOADING SCREEN DA CARTA ══ */
+.carta-loading{
+  display:flex;flex-direction:column;align-items:center;
+  gap:20px;width:280px;
+}
+/* Card placeholder durante loading */
+.carta-loading-card{
+  width:280px;height:390px;border-radius:22px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(155deg,#0d1020 0%,#1a1535 40%,#0d1020 100%);
+  border:1px solid rgba(77,255,176,.2);
+  box-shadow:0 0 0 1px rgba(77,255,176,.1),0 8px 48px rgba(0,0,0,.8);
+  flex-shrink:0;
+}
+/* Scan line que percorre o card */
+.carta-scan-line{
+  position:absolute;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.0) 10%,rgba(77,255,176,1) 50%,rgba(77,255,176,.0) 90%,transparent 100%);
+  box-shadow:0 0 18px 4px rgba(77,255,176,.6),0 0 40px 8px rgba(77,255,176,.2);
+  animation:cartaScan 1.4s ease-in-out infinite;
+  z-index:4;
+  top:0;
+}
+@keyframes cartaScan{
+  0%   { top:-4px; opacity:0; }
+  8%   { opacity:1; }
+  92%  { opacity:1; }
+  100% { top:393px; opacity:0; }
+}
+/* Partículas de dados flutuando */
+.carta-particles{
+  position:absolute;inset:0;overflow:hidden;z-index:3;pointer-events:none;
+}
+.carta-particle{
+  position:absolute;
+  font-family:'DM Mono',monospace;
+  font-size:9px;
+  color:rgba(77,255,176,.55);
+  animation:cartaParticle var(--dur,2s) var(--delay,0s) ease-in infinite;
+  white-space:nowrap;
+}
+@keyframes cartaParticle{
+  0%   { opacity:0; transform:translateY(0) scale(.8); }
+  15%  { opacity:1; }
+  80%  { opacity:.6; }
+  100% { opacity:0; transform:translateY(-60px) scale(1); }
+}
+/* Corner scanner brackets */
+.carta-corner{
+  position:absolute;width:24px;height:24px;z-index:5;
+  animation:cartaCornerPulse 1.4s ease-in-out infinite;
+}
+.carta-corner-tl{ top:14px;left:14px;
+  border-top:2px solid #4dffb0;border-left:2px solid #4dffb0; }
+.carta-corner-tr{ top:14px;right:14px;
+  border-top:2px solid #4dffb0;border-right:2px solid #4dffb0; }
+.carta-corner-bl{ bottom:14px;left:14px;
+  border-bottom:2px solid #4dffb0;border-left:2px solid #4dffb0; }
+.carta-corner-br{ bottom:14px;right:14px;
+  border-bottom:2px solid #4dffb0;border-right:2px solid #4dffb0; }
+@keyframes cartaCornerPulse{
+  0%,100%{ opacity:.4; } 50%{ opacity:1; }
+}
+/* Silhueta fantasma do avatar */
+.carta-ghost-avatar{
+  position:absolute;top:72px;left:50%;transform:translateX(-50%);
+  width:120px;height:120px;border-radius:50%;z-index:2;
+  background:rgba(77,255,176,.06);
+  border:2px solid rgba(77,255,176,.15);
+  overflow:hidden;
+}
+.carta-ghost-avatar::after{
+  content:'';position:absolute;inset:-100%;
+  background:linear-gradient(105deg,transparent 35%,rgba(77,255,176,.12) 50%,transparent 65%);
+  animation:cartaShimmer 1.8s ease-in-out infinite;
+}
+/* Blocos de texto fantasma */
+.carta-ghost-block{
+  position:absolute;border-radius:4px;
+  background:rgba(77,255,176,.07);
+  overflow:hidden;z-index:2;
+}
+.carta-ghost-block::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.18) 50%,transparent 100%);
+  animation:cartaShimmer var(--sd,1.8s) var(--sdd,0s) ease-in-out infinite;
+}
+@keyframes cartaShimmer{
+  0%   { transform:translateX(-100%); }
+  100% { transform:translateX(100%); }
+}
+/* Rating fantasma grande */
+.carta-ghost-rating{
+  position:absolute;top:22px;left:20px;
+  width:38px;height:48px;border-radius:6px;
+  background:rgba(77,255,176,.08);z-index:2;
+  overflow:hidden;
+}
+.carta-ghost-rating::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
+  animation:cartaShimmer 1.6s .1s ease-in-out infinite;
+}
+/* Grid de stats fantasma */
+.carta-ghost-stats{
+  position:absolute;bottom:54px;left:18px;right:18px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;z-index:2;
+}
+.carta-ghost-stat{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.carta-ghost-stat-val{
+  width:32px;height:22px;border-radius:4px;
+  background:rgba(77,255,176,.08);overflow:hidden;
+}
+.carta-ghost-stat-val::after{
+  content:'';display:block;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
+  animation:cartaShimmer 1.6s var(--d,0s) ease-in-out infinite;
+}
+.carta-ghost-stat-lbl{
+  width:22px;height:6px;border-radius:3px;
+  background:rgba(77,255,176,.05);
+}
+/* Overlay de scanning com grid */
+.carta-scan-grid{
+  position:absolute;inset:0;z-index:1;
+  background-image:
+    linear-gradient(rgba(77,255,176,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(77,255,176,.04) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+/* Glow central pulsante */
+.carta-loading-glow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(77,255,176,.08) 0%,transparent 70%);
+  animation:cartaGlowPulse 2s ease-in-out infinite;
+  z-index:1;pointer-events:none;
+}
+@keyframes cartaGlowPulse{
+  0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
+  50%    { transform:translate(-50%,-50%) scale(1.3); opacity:1; }
+}
+/* Status text abaixo do card */
+.carta-loading-status{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.12em;
+  color:#4dffb0;text-transform:uppercase;
+  min-height:16px;text-align:center;
+  animation:cartaStatusBlink .9s ease-in-out infinite;
+}
+@keyframes cartaStatusBlink{
+  0%,100%{ opacity:1; } 50%{ opacity:.4; }
+}
+/* Barra de progresso */
+.carta-progress-wrap{
+  width:240px;height:3px;border-radius:99px;
+  background:rgba(77,255,176,.12);overflow:hidden;
+}
+.carta-progress-bar{
+  height:100%;border-radius:99px;width:0%;
+  background:linear-gradient(90deg,#4dffb0,#26d68a);
+  box-shadow:0 0 8px rgba(77,255,176,.6);
+  transition:width .18s ease;
+}
+
+/* Reveal: card entra com flip 3D */
+@keyframes cartaReveal{
+  0%   { transform:rotateY(90deg) scale(.85); opacity:0; filter:brightness(2.5); }
+  50%  { filter:brightness(1.5); }
+  100% { transform:rotateY(0deg) scale(1); opacity:1; filter:brightness(1); }
+}
+.player-card.revealing{
+  animation:cartaReveal .65s cubic-bezier(.34,1.15,.64,1) both;
+}
+/* Flash de luz no reveal */
+@keyframes cartaFlash{
+  0%  { opacity:1; }
+  100%{ opacity:0; }
+}
+.carta-flash{
+  position:fixed;inset:0;z-index:4000;
+  background:rgba(255,255,255,.18);
+  pointer-events:none;
+  animation:cartaFlash .4s ease-out both;
+}
 /* A carta em si */
 .player-card{
   width:280px;height:390px;border-radius:22px;
@@ -9473,6 +9662,89 @@ function _buildCardHTML(name, photo, s, rating, rarity, groupName){
 }
 
 /* Abre o modal e renderiza a carta */
+/* Dados de partículas flutuantes (stats fake que "escaneiam") */
+function _cartaParticlesHTML(){
+  const itens=['GOL','ASS','G+A','JOG','MED','PEN','ATK','DEF','VEL','FIN','DRI','PAS'];
+  const vals=['99','87','31','18','2.4','83%','94','76','91','88','72','65'];
+  let html='';
+  for(let i=0;i<14;i++){
+    const left=8+Math.random()*82;
+    const top=10+Math.random()*80;
+    const dur=(1.4+Math.random()*1.8).toFixed(2);
+    const delay=(Math.random()*2.5).toFixed(2);
+    const item=itens[i%itens.length];
+    const val=vals[i%vals.length];
+    html+=`<div class="carta-particle" style="left:${left}%;top:${top}%;--dur:${dur}s;--delay:${delay}s">${item} ${val}</div>`;
+  }
+  return html;
+}
+
+/* Renderiza o estado de loading no modal */
+function _renderCartaLoading(inner){
+  inner.innerHTML=`
+    <div class="carta-loading">
+      <div class="carta-loading-card">
+        <div class="carta-scan-grid"></div>
+        <div class="carta-loading-glow"></div>
+        <div class="carta-particles">${_cartaParticlesHTML()}</div>
+        <div class="carta-scan-line"></div>
+        <div class="carta-corner carta-corner-tl"></div>
+        <div class="carta-corner carta-corner-tr"></div>
+        <div class="carta-corner carta-corner-bl"></div>
+        <div class="carta-corner carta-corner-br"></div>
+        <div class="carta-ghost-rating"></div>
+        <div class="carta-ghost-avatar"></div>
+        <!-- nome -->
+        <div class="carta-ghost-block" style="top:210px;left:50%;transform:translateX(-50%);width:140px;height:18px;--sd:1.7s;--sdd:0s"></div>
+        <!-- divisor -->
+        <div class="carta-ghost-block" style="top:242px;left:18px;right:18px;height:1px;--sd:1.9s;--sdd:.1s"></div>
+        <!-- stats grid -->
+        <div class="carta-ghost-stats">
+          ${[0,1,2,3,4,5].map(i=>`
+          <div class="carta-ghost-stat">
+            <div class="carta-ghost-stat-val" style="--d:${(i*.12).toFixed(2)}s"></div>
+            <div class="carta-ghost-stat-lbl"></div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="carta-progress-wrap">
+        <div class="carta-progress-bar" id="carta-pgbar"></div>
+      </div>
+      <div class="carta-loading-status" id="carta-status">INICIALIZANDO...</div>
+    </div>
+  `;
+}
+
+/* Anima a barra e os textos de status, depois chama o reveal */
+function _animateCartaLoading(onComplete){
+  const bar=document.getElementById('carta-pgbar');
+  const status=document.getElementById('carta-status');
+  if(!bar||!status){ onComplete(); return; }
+
+  const steps=[
+    {pct:12, txt:'COLETANDO DADOS...'},
+    {pct:28, txt:'CALCULANDO RATING...'},
+    {pct:47, txt:'ANALISANDO PARTIDAS...'},
+    {pct:63, txt:'PROCESSANDO STATS...'},
+    {pct:81, txt:'DEFININDO RARIDADE...'},
+    {pct:95, txt:'GERANDO CARTA...'},
+    {pct:100,txt:'PRONTO!'},
+  ];
+
+  let i=0;
+  const delays=[0, 280, 480, 680, 860, 1080, 1320];
+
+  steps.forEach((step,idx)=>{
+    setTimeout(()=>{
+      if(bar) bar.style.width=step.pct+'%';
+      if(status) status.textContent=step.txt;
+      if(idx===steps.length-1){
+        setTimeout(onComplete, 220);
+      }
+    }, delays[idx]);
+  });
+}
+
 window.abrirCartaJogador = function(){
   const uid = window._currentUserUid;
   if(!uid){ alert('Faça login para ver sua carta.'); return; }
@@ -9481,14 +9753,13 @@ window.abrirCartaJogador = function(){
   const inner=document.getElementById('carta-inner');
   if(!modal||!inner) return;
 
-  // Coleta dados via proxies expostos no window
+  // Coleta dados
   const gd = window._gd;
   const mb = (gd?.members||[]).find(m=>m.uid===uid);
   const name = mb?.name || mb?.displayName || 'Jogador';
   const photo = mb?.photo || null;
   const groupName = gd?.name || 'FutStats';
 
-  // Stats gerais (usa _getStGeral se disponível, senão _getSt)
   let s;
   try{
     s = mb && window._getStGeral
@@ -9503,20 +9774,46 @@ window.abrirCartaJogador = function(){
   const rating=_cartaRating(s);
   const rarity=_cartaRarity(rating);
 
-  // Monta inner
-  inner.innerHTML=`
-    ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
-    <div class="carta-btns">
-      <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Baixar
-      </button>
-      <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
-    </div>
-  `;
-
+  // 1. Abre modal com loading
+  _renderCartaLoading(inner);
   modal.classList.add('open');
   document.body.style.overflow='hidden';
+
+  // 2. Anima o loading e no fim faz o reveal
+  _animateCartaLoading(()=>{
+    // Flash de luz
+    const flash=document.createElement('div');
+    flash.className='carta-flash';
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(), 450);
+
+    // Substitui loading pela carta real
+    inner.innerHTML=`
+      ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
+      <div class="carta-btns">
+        <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar
+        </button>
+        <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
+      </div>
+    `;
+
+    // Adiciona classe de reveal na carta
+    const card=document.getElementById('player-card-el');
+    if(card){
+      card.classList.add('revealing');
+      card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
+    }
+
+    // Anima os botões
+    const btns=inner.querySelector('.carta-btns');
+    if(btns){
+      btns.style.opacity='0';btns.style.transform='translateY(10px)';
+      btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
+      requestAnimationFrame(()=>{ btns.style.opacity='1';btns.style.transform='translateY(0)'; });
+    }
+  });
 };
 
 window.fecharCartaJogador = function(){
