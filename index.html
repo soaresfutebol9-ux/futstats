@@ -9977,8 +9977,14 @@ window.abrirSurvey = function(){
   if(isAdmin && !survey){
     _renderSurveyAdmin(inner, gd);
   } else if(isAdmin && survey){
-    // Admin sempre vai para a tela de gerenciamento com opção de ver respostas
-    _renderSurveyAdmin(inner, gd);
+    const jaRespondeu = !!(survey.responses||{})[uid];
+    if(jaRespondeu){
+      // Admin já respondeu — vai para tela de gerenciamento
+      _renderSurveyAdmin(inner, gd);
+    } else {
+      // Admin ainda não respondeu — vai para o formulário
+      _renderSurveyForm(inner, survey, members, uid);
+    }
   } else if(survey){
     const jaRespondeu = !!(survey.responses||{})[uid];
     if(jaRespondeu){
