@@ -10323,7 +10323,7 @@ function _renderSurveyResultado(inner, survey, members, uid){
       <div style="text-align:center;padding:30px 0">
         <div style="font-size:48px;margin-bottom:16px">⏳</div>
         <div style="font-family:'Freshman',sans-serif;font-size:17px;color:var(--tx);margin-bottom:8px">Sua resposta foi enviada!</div>
-        <div style="font-size:13px;color:var(--tx2);margin-bottom:20px;line-height:1.5">Aguardando os outros membros responderem.<br>Os cards serão gerados quando todos concluírem.</div>
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:20px;line-height:1.5">Aguardando os outros membros responderem.<br>Quando todos concluírem, seu card FIFA aparecerá automaticamente na <strong style="color:var(--tx)">Carta do Jogador</strong> ⚽</div>
         <div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;margin-bottom:8px">${totalRespostas} / ${totalMembros}</div>
         <div style="font-size:12px;color:var(--tx2)">responderam</div>
         <div style="margin-top:20px;background:rgba(255,255,255,.05);border:1px solid var(--bo);border-radius:12px;overflow:hidden">
@@ -10446,6 +10446,7 @@ window.abrirCartaJogador = function(){
   const uid = window._currentUserUid;
   const survey = gd?.survey;
 
+  // Se o questionário estiver completo, o card FIFA substitui o card antigo para todos
   if(survey?.completed && survey?.results?.[uid]){
     const modal = document.getElementById('modal-carta');
     const inner = document.getElementById('carta-inner');
@@ -10479,8 +10480,12 @@ window.abrirCartaJogador = function(){
 
       const card = document.getElementById('player-card-el');
       if(card){
-        card.classList.add('revealing');
-        card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
+        card.classList.add('survey-card-animated');
+        card.addEventListener('animationend', function h(){
+          card.removeEventListener('animationend', h);
+          card.classList.remove('survey-card-animated');
+          card.classList.add('survey-card-spin');
+        });
       }
       const btns = inner.querySelector('.carta-btns');
       if(btns){
@@ -10492,6 +10497,7 @@ window.abrirCartaJogador = function(){
     return;
   }
 
+  // Questionário não completo — mostra card antigo normalmente
   _origAbrirCarta();
 };
 
