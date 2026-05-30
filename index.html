@@ -8834,7 +8834,8 @@ window.abrirSeletorCqPinadas = function(uid){
 };
 
 window.salvarCqPinadas = async function(uid){
-  if(!currentUser||currentUser.uid!==uid) return;
+  const _currentUid = window._currentUserUid;
+  if(!_currentUid||_currentUid!==uid) return;
   const _gd = window._gd || gd;
   const pinadas = window._pinCqSelecionadas||[];
   try{
