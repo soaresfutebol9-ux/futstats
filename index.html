@@ -9474,24 +9474,28 @@ function _buildCardHTML(name, photo, s, rating, rarity, groupName){
 
 /* Abre o modal e renderiza a carta */
 window.abrirCartaJogador = function(){
-  if(!window.currentUser){ alert('Faça login para ver sua carta.'); return; }
+  const uid = window._currentUserUid;
+  if(!uid){ alert('Faça login para ver sua carta.'); return; }
 
   const modal=document.getElementById('modal-carta');
   const inner=document.getElementById('carta-inner');
   if(!modal||!inner) return;
 
-  // Coleta dados
-  const name = window.myProfile?.displayName || window.currentUser?.displayName || 'Jogador';
-  const photo = window.myProfile?.photo || null;
-  const groupName = window.gd?.name || 'FutStats';
+  // Coleta dados via proxies expostos no window
+  const gd = window._gd;
+  const mb = (gd?.members||[]).find(m=>m.uid===uid);
+  const name = mb?.name || mb?.displayName || 'Jogador';
+  const photo = mb?.photo || null;
+  const groupName = gd?.name || 'FutStats';
 
-  // Stats gerais (usa getStGeral se disponível, senão getSt)
+  // Stats gerais (usa _getStGeral se disponível, senão _getSt)
   let s;
   try{
-    // Tenta pegar stats do usuário logado via getStGeral
-    const mb=(window.gd?.members||[]).find(m=>m.uid===window.currentUser.uid);
-    s = mb ? window._getStGeral ? window._getStGeral(mb) : (window._getSt?window._getSt(window.currentUser.uid,null,true):{n:0,gols:0,assist:0,penBat:0,penOk:0})
-           : (window._getSt?window._getSt(window.currentUser.uid,null,true):{n:0,gols:0,assist:0,penBat:0,penOk:0});
+    s = mb && window._getStGeral
+      ? window._getStGeral(mb)
+      : window._getSt
+        ? window._getSt(uid, null, true)
+        : {n:0,gols:0,assist:0,penBat:0,penOk:0};
   }catch(e){
     s={n:0,gols:0,assist:0,penBat:0,penOk:0};
   }
@@ -9582,12 +9586,7 @@ function _cartaFallbackDownload(card){
   w.document.close();
 }
 
-/* Expõe getStGeral para uso interno */
-window._getStGeral = function(m){
-  if(typeof getStGeral==='function') return getStGeral(m);
-  if(typeof window._getSt==='function') return window._getSt(m.uid||m.name,null,!!m.uid);
-  return{n:0,gols:0,assist:0,penBat:0,penOk:0};
-};
+/* _getStGeral já é exposto pelo módulo principal via window._getStGeral */
 </script>
 </body>
 </html>
