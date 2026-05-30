@@ -10507,16 +10507,25 @@ window.abrirCartaJogador = function(){
 
 /* ── ATUALIZA FAB via polling leve ── */
 (function _initSurveyFAB(){
-  const _t = setInterval(()=>{
+  let _lastSurveyStr = '';
+  let _ready = false;
+
+  function _check(){
     if(window._gd && window._currentUserUid){
+      if(!_ready){ _ready = true; _surveyUpdateFAB(); }
+      const cur = JSON.stringify(window._gd?.survey);
+      if(cur !== _lastSurveyStr){ _lastSurveyStr = cur; _surveyUpdateFAB(); }
+    } else {
+      // ainda não carregou — tenta de novo
       _surveyUpdateFAB();
-      clearInterval(_t);
-      let _lastSurveyStr = '';
-      setInterval(()=>{
-        const cur = JSON.stringify(window._gd?.survey);
-        if(cur !== _lastSurveyStr){ _lastSurveyStr = cur; _surveyUpdateFAB(); }
-      }, 2000);
     }
-  }, 400);
+  }
+
+  // Polling frequente no início, depois relaxa
+  const _fast = setInterval(()=>{ _check(); if(_ready) clearInterval(_fast); }, 300);
+  setInterval(_check, 2000);
+
+  // Também atualiza quando a página volta ao foco (útil no mobile)
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) _check(); });
 })();
 </script>
