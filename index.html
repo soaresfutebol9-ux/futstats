@@ -4114,7 +4114,7 @@ window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
   try{
     const ma=mesAtual();const member={uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()};
-    const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp()};
+    const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp(),createdBy:currentUser.uid};
     const ref=await addDoc(collection(db,'groups'),data);
     groupId=ref.id;gd=data;await updateDoc(doc(db,'users',currentUser.uid),{groupId:ref.id});myProfile.groupId=ref.id;
     closeP('pc');enterApp();subscribeGroup();
@@ -7133,6 +7133,12 @@ window.irParaRankingGA=()=>{
 <div class="mfab-wrap" id="mfab-wrap">
   <!-- Itens expandíveis -->
   <div class="mfab-items" id="mfab-items">
+    <div class="mfab-item-wrap" id="mfab-survey-wrap" style="display:none">
+      <span class="mfab-item-label">Questionário</span>
+      <button class="mfab-item" id="mfab-survey-btn" onclick="mfabClose();abrirSurvey()" title="Questionário de Atributos" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">
+        📋
+      </button>
+    </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Carta do Jogador</span>
       <button class="mfab-item mfab-item-carta" onclick="mfabClose();abrirCartaJogador()" title="Carta do Jogador">
@@ -7166,6 +7172,13 @@ window.irParaRankingGA=()=>{
 <div id="modal-carta" onclick="if(event.target===this)fecharCartaJogador()">
   <div class="carta-inner" id="carta-inner">
     <!-- card gerado dinamicamente por JS -->
+  </div>
+</div>
+
+<!-- ══ MODAL SURVEY (Questionário de Atributos) ══ -->
+<div id="modal-survey" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-y:auto;padding:20px 0">
+  <div id="survey-inner" style="max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--bo);border-radius:20px;padding:24px 20px 32px;position:relative">
+    <!-- preenchido dinamicamente -->
   </div>
 </div>
 
@@ -9911,4 +9924,475 @@ window.closePhotoLightbox = function() {
   setTimeout(() => { lb.style.display = 'none'; }, 200);
 };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoLightbox(); });
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   SURVEY DE ATRIBUTOS — Questionário FIFA-style
+   ══════════════════════════════════════════════════════ */
+
+const SURVEY_ATTRS = [
+  { id:'pac', label:'Velocidade', icon:'⚡' },
+  { id:'sho', label:'Chute',      icon:'⚽' },
+  { id:'pas', label:'Passe',      icon:'👟' },
+  { id:'dri', label:'Drible',     icon:'🔥' },
+  { id:'def', label:'Defesa',     icon:'🛡️' },
+  { id:'phy', label:'Físico',     icon:'💪' },
+];
+
+/* Admin = quem tem o uid no campo createdBy do grupo.
+   Fallback para members[0] caso o grupo seja antigo (sem createdBy). */
+function _isAdmin(){
+  const gd = window._gd;
+  const uid = window._currentUserUid;
+  if(!gd || !uid) return false;
+  if(gd.createdBy) return gd.createdBy === uid;
+  return (gd.members||[])[0]?.uid === uid;
+}
+
+/* Mostra/oculta botão do FAB dependendo de ser admin */
+function _surveyUpdateFAB(){
+  const wrap = document.getElementById('mfab-survey-wrap');
+  if(wrap) wrap.style.display = _isAdmin() ? '' : 'none';
+}
+
+/* ── ABRIR SURVEY ── */
+window.abrirSurvey = function(){
+  const gd = window._gd;
+  const uid = window._currentUserUid;
+  if(!gd || !uid) return;
+
+  const modal = document.getElementById('modal-survey');
+  const inner = document.getElementById('survey-inner');
+  if(!modal || !inner) return;
+
+  const isAdmin = _isAdmin();
+  const survey = gd.survey || null;
+  const members = gd.members || [];
+
+  if(isAdmin && !survey){
+    _renderSurveyAdmin(inner, gd);
+  } else if(survey){
+    const jaRespondeu = !!(survey.responses||{})[uid];
+    if(jaRespondeu){
+      _renderSurveyResultado(inner, survey, members, uid);
+    } else {
+      _renderSurveyForm(inner, survey, members, uid);
+    }
+  } else {
+    inner.innerHTML = `
+      <div style="text-align:center;padding:40px 0">
+        <div style="font-size:40px;margin-bottom:16px">📋</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:8px">Nenhum questionário ativo</div>
+        <div style="font-size:13px;color:var(--tx2)">Aguarde o admin criar um questionário.</div>
+        <button onclick="fecharSurvey()" style="margin-top:24px;padding:10px 28px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
+      </div>`;
+  }
+
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+};
+
+window.fecharSurvey = function(){
+  const modal = document.getElementById('modal-survey');
+  if(modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+document.getElementById('modal-survey').addEventListener('click', e => {
+  if(e.target === document.getElementById('modal-survey')) fecharSurvey();
+});
+
+/* ── TELA ADMIN: criar ou resetar survey ── */
+function _renderSurveyAdmin(inner, gd){
+  const survey = gd.survey || null;
+  const members = gd.members || [];
+  const totalRespostas = survey ? Object.keys(survey.responses||{}).length : 0;
+  const totalMembros = members.length;
+
+  inner.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
+      <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+
+    ${survey ? `
+    <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">Questionário ativo</div>
+      <div style="font-size:15px;font-family:'DM Mono',monospace;color:#4dffb0">${totalRespostas} / ${totalMembros} responderam</div>
+      ${totalRespostas===totalMembros && totalMembros>0 ? `<div style="font-size:12px;color:#4dffb0;margin-top:6px">✅ Todos responderam — cards gerados!</div>` : ''}
+    </div>
+    ` : `
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--bo);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--tx2)">Nenhum questionário ativo no momento.</div>
+    </div>
+    `}
+
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.5">
+      Ao criar um novo questionário, todos os membros poderão avaliar uns aos outros nas 6 características. O questionário anterior (se houver) será substituído.
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+      ${SURVEY_ATTRS.map(a=>`
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,.06);border:1px solid var(--bo);border-radius:20px;font-size:13px;color:var(--tx2)">
+          ${a.icon} ${a.label}
+        </div>`).join('')}
+    </div>
+
+    <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      ${survey ? '🔄 Criar novo questionário' : '✨ Criar questionário'}
+    </button>
+  `;
+}
+
+/* ── CRIAR SURVEY no Firestore ── */
+window._criarSurvey = async function(){
+  const gid = window._groupId;
+  if(!gid) return;
+  if(!confirm('Criar um novo questionário? Isso apagará o anterior e todas as respostas.')) return;
+
+  const survey = { createdAt: Date.now(), responses: {}, results: {} };
+  try{
+    await window._db_updateDoc(window._db_doc('groups', gid), { survey });
+    window._gd.survey = survey;
+    fecharSurvey();
+    setTimeout(()=> abrirSurvey(), 200);
+  } catch(e){
+    alert('Erro ao criar questionário: ' + e.message);
+  }
+};
+
+/* ── TELA DO FORMULÁRIO DE RESPOSTA ── */
+function _renderSurveyForm(inner, survey, members, uid){
+  const state = {};
+  members.forEach(m=>{
+    state[m.uid] = {};
+    SURVEY_ATTRS.forEach(a=>{ state[m.uid][a.id] = 50; });
+  });
+
+  function buildForm(confirming){
+    const membersHTML = members.map(m => {
+      const isMe = m.uid === uid;
+      const vals = state[m.uid];
+      return `
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--bo);border-radius:14px;padding:16px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            ${m.photo
+              ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--bo)">`
+              : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
+            <div>
+              <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
+              ${isMe ? `<div style="font-size:11px;color:#a855f7;font-family:'DM Mono',monospace">Você mesmo</div>` : ''}
+            </div>
+          </div>
+          ${SURVEY_ATTRS.map(a=>`
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                <div style="font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase">${a.icon} ${a.label}</div>
+                <div style="font-family:'Freshman',sans-serif;font-size:18px;color:#a855f7" id="val-${m.uid}-${a.id}">${vals[a.id]}</div>
+              </div>
+              <input type="range" min="0" max="99" value="${vals[a.id]}"
+                ${confirming ? 'disabled' : ''}
+                oninput="_surveySlider('${m.uid}','${a.id}',this.value)"
+                style="width:100%;accent-color:#a855f7;cursor:${confirming?'default':'pointer'}">
+            </div>
+          `).join('')}
+        </div>`;
+    }).join('');
+
+    inner.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
+        <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+      </div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:20px;font-family:'DM Mono',monospace">Avalie cada jogador de 0 a 99</div>
+
+      ${confirming ? `
+      <div style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.35);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#f5c400;line-height:1.5">
+        ⚠️ <strong>Atenção!</strong> Após confirmar, suas respostas não poderão ser editadas. Tem certeza?
+      </div>` : ''}
+
+      <div id="survey-form-body">${membersHTML}</div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        ${confirming ? `
+          <button onclick="_surveySubmit()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer">✅ Confirmar</button>
+          <button onclick="_surveyVoltarEditar()" style="padding:14px 20px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Editar</button>
+        ` : `
+          <button onclick="_surveyConfirmar()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer">Enviar respostas →</button>
+        `}
+      </div>
+    `;
+  }
+
+  window._surveySlider = function(targetUid, attrId, val){
+    state[targetUid][attrId] = parseInt(val);
+    const el = document.getElementById(`val-${targetUid}-${attrId}`);
+    if(el) el.textContent = val;
+  };
+
+  window._surveyConfirmar = function(){
+    buildForm(true);
+    const modal = document.getElementById('modal-survey');
+    if(modal) modal.scrollTop = 0;
+  };
+
+  window._surveyVoltarEditar = function(){ buildForm(false); };
+
+  window._surveySubmit = async function(){
+    const gid = window._groupId;
+    if(!gid) return;
+
+    const myResponse = {};
+    members.forEach(m=>{
+      myResponse[m.uid] = {};
+      SURVEY_ATTRS.forEach(a=>{ myResponse[m.uid][a.id] = state[m.uid][a.id]; });
+    });
+
+    try{
+      const snap = await window._db_getDoc(window._db_doc('groups', gid));
+      if(!snap.exists()) return;
+      const cur = snap.data();
+      const curSurvey = cur.survey || {};
+      const responses = { ...(curSurvey.responses||{}), [uid]: myResponse };
+      const allMembers = cur.members || [];
+      const results = _calcSurveyResults(responses, allMembers);
+      const todos = allMembers.length > 0 && Object.keys(responses).length >= allMembers.length;
+
+      await window._db_updateDoc(window._db_doc('groups', gid), {
+        'survey.responses': responses,
+        'survey.results': results,
+        'survey.completed': todos,
+      });
+
+      window._gd.survey = { ...curSurvey, responses, results, completed: todos };
+      fecharSurvey();
+      setTimeout(()=> abrirSurvey(), 200);
+    } catch(e){
+      alert('Erro ao salvar: ' + e.message);
+    }
+  };
+
+  buildForm(false);
+}
+
+/* ── CALCULA MÉDIAS (aritmética simples, Math.round) ── */
+function _calcSurveyResults(responses, members){
+  const results = {};
+  members.forEach(m=>{
+    const uid = m.uid;
+    const sums = {}, counts = {};
+    SURVEY_ATTRS.forEach(a=>{ sums[a.id]=0; counts[a.id]=0; });
+
+    Object.values(responses).forEach(voterResp=>{
+      const forPlayer = voterResp[uid];
+      if(!forPlayer) return;
+      SURVEY_ATTRS.forEach(a=>{
+        if(forPlayer[a.id] != null){
+          sums[a.id] += forPlayer[a.id];
+          counts[a.id]++;
+        }
+      });
+    });
+
+    const attrs = {};
+    SURVEY_ATTRS.forEach(a=>{
+      attrs[a.id] = counts[a.id] > 0 ? Math.round(sums[a.id] / counts[a.id]) : 50;
+    });
+    const rating = Math.round(Object.values(attrs).reduce((s,v)=>s+v, 0) / SURVEY_ATTRS.length);
+    results[uid] = { attrs, rating };
+  });
+  return results;
+}
+
+/* ── TELA DE RESULTADO / AGUARDANDO ── */
+function _renderSurveyResultado(inner, survey, members, uid){
+  const totalRespostas = Object.keys(survey.responses||{}).length;
+  const totalMembros = members.length;
+  const todos = survey.completed || totalRespostas >= totalMembros;
+
+  if(!todos){
+    inner.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
+        <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+      </div>
+      <div style="text-align:center;padding:30px 0">
+        <div style="font-size:48px;margin-bottom:16px">⏳</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:17px;color:var(--tx);margin-bottom:8px">Sua resposta foi enviada!</div>
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:20px;line-height:1.5">Aguardando os outros membros responderem.<br>Os cards serão gerados quando todos concluírem.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;margin-bottom:8px">${totalRespostas} / ${totalMembros}</div>
+        <div style="font-size:12px;color:var(--tx2)">responderam</div>
+        <div style="margin-top:20px;background:rgba(255,255,255,.05);border:1px solid var(--bo);border-radius:12px;overflow:hidden">
+          <div style="height:8px;background:linear-gradient(90deg,#a855f7,#7c3aed);width:${Math.round(totalRespostas/totalMembros*100)}%;transition:width .5s"></div>
+        </div>
+      </div>
+      <button onclick="fecharSurvey()" style="width:100%;padding:12px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;margin-top:8px">Fechar</button>
+    `;
+    return;
+  }
+
+  // Todos responderam — mostrar card
+  const results = survey.results || {};
+  const mb = members.find(m=>m.uid===uid);
+  const myResult = results[uid];
+  if(!myResult){ inner.innerHTML='<div style="padding:40px;text-align:center;color:var(--tx2)">Resultado não disponível.</div>'; return; }
+
+  const { attrs, rating } = myResult;
+  const rarity = rating>=90?'elite': rating>=80?'gold': rating>=70?'silver':'bronze';
+
+  inner.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">🏆 Seu Card</div>
+      <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div id="survey-card-wrap" style="display:flex;justify-content:center;margin-bottom:16px"></div>
+    <div style="font-size:12px;color:var(--tx2);text-align:center;margin-bottom:16px">Média de ${totalRespostas} avaliações</div>
+    <button onclick="fecharSurvey()" style="width:100%;padding:12px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
+  `;
+
+  const wrap = inner.querySelector('#survey-card-wrap');
+  if(wrap) wrap.innerHTML = _buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, window._gd?.name||'FutStats');
+}
+
+/* ── CONSTRÓI O CARD HTML COM ATRIBUTOS FIFA ── */
+function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
+  const posLabel = rating>=90?'ELITE': rating>=80?'ATK': rating>=70?'MID':'SUB';
+  const attrLabels = { pac:'PAC', sho:'SHO', pas:'PAS', dri:'DRI', def:'DEF', phy:'PHY' };
+
+  const bgMap = {
+    gold:  'linear-gradient(155deg,#c5a200 0%,#ffe066 30%,#b8860b 60%,#ffe599 80%,#8B6914 100%)',
+    silver:'linear-gradient(155deg,#8190a1 0%,#c8d6e5 30%,#8190a1 60%,#dde8f0 80%,#617080 100%)',
+    bronze:'linear-gradient(155deg,#8B5E3C 0%,#D4956A 30%,#7A4F2E 60%,#E0A87A 80%,#6B3F22 100%)',
+    elite: 'linear-gradient(155deg,#0a0a1a 0%,#1a1060 20%,#a855f7 50%,#1a1060 80%,#0a0a1a 100%)',
+  };
+  const shadowMap = {
+    gold:  '0 0 0 2px #c5a200,0 8px 48px rgba(197,162,0,.7)',
+    silver:'0 0 0 2px #8190a1,0 8px 40px rgba(129,144,161,.5)',
+    bronze:'0 0 0 2px #8B5E3C,0 8px 40px rgba(139,94,60,.5)',
+    elite: '0 0 0 2px #a855f7,0 0 40px rgba(168,85,247,.5)',
+  };
+  const textMap  = { gold:'#1a0f00', silver:'#1a2030', bronze:'#1a0a00', elite:'#fff' };
+  const barMap   = { gold:'rgba(0,0,0,.5)', silver:'rgba(0,0,0,.45)', bronze:'rgba(0,0,0,.5)', elite:'#a855f7' };
+
+  const textC = textMap[rarity];
+  const barC  = barMap[rarity];
+  const editionTxt = (groupName||'FutStats') + '  ·  ' + new Date().getFullYear();
+
+  const photoEl = photo
+    ? `<img src="${photo}" alt="${name}" style="width:100%;height:100%;object-fit:cover">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:40px;background:rgba(0,0,0,.25)">${(name||'?')[0].toUpperCase()}</div>`;
+
+  const statsHTML = SURVEY_ATTRS.map(a=>`
+    <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;color:${textC}">
+      <div style="font-family:'Freshman',sans-serif;font-size:20px;line-height:1;min-width:26px;text-align:right">${attrs[a.id]??50}</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;opacity:.75;min-width:24px">${attrLabels[a.id]}</div>
+      <div style="flex:1;height:4px;border-radius:2px;background:rgba(0,0,0,.18);overflow:hidden">
+        <div style="height:100%;border-radius:2px;background:${barC};width:${attrs[a.id]??50}%"></div>
+      </div>
+    </div>`).join('');
+
+  return `
+  <div id="player-card-el" style="
+    width:280px;height:390px;border-radius:22px;
+    position:relative;overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;
+    font-family:'Freshman',sans-serif;
+    background:${bgMap[rarity]};
+    box-shadow:${shadowMap[rarity]},0 2px 16px rgba(0,0,0,.6);
+    flex-shrink:0;
+  ">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.25) 0%,transparent 55%);pointer-events:none;z-index:1"></div>
+    <div style="position:absolute;left:12px;right:12px;top:50px;height:1px;background:rgba(255,255,255,.18);pointer-events:none;z-index:2"></div>
+    <div style="position:relative;z-index:3;width:100%;padding:14px 18px 0;display:flex;align-items:flex-start;justify-content:space-between">
+      <div>
+        <div style="font-size:42px;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.4);letter-spacing:-2px;color:${textC}">${rating}</div>
+        <div style="font-size:15px;letter-spacing:.5px;line-height:1;color:${textC}">${posLabel}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:4px">
+        <span style="font-size:22px">⚽</span>
+      </div>
+    </div>
+    <div style="position:relative;z-index:3;width:120px;height:120px;border-radius:50%;margin-top:6px;overflow:hidden;border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 20px rgba(0,0,0,.5);flex-shrink:0">
+      ${photoEl}
+    </div>
+    <div style="position:relative;z-index:3;font-family:'VarsityTeam',sans-serif;font-size:22px;letter-spacing:2px;text-align:center;margin-top:10px;padding:0 12px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${textC}">${name||'Jogador'}</div>
+    <div style="position:relative;z-index:3;width:calc(100% - 40px);height:1px;background:rgba(255,255,255,.2);margin:8px 0"></div>
+    <div style="position:relative;z-index:3;width:calc(100% - 28px);padding-bottom:14px">
+      ${statsHTML}
+    </div>
+    <div style="position:absolute;bottom:14px;left:0;right:0;z-index:3;text-align:center;font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.45;color:${textC}">${editionTxt}</div>
+  </div>`;
+}
+
+/* ── PATCH no abrirCartaJogador: usa survey se disponível ── */
+const _origAbrirCarta = window.abrirCartaJogador;
+window.abrirCartaJogador = function(){
+  const gd = window._gd;
+  const uid = window._currentUserUid;
+  const survey = gd?.survey;
+
+  if(survey?.completed && survey?.results?.[uid]){
+    const modal = document.getElementById('modal-carta');
+    const inner = document.getElementById('carta-inner');
+    if(!modal||!inner) return;
+
+    const members = gd.members || [];
+    const mb = members.find(m=>m.uid===uid);
+    const { attrs, rating } = survey.results[uid];
+    const rarity = rating>=90?'elite': rating>=80?'gold': rating>=70?'silver':'bronze';
+
+    _renderCartaLoading(inner);
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    _animateCartaLoading(()=>{
+      const flash = document.createElement('div');
+      flash.className = 'carta-flash';
+      document.body.appendChild(flash);
+      setTimeout(()=>flash.remove(), 450);
+
+      inner.innerHTML = `
+        ${_buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, gd?.name||'FutStats')}
+        <div class="carta-btns">
+          <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar
+          </button>
+          <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
+        </div>
+      `;
+
+      const card = document.getElementById('player-card-el');
+      if(card){
+        card.classList.add('revealing');
+        card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
+      }
+      const btns = inner.querySelector('.carta-btns');
+      if(btns){
+        btns.style.opacity='0'; btns.style.transform='translateY(10px)';
+        btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
+        requestAnimationFrame(()=>{ btns.style.opacity='1'; btns.style.transform='translateY(0)'; });
+      }
+    });
+    return;
+  }
+
+  _origAbrirCarta();
+};
+
+/* ── ATUALIZA FAB via polling leve ── */
+(function _initSurveyFAB(){
+  const _t = setInterval(()=>{
+    if(window._gd && window._currentUserUid){
+      _surveyUpdateFAB();
+      clearInterval(_t);
+      let _lastSurveyStr = '';
+      setInterval(()=>{
+        const cur = JSON.stringify(window._gd?.survey);
+        if(cur !== _lastSurveyStr){ _lastSurveyStr = cur; _surveyUpdateFAB(); }
+      }, 2000);
+    }
+  }, 400);
+})();
 </script>
