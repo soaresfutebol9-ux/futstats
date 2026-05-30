@@ -2651,6 +2651,7 @@ Object.defineProperties(window,{
   _dueloB_:{get:()=>_dueloB,set:v=>{_dueloB=v;}},
   _dueloScope_:{get:()=>_dueloScope,set:v=>{_dueloScope=v;}},
   _currentUserUid:{get:()=>currentUser?.uid},
+  _groupId:{get:()=>groupId},
 });
 window._getSt=(...a)=>getSt(...a);
 window._getStGeral=(...a)=>getStGeral(...a);
@@ -8836,13 +8837,13 @@ window.abrirSeletorCqPinadas = function(uid){
 window.salvarCqPinadas = async function(uid){
   const _currentUid = window._currentUserUid;
   if(!_currentUid||_currentUid!==uid) return;
-  const _gd = window._gd || gd;
+  const _gd = window._gd;
   const pinadas = window._pinCqSelecionadas||[];
   try{
     const idx = (_gd.members||[]).findIndex(m=>m.uid===uid);
     if(idx>=0) _gd.members[idx].cqPinadas = pinadas;
     if(window._gd) window._gd = _gd;
-    await updateDoc(doc(db,'groups',groupId),{members: _gd.members});
+    await window._db_updateDoc(window._db_doc('groups',window._groupId),{members: _gd.members});
     document.getElementById('pin-cq-overlay')?.remove();
     openPlayerProfile(uid);
   }catch(e){
