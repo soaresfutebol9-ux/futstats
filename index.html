@@ -2170,7 +2170,7 @@ body::before{
           <div style="font-family:'VarsityTeam',serif;font-size:28px;font-weight:bold;letter-spacing:1px;background:linear-gradient(135deg,var(--tx) 0%,rgba(77,255,176,.9) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 6px rgba(77,255,176,.15))">Nova Partida</div>
           <div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.06em;margin-top:2px">Registre sua performance</div>
         </div>
-        <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(77,255,176,.2),rgba(77,255,176,.06));border:1px solid rgba(77,255,176,.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 20px rgba(77,255,176,.1)">⚽</div>
+
       </div>
 
       <!-- Card info da partida -->
@@ -2290,7 +2290,7 @@ body::before{
       <div class="ok2" id="aok" style="display:none;border-radius:14px;padding:14px 18px;font-size:15px;font-weight:600;letter-spacing:.02em">⚽ Partida salva com sucesso!</div>
 
       <button onclick="addMatch()" style="width:100%;padding:18px;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;letter-spacing:.04em;background:var(--grad-green);color:#07090d;box-shadow:0 6px 24px rgba(77,255,176,.35),0 2px 8px rgba(0,0,0,.3);transition:all .18s;margin-bottom:1.5rem" onmouseover="this.style.filter='brightness(1.08)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(77,255,176,.45),0 3px 12px rgba(0,0,0,.3)'" onmouseout="this.style.filter='';this.style.transform='';this.style.boxShadow='0 6px 24px rgba(77,255,176,.35),0 2px 8px rgba(0,0,0,.3)'">
-        ⚽ Salvar Partida
+        Salvar Partida
       </button>
     </div>
     <!-- GALERA removida -->
@@ -5381,18 +5381,14 @@ function renderRecordes(){
       <div class="rec-section">
         <div class="rec-section-header">
           <div class="rec-section-title">⚽ Mais Gols em um Mês</div>
-          <button class="rec-share-btn" onclick="shareRecord('gols')">
-            <img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="16" height="16" style="display:block"> Compartilhar
-          </button>
+
         </div>
         <div id="rec-gols-list">${golsHTML}</div>
       </div>
       <div class="rec-section">
         <div class="rec-section-header">
           <div class="rec-section-title">👟 Mais Assistências em um Mês</div>
-          <button class="rec-share-btn" onclick="shareRecord('assist')">
-            <img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="16" height="16" style="display:block"> Compartilhar
-          </button>
+
         </div>
         <div id="rec-assist-list">${assistHTML}</div>
       </div>
@@ -5449,8 +5445,10 @@ function renderHistTab(){
   if(!_histAnoAtivo||!anos.includes(_histAnoAtivo)) _histAnoAtivo=anos[anos.length-1];
 
   // Seletor de anos
-  const anoSelector=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem">
-    ${anos.map(a=>`<button onclick="setHistAno('${a}')" style="padding:8px 20px;border-radius:99px;border:1.5px solid ${a===_histAnoAtivo?'var(--g)':'var(--bo2)'};background:${a===_histAnoAtivo?'rgba(77,255,176,.15)':'var(--bg3)'};color:${a===_histAnoAtivo?'var(--g)':'var(--tx2)'};font-family:'DM Mono',monospace;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;letter-spacing:.04em">${a}</button>`).join('')}
+  const anoSelector=`<div style="margin-bottom:1.25rem">
+    <select onchange="setHistAno(this.value)" style="padding:8px 14px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;transition:border-color .18s">
+      ${anos.map(a=>`<option value="${a}" ${a===_histAnoAtivo?'selected':''}>${a}</option>`).join('')}
+    </select>
   </div>`;
 
   // Meses do ano ativo (inclui mês vigente se for do mesmo ano)
@@ -5670,7 +5668,7 @@ function _buildPlayerProfile(uid){
   // ── SELETOR INDEPENDENTE: MEDALHAS ──
   const btnStyleM=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#e8df2c':'#b7b8b6'};background:${active?'#e8df2c':'#dedede'};color:${active?'#3d2800':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
   const selMedalhas=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Pódio:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Selecione a temporada:</span>
     ${anos.map(a=>`<button onclick="setMpAnoMedalhas('${uid}','${a}')" style="${btnStyleM(a,a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__')}">${a}</button>`).join('')}
     <button onclick="setMpAnoMedalhas('${uid}','__all__')" style="${btnStyleM('__all__',_mpAnoMedalhas==='__all__')}">Geral</button>
   </div>`:'';
@@ -5688,7 +5686,7 @@ function _buildPlayerProfile(uid){
   const isAllMeses=(_mpAnoMeses==='__all__');
   const btnStyleMes=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#2a9cc9':'#b7b8b6'};background:${active?'#b0d8f0':'#dedede'};color:${active?'#0a3a5a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
   const selMeses=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Ver meses:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Selecione a temporada:</span>
     ${anos.map(a=>`<button onclick="setMpAnoMeses('${uid}','${a}')" style="${btnStyleMes(a,a===_mpAnoMeses&&!isAllMeses)}">${a}</button>`).join('')}
     <button onclick="setMpAnoMeses('${uid}','__all__')" style="${btnStyleMes('__all__',isAllMeses)}">Todos</button>
   </div>`:'';
@@ -5787,7 +5785,7 @@ function _buildPlayerProfile(uid){
   const isAllMedia=(_mpAnoMedia==='__all__');
   const btnStyleMed=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#629ade':'#b7b8b6'};background:${active?'#a0c8fa':'#dedede'};color:${active?'#629ade':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
   const selMedia=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Período:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Selecione a temporada:</span>
     ${anos.map(a=>`<button onclick="setMpAnoMedia('${uid}','${a}')" style="${btnStyleMed(a,a===_mpAnoMedia&&!isAllMedia)}">${a}</button>`).join('')}
     <button onclick="setMpAnoMedia('${uid}','__all__')" style="${btnStyleMed('__all__',isAllMedia)}">Geral</button>
   </div>`:'';
@@ -5932,21 +5930,43 @@ function _buildPlayerProfile(uid){
       </div>
     </div>`).join('');
 
-  // ── CARD DE CONQUISTAS ──────────────────────────────
+  // ── CARD DE CONQUISTAS (pinadas) ─────────────────────
   const calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : {};
   const cqDesb  = window._CONQUISTAS ? window._CONQUISTAS.filter(c=>calcCq[c.id]&&calcCq[c.id].achieved) : [];
   const cqTotal = window._CONQUISTAS ? window._CONQUISTAS.length : 0;
+  const mbData  = (gd.members||[]).find(m=>m.uid===uid)||{};
+  const pinadas = (mbData.cqPinadas||[]).slice(0,3);
+  const pinadasObjs = pinadas.map(id=>window._CONQUISTAS&&window._CONQUISTAS.find(c=>c.id===id)).filter(Boolean);
+  const isMe = currentUser && currentUser.uid === uid;
+  let conquistasCardInner = '';
+  if(pinadasObjs.length===0){
+    conquistasCardInner = `
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="color:#8a6a00;font-size:12px;font-family:'DM Mono',monospace;opacity:.65;margin-bottom:8px">Nenhuma conquista em destaque</div>
+        ${isMe&&cqDesb.length>0?`<button onclick="abrirSeletorCqPinadas('${uid}')" style="background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);border-radius:20px;padding:5px 14px;color:#8a6a00;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;font-weight:700">+ Escolher destaque</button>`:''}
+      </div>`;
+  } else {
+    conquistasCardInner = `
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        ${pinadasObjs.map(c=>`
+          <div style="flex:1;min-width:80px;max-width:110px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.35);border-radius:12px;padding:10px 8px;text-align:center">
+            <div style="font-size:28px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.2))">${c.icon}</div>
+            <div style="font-family:'VarsityTeam',serif;font-size:11px;color:#6a4e00;line-height:1.2">${c.nome}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:#8a6a00;margin-top:3px;opacity:.75">${c.desc}</div>
+          </div>`).join('')}
+      </div>
+      ${isMe?`<div style="text-align:center;margin-top:8px"><button onclick="abrirSeletorCqPinadas('${uid}')" style="background:none;border:none;color:#8a6a00;font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;opacity:.7;text-decoration:underline;padding:2px 6px">✏️ editar</button></div>`:''}`;
+  }
   const conquistasCard = cqTotal>0 ? `
-  <div style="background:#ebebeb;border:1.5px solid rgba(255,215,0,.5);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 16px rgba(255,200,0,.12);cursor:pointer" onclick="abrirConquistas('${uid}')">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+  <div style="background:#ebebeb;border:1.5px solid rgba(255,215,0,.5);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 16px rgba(255,200,0,.12)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div style="font-size:10px;color:#8a6a00;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Conquistas
+        Conquistas em destaque
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8a6a00;font-weight:700">${cqDesb.length}/${cqTotal} →</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8a6a00;font-weight:700;cursor:pointer" onclick="abrirConquistas('${uid}')">${cqDesb.length}/${cqTotal} →</div>
     </div>
-    ${cqDesb.length===0?`<div style="text-align:center;padding:6px;color:#8a6a00;font-size:12px;font-family:'DM Mono',monospace;opacity:.6">Nenhuma conquista ainda</div>`
-    :`<div style="display:flex;flex-wrap:wrap;gap:4px">${cqDesb.slice(0,12).map(c=>`<span title="${c.nome}" style="font-size:22px;line-height:1">${c.icon}</span>`).join('')}${cqDesb.length>12?`<span style="font-size:12px;color:#8a6a00;font-family:'DM Mono',monospace;align-self:center;margin-left:2px">+${cqDesb.length-12}</span>`:''}</div>`}
+    ${conquistasCardInner}
   </div>` : '';
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
@@ -8915,6 +8935,75 @@ window._calcConquistas = calcConquistas;
 window._CONQUISTAS = CONQUISTAS;
 
 // ── ABRIR CONQUISTAS ───────────────────────────────────────────
+// ── SELETOR DE CONQUISTAS PINADAS ──────────────────────────────
+window.abrirSeletorCqPinadas = function(uid){
+  if(!uid||!window._CONQUISTAS||!window._calcConquistas||!gd) return;
+  const calcCq = window._calcConquistas(uid, gd);
+  const cqDesb = window._CONQUISTAS.filter(c=>calcCq[c.id]&&calcCq[c.id].achieved);
+  const mbData = (gd.members||[]).find(m=>m.uid===uid)||{};
+  window._pinCqSelecionadas = [...(mbData.cqPinadas||[])].slice(0,3);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'pin-cq-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  overlay.innerHTML = `
+    <div style="background:#1a1a1a;border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;padding:20px 16px 32px;gap:12px;box-sizing:border-box">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'VarsityTeam',serif;font-size:18px;color:#FFD700">Escolher destaque</div>
+        <button onclick="document.getElementById('pin-cq-overlay').remove()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#666;letter-spacing:.05em">Selecione até 3 conquistas para destacar no seu perfil</div>
+      <div id="pin-cq-selected" style="display:flex;gap:8px;min-height:28px;flex-wrap:wrap;align-items:center"></div>
+      <div style="overflow-y:auto;flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px" id="pin-cq-grid"></div>
+      <button onclick="salvarCqPinadas('${uid}')" style="background:linear-gradient(135deg,#FFD700,#FF8C00);border:none;border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#07090d;cursor:pointer;margin-top:4px">Salvar destaque</button>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  function renderGrid(){
+    const grid = document.getElementById('pin-cq-grid');
+    const selDiv = document.getElementById('pin-cq-selected');
+    if(!grid) return;
+    const sel = window._pinCqSelecionadas;
+    selDiv.innerHTML = sel.length===0
+      ? `<span style="font-family:'DM Mono',monospace;font-size:10px;color:#555">Nenhuma selecionada</span>`
+      : sel.map(id=>{const c=window._CONQUISTAS&&window._CONQUISTAS.find(x=>x.id===id);return c?`<span style="font-size:20px" title="${c.nome}">${c.icon}</span>`:'';}).join('');
+    grid.innerHTML = cqDesb.map(c=>{
+      const isSel = sel.includes(c.id);
+      return `<div onclick="togglePinCq('${c.id}')" style="background:${isSel?'rgba(255,215,0,.18)':'rgba(255,255,255,.05)'};border:1.5px solid ${isSel?'rgba(255,215,0,.7)':'rgba(255,255,255,.1)'};border-radius:12px;padding:10px 8px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s">
+        <span style="font-size:24px;flex-shrink:0">${c.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'VarsityTeam',serif;font-size:12px;color:${isSel?'#FFD700':'#ddd'};line-height:1.2">${c.nome}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:#666;margin-top:2px">${c.desc}</div>
+        </div>
+        ${isSel?'<span style="margin-left:auto;color:#FFD700;font-size:14px;flex-shrink:0">✓</span>':''}</div>`;
+    }).join('');
+  }
+  window.togglePinCq = function(id){
+    const sel = window._pinCqSelecionadas;
+    const idx = sel.indexOf(id);
+    if(idx>=0){ sel.splice(idx,1); }
+    else if(sel.length<3){ sel.push(id); }
+    renderGrid();
+  };
+  renderGrid();
+};
+
+window.salvarCqPinadas = async function(uid){
+  if(!currentUser||currentUser.uid!==uid) return;
+  const pinadas = window._pinCqSelecionadas||[];
+  try{
+    const idx = (gd.members||[]).findIndex(m=>m.uid===uid);
+    if(idx>=0) gd.members[idx].cqPinadas = pinadas;
+    const {updateDoc:_upd, doc:_doc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await _upd(_doc(db,'groups',groupId),{members: gd.members});
+    document.getElementById('pin-cq-overlay')?.remove();
+    openPlayerProfile(uid);
+  }catch(e){
+    console.error(e);
+    alert('Erro ao salvar. Tente novamente.');
+  }
+};
+
 let _cqUid = null;
 
 window.abrirConquistas = function(uid){
