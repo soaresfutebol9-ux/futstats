@@ -1803,7 +1803,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s;
   pointer-events:none;
 }
-.mfab-items.open{ max-height:220px;opacity:1;pointer-events:all; }
+.mfab-items.open{ max-height:300px;opacity:1;pointer-events:all; }
 .mfab-item-wrap{
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
 }
@@ -1834,6 +1834,199 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
   filter:drop-shadow(0 4px 8px rgba(255,180,0,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
   color:#07090d;
+}
+.mfab-item-carta{
+  background:linear-gradient(135deg,#6ee7f7 0%,#2563eb 100%);
+  filter:drop-shadow(0 4px 8px rgba(110,231,247,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  color:#fff;
+}
+
+/* ══ MODAL CARTA DO JOGADOR ══ */
+#modal-carta{
+  position:fixed;inset:0;z-index:3000;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:16px;
+}
+#modal-carta.open{ display:flex; }
+.carta-inner{
+  background:transparent;
+  display:flex;flex-direction:column;align-items:center;
+  gap:16px;max-width:340px;width:100%;
+  animation:fadeInUp .35s cubic-bezier(.34,1.2,.64,1);
+}
+/* A carta em si */
+.player-card{
+  width:280px;height:390px;border-radius:22px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  font-family:'Freshman',sans-serif;
+  cursor:default;
+  flex-shrink:0;
+}
+/* ---- VARIANTES DE RARIDADE ---- */
+.player-card.rarity-gold{
+  background:linear-gradient(155deg,#c5a200 0%,#ffe066 30%,#b8860b 60%,#ffe599 80%,#8B6914 100%);
+  box-shadow:0 0 0 2px #c5a200,0 8px 48px rgba(197,162,0,.7),0 2px 16px rgba(0,0,0,.6);
+}
+.player-card.rarity-silver{
+  background:linear-gradient(155deg,#8190a1 0%,#c8d6e5 30%,#8190a1 60%,#dde8f0 80%,#617080 100%);
+  box-shadow:0 0 0 2px #8190a1,0 8px 40px rgba(129,144,161,.5),0 2px 16px rgba(0,0,0,.5);
+}
+.player-card.rarity-bronze{
+  background:linear-gradient(155deg,#8B5E3C 0%,#D4956A 30%,#7A4F2E 60%,#E0A87A 80%,#6B3F22 100%);
+  box-shadow:0 0 0 2px #8B5E3C,0 8px 40px rgba(139,94,60,.5),0 2px 16px rgba(0,0,0,.5);
+}
+.player-card.rarity-elite{
+  background:linear-gradient(155deg,#0a0a1a 0%,#1a1060 20%,#4dffb0 50%,#1a1060 80%,#0a0a1a 100%);
+  box-shadow:0 0 0 2px #4dffb0,0 0 40px rgba(77,255,176,.5),0 8px 48px rgba(0,0,0,.8);
+}
+
+/* Brilho de canto */
+.player-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.25) 0%,transparent 55%);
+  pointer-events:none;z-index:1;
+}
+/* Linha decorativa */
+.player-card::after{
+  content:'';position:absolute;left:12px;right:12px;top:50px;height:1px;
+  background:rgba(255,255,255,.18);
+  pointer-events:none;z-index:2;
+}
+/* Seção top */
+.card-top{
+  position:relative;z-index:3;
+  width:100%;padding:14px 18px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.card-rating{
+  font-size:42px;line-height:1;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);
+  letter-spacing:-2px;
+}
+.card-pos-flag{
+  display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:4px;
+}
+.card-pos{
+  font-size:15px;letter-spacing:.5px;line-height:1;
+  text-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.card-flag{ font-size:22px;line-height:1; }
+/* Rarity colors */
+.player-card.rarity-gold .card-rating,
+.player-card.rarity-gold .card-pos{ color:#1a0f00; }
+.player-card.rarity-silver .card-rating,
+.player-card.rarity-silver .card-pos{ color:#1a2030; }
+.player-card.rarity-bronze .card-rating,
+.player-card.rarity-bronze .card-pos{ color:#1a0a00; }
+.player-card.rarity-elite .card-rating,
+.player-card.rarity-elite .card-pos{ color:#4dffb0; }
+
+/* Foto / avatar */
+.card-photo{
+  position:relative;z-index:3;
+  width:120px;height:120px;border-radius:50%;
+  margin-top:6px;
+  overflow:hidden;
+  border:3px solid rgba(255,255,255,.35);
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  flex-shrink:0;
+}
+.card-photo img{ width:100%;height:100%;object-fit:cover; }
+.card-photo-init{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Freshman',sans-serif;font-size:40px;
+  background:rgba(0,0,0,.25);
+}
+/* Card name */
+.card-name{
+  position:relative;z-index:3;
+  font-family:'VarsityTeam',sans-serif;
+  font-size:22px;letter-spacing:2px;
+  text-align:center;
+  margin-top:10px;padding:0 12px;
+  line-height:1.1;
+  text-shadow:0 2px 8px rgba(0,0,0,.5);
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.player-card.rarity-gold .card-name{ color:#1a0f00; }
+.player-card.rarity-silver .card-name{ color:#1a2030; }
+.player-card.rarity-bronze .card-name{ color:#1a0a00; }
+.player-card.rarity-elite .card-name{ color:#fff; }
+
+/* Divisor */
+.card-divider{
+  position:relative;z-index:3;
+  width:calc(100% - 40px);height:1px;
+  background:rgba(255,255,255,.2);
+  margin:8px 0;
+}
+/* Stats grid */
+.card-stats{
+  position:relative;z-index:3;
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:6px 2px;
+  width:calc(100% - 28px);
+  padding-bottom:14px;
+}
+.card-stat{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.card-stat-val{
+  font-family:'Freshman',sans-serif;
+  font-size:22px;line-height:1;
+  text-shadow:0 1px 6px rgba(0,0,0,.3);
+}
+.card-stat-lbl{
+  font-family:'DM Sans',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.7;
+  text-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.player-card.rarity-gold .card-stat-val,
+.player-card.rarity-gold .card-stat-lbl{ color:#1a0f00; }
+.player-card.rarity-silver .card-stat-val,
+.player-card.rarity-silver .card-stat-lbl{ color:#1a2030; }
+.player-card.rarity-bronze .card-stat-val,
+.player-card.rarity-bronze .card-stat-lbl{ color:#1a0a00; }
+.player-card.rarity-elite .card-stat-val{ color:#4dffb0; }
+.player-card.rarity-elite .card-stat-lbl{ color:rgba(255,255,255,.7); }
+
+/* Edição badge */
+.card-edition{
+  position:absolute;bottom:14px;left:0;right:0;z-index:3;
+  text-align:center;
+  font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;opacity:.45;
+}
+.player-card.rarity-gold .card-edition{ color:#1a0f00; }
+.player-card.rarity-silver .card-edition{ color:#1a2030; }
+.player-card.rarity-bronze .card-edition{ color:#1a0a00; }
+.player-card.rarity-elite .card-edition{ color:#fff; }
+
+/* Botões da carta */
+.carta-btns{
+  display:flex;gap:10px;
+}
+.carta-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 20px;border-radius:40px;
+  border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+  transition:transform .15s,filter .15s;
+}
+.carta-btn:active{ transform:scale(.94); }
+.carta-btn-download{
+  background:linear-gradient(135deg,#4dffb0 0%,#00c97a 100%);
+  color:#07090d;
+  box-shadow:0 4px 18px rgba(77,255,176,.35);
+}
+.carta-btn-fechar{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--tx);
 }
 
 /* ── MODAL CONQUISTAS ── */
@@ -6752,6 +6945,12 @@ window.irParaRankingGA=()=>{
   <!-- Itens expandíveis -->
   <div class="mfab-items" id="mfab-items">
     <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Carta do Jogador</span>
+      <button class="mfab-item mfab-item-carta" onclick="mfabClose();abrirCartaJogador()" title="Carta do Jogador">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><rect x="3" y="2" width="18" height="20" rx="3"/><circle cx="12" cy="9" r="3"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+      </button>
+    </div>
+    <div class="mfab-item-wrap">
       <span class="mfab-item-label">Conquistas</span>
       <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();abrirConquistas()" title="Conquistas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -6773,6 +6972,13 @@ window.irParaRankingGA=()=>{
 <button class="conquistas-fab" id="conquistas-fab" style="display:none!important"></button>
 <button class="duelo-fab" id="duelo-fab" style="display:none!important"></button>
 
+
+<!-- ══ MODAL CARTA DO JOGADOR ══ -->
+<div id="modal-carta" onclick="if(event.target===this)fecharCartaJogador()">
+  <div class="carta-inner" id="carta-inner">
+    <!-- card gerado dinamicamente por JS -->
+  </div>
+</div>
 
 <!-- Modal Duelo -->
 <div id="modal-duelo">
@@ -9186,6 +9392,203 @@ document.getElementById('modal-conquistas').addEventListener('click', e=>{
     <div class="notif-empty">Nenhuma atividade ainda.</div>
   </div>
 </div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   CARTA DO JOGADOR — Estilo FIFA
+   Gera um card visual com as stats do usuário logado
+   e permite baixar como imagem.
+   ══════════════════════════════════════════════════════ */
+
+/* Calcula rating (0-99) baseado em G+A, partidas, aproveitamento etc. */
+function _cartaRating(s){
+  if(!s||s.n===0) return 55;
+  const ga=s.gols+s.assist;
+  const mediaGA=ga/s.n;
+  // Base: média G+A por jogo → escala 55-99
+  let r=55+Math.min(mediaGA*18,38);
+  // Bônus por pênaltis (se tiver)
+  if(s.penBat>0){const pct=s.penOk/s.penBat;if(pct>=.8)r+=2;else if(pct<.5)r-=2;}
+  // Bônus por volume de partidas
+  if(s.n>=20)r+=3;else if(s.n>=10)r+=1;
+  return Math.max(55,Math.min(99,Math.round(r)));
+}
+
+/* Define raridade pela nota */
+function _cartaRarity(rating){
+  if(rating>=90) return'elite';
+  if(rating>=80) return'gold';
+  if(rating>=70) return'silver';
+  return'bronze';
+}
+
+/* Formata número grande */
+function _fmtN(n){ return n>=100?n:n; }
+
+/* Constrói o HTML completo da carta */
+function _buildCardHTML(name, photo, s, rating, rarity, groupName){
+  const ga=s.gols+s.assist;
+  const aprov=s.n>0?Math.round((s.penOk/Math.max(s.penBat,1))*100):null;
+  const penPct=s.penBat>0?Math.round((s.penOk/s.penBat)*100):null;
+  const posLabel = rating>=90?'ELITE': rating>=80?'ATK': rating>=70?'MID':'SUB';
+
+  /* stats que aparecem na carta: 6 células */
+  const statsArr=[
+    {v:s.gols,       l:'GOL'},
+    {v:s.assist,     l:'ASS'},
+    {v:ga,           l:'G+A'},
+    {v:s.n,          l:'JOG'},
+    {v:s.n>0?+(ga/s.n).toFixed(1):0, l:'MED'},
+    {v:penPct!==null?penPct+'%':'—',  l:'PEN'},
+  ];
+
+  const photoEl = photo
+    ? `<img src="${photo}" alt="${name}">`
+    : `<div class="card-photo-init">${(name||'?').charAt(0).toUpperCase()}</div>`;
+
+  const statsHTML=statsArr.map(st=>`
+    <div class="card-stat">
+      <div class="card-stat-val">${st.v}</div>
+      <div class="card-stat-lbl">${st.l}</div>
+    </div>`).join('');
+
+  const editionTxt=(groupName||'FutStats')+'  ·  '+new Date().getFullYear();
+
+  return`<div class="player-card rarity-${rarity}" id="player-card-el">
+    <div class="card-top">
+      <div>
+        <div class="card-rating">${rating}</div>
+        <div class="card-pos">${posLabel}</div>
+      </div>
+      <div class="card-pos-flag">
+        <span class="card-flag">⚽</span>
+      </div>
+    </div>
+    <div class="card-photo">${photoEl}</div>
+    <div class="card-name">${name||'Jogador'}</div>
+    <div class="card-divider"></div>
+    <div class="card-stats">${statsHTML}</div>
+    <div class="card-edition">${editionTxt}</div>
+  </div>`;
+}
+
+/* Abre o modal e renderiza a carta */
+window.abrirCartaJogador = function(){
+  if(!window.currentUser){ alert('Faça login para ver sua carta.'); return; }
+
+  const modal=document.getElementById('modal-carta');
+  const inner=document.getElementById('carta-inner');
+  if(!modal||!inner) return;
+
+  // Coleta dados
+  const name = window.myProfile?.displayName || window.currentUser?.displayName || 'Jogador';
+  const photo = window.myProfile?.photo || null;
+  const groupName = window.gd?.name || 'FutStats';
+
+  // Stats gerais (usa getStGeral se disponível, senão getSt)
+  let s;
+  try{
+    // Tenta pegar stats do usuário logado via getStGeral
+    const mb=(window.gd?.members||[]).find(m=>m.uid===window.currentUser.uid);
+    s = mb ? window._getStGeral ? window._getStGeral(mb) : (window._getSt?window._getSt(window.currentUser.uid,null,true):{n:0,gols:0,assist:0,penBat:0,penOk:0})
+           : (window._getSt?window._getSt(window.currentUser.uid,null,true):{n:0,gols:0,assist:0,penBat:0,penOk:0});
+  }catch(e){
+    s={n:0,gols:0,assist:0,penBat:0,penOk:0};
+  }
+
+  const rating=_cartaRating(s);
+  const rarity=_cartaRarity(rating);
+
+  // Monta inner
+  inner.innerHTML=`
+    ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
+    <div class="carta-btns">
+      <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar
+      </button>
+      <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
+    </div>
+  `;
+
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+};
+
+window.fecharCartaJogador = function(){
+  const modal=document.getElementById('modal-carta');
+  if(modal) modal.classList.remove('open');
+  document.body.style.overflow='';
+};
+
+/* Fecha ao apertar Escape */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') window.fecharCartaJogador?.();
+});
+
+/* Download da carta como PNG usando html2canvas ou canvas nativo */
+window.baixarCarta = async function(){
+  const card=document.getElementById('player-card-el');
+  if(!card){ alert('Carta não encontrada.'); return; }
+
+  // Usa html2canvas se disponível, senão SVG fallback
+  if(typeof html2canvas !== 'undefined'){
+    try{
+      const canvas=await html2canvas(card,{
+        backgroundColor:null,
+        scale:3,
+        useCORS:true,
+        allowTaint:true,
+        logging:false,
+      });
+      const link=document.createElement('a');
+      link.download='carta-jogador-futstats.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+    }catch(err){ _cartaFallbackDownload(card); }
+  } else {
+    // Tenta carregar html2canvas dinamicamente
+    _loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', async ()=>{
+      if(typeof html2canvas !== 'undefined'){
+        try{
+          const canvas=await html2canvas(card,{backgroundColor:null,scale:3,useCORS:true,allowTaint:true,logging:false});
+          const link=document.createElement('a');
+          link.download='carta-jogador-futstats.png';
+          link.href=canvas.toDataURL('image/png');
+          link.click();
+        }catch(err){ _cartaFallbackDownload(card); }
+      } else { _cartaFallbackDownload(card); }
+    });
+  }
+};
+
+function _loadScript(src, cb){
+  const s=document.createElement('script');
+  s.src=src;s.onload=cb;s.onerror=()=>cb();
+  document.head.appendChild(s);
+}
+
+function _cartaFallbackDownload(card){
+  // Fallback: abre nova aba com a carta em HTML simples
+  const w=window.open('','_blank');
+  if(!w){ alert('Permita pop-ups para baixar a carta.'); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Carta do Jogador</title><style>
+    body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#111;font-family:sans-serif;}
+    p{color:#aaa;text-align:center;margin-top:16px;font-size:13px;}
+  </style></head><body>
+  ${card.outerHTML}
+  <p>Use a opção "Salvar imagem" do seu navegador (clique com botão direito na carta)</p>
+  </body></html>`);
+  w.document.close();
+}
+
+/* Expõe getStGeral para uso interno */
+window._getStGeral = function(m){
+  if(typeof getStGeral==='function') return getStGeral(m);
+  if(typeof window._getSt==='function') return window._getSt(m.uid||m.name,null,!!m.uid);
+  return{n:0,gols:0,assist:0,penBat:0,penOk:0};
+};
+</script>
 </body>
 </html>
 <!-- PHOTO LIGHTBOX -->
