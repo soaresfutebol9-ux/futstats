@@ -9954,10 +9954,14 @@ function _isAdmin(){
   return (gd.members||[])[0]?.uid === uid;
 }
 
-/* Mostra/oculta botão do FAB dependendo de ser admin */
+/* Mostra botão do FAB: admin sempre vê, membros veem quando há questionário ativo */
 function _surveyUpdateFAB(){
   const wrap = document.getElementById('mfab-survey-wrap');
-  if(wrap) wrap.style.display = _isAdmin() ? '' : 'none';
+  if(!wrap) return;
+  const survey = window._gd?.survey || null;
+  const isAdmin = _isAdmin();
+  // Admin vê sempre; membro comum só vê se houver questionário ativo
+  wrap.style.display = (isAdmin || survey) ? '' : 'none';
 }
 
 /* ── ABRIR SURVEY ── */
