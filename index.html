@@ -284,6 +284,10 @@ html.save-data #sl::after{display:none}
 .sp-bar{width:clamp(100px,40vw,140px);height:2px;background:var(--bg3);border-radius:99px;overflow:hidden;opacity:0;animation:sp-fade-up .5s 1.6s ease forwards}
 .sp-fill{height:100%;background:linear-gradient(90deg,var(--gd),var(--g));border-radius:99px;animation:spfill 1.8s 1.6s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes spfill{from{width:0}to{width:100%}}
+@keyframes surveyCardIn{0%{opacity:0;transform:perspective(800px) rotateY(-90deg) scale(.85)}60%{transform:perspective(800px) rotateY(8deg) scale(1.03)}80%{transform:perspective(800px) rotateY(-4deg) scale(1)}100%{opacity:1;transform:perspective(800px) rotateY(0deg) scale(1)}}
+@keyframes surveyCardSpin{0%{transform:perspective(900px) rotateY(0deg)}50%{transform:perspective(900px) rotateY(12deg)}100%{transform:perspective(900px) rotateY(0deg)}}
+#player-card-el.survey-card-animated{animation:surveyCardIn .8s cubic-bezier(.22,1,.36,1) forwards}
+#player-card-el.survey-card-spin{animation:surveyCardSpin 4s ease-in-out infinite}
 
 /* ── RESPONSIVIDADE SPLASH / LOGO ── */
 @media (max-width:480px){
@@ -9972,6 +9976,9 @@ window.abrirSurvey = function(){
 
   if(isAdmin && !survey){
     _renderSurveyAdmin(inner, gd);
+  } else if(isAdmin && survey){
+    // Admin sempre vai para a tela de gerenciamento com opção de ver respostas
+    _renderSurveyAdmin(inner, gd);
   } else if(survey){
     const jaRespondeu = !!(survey.responses||{})[uid];
     if(jaRespondeu){
@@ -10039,9 +10046,99 @@ function _renderSurveyAdmin(inner, gd){
         </div>`).join('')}
     </div>
 
+    ${totalRespostas > 0 ? `
+    <button onclick="_verTodasRespostas()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:10px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      👁️ Ver respostas de todos (${totalRespostas}/${totalMembros})
+    </button>
+    ` : ''}
+
     <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       ${survey ? '🔄 Criar novo questionário' : '✨ Criar questionário'}
     </button>
+  `;
+}
+
+/* ── ADMIN: ver respostas de todos ── */
+window._verTodasRespostas = function(){
+  if(!_isAdmin()) return;
+  const gd = window._gd;
+  const inner = document.getElementById('survey-inner');
+  if(!inner || !gd) return;
+  _renderSurveyTodasRespostas(inner, gd.survey, gd.members || []);
+};
+
+function _renderSurveyTodasRespostas(inner, survey, members){
+  if(!survey) return;
+  const responses = survey.responses || {};
+  const results = survey.results || {};
+  const attrLabels = { pac:'PAC', sho:'SHO', pas:'PAS', dri:'DRI', def:'DEF', phy:'PHY' };
+
+  const membersHTML = members.map(m => {
+    const resp = responses[m.uid];
+    const result = results[m.uid];
+    const respondeu = !!resp;
+
+    return `
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--bo);border-radius:14px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:${respondeu ? '14px' : '0'}">
+          ${m.photo
+            ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--bo)">`
+            : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
+          <div style="flex:1">
+            <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
+            <div style="font-size:11px;font-family:'DM Mono',monospace;color:${respondeu ? '#4dffb0' : '#f87171'};margin-top:2px">${respondeu ? '✅ Respondeu' : '⏳ Aguardando'}</div>
+          </div>
+          ${result ? `<div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;font-weight:700">${result.rating}</div>` : ''}
+        </div>
+        ${respondeu && result ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+          ${SURVEY_ATTRS.map(a=>`
+            <div style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:6px 8px;text-align:center">
+              <div style="font-size:9px;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">${attrLabels[a.id]||a.id}</div>
+              <div style="font-family:'Freshman',sans-serif;font-size:18px;color:#a855f7">${result.attrs?.[a.id] ?? '—'}</div>
+            </div>
+          `).join('')}
+        </div>
+        <details style="margin-top:8px">
+          <summary style="font-size:12px;color:var(--tx2);cursor:pointer;user-select:none;margin-bottom:8px">🔍 Ver votos individuais recebidos</summary>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead>
+                <tr>
+                  <th style="text-align:left;padding:4px 6px;color:var(--tx2);font-weight:600;border-bottom:1px solid var(--bo)">Avaliador</th>
+                  ${SURVEY_ATTRS.map(a=>`<th style="text-align:center;padding:4px 4px;color:var(--tx2);font-weight:600;border-bottom:1px solid var(--bo)">${attrLabels[a.id]}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${members.map(voter => {
+                  const voterResp = responses[voter.uid];
+                  if(!voterResp) return '';
+                  const forThis = voterResp[m.uid];
+                  if(!forThis) return '';
+                  return `<tr>
+                    <td style="padding:4px 6px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,.05)">${voter.name||'?'}</td>
+                    ${SURVEY_ATTRS.map(a=>`<td style="text-align:center;padding:4px 4px;color:#a855f7;font-family:'DM Mono',monospace;border-bottom:1px solid rgba(255,255,255,.05)">${forThis[a.id] ?? '—'}</td>`).join('')}
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        ` : ''}
+      </div>`;
+  }).join('');
+
+  inner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button onclick="abrirSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
+      <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);flex:1">👁️ Respostas (Admin)</div>
+      <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;padding:8px 12px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px">
+      🔒 Visível apenas para o administrador do grupo
+    </div>
+    ${membersHTML}
+    <button onclick="abrirSurvey()" style="width:100%;padding:12px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;margin-top:8px">← Voltar</button>
   `;
 }
 
@@ -10252,7 +10349,18 @@ function _renderSurveyResultado(inner, survey, members, uid){
   `;
 
   const wrap = inner.querySelector('#survey-card-wrap');
-  if(wrap) wrap.innerHTML = _buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, window._gd?.name||'FutStats');
+  if(wrap){
+    wrap.innerHTML = _buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, window._gd?.name||'FutStats');
+    const el = wrap.querySelector('#player-card-el');
+    if(el){
+      el.classList.add('survey-card-animated');
+      el.addEventListener('animationend', function h(){
+        el.removeEventListener('animationend',h);
+        el.classList.remove('survey-card-animated');
+        el.classList.add('survey-card-spin');
+      });
+    }
+  }
 }
 
 /* ── CONSTRÓI O CARD HTML COM ATRIBUTOS FIFA ── */
@@ -10316,7 +10424,7 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
     <div style="position:relative;z-index:3;width:120px;height:120px;border-radius:50%;margin-top:6px;overflow:hidden;border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 20px rgba(0,0,0,.5);flex-shrink:0">
       ${photoEl}
     </div>
-    <div style="position:relative;z-index:3;font-family:'VarsityTeam',sans-serif;font-size:22px;letter-spacing:2px;text-align:center;margin-top:10px;padding:0 12px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${textC}">${name||'Jogador'}</div>
+    <div style="position:relative;z-index:3;font-family:'VarsityTeam',sans-serif;font-size:${(name||'Jogador').length>16?14:(name||'Jogador').length>12?17:22}px;letter-spacing:${(name||'Jogador').length>12?1:2}px;text-align:center;margin-top:10px;padding:0 12px;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${textC}">${name||'Jogador'}</div>
     <div style="position:relative;z-index:3;width:calc(100% - 40px);height:1px;background:rgba(255,255,255,.2);margin:8px 0"></div>
     <div style="position:relative;z-index:3;width:calc(100% - 28px);padding-bottom:14px">
       ${statsHTML}
