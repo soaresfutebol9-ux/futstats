@@ -401,7 +401,7 @@ html.is-touch .auth-ball{animation:none}
 #photo-input-reg,#photo-input-profile{display:none}
 .profile-panel-avatar{width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid var(--bo2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:26px;font-weight:500;cursor:pointer;position:relative;flex-shrink:0}
 .profile-panel-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-panel-avatar .edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;border-radius:50%;font-size:22px}
+.profile-panel-avatar .edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;border-radius:50%;font-size:22px}
 .profile-panel-avatar:hover .edit-overlay{display:flex}
 
 /* ── AVATAR ── */
@@ -511,7 +511,7 @@ body.light .ah::after{
 .notif-btn{
   position:relative;width:34px;height:34px;border-radius:50%;
   background:var(--bg3);border:1.5px solid var(--bo2);
-  display:none;align-items:center;justify-content:center;
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
   cursor:pointer;flex-shrink:0;transition:all .18s;
 }
 .notif-btn:hover{border-color:var(--g);background:var(--bg4);}
@@ -521,7 +521,7 @@ body.light .ah::after{
   position:absolute;top:-4px;right:-4px;
   min-width:18px;height:18px;border-radius:99px;
   background:#FF5A7A;border:2px solid var(--bg);
-  display:none;align-items:center;justify-content:center;
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
   font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
   color:#fff;padding:0 3px;line-height:1;
   animation:notifPulse 1.8s ease-in-out infinite;
@@ -1798,7 +1798,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   min-width:18px;height:18px;border-radius:99px;padding:0 5px;
   background:#FF5A7A;border:2px solid #07090d;
   font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
-  color:#fff;display:none;align-items:center;justify-content:center;
+  color:#fff;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
   animation:badgePulse 1.8s ease-in-out infinite;
 }
 .mfab-items{
@@ -1848,7 +1848,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 /* ══ MODAL CARTA DO JOGADOR ══ */
 #modal-carta{
   position:fixed;inset:0;z-index:3000;
-  display:none;align-items:center;justify-content:center;
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
   background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   padding:16px;
 }
@@ -1857,9 +1857,9 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:transparent;
   display:flex;flex-direction:column;align-items:center;
   gap:16px;max-width:340px;width:100%;
-  max-height:calc(var(--vh,1vh)*92);
-  overflow-y:auto;overflow-x:hidden;
-  scrollbar-width:none;-ms-overflow-style:none;
+  
+  
+  
   animation:fadeInUp .35s cubic-bezier(.34,1.2,.64,1);
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -2305,7 +2305,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 #carta-temas-scroll{
   display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;
-  scrollbar-width:none;-ms-overflow-style:none;
+  
 }
 #carta-temas-scroll::-webkit-scrollbar{ display:none; }
 .carta-tema-btn{
@@ -10009,11 +10009,12 @@ window.abrirCartaJogador = function(){
 
     // Substitui loading pela carta real
     _cartaTemaAtivo = 'padrao';
+    const temasHTML = window._buildTemasHTML ? window._buildTemasHTML() : '';
     inner.innerHTML=`
       ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
       <div id="carta-temas-wrap">
         <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-        <div id="carta-temas-scroll">${window._buildTemasHTML()}</div>
+        <div id="carta-temas-scroll">${temasHTML}</div>
       </div>
       <div class="carta-btns">
         <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
@@ -10023,6 +10024,9 @@ window.abrirCartaJogador = function(){
         <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
       </div>
     `;
+
+    // Scroll para cima para garantir que a carta apareça primeiro
+    inner.scrollTop = 0;
 
     // Adiciona classe de reveal na carta
     const card=document.getElementById('player-card-el');
