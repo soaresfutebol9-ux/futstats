@@ -2162,7 +2162,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   display:grid;grid-template-columns:1fr 1fr 1fr;
   gap:6px 2px;
   width:calc(100% - 28px);
-  padding-bottom:30px;
+  padding-bottom:14px;
 }
 .card-stat{
   display:flex;flex-direction:column;align-items:center;gap:2px;
@@ -2189,7 +2189,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 
 /* Edição badge */
 .card-edition{
-  position:absolute;bottom:12px;left:0;right:0;z-index:3;
+  position:absolute;bottom:14px;left:0;right:0;z-index:3;
   text-align:center;
   font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;opacity:.45;
@@ -5866,29 +5866,32 @@ function _buildPlayerProfile(uid){
   const posBadgeColor=pos=>pos===1?'#3d2800':pos===2?'#1a1a1a':pos===3?'#634720':'#000000';
 
   // ── SELETOR INDEPENDENTE: MEDALHAS ──
-  const btnStyleM=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#e8df2c':'#b7b8b6'};background:${active?'#e8df2c':'#dedede'};color:${active?'#3d2800':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
-  const selMedalhas=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Selecione a temporada:</span>
-    ${anos.map(a=>`<button onclick="setMpAnoMedalhas('${uid}','${a}')" style="${btnStyleM(a,a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__')}">${a}</button>`).join('')}
-    <button onclick="setMpAnoMedalhas('${uid}','__all__')" style="${btnStyleM('__all__',_mpAnoMedalhas==='__all__')}">Geral</button>
+  const selMedalhas=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Temporada:</span>
+    <select onchange="setMpAnoMedalhas('${uid}',this.value)" style="padding:5px 28px 5px 10px;border-radius:8px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center">
+      ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__'?'selected':''}>` + a + `</option>`).join('')}
+      <option value="__all__" ${_mpAnoMedalhas==='__all__'?'selected':''}>Geral</option>
+    </select>
   </div>`:'';
 
   // ── SELETOR INDEPENDENTE: TOTAL ──
   const isAllTotal=(_mpAnoTotal==='__all__');
-  const btnStyleT=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#40c960':'#b7b8b6'};background:${active?'#aef2b3':'#dedede'};color:${active?'#1a5c2a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
-  const selTotal=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+  const selTotal=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
     <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📊 Temporada:</span>
-    ${anos.map(a=>`<button onclick="setMpAnoTotal('${uid}','${a}')" style="${btnStyleT(a,a===_mpAnoTotal&&!isAllTotal)}">${a}</button>`).join('')}
-    <button onclick="setMpAnoTotal('${uid}','__all__')" style="${btnStyleT('__all__',isAllTotal)}">Geral</button>
+    <select onchange="setMpAnoTotal('${uid}',this.value)" style="padding:5px 28px 5px 10px;border-radius:8px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center">
+      ${anos.map(a=>`<option value="${a}" ${a===_mpAnoTotal&&!isAllTotal?'selected':''}>` + a + `</option>`).join('')}
+      <option value="__all__" ${isAllTotal?'selected':''}>Geral</option>
+    </select>
   </div>`:'';
 
   // ── SELETOR INDEPENDENTE: MESES ──
   const isAllMeses=(_mpAnoMeses==='__all__');
-  const btnStyleMes=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#2a9cc9':'#b7b8b6'};background:${active?'#b0d8f0':'#dedede'};color:${active?'#0a3a5a':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
-  const selMeses=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Selecione a temporada:</span>
-    ${anos.map(a=>`<button onclick="setMpAnoMeses('${uid}','${a}')" style="${btnStyleMes(a,a===_mpAnoMeses&&!isAllMeses)}">${a}</button>`).join('')}
-    <button onclick="setMpAnoMeses('${uid}','__all__')" style="${btnStyleMes('__all__',isAllMeses)}">Todos</button>
+  const selMeses=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Temporada:</span>
+    <select onchange="setMpAnoMeses('${uid}',this.value)" style="padding:5px 28px 5px 10px;border-radius:8px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center">
+      ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMeses&&!isAllMeses?'selected':''}>` + a + `</option>`).join('')}
+      <option value="__all__" ${isAllMeses?'selected':''}>Todos</option>
+    </select>
   </div>`:'';
 
   // ── Totais por seleção ──
@@ -5983,11 +5986,12 @@ function _buildPlayerProfile(uid){
 
   // ── SELETOR INDEPENDENTE: MÉDIAS ──
   const isAllMedia=(_mpAnoMedia==='__all__');
-  const btnStyleMed=(a,active)=>`padding:5px 12px;border-radius:99px;border:1.5px solid ${active?'#629ade':'#b7b8b6'};background:${active?'#a0c8fa':'#dedede'};color:${active?'#629ade':'#494a48'};font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer`;
-  const selMedia=anos.length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Selecione a temporada:</span>
-    ${anos.map(a=>`<button onclick="setMpAnoMedia('${uid}','${a}')" style="${btnStyleMed(a,a===_mpAnoMedia&&!isAllMedia)}">${a}</button>`).join('')}
-    <button onclick="setMpAnoMedia('${uid}','__all__')" style="${btnStyleMed('__all__',isAllMedia)}">Geral</button>
+  const selMedia=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Temporada:</span>
+    <select onchange="setMpAnoMedia('${uid}',this.value)" style="padding:5px 28px 5px 10px;border-radius:8px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center">
+      ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMedia&&!isAllMedia?'selected':''}>` + a + `</option>`).join('')}
+      <option value="__all__" ${isAllMedia?'selected':''}>Geral</option>
+    </select>
   </div>`:'';
 
   const mesesParaMedia=isAllMedia?allMonths.filter(m=>!m.current):allMonths.filter(m=>!m.current&&m.ano===_mpAnoMedia);
