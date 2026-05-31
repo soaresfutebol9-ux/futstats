@@ -10009,12 +10009,26 @@ window.abrirCartaJogador = function(){
 
     // Substitui loading pela carta real
     _cartaTemaAtivo = 'padrao';
-    const temasHTML = window._buildTemasHTML ? window._buildTemasHTML() : '';
+
+    // Gera botões de tema inline — sem depender de funções externas
+    const _calcCq = (typeof calcConquistas === 'function') ? calcConquistas(uid, gd) : {};
+    const _temasInlineHTML = CARTA_TEMAS.map(t => {
+      const desbloqueado = !t.cqId || (_calcCq[t.cqId] && _calcCq[t.cqId].achieved);
+      const bloqClass = desbloqueado ? '' : ' bloqueado';
+      const onclick = desbloqueado
+        ? `onclick="window._selecionarTema('${t.id}')"`
+        : `title="🔒 ${t.desc}"`;
+      return `<button class="carta-tema-btn ativo-${t.id === 'padrao' ? 'ativo' : ''}${bloqClass}" ${onclick} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'.85':'.35'};transition:opacity .2s,transform .2s">
+        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${t.id==='padrao'?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${t.id==='padrao'?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+      </button>`;
+    }).join('');
+
     inner.innerHTML=`
       ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
-      <div id="carta-temas-wrap">
+      <div id="carta-temas-wrap" style="width:100%;margin-bottom:14px">
         <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-        <div id="carta-temas-scroll">${temasHTML}</div>
+        <div id="carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasInlineHTML}</div>
       </div>
       <div class="carta-btns">
         <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
