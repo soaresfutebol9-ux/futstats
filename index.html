@@ -2199,6 +2199,143 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.rarity-bronze .card-edition{ color:#1a0a00; }
 .player-card.rarity-elite .card-edition{ color:#fff; }
 
+
+/* ══════════════════════════════════════════════════════
+   TEMAS VISUAIS DA CARTA — desbloqueados por conquistas
+   ══════════════════════════════════════════════════════ */
+
+/* NEON */
+.player-card.tema-neon{
+  background:linear-gradient(155deg,#0d0d1a 0%,#12002e 40%,#0d0d1a 100%);
+  box-shadow:0 0 0 2px #b400ff,0 0 30px rgba(180,0,255,.6),0 0 60px rgba(77,255,176,.3),0 8px 48px rgba(0,0,0,.9);
+}
+.player-card.tema-neon::before{
+  background:radial-gradient(ellipse at 28% 20%,rgba(180,0,255,.2) 0%,transparent 55%);
+}
+.player-card.tema-neon .card-rating,.player-card.tema-neon .card-pos,
+.player-card.tema-neon .card-name,.player-card.tema-neon .card-stat-val{ color:#b400ff; }
+.player-card.tema-neon .card-stat-lbl,.player-card.tema-neon .card-edition{ color:rgba(180,0,255,.7); }
+.player-card.tema-neon .card-divider{ background:linear-gradient(90deg,transparent,#b400ff,transparent); }
+@keyframes neonBorderPulse{0%,100%{box-shadow:0 0 0 2px #b400ff,0 0 30px rgba(180,0,255,.6),0 0 60px rgba(77,255,176,.3),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #4dffb0,0 0 40px rgba(77,255,176,.7),0 0 70px rgba(180,0,255,.4),0 8px 48px rgba(0,0,0,.9)}}
+.player-card.tema-neon{ animation:neonBorderPulse 2s ease-in-out infinite; }
+
+/* FOGO */
+.player-card.tema-fogo{
+  background:linear-gradient(155deg,#1a0000 0%,#7a1200 20%,#ff4500 50%,#ff8c00 70%,#ffcc00 100%);
+  box-shadow:0 0 0 2px #ff4500,0 0 40px rgba(255,69,0,.7),0 8px 48px rgba(0,0,0,.8);
+}
+.player-card.tema-fogo .card-rating,.player-card.tema-fogo .card-pos,
+.player-card.tema-fogo .card-name,.player-card.tema-fogo .card-stat-val{ color:#fff; }
+.player-card.tema-fogo .card-stat-lbl,.player-card.tema-fogo .card-edition{ color:rgba(255,255,255,.7); }
+.player-card.tema-fogo .card-divider{ background:linear-gradient(90deg,transparent,#ffcc00,transparent); }
+@keyframes fogoGlow{0%,100%{box-shadow:0 0 0 2px #ff4500,0 0 40px rgba(255,69,0,.7),0 8px 48px rgba(0,0,0,.8)}50%{box-shadow:0 0 0 2px #ffcc00,0 0 55px rgba(255,140,0,.8),0 8px 48px rgba(0,0,0,.8)}}
+.player-card.tema-fogo{ animation:fogoGlow 1.5s ease-in-out infinite; }
+
+/* GALAXY */
+.player-card.tema-galaxy{
+  background:linear-gradient(155deg,#04001a 0%,#0d0033 25%,#1a006b 50%,#3d0070 75%,#04001a 100%);
+  box-shadow:0 0 0 2px #7c3aed,0 0 50px rgba(124,58,237,.6),0 8px 48px rgba(0,0,0,.9);
+  overflow:hidden;
+}
+.player-card.tema-galaxy::after{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(1px 1px at 20% 30%,#fff 0%,transparent 100%),radial-gradient(1px 1px at 80% 10%,#fff 0%,transparent 100%),radial-gradient(1px 1px at 50% 60%,rgba(255,255,255,.8) 0%,transparent 100%),radial-gradient(1px 1px at 10% 80%,rgba(255,255,255,.6) 0%,transparent 100%),radial-gradient(1px 1px at 90% 70%,rgba(255,255,255,.7) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 35% 15%,rgba(200,180,255,.9) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 65% 85%,rgba(200,180,255,.9) 0%,transparent 100%);
+  pointer-events:none;z-index:1;
+}
+.player-card.tema-galaxy .card-rating,.player-card.tema-galaxy .card-pos,
+.player-card.tema-galaxy .card-name,.player-card.tema-galaxy .card-stat-val{ color:#e0c7ff; }
+.player-card.tema-galaxy .card-stat-lbl,.player-card.tema-galaxy .card-edition{ color:rgba(224,199,255,.65); }
+.player-card.tema-galaxy .card-divider{ background:linear-gradient(90deg,transparent,#7c3aed,transparent); }
+@keyframes galaxyPulse{0%,100%{box-shadow:0 0 0 2px #7c3aed,0 0 50px rgba(124,58,237,.6),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #a78bfa,0 0 65px rgba(167,139,250,.7),0 8px 48px rgba(0,0,0,.9)}}
+.player-card.tema-galaxy{ animation:galaxyPulse 3s ease-in-out infinite; }
+
+/* CROMO */
+.player-card.tema-cromo{
+  background:linear-gradient(155deg,#c0c0c0 0%,#f5f5f5 20%,#a8a8a8 40%,#ffffff 55%,#b0b0b0 70%,#e8e8e8 85%,#909090 100%);
+  box-shadow:0 0 0 2px #c0c0c0,0 8px 40px rgba(180,180,180,.6),0 2px 16px rgba(0,0,0,.4);
+}
+.player-card.tema-cromo .card-rating,.player-card.tema-cromo .card-pos,
+.player-card.tema-cromo .card-name,.player-card.tema-cromo .card-stat-val{ color:#1a1a2e; }
+.player-card.tema-cromo .card-stat-lbl,.player-card.tema-cromo .card-edition{ color:rgba(26,26,46,.65); }
+.player-card.tema-cromo .card-divider{ background:linear-gradient(90deg,transparent,#888,transparent); }
+@keyframes cromoShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* GELO */
+.player-card.tema-gelo{
+  background:linear-gradient(155deg,#e8f4ff 0%,#b3d9ff 20%,#80bfff 40%,#cce8ff 60%,#99ccff 80%,#d6eeff 100%);
+  box-shadow:0 0 0 2px #4da6ff,0 0 35px rgba(77,166,255,.5),0 8px 40px rgba(0,0,0,.4);
+}
+.player-card.tema-gelo .card-rating,.player-card.tema-gelo .card-pos,
+.player-card.tema-gelo .card-name,.player-card.tema-gelo .card-stat-val{ color:#003366; }
+.player-card.tema-gelo .card-stat-lbl,.player-card.tema-gelo .card-edition{ color:rgba(0,51,102,.65); }
+.player-card.tema-gelo .card-divider{ background:linear-gradient(90deg,transparent,#4da6ff,transparent); }
+@keyframes geloShimmer{0%,100%{box-shadow:0 0 0 2px #4da6ff,0 0 35px rgba(77,166,255,.5),0 8px 40px rgba(0,0,0,.4)}50%{box-shadow:0 0 0 2px #99ddff,0 0 50px rgba(153,221,255,.7),0 8px 40px rgba(0,0,0,.4)}}
+.player-card.tema-gelo{ animation:geloShimmer 2.5s ease-in-out infinite; }
+
+/* CARBONO */
+.player-card.tema-carbono{
+  background:repeating-linear-gradient(45deg,#1a1a1a 0px,#1a1a1a 1px,#2a2a2a 1px,#2a2a2a 4px),linear-gradient(155deg,#111 0%,#333 50%,#111 100%);
+  box-shadow:0 0 0 2px #555,0 8px 40px rgba(0,0,0,.8),0 2px 8px rgba(255,255,255,.05);
+}
+.player-card.tema-carbono .card-rating,.player-card.tema-carbono .card-pos,
+.player-card.tema-carbono .card-name,.player-card.tema-carbono .card-stat-val{ color:#e0e0e0; }
+.player-card.tema-carbono .card-stat-lbl,.player-card.tema-carbono .card-edition{ color:rgba(224,224,224,.6); }
+.player-card.tema-carbono .card-divider{ background:linear-gradient(90deg,transparent,#888,transparent); }
+
+/* OURO SÓLIDO */
+.player-card.tema-ouro-solido{
+  background:linear-gradient(155deg,#7a5500 0%,#ffd700 20%,#ff9d00 40%,#ffe44d 55%,#cc8800 70%,#fff0a0 85%,#b37700 100%);
+  box-shadow:0 0 0 3px #ffd700,0 0 50px rgba(255,215,0,.8),0 8px 48px rgba(0,0,0,.6);
+}
+.player-card.tema-ouro-solido .card-rating,.player-card.tema-ouro-solido .card-pos,
+.player-card.tema-ouro-solido .card-name,.player-card.tema-ouro-solido .card-stat-val{ color:#1a0a00; }
+.player-card.tema-ouro-solido .card-stat-lbl,.player-card.tema-ouro-solido .card-edition{ color:rgba(26,10,0,.65); }
+.player-card.tema-ouro-solido .card-divider{ background:linear-gradient(90deg,transparent,#cc8800,transparent); }
+@keyframes ouroGlow{0%,100%{box-shadow:0 0 0 3px #ffd700,0 0 50px rgba(255,215,0,.8),0 8px 48px rgba(0,0,0,.6)}50%{box-shadow:0 0 0 3px #fff0a0,0 0 70px rgba(255,240,160,.9),0 8px 48px rgba(0,0,0,.6)}}
+.player-card.tema-ouro-solido{ animation:ouroGlow 2s ease-in-out infinite; }
+
+/* Seletor de temas */
+#carta-temas-wrap{
+  width:100%;margin-bottom:14px;
+}
+#carta-temas-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+#carta-temas-scroll::-webkit-scrollbar{ display:none; }
+.carta-tema-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;
+  opacity:.75;transition:opacity .2s,transform .2s;
+}
+.carta-tema-btn:hover{ opacity:1;transform:translateY(-2px); }
+.carta-tema-btn.ativo{ opacity:1;transform:translateY(-2px); }
+.carta-tema-preview{
+  width:38px;height:50px;border-radius:7px;border:2px solid transparent;
+  transition:border-color .2s;position:relative;overflow:hidden;
+}
+.carta-tema-btn.ativo .carta-tema-preview{ border-color:#fff; }
+.carta-tema-btn.bloqueado{ opacity:.35;cursor:not-allowed; }
+.carta-tema-btn.bloqueado .carta-tema-preview::after{
+  content:'🔒';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:14px;background:rgba(0,0,0,.5);
+}
+.carta-tema-label{
+  font-size:8px;font-family:'DM Mono',monospace;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.7);
+  white-space:nowrap;
+}
+.carta-tema-btn.ativo .carta-tema-label{ color:#fff; }
+/* Previews de cada tema */
+.tp-padrao{ background:linear-gradient(155deg,#c5a200,#ffe066,#b8860b); }
+.tp-neon{ background:linear-gradient(155deg,#0d0d1a,#12002e,#b400ff); border:1px solid #b400ff; }
+.tp-fogo{ background:linear-gradient(155deg,#1a0000,#ff4500,#ffcc00); }
+.tp-galaxy{ background:linear-gradient(155deg,#04001a,#1a006b,#3d0070); }
+.tp-cromo{ background:linear-gradient(155deg,#c0c0c0,#ffffff,#909090); }
+.tp-gelo{ background:linear-gradient(155deg,#e8f4ff,#80bfff,#99ccff); }
+.tp-carbono{ background:repeating-linear-gradient(45deg,#1a1a1a 0px,#1a1a1a 1px,#2a2a2a 1px,#2a2a2a 4px); }
+.tp-ouro-solido{ background:linear-gradient(155deg,#7a5500,#ffd700,#ffe44d); }
+
 /* Botões da carta */
 .carta-btns{
   display:flex;gap:10px;
@@ -9766,6 +9903,63 @@ function _animateCartaLoading(onComplete){
   });
 }
 
+
+/* ══════════════════════════════════════════════════════
+   SISTEMA DE TEMAS DA CARTA
+   ══════════════════════════════════════════════════════ */
+
+const CARTA_TEMAS = [
+  { id:'padrao',     label:'Padrão',      preview:'tp-padrao',     cqId:null,                    desc:null },
+  { id:'ouro-solido',label:'Ouro',        preview:'tp-ouro-solido',cqId:'ouro_acum_5',           desc:'Campeão (5 ouros acumulados)' },
+  { id:'fogo',       label:'Fogo',        preview:'tp-fogo',       cqId:'ouro_consec_2',         desc:'Em Chamas (2 ouros consecutivos)' },
+  { id:'neon',       label:'Neon',        preview:'tp-neon',       cqId:'ga_50',                 desc:'Craque (50 G+A em um mês)' },
+  { id:'galaxy',     label:'Galaxy',      preview:'tp-galaxy',     cqId:'ouro_acum_10',          desc:'Lenda (10 ouros acumulados)' },
+  { id:'cromo',      label:'Cromo',       preview:'tp-cromo',      cqId:'assist_25',             desc:'Construtor (25 assistências em um mês)' },
+  { id:'gelo',       label:'Gelo',        preview:'tp-gelo',       cqId:'pen_seq_5',             desc:'Frieza Clínica (5 pênaltis consecutivos)' },
+  { id:'carbono',    label:'Carbono',     preview:'tp-carbono',    cqId:'ouro_acum_15',          desc:'Imortal (15 ouros acumulados)' },
+];
+
+let _cartaTemaAtivo = 'padrao';
+
+window._getTemasDesbloqueados = function(){
+  const calcCq = window._calcConquistas ? window._calcConquistas(window._currentUserUid, window._gd) : {};
+  return CARTA_TEMAS.filter(t => !t.cqId || (calcCq[t.cqId] && calcCq[t.cqId].achieved));
+};
+
+window._buildTemasHTML = function(){
+  const calcCq = window._calcConquistas ? window._calcConquistas(window._currentUserUid, window._gd) : {};
+  return CARTA_TEMAS.map(t => {
+    const desbloqueado = !t.cqId || (calcCq[t.cqId] && calcCq[t.cqId].achieved);
+    const ativo = _cartaTemaAtivo === t.id;
+    const bloqClass = desbloqueado ? '' : ' bloqueado';
+    const ativoClass = ativo ? ' ativo' : '';
+    const onclick = desbloqueado
+      ? `onclick="window._selecionarTema('${t.id}')"`
+      : `title="🔒 Desbloqueie: ${t.desc}"`;
+    return `<button class="carta-tema-btn${ativoClass}${bloqClass}" ${onclick}>
+      <div class="carta-tema-preview ${t.preview}"></div>
+      <span class="carta-tema-label">${t.label}</span>
+    </button>`;
+  }).join('');
+};
+
+window._selecionarTema = function(temaId){
+  _cartaTemaAtivo = temaId;
+  // Atualiza botões
+  document.querySelectorAll('.carta-tema-btn').forEach(btn => {
+    btn.classList.remove('ativo');
+  });
+  const card = document.getElementById('player-card-el');
+  if(!card) return;
+  // Remove todos os temas
+  CARTA_TEMAS.forEach(t => card.classList.remove('tema-' + t.id));
+  if(temaId !== 'padrao') card.classList.add('tema-' + temaId);
+  // Marca botão ativo
+  const btns = document.querySelectorAll('.carta-tema-btn');
+  const idx = CARTA_TEMAS.findIndex(t => t.id === temaId);
+  if(btns[idx]) btns[idx].classList.add('ativo');
+};
+
 window.abrirCartaJogador = function(){
   const uid = window._currentUserUid;
   if(!uid){ alert('Faça login para ver sua carta.'); return; }
@@ -9809,8 +10003,13 @@ window.abrirCartaJogador = function(){
     setTimeout(()=>flash.remove(), 450);
 
     // Substitui loading pela carta real
+    _cartaTemaAtivo = 'padrao';
     inner.innerHTML=`
       ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
+      <div id="carta-temas-wrap">
+        <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
+        <div id="carta-temas-scroll">${window._buildTemasHTML()}</div>
+      </div>
       <div class="carta-btns">
         <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
