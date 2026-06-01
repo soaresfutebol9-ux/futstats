@@ -9950,19 +9950,24 @@ window._buildTemasHTML = function(){
 
 window._selecionarTema = function(temaId){
   _cartaTemaAtivo = temaId;
-  // Atualiza botões
-  document.querySelectorAll('.carta-tema-btn').forEach(btn => {
-    btn.classList.remove('ativo');
-  });
   const card = document.getElementById('player-card-el');
   if(!card) return;
-  // Remove todos os temas
+  // Remove todos os temas da carta
   CARTA_TEMAS.forEach(t => card.classList.remove('tema-' + t.id));
   if(temaId !== 'padrao') card.classList.add('tema-' + temaId);
-  // Marca botão ativo
-  const btns = document.querySelectorAll('.carta-tema-btn');
-  const idx = CARTA_TEMAS.findIndex(t => t.id === temaId);
-  if(btns[idx]) btns[idx].classList.add('ativo');
+  // Atualiza visual dos botões
+  document.querySelectorAll('.carta-tema-btn').forEach((btn, idx) => {
+    const t = CARTA_TEMAS[idx];
+    if(!t) return;
+    const ativo = t.id === temaId;
+    btn.classList.toggle('ativo', ativo);
+    const preview = btn.querySelector('div');
+    const label = btn.querySelector('span');
+    if(preview) preview.style.borderColor = ativo ? '#fff' : 'transparent';
+    if(label) label.style.color = ativo ? '#fff' : 'rgba(255,255,255,.7)';
+    btn.style.opacity = btn.classList.contains('bloqueado') ? '.35' : '1';
+    btn.style.transform = ativo ? 'translateY(-2px)' : '';
+  });
 };
 
 window.abrirCartaJogador = function(){
@@ -10010,17 +10015,14 @@ window.abrirCartaJogador = function(){
     // Substitui loading pela carta real
     _cartaTemaAtivo = 'padrao';
 
-    // Gera botões de tema inline — sem depender de funções externas
-    const _calcCq = (typeof calcConquistas === 'function') ? calcConquistas(uid, gd) : {};
+    // Gera botões de tema inline
+    const _calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
     const _temasInlineHTML = CARTA_TEMAS.map(t => {
-      const desbloqueado = !t.cqId || (_calcCq[t.cqId] && _calcCq[t.cqId].achieved);
-      const bloqClass = desbloqueado ? '' : ' bloqueado';
-      const onclick = desbloqueado
-        ? `onclick="window._selecionarTema('${t.id}')"`
-        : `title="🔒 ${t.desc}"`;
-      return `<button class="carta-tema-btn ativo-${t.id === 'padrao' ? 'ativo' : ''}${bloqClass}" ${onclick} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'.85':'.35'};transition:opacity .2s,transform .2s">
-        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${t.id==='padrao'?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
-        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${t.id==='padrao'?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+      const desbloqueado = !t.cqId || !!(_calcCq[t.cqId] && _calcCq[t.cqId].achieved);
+      const ativo = t.id === 'padrao';
+      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
       </button>`;
     }).join('');
 
@@ -10698,16 +10700,13 @@ window.abrirCartaJogador = function(){
       setTimeout(()=>flash.remove(), 450);
 
       _cartaTemaAtivo = 'padrao';
-      const _calcCq2 = (typeof calcConquistas === 'function') ? calcConquistas(uid, gd) : {};
+      const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
       const _temasHTML2 = CARTA_TEMAS.map(t => {
-        const desbloqueado = !t.cqId || (_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
-        const bloqClass = desbloqueado ? '' : ' bloqueado';
-        const onclick = desbloqueado
-          ? `onclick="window._selecionarTema('${t.id}')"`
-          : `title="🔒 ${t.desc}"`;
-        return `<button class="carta-tema-btn${t.id==='padrao'?' ativo':''}${bloqClass}" ${onclick} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'.85':'.35'}">
-          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${t.id==='padrao'?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
-          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${t.id==='padrao'?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+        const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
+        const ativo = t.id === 'padrao';
+        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
+          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
         </button>`;
       }).join('');
 
