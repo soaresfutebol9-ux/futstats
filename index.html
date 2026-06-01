@@ -510,71 +510,6 @@ body.light .ah::after{
 /* Avatar lado direito */
 .ah-right{display:flex;align-items:center;gap:8px;cursor:pointer}
 
-/* ── SISTEMA DE TEMPORADAS ── */
-.temp-champ-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(255,200,0,.18) 0%,rgba(255,150,0,.12) 100%);border:1px solid rgba(255,200,0,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:#F2C94C;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;cursor:default;}
-.temp-champ-mini{font-size:9px;font-family:'DM Mono',monospace;color:#F2C94C;background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:6px;padding:1px 6px;white-space:nowrap;margin-left:4px;}
-.temp-card{background:var(--bg2);border:1px solid var(--bo);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
-.temp-card:hover{border-color:rgba(255,200,0,.35);box-shadow:0 4px 24px rgba(255,200,0,.08);}
-.temp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#F2C94C,rgba(255,200,0,.3),transparent);}
-.temp-card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.temp-card-icon{font-size:22px;flex-shrink:0;}
-.temp-card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--tx);letter-spacing:-.3px;}
-.temp-card-subtitle{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
-.temp-card-podium{display:flex;gap:8px;}
-.temp-podium-item{flex:1;background:var(--bg3);border-radius:10px;padding:8px 6px;display:flex;align-items:center;gap:6px;border:1px solid var(--bo);}
-.temp-podium-pos{font-size:14px;flex-shrink:0;}
-.temp-podium-name{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.temp-podium-ga{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);white-space:nowrap;}
-.temp-podium-item.gold{border-color:rgba(242,196,76,.4);background:rgba(242,196,76,.06);}
-.temp-podium-item.silver{border-color:rgba(189,189,189,.3);background:rgba(189,189,189,.04);}
-.temp-podium-item.bronze{border-color:rgba(160,120,90,.3);background:rgba(160,120,90,.04);}
-.temp-section-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;margin-top:20px;}
-.temp-section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:.2px;}
-.temp-section-badge{font-family:'DM Mono',monospace;font-size:9px;color:var(--am);background:rgba(242,196,76,.12);border:1px solid rgba(242,196,76,.25);border-radius:6px;padding:2px 7px;text-transform:uppercase;letter-spacing:.08em;}
-#modal-temporada{display:none;position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.9);align-items:center;justify-content:center;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-#modal-temporada.open{display:flex;animation:tempModalIn .35s ease forwards;}
-@keyframes tempModalIn{from{opacity:0}to{opacity:1}}
-.temp-modal-inner{background:var(--bg2);border:1px solid rgba(255,200,0,.2);border-radius:28px;width:92%;max-width:440px;max-height:90vh;overflow-y:auto;padding:0;box-shadow:0 8px 64px rgba(242,196,76,.15),0 0 0 1px rgba(255,200,0,.1);animation:tempInnerIn .4s cubic-bezier(.16,1,.3,1) forwards;}
-@keyframes tempInnerIn{from{transform:scale(.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.temp-modal-hero{text-align:center;padding:36px 24px 20px;background:radial-gradient(ellipse at 50% 0%,rgba(255,200,0,.12) 0%,transparent 70%);position:relative;}
-.temp-modal-trophy{font-size:72px;display:block;animation:tempTrophyIn .6s .2s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 0 32px rgba(255,200,0,.6));}
-@keyframes tempTrophyIn{from{transform:scale(0) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-.temp-modal-season{font-family:'DM Mono',monospace;font-size:11px;color:var(--am);letter-spacing:.15em;text-transform:uppercase;margin-top:12px;}
-.temp-modal-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px;margin:6px 0 2px;background:linear-gradient(135deg,#F2C94C,#ffb700,#F2C94C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.temp-modal-winner-name{font-size:18px;font-weight:700;color:var(--tx);margin-bottom:4px;}
-.temp-modal-winner-ga{font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3);}
-.temp-confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:28px 28px 0 0;}
-.temp-confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:tempConfettiFall linear forwards;}
-@keyframes tempConfettiFall{from{opacity:1;transform:translateY(-20px) rotate(0deg)}to{opacity:0;transform:translateY(280px) rotate(720deg)}}
-.temp-modal-podium{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px;}
-.temp-modal-podium-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--bo);background:var(--bg3);animation:tempPodiumItemIn .4s cubic-bezier(.16,1,.3,1) both;}
-.temp-modal-podium-item:nth-child(1){animation-delay:.35s;border-color:rgba(242,196,76,.35);background:rgba(242,196,76,.06);}
-.temp-modal-podium-item:nth-child(2){animation-delay:.45s;border-color:rgba(189,189,189,.25);background:rgba(189,189,189,.04);}
-.temp-modal-podium-item:nth-child(3){animation-delay:.55s;border-color:rgba(160,120,90,.25);background:rgba(160,120,90,.04);}
-@keyframes tempPodiumItemIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-.temp-modal-pos{font-size:20px;flex-shrink:0;width:32px;text-align:center;}
-.temp-modal-player-info{flex:1;min-width:0;}
-.temp-modal-player-name{font-size:15px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.temp-modal-player-stats{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);}
-.temp-modal-player-ga{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--tx2);flex-shrink:0;}
-.temp-modal-player-ga span{font-size:11px;color:var(--tx3);font-weight:400;}
-.temp-champ-badge-lg{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(255,200,0,.2),rgba(255,150,0,.12));border:1px solid rgba(255,200,0,.5);border-radius:99px;padding:5px 14px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;color:#F2C94C;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;animation:badge-glow 2.5s ease-in-out infinite;}
-.temp-modal-close{width:calc(100% - 40px);padding:14px;background:none;border:1px solid var(--bo2);border-radius:12px;color:var(--tx2);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;margin:0 20px 20px;display:block;transition:background .15s,border-color .15s;}
-.temp-modal-close:hover{background:var(--bg3);border-color:var(--bo3);}
-.temp-active-banner{background:linear-gradient(135deg,rgba(242,196,76,.07) 0%,rgba(255,150,0,.04) 100%);border:1px solid rgba(242,196,76,.2);border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .2s;}
-.temp-active-banner:hover{border-color:rgba(242,196,76,.4);}
-.temp-active-icon{font-size:20px;flex-shrink:0;}
-.temp-active-info{flex:1;min-width:0;}
-.temp-active-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--am);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
-.temp-active-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--tx);}
-.temp-active-countdown{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);}
-.temp-days-pill{background:rgba(242,196,76,.12);border:1px solid rgba(242,196,76,.25);border-radius:99px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--am);font-weight:700;flex-shrink:0;}
-.temp-trophies-section{margin-bottom:1rem;}
-.temp-trophies-label{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
-.temp-trophies-list{display:flex;flex-wrap:wrap;gap:6px;}
-.temp-trophy-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(242,196,76,.08);border:1px solid rgba(242,196,76,.3);border-radius:99px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--am);font-weight:600;animation:badge-glow 3s ease-in-out infinite;}
-.temp-no-trophies{font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;padding:10px 14px;background:var(--bg3);border-radius:10px;border:1px solid var(--bo);display:block;}
-
 /* Sino de notificações */
 .notif-btn{
   position:relative;width:34px;height:34px;border-radius:50%;
@@ -5293,16 +5228,6 @@ function enterApp(){
       }
     }
   }, 1500);
-  // ── Verifica encerramento automático de temporada (ano anterior) ──
-  setTimeout(async()=>{
-    if(window._verificarEncerramentoTemporada && db && groupId && gd){
-      const encerrou=await window._verificarEncerramentoTemporada(db,groupId,gd);
-      if(encerrou){
-        const anoAnt=new Date().getFullYear()-1;
-        setTimeout(()=>window.abrirTemporadaDetalhes&&abrirTemporadaDetalhes(String(anoAnt)),600);
-      }
-    }
-  },2500);
 }
 async function _checkBadgeConquistas(){
   if(!currentUser||!gd) return;
@@ -6107,7 +6032,7 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${typeof _renderBannerTemporada==='function'?_renderBannerTemporada(gd):''}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${typeof _badgesTemporadaRanking==='function'?_badgesTemporadaRanking(gd,p.uid):''}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
@@ -6354,9 +6279,6 @@ function renderHistTab(){
     ].join('');
 
   el.innerHTML=anoSelector+mesesHTML;
-  // ── TEMPORADAS ──
-  const tempSection=typeof _renderSecaoTemporadas==='function'?_renderSecaoTemporadas(gd):'';
-  if(tempSection) el.innerHTML+=tempSection;
 }
 
 window.setHistAno=ano=>{
@@ -6845,7 +6767,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :conquistasCard+(typeof _renderTrofeusTemporada==='function'?_renderTrofeusTemporada(gd,uid):'')+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
+    :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
   // ── Desafios do jogador ──
   const desafiosDoJogador = (gd.desafios||[]).filter(d =>
@@ -7899,23 +7821,6 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL DESAFIO DIRETO ══ -->
-<!-- ══ MODAL CERIMÔNIA DE TEMPORADA ══ -->
-<div id="modal-temporada">
-  <div class="temp-modal-inner">
-    <div class="temp-modal-hero">
-      <div class="temp-confetti-wrap" id="temp-confetti-wrap"></div>
-      <span class="temp-modal-trophy">🏆</span>
-      <div class="temp-modal-season" id="temp-modal-season">TEMPORADA 2025</div>
-      <div class="temp-modal-title">Campeão!</div>
-      <div class="temp-modal-winner-name" id="temp-modal-winner-name">—</div>
-      <div class="temp-modal-winner-ga" id="temp-modal-winner-ga">—</div>
-      <div class="temp-champ-badge-lg" id="temp-modal-badge">🏆 Campeão T2025</div>
-    </div>
-    <div class="temp-modal-podium" id="temp-modal-podium"></div>
-    <button class="temp-modal-close" onclick="fecharModalTemporada()">Fechar</button>
-  </div>
-</div>
-
 <div id="modal-desafio" style="display:none">
   <div class="desafio-inner">
     <div class="desafio-header">
@@ -9889,140 +9794,7 @@ window._checkConquistas = async function(db, currentUser, gd){
 window._calcConquistas = calcConquistas;
 window._CONQUISTAS = CONQUISTAS;
 
-// ══════════════════════════════════════════════════════════════
-//  FUTSTATS — SISTEMA DE TEMPORADAS (Jan–Dez, encerra 31/dez)
-// ══════════════════════════════════════════════════════════════
-function _diasParaFimTemporada(){const hoje=new Date();const fim=new Date(hoje.getFullYear(),11,31);return Math.max(0,Math.ceil((fim-hoje)/(1000*60*60*24)));}
-
-function _partidasDoAno(gd,ano){
-  if(!gd)return[];
-  const anoStr=String(ano);const todas=[];
-  (gd.matches||[]).forEach(m=>{const mk=m.mesKey||m.date?.substring(0,7);if(mk&&mk.startsWith(anoStr))todas.push(m);});
-  Object.entries(gd.historico||{}).forEach(([k,h])=>{if(k.startsWith(anoStr))(h.matches||[]).forEach(m=>todas.push(m));});
-  return todas;
-}
-
-function _calcRankingTemporada(gd,ano){
-  if(!gd)return[];
-  const partidas=_partidasDoAno(gd,ano);
-  const map={};
-  (gd.members||[]).forEach(m=>{if(!map[m.uid])map[m.uid]={uid:m.uid,name:m.name,gols:0,assist:0};});
-  partidas.forEach(p=>{const uid=p.uid;if(!uid)return;if(!map[uid])map[uid]={uid,name:p.player||p.name||'Jogador',gols:0,assist:0};map[uid].gols+=(p.gols||0);map[uid].assist+=(p.assist||0);});
-  return Object.values(map).map(p=>({...p,ga:p.gols+p.assist})).sort((a,b)=>b.ga-a.ga||b.gols-a.gols);
-}
-
-async function _verificarEncerramentoTemporada(db,groupId,gd){
-  if(!gd||!groupId||!db)return false;
-  const anoAnterior=new Date().getFullYear()-1;
-  const salvas=gd.temporadas||{};
-  if(salvas[String(anoAnterior)])return false;
-  const rank=_calcRankingTemporada(gd,anoAnterior);
-  if(!rank.length||rank[0].ga===0)return false;
-  const podium=rank.slice(0,3).map(p=>({uid:p.uid,name:p.name,gols:p.gols,assist:p.assist,ga:p.ga}));
-  const campeao=(rank.length<2||rank[0].ga>rank[1].ga)?rank[0]:null;
-  const tempData={ano:anoAnterior,encerradaEm:Date.now(),podium,campeaoUid:campeao?.uid||null,campeaoNome:campeao?.name||null,campeaoGa:campeao?.ga||0,campeaoGols:campeao?.gols||0,campeaoAssist:campeao?.assist||0};
-  try{
-    const snap=await getDoc(doc(db,'groups',groupId));
-    const cur=snap.data();
-    if(!cur.temporadas)cur.temporadas={};
-    cur.temporadas[String(anoAnterior)]=tempData;
-    await setDoc(doc(db,'groups',groupId),cur);
-    if(!gd.temporadas)gd.temporadas={};
-    gd.temporadas[String(anoAnterior)]=tempData;
-    return true;
-  }catch(e){console.warn('[Temporadas] Erro ao salvar:',e);return false;}
-}
-
-function _renderBannerTemporada(gd){
-  if(!gd)return'';
-  const ano=new Date().getFullYear();
-  const dias=_diasParaFimTemporada();
-  const rank=_calcRankingTemporada(gd,ano);
-  const lider=rank[0];
-  let liderHTML='';
-  if(lider&&lider.ga>0){
-    const empate=rank.length>=2&&rank[0].ga===rank[1].ga;
-    liderHTML=empate
-      ?`<div class="temp-active-countdown">🤝 Empate: ${rank[0].name} & ${rank[1].name}</div>`
-      :`<div class="temp-active-countdown">🥇 Liderando: <strong>${lider.name}</strong> · ${lider.ga} G+A</div>`;
-  }else{
-    liderHTML=`<div class="temp-active-countdown">Nenhuma partida ainda em ${ano}</div>`;
-  }
-  return`<div class="temp-active-banner" onclick="abrirTemporadas()"><div class="temp-active-icon">🏆</div><div class="temp-active-info"><div class="temp-active-label">Temporada ${ano}</div><div class="temp-active-title">Jan–Dez ${ano}</div>${liderHTML}</div><div class="temp-days-pill">${dias}d</div></div>`;
-}
-
-function _renderSecaoTemporadas(gd){
-  if(!gd)return'';
-  const salvas=gd.temporadas||{};
-  const anos=Object.keys(salvas).sort((a,b)=>b-a);
-  if(!anos.length)return'';
-  const medalhas=['🥇','🥈','🥉'];
-  const cls=['gold','silver','bronze'];
-  const cards=anos.map(ano=>{
-    const t=salvas[ano];
-    const podiumItems=(t.podium||[]).map((p,i)=>`<div class="temp-podium-item ${cls[i]||''}"><span class="temp-podium-pos">${medalhas[i]||i+1}</span><div><div class="temp-podium-name">${p.name}</div><div class="temp-podium-ga">${p.ga} G+A</div></div></div>`).join('');
-    return`<div class="temp-card" onclick="abrirTemporadaDetalhes('${ano}')"><div class="temp-card-header"><span class="temp-card-icon">🏆</span><div><div class="temp-card-title">Temporada ${ano}</div><div class="temp-card-subtitle">${t.campeaoNome?`Campeão: ${t.campeaoNome}`:'Sem campeão (empate)'}</div></div></div><div class="temp-card-podium">${podiumItems}</div></div>`;
-  }).join('');
-  return`<div class="temp-section-header"><span style="font-size:18px">🏆</span><span class="temp-section-title">Temporadas</span><span class="temp-section-badge">${anos.length} encerrada${anos.length>1?'s':''}</span></div>${cards}`;
-}
-
-function _renderTrofeusTemporada(gd,uid){
-  if(!gd||!uid)return'';
-  const salvas=gd.temporadas||{};
-  const anos=Object.keys(salvas).sort((a,b)=>a-b);
-  const conquistas=anos.filter(ano=>salvas[ano].campeaoUid===uid);
-  if(!conquistas.length)return`<div class="temp-trophies-section"><div class="temp-trophies-label">🏆 Títulos de Temporada</div><div class="temp-no-trophies">Nenhum título ainda</div></div>`;
-  return`<div class="temp-trophies-section"><div class="temp-trophies-label">🏆 Títulos de Temporada</div><div class="temp-trophies-list">${conquistas.map(ano=>`<span class="temp-trophy-pill">🏆 T${ano}</span>`).join('')}</div></div>`;
-}
-
-function _badgesTemporadaRanking(gd,uid){
-  if(!gd||!uid)return'';
-  const salvas=gd.temporadas||{};
-  return Object.keys(salvas).filter(ano=>salvas[ano].campeaoUid===uid).sort((a,b)=>b-a).slice(0,2).map(ano=>`<span class="temp-champ-mini">🏆 T${ano}</span>`).join('');
-}
-
-function _spawnConfetti(){
-  const wrap=document.getElementById('temp-confetti-wrap');
-  if(!wrap)return;wrap.innerHTML='';
-  const colors=['#F2C94C','#FF5A7A','#4dffb0','#fff','#ffb700','#a855f7'];
-  for(let i=0;i<40;i++){const el=document.createElement('div');el.className='temp-confetti';el.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${0.8+Math.random()*1.2}s;animation-delay:${Math.random()*.5}s;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;`;wrap.appendChild(el);}
-}
-
-window.abrirTemporadaDetalhes=function(ano){
-  const gd=window._gd;if(!gd)return;
-  const t=(gd.temporadas||{})[String(ano)];if(!t)return;
-  document.getElementById('temp-modal-season').textContent=`TEMPORADA ${ano}`;
-  document.getElementById('temp-modal-winner-name').textContent=t.campeaoNome||'Empate';
-  document.getElementById('temp-modal-winner-ga').textContent=t.campeaoGa?`${t.campeaoGa} G+A · ${t.campeaoGols}G ${t.campeaoAssist}A`:'—';
-  const badge=document.getElementById('temp-modal-badge');badge.textContent=`🏆 Campeão T${ano}`;badge.style.display=t.campeaoUid?'inline-flex':'none';
-  const medalhas=['🥇','🥈','🥉'];
-  document.getElementById('temp-modal-podium').innerHTML=(t.podium||[]).map((p,i)=>`<div class="temp-modal-podium-item"><div class="temp-modal-pos">${medalhas[i]||i+1}</div><div class="temp-modal-player-info"><div class="temp-modal-player-name">${p.name}</div><div class="temp-modal-player-stats">${p.gols}G · ${p.assist}A</div></div><div class="temp-modal-player-ga">${p.ga} <span>G+A</span></div></div>`).join('');
-  _spawnConfetti();
-  document.getElementById('modal-temporada').classList.add('open');
-};
-
-window.abrirTemporadas=function(){
-  const gd=window._gd;if(!gd)return;
-  const anos=Object.keys(gd.temporadas||{}).sort((a,b)=>b-a);
-  if(anos.length)abrirTemporadaDetalhes(anos[0]);
-  else{const ano=new Date().getFullYear();const dias=_diasParaFimTemporada();alert(`Temporada ${ano} em andamento!\nEncerra em ${dias} dia${dias!==1?'s':''}. Campeão definido em 31/dez.`);}
-};
-
-window.fecharModalTemporada=function(){document.getElementById('modal-temporada').classList.remove('open');};
-
-// Fecha o modal de temporada com Escape / back
-document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModalTemporada();});
-document.getElementById('modal-temporada').addEventListener('click',function(e){if(e.target===this)fecharModalTemporada();});
-
-// Verifica encerramento do ano anterior ao entrar no app (chamado após carregar gd)
-window._verificarEncerramentoTemporada=_verificarEncerramentoTemporada;
-window._calcRankingTemporada=_calcRankingTemporada;
-window._renderBannerTemporada=_renderBannerTemporada;
-window._renderSecaoTemporadas=_renderSecaoTemporadas;
-window._renderTrofeusTemporada=_renderTrofeusTemporada;
-window._badgesTemporadaRanking=_badgesTemporadaRanking;
-
-
+// ── ABRIR CONQUISTAS ───────────────────────────────────────────
 // ── SELETOR DE CONQUISTAS PINADAS ──────────────────────────────
 window.abrirSeletorCqPinadas = function(uid){
   const _gd = window._gd || gd;
