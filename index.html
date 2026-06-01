@@ -10048,21 +10048,57 @@ window._buildTemasHTML = function(){
   }).join('');
 };
 
-window._mostrarReqTema = function(temaId){
+window._mostrarReqTema = function(temaId, desbloqueado){
   const t = CARTA_TEMAS.find(x=>x.id===temaId);
-  if(!t || !t.desc) return;
-  // Remove toast anterior se existir
+  if(!t) return;
+  if(!t.cqId) return; // padrão não tem conquista
   const old = document.getElementById('tema-req-toast');
   if(old) old.remove();
   const toast = document.createElement('div');
   toast.id = 'tema-req-toast';
-  toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.96);border:1px solid rgba(255,100,100,.4);color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:10px 16px;border-radius:12px;z-index:9999;max-width:280px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;animation:toastIn .25s ease';
+  const borderColor = desbloqueado ? 'rgba(255,215,0,.5)' : 'rgba(255,100,100,.4)';
+  toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(14,16,26,.97);border:1px solid '+borderColor+';color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:12px 18px;border-radius:14px;z-index:9999;max-width:290px;text-align:center;box-shadow:0 6px 28px rgba(0,0,0,.6);pointer-events:none;animation:toastIn .25s ease';
   const cqMatch = window._CONQUISTAS ? window._CONQUISTAS.find(c=>c.id===t.cqId) : null;
-  const conquNome = cqMatch ? `${cqMatch.icon} ${cqMatch.nome}` : (t.reqIcon||'🔒');
-  toast.innerHTML = `<div style="color:rgba(255,120,120,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">🔒 Tema bloqueado</div><div style="color:#fff;font-weight:700;font-size:12px;margin-bottom:2px">${t.label}</div><div style="color:rgba(255,255,255,.7);font-size:10px">Conquista necessária:</div><div style="color:#ffd700;font-size:11px;margin-top:3px">${conquNome}</div><div style="color:rgba(255,255,255,.5);font-size:10px;margin-top:2px">${t.desc.includes('—') ? t.desc.split('—')[1].trim() : t.desc}</div>`;
+  const conquNome = cqMatch ? cqMatch.icon+' '+cqMatch.nome : (t.reqIcon||'🏆');
+  const condLine = t.desc.includes('—') ? t.desc.split('—')[1].trim() : t.desc;
+  const statusLine = desbloqueado
+    ? '<div style="color:rgba(77,255,176,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">✅ Tema desbloqueado</div>'
+    : '<div style="color:rgba(255,120,120,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">🔒 Tema bloqueado</div>';
+  toast.innerHTML = statusLine
+    + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:6px">'+(t.reqIcon||'🎨')+' '+t.label+'</div>'
+    + '<div style="color:rgba(255,255,255,.6);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">'+(desbloqueado?'Desbloqueado com':'Conquista necessária')+':</div>'
+    + '<div style="color:#ffd700;font-size:12px;font-weight:700;margin-bottom:2px">'+conquNome+'</div>'
+    + '<div style="color:rgba(255,255,255,.45);font-size:10px">'+condLine+'</div>';
   document.body.appendChild(toast);
-  setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, 2500);
+  const dur = desbloqueado ? 3000 : 2800;
+  setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, dur);
 };
+
+// Long press em temas desbloqueados
+window._attachTemaLongPress = function(){
+  document.querySelectorAll('.carta-tema-btn:not(.bloqueado)').forEach(btn=>{
+    if(btn.dataset.lpAttached) return;
+    btn.dataset.lpAttached = '1';
+    let timer = null, moved = false;
+    const getThemeId = ()=>{ const m=(btn.getAttribute('onclick')||'').match(/_selecionarTema\('([^']+)'\)/); return m?m[1]:null; };
+    const start = ()=>{ moved=false; timer=setTimeout(()=>{ if(moved) return; if(navigator.vibrate) navigator.vibrate(40); const id=getThemeId(); if(id) window._mostrarReqTema(id, true); }, 500); };
+    const cancel = ()=>clearTimeout(timer);
+    const move = ()=>{ moved=true; clearTimeout(timer); };
+    btn.addEventListener('pointerdown', start, {passive:true});
+    btn.addEventListener('pointerup', cancel, {passive:true});
+    btn.addEventListener('pointercancel', cancel, {passive:true});
+    btn.addEventListener('pointermove', move, {passive:true});
+    btn.addEventListener('contextmenu', e=>e.preventDefault());
+  });
+};
+
+(function(){
+  const obs = new MutationObserver(()=>{
+    const unattached = document.querySelector('.carta-tema-btn:not(.bloqueado):not([data-lp-attached])');
+    if(unattached) window._attachTemaLongPress();
+  });
+  obs.observe(document.body, {childList:true, subtree:true});
+})();
 
 window._selecionarTema = function(temaId){
   _cartaTemaAtivo = temaId;
@@ -10093,28 +10129,70 @@ window._selecionarTema = function(temaId){
 
   const st = temaStyles[temaId];
 
-  // Se a carta tem style inline (survey card), sobrescreve diretamente
-  if(card.style.background || card.style.backgroundImage){
+  // Detecta se é survey card (tem background inline) ou carta CSS normal
+  const isSurveyCard = !!(card.style.background || card.style.backgroundImage);
+
+  if(isSurveyCard){
+    // ── Survey card: usa inline styles ──
+    // Salva estilos originais na primeira abertura
+    if(!card.dataset.origSaved){
+      card.dataset.origSaved = '1';
+      card.dataset.origBg     = card.style.background  || '';
+      card.dataset.origShadow = card.style.boxShadow   || '';
+      card.dataset.origAnim   = card.style.animation   || '';
+      // Salva cor original de cada elemento com cor inline
+      const snapEls = [
+        ...card.querySelectorAll('[data-stat-val]'),
+        ...card.querySelectorAll('[data-stat-bar]'),
+        ...card.querySelectorAll('div[style*="color"]'),
+      ];
+      card.dataset.origEls = snapEls.length;
+      snapEls.forEach((el, i) => {
+        el.dataset.temaIdx    = i;
+        card.dataset['origColor_' + i] = el.style.color      || '';
+        card.dataset['origElBg_'  + i] = el.style.background || '';
+      });
+    }
+
     if(st){
       card.style.background = st.bg;
-      card.style.boxShadow = st.shadow + ',0 2px 16px rgba(0,0,0,.6)';
-      card.style.animation = st.anim;
-      // Atualiza cores do texto e barras
+      card.style.boxShadow  = st.shadow + ',0 2px 16px rgba(0,0,0,.6)';
+      card.style.animation  = st.anim;
       card.querySelectorAll('[data-stat-val]').forEach(el => el.style.color = st.text);
       card.querySelectorAll('[data-stat-bar]').forEach(el => el.style.background = st.bar);
-      // Fallback: atualiza todos os textos coloridos pelo tema
       card.querySelectorAll('div[style*="color"]').forEach(el => {
         if(!el.style.background && !el.style.backgroundImage) el.style.color = st.text;
       });
     } else {
-      // Volta ao padrão — restaura estilos originais salvos
-      card.style.background = card.dataset.origBg || '';
-      card.style.boxShadow = card.dataset.origShadow || '';
-      card.style.animation = '';
+      // Volta ao padrão: restaura TUDO ao original
+      card.style.background = card.dataset.origBg     || '';
+      card.style.boxShadow  = card.dataset.origShadow || '';
+      card.style.animation  = card.dataset.origAnim   || '';
+      card.querySelectorAll('[data-tema-idx]').forEach(el => {
+        const i = el.dataset.temaIdx;
+        el.style.color      = card.dataset['origColor_' + i] || '';
+        el.style.background = card.dataset['origElBg_'  + i] || '';
+      });
     }
   } else {
-    // Carta CSS normal — aplica via classe
-    if(temaId !== 'padrao') card.classList.add('tema-' + temaId);
+    // ── Carta CSS normal: usa classes ──
+    if(temaId === 'padrao'){
+      // Limpa qualquer inline style residual de temas anteriores
+      card.querySelectorAll('[data-stat-val],[data-stat-bar]').forEach(el => {
+        el.style.color = '';
+        el.style.background = '';
+      });
+      // Remove inline color de todos os elementos filhos que possam ter sido tocados
+      card.querySelectorAll('*').forEach(el => {
+        if(el.dataset.temaColorApplied) {
+          el.style.color = el.dataset.origColor || '';
+          el.style.background = el.dataset.origBg2 || '';
+          delete el.dataset.temaColorApplied;
+        }
+      });
+    } else {
+      card.classList.add('tema-' + temaId);
+    }
   }
 
   // Atualiza visual dos botões
@@ -10215,6 +10293,11 @@ window.abrirCartaJogador = function(){
     // Adiciona classe de reveal na carta
     const card=document.getElementById('player-card-el');
     if(card){
+      // Limpa dataset de temas anteriores (carta foi recriada)
+      Object.keys(card.dataset).forEach(k => {
+        if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
+      });
+      card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
       card.classList.add('revealing');
       card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
       // Aplica tema salvo
@@ -10905,9 +10988,16 @@ window.abrirCartaJogador = function(){
 
       const card = document.getElementById('player-card-el');
       if(card){
+        // Limpa dataset de temas anteriores (carta foi recriada)
+        Object.keys(card.dataset).forEach(k => {
+          if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
+        });
+        // Limpa também temaIdx nos filhos
+        card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
         // Salva estilos originais para restaurar no tema Padrão
         card.dataset.origBg = card.style.background;
         card.dataset.origShadow = card.style.boxShadow;
+        card.dataset.origAnim = card.style.animation || '';
         card.classList.add('survey-card-animated');
         card.addEventListener('animationend', function h(){
           card.removeEventListener('animationend', h);
