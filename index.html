@@ -2340,6 +2340,92 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .tp-gelo{ background:linear-gradient(155deg,#e8f4ff,#80bfff,#99ccff); }
 .tp-carbono{ background:repeating-linear-gradient(45deg,#1a1a1a 0px,#1a1a1a 1px,#2a2a2a 1px,#2a2a2a 4px); }
 .tp-ouro-solido{ background:linear-gradient(155deg,#7a5500,#ffd700,#ffe44d); }
+.tp-sangue{ background:linear-gradient(155deg,#0a0000,#6b0000,#c00020); border:1px solid #8b0000; }
+.tp-veneno{ background:linear-gradient(155deg,#001a00,#006600,#00ff44); border:1px solid #00cc33; }
+.tp-titanio{ background:linear-gradient(155deg,#1a1a2e,#16213e,#0f3460); }
+.tp-aurora{ background:linear-gradient(135deg,#003322 0%,#00cc77 33%,#0099ff 66%,#aa00ff 100%); }
+.tp-lava{ background:linear-gradient(155deg,#1a0a00,#4d1500,#cc3300,#ff6600); }
+.tp-diamante{ background:linear-gradient(135deg,#e8f4ff 0%,#b3e0ff 25%,#ffffff 50%,#c0e8ff 75%,#80ccff 100%); border:1px solid #66b3ff; }
+
+/* SANGUE */
+.player-card.tema-sangue{
+  background:linear-gradient(155deg,#0a0000 0%,#3d0000 30%,#8b0000 60%,#c00020 85%,#4d0000 100%);
+  box-shadow:0 0 0 2px #8b0000,0 0 40px rgba(180,0,20,.7),0 8px 48px rgba(0,0,0,.9);
+}
+.player-card.tema-sangue .card-rating,.player-card.tema-sangue .card-pos,
+.player-card.tema-sangue .card-name,.player-card.tema-sangue .card-stat-val{ color:#ff6680; }
+.player-card.tema-sangue .card-stat-lbl,.player-card.tema-sangue .card-edition{ color:rgba(255,102,128,.7); }
+.player-card.tema-sangue .card-divider{ background:linear-gradient(90deg,transparent,#c00020,transparent); }
+@keyframes sangueGlow{0%,100%{box-shadow:0 0 0 2px #8b0000,0 0 40px rgba(180,0,20,.7),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #ff1a40,0 0 55px rgba(255,26,64,.6),0 8px 48px rgba(0,0,0,.9)}}
+.player-card.tema-sangue{ animation:sangueGlow 2s ease-in-out infinite; }
+
+/* VENENO */
+.player-card.tema-veneno{
+  background:linear-gradient(155deg,#001a00 0%,#003300 25%,#006600 55%,#009933 80%,#001a00 100%);
+  box-shadow:0 0 0 2px #00cc33,0 0 35px rgba(0,204,51,.5),0 8px 48px rgba(0,0,0,.9);
+}
+.player-card.tema-veneno .card-rating,.player-card.tema-veneno .card-pos,
+.player-card.tema-veneno .card-name,.player-card.tema-veneno .card-stat-val{ color:#00ff88; }
+.player-card.tema-veneno .card-stat-lbl,.player-card.tema-veneno .card-edition{ color:rgba(0,255,136,.65); }
+.player-card.tema-veneno .card-divider{ background:linear-gradient(90deg,transparent,#00cc33,transparent); }
+@keyframes venenoGlow{0%,100%{box-shadow:0 0 0 2px #00cc33,0 0 35px rgba(0,204,51,.5),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #00ff88,0 0 50px rgba(0,255,136,.65),0 8px 48px rgba(0,0,0,.9)}}
+.player-card.tema-veneno{ animation:venenoGlow 2.2s ease-in-out infinite; }
+
+/* TITANIO */
+.player-card.tema-titanio{
+  background:linear-gradient(155deg,#0d0d1a 0%,#1a1a3a 30%,#16213e 60%,#0f3460 85%,#0a0a20 100%);
+  box-shadow:0 0 0 2px #4a90d9,0 0 40px rgba(74,144,217,.4),0 8px 48px rgba(0,0,0,.9);
+}
+.player-card.tema-titanio .card-rating,.player-card.tema-titanio .card-pos,
+.player-card.tema-titanio .card-name,.player-card.tema-titanio .card-stat-val{ color:#a0c8ff; }
+.player-card.tema-titanio .card-stat-lbl,.player-card.tema-titanio .card-edition{ color:rgba(160,200,255,.65); }
+.player-card.tema-titanio .card-divider{ background:linear-gradient(90deg,transparent,#4a90d9,transparent); }
+
+/* AURORA */
+.player-card.tema-aurora{
+  background:linear-gradient(135deg,#001a0d 0%,#003322 20%,#00cc77 45%,#0099ff 65%,#aa00ff 85%,#001a0d 100%);
+  box-shadow:0 0 0 2px #00cc77,0 0 45px rgba(0,204,119,.5),0 8px 48px rgba(0,0,0,.9);
+  background-size:200% 200%;
+}
+.player-card.tema-aurora .card-rating,.player-card.tema-aurora .card-pos,
+.player-card.tema-aurora .card-name,.player-card.tema-aurora .card-stat-val{ color:#e0fff0; }
+.player-card.tema-aurora .card-stat-lbl,.player-card.tema-aurora .card-edition{ color:rgba(224,255,240,.65); }
+.player-card.tema-aurora .card-divider{ background:linear-gradient(90deg,transparent,#00cc77,transparent); }
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.player-card.tema-aurora{ animation:auroraShift 4s ease infinite; }
+
+/* LAVA */
+.player-card.tema-lava{
+  background:linear-gradient(155deg,#0f0500 0%,#3d1000 20%,#8b2200 45%,#cc4400 65%,#ff6600 80%,#ff9900 100%);
+  box-shadow:0 0 0 2px #cc4400,0 0 50px rgba(204,68,0,.7),0 8px 48px rgba(0,0,0,.9);
+}
+.player-card.tema-lava .card-rating,.player-card.tema-lava .card-pos,
+.player-card.tema-lava .card-name,.player-card.tema-lava .card-stat-val{ color:#ffe0b2; }
+.player-card.tema-lava .card-stat-lbl,.player-card.tema-lava .card-edition{ color:rgba(255,224,178,.65); }
+.player-card.tema-lava .card-divider{ background:linear-gradient(90deg,transparent,#ff6600,transparent); }
+@keyframes lavaGlow{0%,100%{box-shadow:0 0 0 2px #cc4400,0 0 50px rgba(204,68,0,.7),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #ff6600,0 0 70px rgba(255,102,0,.8),0 8px 48px rgba(0,0,0,.9)}}
+.player-card.tema-lava{ animation:lavaGlow 1.8s ease-in-out infinite; }
+
+/* DIAMANTE */
+.player-card.tema-diamante{
+  background:linear-gradient(135deg,#c8e8ff 0%,#f0f8ff 20%,#80c8ff 35%,#ffffff 50%,#a0d8ff 65%,#e0f4ff 80%,#b0d8ff 100%);
+  box-shadow:0 0 0 2px #80c0ff,0 0 0 4px rgba(200,232,255,.3),0 0 50px rgba(128,200,255,.6),0 8px 48px rgba(0,0,0,.4);
+}
+.player-card.tema-diamante .card-rating,.player-card.tema-diamante .card-pos,
+.player-card.tema-diamante .card-name,.player-card.tema-diamante .card-stat-val{ color:#001a33; }
+.player-card.tema-diamante .card-stat-lbl,.player-card.tema-diamante .card-edition{ color:rgba(0,26,51,.65); }
+.player-card.tema-diamante .card-divider{ background:linear-gradient(90deg,transparent,#4da6ff,transparent); }
+@keyframes diamanteShimmer{0%,100%{box-shadow:0 0 0 2px #80c0ff,0 0 0 4px rgba(200,232,255,.3),0 0 50px rgba(128,200,255,.6),0 8px 48px rgba(0,0,0,.4)}50%{box-shadow:0 0 0 2px #ffffff,0 0 0 4px rgba(255,255,255,.5),0 0 70px rgba(255,255,255,.7),0 8px 48px rgba(0,0,0,.4)}}
+.player-card.tema-diamante{ animation:diamanteShimmer 2s ease-in-out infinite; }
+
+/* Botão bloqueado com requisito visível */
+.carta-tema-btn.bloqueado .carta-req-label{
+  font-size:7px;font-family:'DM Mono',monospace;letter-spacing:.03em;
+  color:rgba(255,100,100,.8);white-space:nowrap;text-align:center;
+  max-width:46px;overflow:hidden;text-overflow:ellipsis;
+  display:block;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* Botões da carta */
 .carta-btns{
@@ -9914,17 +10000,31 @@ function _animateCartaLoading(onComplete){
    ══════════════════════════════════════════════════════ */
 
 const CARTA_TEMAS = [
-  { id:'padrao',     label:'Padrão',      preview:'tp-padrao',     cqId:null,                    desc:null },
-  { id:'ouro-solido',label:'Ouro',        preview:'tp-ouro-solido',cqId:'ouro_acum_5',           desc:'Campeão (5 ouros acumulados)' },
-  { id:'fogo',       label:'Fogo',        preview:'tp-fogo',       cqId:'ouro_consec_2',         desc:'Em Chamas (2 ouros consecutivos)' },
-  { id:'neon',       label:'Neon',        preview:'tp-neon',       cqId:'ga_50',                 desc:'Craque (50 G+A em um mês)' },
-  { id:'galaxy',     label:'Galaxy',      preview:'tp-galaxy',     cqId:'ouro_acum_10',          desc:'Lenda (10 ouros acumulados)' },
-  { id:'cromo',      label:'Cromo',       preview:'tp-cromo',      cqId:'assist_25',             desc:'Construtor (25 assistências em um mês)' },
-  { id:'gelo',       label:'Gelo',        preview:'tp-gelo',       cqId:'pen_seq_5',             desc:'Frieza Clínica (5 pênaltis consecutivos)' },
-  { id:'carbono',    label:'Carbono',     preview:'tp-carbono',    cqId:'ouro_acum_15',          desc:'Imortal (15 ouros acumulados)' },
+  { id:'padrao',     label:'Padrão',      preview:'tp-padrao',     cqId:null,              reqIcon:null,  desc:null },
+  { id:'fogo',       label:'Fogo',        preview:'tp-fogo',       cqId:'ouro_consec_2',   reqIcon:'🔥',  desc:'Em Chamas — 2 ouros consecutivos' },
+  { id:'ouro-solido',label:'Ouro',        preview:'tp-ouro-solido',cqId:'ouro_acum_5',     reqIcon:'🏅',  desc:'Campeão — 5 ouros acumulados' },
+  { id:'neon',       label:'Neon',        preview:'tp-neon',       cqId:'ga_50',           reqIcon:'🌟',  desc:'Craque — 50 G+A em um mês' },
+  { id:'galaxy',     label:'Galaxy',      preview:'tp-galaxy',     cqId:'ouro_acum_10',    reqIcon:'🦁',  desc:'Lenda — 10 ouros acumulados' },
+  { id:'gelo',       label:'Gelo',        preview:'tp-gelo',       cqId:'pen_seq_5',       reqIcon:'🧊',  desc:'Frieza Clínica — 5 pênaltis consecutivos' },
+  { id:'cromo',      label:'Cromo',       preview:'tp-cromo',      cqId:'assist_25',       reqIcon:'🎯',  desc:'Construtor — 25 assistências em um mês' },
+  { id:'carbono',    label:'Carbono',     preview:'tp-carbono',    cqId:'ouro_acum_15',    reqIcon:'⚔️', desc:'Imortal — 15 ouros acumulados' },
+  { id:'sangue',     label:'Sangue',      preview:'tp-sangue',     cqId:'ouro_consec_4',   reqIcon:'👑',  desc:'Dominador — 4 ouros consecutivos' },
+  { id:'veneno',     label:'Veneno',      preview:'tp-veneno',     cqId:'gols_30',         reqIcon:'💥',  desc:'Sniper — 30 gols em um mês' },
+  { id:'titanio',    label:'Titânio',     preview:'tp-titanio',    cqId:'ouro_consec_3',   reqIcon:'⚡',  desc:'Imparável — 3 ouros consecutivos' },
+  { id:'aurora',     label:'Aurora',      preview:'tp-aurora',     cqId:'ouro_acum_20',    reqIcon:'🌠',  desc:'Eterno — 20 ouros acumulados' },
+  { id:'lava',       label:'Lava',        preview:'tp-lava',       cqId:'ga_60',           reqIcon:'🛸',  desc:'Extraterrestre — 60 G+A em um mês' },
+  { id:'diamante',   label:'Diamante',    preview:'tp-diamante',   cqId:'ouro_acum_25',    reqIcon:'🔮',  desc:'Mítico — 25 ouros acumulados' },
 ];
 
 let _cartaTemaAtivo = 'padrao';
+
+// Carrega tema salvo do localStorage
+(function(){
+  try {
+    const saved = localStorage.getItem('futstats-carta-tema');
+    if(saved && CARTA_TEMAS.find(t => t.id === saved)) _cartaTemaAtivo = saved;
+  } catch(e) {}
+})();
 
 window._getTemasDesbloqueados = function(){
   const calcCq = window._calcConquistas ? window._calcConquistas(window._currentUserUid, window._gd) : {};
@@ -9948,8 +10048,25 @@ window._buildTemasHTML = function(){
   }).join('');
 };
 
+window._mostrarReqTema = function(temaId){
+  const t = CARTA_TEMAS.find(x=>x.id===temaId);
+  if(!t || !t.desc) return;
+  // Remove toast anterior se existir
+  const old = document.getElementById('tema-req-toast');
+  if(old) old.remove();
+  const toast = document.createElement('div');
+  toast.id = 'tema-req-toast';
+  toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.96);border:1px solid rgba(255,100,100,.4);color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:10px 16px;border-radius:12px;z-index:9999;max-width:280px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;animation:toastIn .25s ease';
+  const cqMatch = window._CONQUISTAS ? window._CONQUISTAS.find(c=>c.id===t.cqId) : null;
+  const conquNome = cqMatch ? `${cqMatch.icon} ${cqMatch.nome}` : (t.reqIcon||'🔒');
+  toast.innerHTML = `<div style="color:rgba(255,120,120,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">🔒 Tema bloqueado</div><div style="color:#fff;font-weight:700;font-size:12px;margin-bottom:2px">${t.label}</div><div style="color:rgba(255,255,255,.7);font-size:10px">Conquista necessária:</div><div style="color:#ffd700;font-size:11px;margin-top:3px">${conquNome}</div><div style="color:rgba(255,255,255,.5);font-size:10px;margin-top:2px">${t.desc.includes('—') ? t.desc.split('—')[1].trim() : t.desc}</div>`;
+  document.body.appendChild(toast);
+  setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, 2500);
+};
+
 window._selecionarTema = function(temaId){
   _cartaTemaAtivo = temaId;
+  try { localStorage.setItem('futstats-carta-tema', temaId); } catch(e) {}
   const card = document.getElementById('player-card-el');
   if(!card) return;
 
@@ -9966,6 +10083,12 @@ window._selecionarTema = function(temaId){
     'cromo':      { bg:'linear-gradient(155deg,#c0c0c0,#ffffff,#909090)', shadow:'0 0 0 2px #aaa,0 8px 40px rgba(180,180,180,.4)', text:'#1a1a2e', bar:'rgba(100,100,100,.4)', anim:'cromoShine 3s ease-in-out infinite' },
     'gelo':       { bg:'linear-gradient(155deg,#e8f4ff,#80bfff,#99ccff)', shadow:'0 0 0 2px #4da6ff,0 0 35px rgba(77,166,255,.5)', text:'#003366', bar:'rgba(0,51,102,.3)', anim:'geloShimmer 2.5s ease-in-out infinite' },
     'carbono':    { bg:'repeating-linear-gradient(45deg,#1a1a1a 0px,#1a1a1a 2px,#2a2a2a 2px,#2a2a2a 6px)', shadow:'0 0 0 2px #444,0 8px 40px rgba(0,0,0,.8)', text:'#e0e0e0', bar:'rgba(200,200,200,.3)', anim:'none' },
+    'sangue':     { bg:'linear-gradient(155deg,#0a0000,#3d0000,#8b0000,#c00020)', shadow:'0 0 0 2px #8b0000,0 0 40px rgba(180,0,20,.7)', text:'#ff6680', bar:'rgba(192,0,32,.5)', anim:'sangueGlow 2s ease-in-out infinite' },
+    'veneno':     { bg:'linear-gradient(155deg,#001a00,#003300,#006600,#009933)', shadow:'0 0 0 2px #00cc33,0 0 35px rgba(0,204,51,.5)', text:'#00ff88', bar:'rgba(0,153,51,.5)', anim:'venenoGlow 2.2s ease-in-out infinite' },
+    'titanio':    { bg:'linear-gradient(155deg,#0d0d1a,#1a1a3a,#16213e,#0f3460)', shadow:'0 0 0 2px #4a90d9,0 0 40px rgba(74,144,217,.4)', text:'#a0c8ff', bar:'rgba(74,144,217,.4)', anim:'none' },
+    'aurora':     { bg:'linear-gradient(135deg,#001a0d 0%,#003322 20%,#00cc77 45%,#0099ff 65%,#aa00ff 85%,#001a0d 100%)', shadow:'0 0 0 2px #00cc77,0 0 45px rgba(0,204,119,.5)', text:'#e0fff0', bar:'rgba(0,204,119,.4)', anim:'auroraShift 4s ease infinite' },
+    'lava':       { bg:'linear-gradient(155deg,#0f0500,#3d1000,#8b2200,#cc4400,#ff6600)', shadow:'0 0 0 2px #cc4400,0 0 50px rgba(204,68,0,.7)', text:'#ffe0b2', bar:'rgba(204,68,0,.5)', anim:'lavaGlow 1.8s ease-in-out infinite' },
+    'diamante':   { bg:'linear-gradient(135deg,#c8e8ff 0%,#f0f8ff 20%,#80c8ff 35%,#ffffff 50%,#a0d8ff 65%,#e0f4ff 80%,#b0d8ff 100%)', shadow:'0 0 0 2px #80c0ff,0 0 0 4px rgba(200,232,255,.3),0 0 50px rgba(128,200,255,.6)', text:'#001a33', bar:'rgba(0,80,160,.2)', anim:'diamanteShimmer 2s ease-in-out infinite' },
   };
 
   const st = temaStyles[temaId];
@@ -10051,16 +10174,23 @@ window.abrirCartaJogador = function(){
     setTimeout(()=>flash.remove(), 450);
 
     // Substitui loading pela carta real
-    _cartaTemaAtivo = 'padrao';
+    // Restaura tema salvo (não reseta para padrão toda vez)
+    try {
+      const saved = localStorage.getItem('futstats-carta-tema');
+      if(saved && CARTA_TEMAS.find(t=>t.id===saved)) _cartaTemaAtivo = saved;
+      else _cartaTemaAtivo = 'padrao';
+    } catch(e) { _cartaTemaAtivo = 'padrao'; }
 
     // Gera botões de tema inline
     const _calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
     const _temasInlineHTML = CARTA_TEMAS.map(t => {
       const desbloqueado = !t.cqId || !!(_calcCq[t.cqId] && _calcCq[t.cqId].achieved);
-      const ativo = t.id === 'padrao';
-      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+      const ativo = t.id === _cartaTemaAtivo && desbloqueado;
+      const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
+      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
         <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
         <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+        ${reqLabel}
       </button>`;
     }).join('');
 
@@ -10087,6 +10217,10 @@ window.abrirCartaJogador = function(){
     if(card){
       card.classList.add('revealing');
       card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
+      // Aplica tema salvo
+      if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
+        setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 50);
+      }
     }
 
     // Anima os botões
@@ -10738,13 +10872,19 @@ window.abrirCartaJogador = function(){
       setTimeout(()=>flash.remove(), 450);
 
       _cartaTemaAtivo = 'padrao';
+      try {
+        const saved2 = localStorage.getItem('futstats-carta-tema');
+        if(saved2 && CARTA_TEMAS.find(t=>t.id===saved2)) _cartaTemaAtivo = saved2;
+      } catch(e) {}
       const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
       const _temasHTML2 = CARTA_TEMAS.map(t => {
         const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
-        const ativo = t.id === 'padrao';
-        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+        const ativo = t.id === _cartaTemaAtivo && desbloqueado;
+        const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
+        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
           <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
           <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+          ${reqLabel}
         </button>`;
       }).join('');
 
@@ -10774,6 +10914,10 @@ window.abrirCartaJogador = function(){
           card.classList.remove('survey-card-animated');
           card.classList.add('survey-card-spin');
         });
+        // Aplica tema salvo
+        if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
+          setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 100);
+        }
       }
       const btns = inner.querySelector('.carta-btns');
       if(btns){
