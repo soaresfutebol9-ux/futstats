@@ -2332,7 +2332,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 .carta-tema-btn.ativo .carta-tema-label{ color:#fff; }
 /* Previews de cada tema */
-.tp-padrao{ background:linear-gradient(155deg,#c5a200,#ffe066,#b8860b); }
+.tp-padrao{ background:#1a1d2b; border:1.5px solid rgba(255,255,255,.18) !important; }
 .tp-neon{ background:linear-gradient(155deg,#0d0d1a,#12002e,#b400ff); border:1px solid #b400ff; }
 .tp-fogo{ background:linear-gradient(155deg,#1a0000,#ff4500,#ffcc00); }
 .tp-galaxy{ background:linear-gradient(155deg,#04001a,#1a006b,#3d0070); }
@@ -10041,9 +10041,12 @@ window._buildTemasHTML = function(){
     const onclick = desbloqueado
       ? `onclick="window._selecionarTema('${t.id}')"`
       : `title="🔒 Desbloqueie: ${t.desc}"`;
-    return `<button class="carta-tema-btn${ativoClass}${bloqClass}" ${onclick}>
-      <div class="carta-tema-preview ${t.preview}"></div>
-      <span class="carta-tema-label">${t.label}</span>
+    const previewInner = t.id === 'padrao'
+      ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
+      : '';
+    return `<button class="carta-tema-btn${ativoClass}${bloqClass}" data-tema-id="${t.id}" ${onclick}>
+      <div class="carta-tema-preview ${t.preview}" style="position:relative;pointer-events:none;">${previewInner}</div>
+      <span class="carta-tema-label" style="pointer-events:none;">${t.label}</span>
     </button>`;
   }).join('');
 };
@@ -10051,7 +10054,21 @@ window._buildTemasHTML = function(){
 window._mostrarReqTema = function(temaId, desbloqueado){
   const t = CARTA_TEMAS.find(x=>x.id===temaId);
   if(!t) return;
-  if(!t.cqId) return; // padrão não tem conquista
+  // Padrão (sem conquista): só mostra toast se for long press em desbloqueado
+  if(!t.cqId){
+    if(!desbloqueado) return;
+    const old = document.getElementById('tema-req-toast');
+    if(old) old.remove();
+    const toast = document.createElement('div');
+    toast.id = 'tema-req-toast';
+    toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(14,16,26,.97);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:12px 18px;border-radius:14px;z-index:9999;max-width:290px;text-align:center;box-shadow:0 6px 28px rgba(0,0,0,.6);pointer-events:none;animation:toastIn .25s ease';
+    toast.innerHTML = '<div style="color:rgba(77,255,176,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">✅ Disponível para todos</div>'
+      + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:6px">✕ Padrão</div>'
+      + '<div style="color:rgba(255,255,255,.45);font-size:10px">Sem tema — usa o visual original da raridade do jogador.</div>';
+    document.body.appendChild(toast);
+    setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, 2500);
+    return;
+  }
   const old = document.getElementById('tema-req-toast');
   if(old) old.remove();
   const toast = document.createElement('div');
@@ -10080,7 +10097,7 @@ window._attachTemaLongPress = function(){
     if(btn.dataset.lpAttached) return;
     btn.dataset.lpAttached = '1';
     let timer = null, moved = false;
-    const getThemeId = ()=>{ const m=(btn.getAttribute('onclick')||'').match(/_selecionarTema\('([^']+)'\)/); return m?m[1]:null; };
+    const getThemeId = ()=> btn.dataset.temaId || null;
     const start = ()=>{ moved=false; timer=setTimeout(()=>{ if(moved) return; if(navigator.vibrate) navigator.vibrate(40); const id=getThemeId(); if(id) window._mostrarReqTema(id, true); }, 500); };
     const cancel = ()=>clearTimeout(timer);
     const move = ()=>{ moved=true; clearTimeout(timer); };
@@ -10964,9 +10981,12 @@ window.abrirCartaJogador = function(){
         const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
         const ativo = t.id === _cartaTemaAtivo && desbloqueado;
         const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
-        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
-          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
-          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
+        const previewInner2 = t.id === 'padrao'
+          ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
+          : '';
+        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" data-tema-id="${t.id}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden;pointer-events:none;" class="${t.preview}">${previewInner2}</div>
+          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap;pointer-events:none;">${t.label}</span>
           ${reqLabel}
         </button>`;
       }).join('');
