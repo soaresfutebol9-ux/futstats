@@ -5770,6 +5770,8 @@ function enterApp(){
         _checkBadgeConquistas();
       }
     }
+    // Grava craque da semana passada automaticamente
+    if(window._salvarCraqueSemana) window._salvarCraqueSemana();
   }, 1500);
 }
 async function _checkBadgeConquistas(){
@@ -11619,55 +11621,105 @@ function _cartaFallbackDownload(card){
       </div>
       <button class="craque-modal-close" onclick="fecharCraqueSemana()">✕</button>
     </div>
+    <div class="craque-tabs">
+      <button class="craque-tab-btn active" data-tab="semana" onclick="_setCraqueTab('semana')">🏆 Semana</button>
+      <button class="craque-tab-btn" data-tab="historico" onclick="_setCraqueTab('historico')">📜 Histórico</button>
+    </div>
     <div class="craque-modal-body" id="craque-modal-body">
     </div>
   </div>
 </div>
 
-<script>
-window.abrirCraqueSemana = function(){
-  const gd = window._gd;
-  const modal = document.getElementById('modal-craque-semana');
-  const body  = document.getElementById('craque-modal-body');
-  const periodoEl = document.getElementById('craque-modal-periodo');
-  if(!modal || !gd) return;
+<style>
+/* ── TABS DO MODAL CRAQUE ── */
+.craque-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,215,0,.2);margin-bottom:12px}
+.craque-tab-btn{
+  flex:1;padding:8px 4px;background:none;border:none;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,215,0,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+}
+.craque-tab-btn.active{color:#FFD700;border-bottom-color:#FFD700;}
+.craque-tab-btn:hover:not(.active){color:rgba(255,215,0,.75);}
+/* ── HISTÓRICO DE CRAQUES ── */
+.craque-hist-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);
+  margin-bottom:8px;cursor:pointer;transition:background .15s;
+}
+.craque-hist-item:hover{background:rgba(255,215,0,.09);}
+.craque-hist-crown{font-size:18px;flex-shrink:0}
+.craque-hist-info{flex:1;min-width:0}
+.craque-hist-name{
+  font-family:'VarsityTeam',serif;font-size:15px;color:#FFD700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.craque-hist-periodo{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.5);margin-top:1px}
+.craque-hist-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.craque-hist-chip{
+  font-family:'DM Mono',monospace;font-size:10px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:99px;padding:1px 7px;color:rgba(255,255,255,.7);
+}
+.craque-hist-score{
+  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#FFD700;
+  flex-shrink:0;text-align:right;line-height:1;
+}
+.craque-hist-score-lbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,215,0,.5);text-align:center}
+.craque-hist-empty{
+  text-align:center;padding:28px 16px;
+  font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,215,0,.35);
+  letter-spacing:.06em;
+}
+</style>
 
-  // Calcula a mesma janela da semana
+<script>
+// ── GRAVAÇÃO AUTOMÁTICA DO CRAQUE DA SEMANA ──────────────────────
+// Chave de semana: "YYYY-WNN" (ex: "2025-W22")
+function _weekKey(mondayDate){
+  const pad = n => String(n).padStart(2,'0');
+  // Usa ISO week: calcula semana do ano
+  const d = new Date(mondayDate);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  const wn = 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  return `${d.getFullYear()}-W${pad(wn)}`;
+}
+
+// Calcula semana anterior e retorna {mondayDate, sundayDate, weekStart, weekEnd, label, key}
+function _calcLastWeekInfo(){
   const today = new Date();
   const dow = today.getDay();
   const pad = n => String(n).padStart(2,'0');
   const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const fmtShort  = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
-
-  // Sempre exibe semana ANTERIOR
   const diffToMonCurrent = (dow === 0) ? -6 : 1 - dow;
   const currentMonday = new Date(today);
   currentMonday.setDate(today.getDate() + diffToMonCurrent);
   currentMonday.setHours(0,0,0,0);
-
   const mondayDate = new Date(currentMonday);
   mondayDate.setDate(currentMonday.getDate() - 7);
   mondayDate.setHours(0,0,0,0);
   const sundayDate = new Date(mondayDate);
   sundayDate.setDate(mondayDate.getDate() + 6);
   sundayDate.setHours(23,59,59,999);
+  return {
+    mondayDate, sundayDate,
+    weekStart: toDateStr(mondayDate),
+    weekEnd:   toDateStr(sundayDate),
+    label: `Seg ${fmtShort(mondayDate)} – Dom ${fmtShort(sundayDate)}`,
+    key: _weekKey(mondayDate),
+  };
+}
 
-  const weekStart = toDateStr(mondayDate);
-  const weekEnd   = toDateStr(sundayDate);
-
-  periodoEl.textContent = `Seg ${fmtShort(mondayDate)} – Dom ${fmtShort(sundayDate)}`;
-
-  // Coleta todos os matches da semana
-  const allMatches = [...(gd.matches || [])];
-  Object.values(gd.historico || {}).forEach(h => allMatches.push(...(h.matches || [])));
-
+// Calcula ranking completo de uma semana a partir dos matches
+function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
   const weekMatches = allMatches.filter(m => {
     if(!m.date) return false;
     const d = m.date.slice(0,10);
     return d >= weekStart && d <= weekEnd;
   });
-
-  // Agrega por jogador
   const byPlayer = {};
   weekMatches.forEach(m => {
     const key = m.uid || m.player;
@@ -11682,58 +11734,179 @@ window.abrirCraqueSemana = function(){
     byPlayer[key].penOk  += pk;
     byPlayer[key].penErr += Math.max(0, pb - pk);
   });
-
-  // Inclui todos os membros do grupo, mesmo os com zero
-  (gd.members || []).forEach(mb => {
+  // Inclui membros sem partidas
+  (members || []).forEach(mb => {
     const key = mb.uid || mb.name;
     if(!byPlayer[key]){
       byPlayer[key] = { uid: mb.uid||null, name: mb.name||key, gols:0, assist:0, penOk:0, penErr:0 };
     }
   });
-
-  const ranked = Object.values(byPlayer)
+  return Object.values(byPlayer)
     .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
-    .sort((a, b) => {
-      if(b.score !== a.score) return b.score - a.score;
-      return b.gols - a.gols;
-    });
+    .sort((a, b) => b.score !== a.score ? b.score - a.score : b.gols - a.gols);
+}
 
-  if(!ranked.length){
-    body.innerHTML = '<div class="craque-modal-empty">Nenhuma partida registrada esta semana.</div>';
+// Salva o craque da semana passada no Firestore (se ainda não salvo)
+window._salvarCraqueSemana = async function(){
+  if(!window._gd || !groupId || !currentUser) return;
+  const gd = window._gd;
+  const info = _calcLastWeekInfo();
+
+  // Verifica se já existe no histórico
+  const jaExiste = (gd.craquesSemana || []).some(c => c.key === info.key);
+  if(jaExiste) return;
+
+  const allMatches = [...(gd.matches || [])];
+  Object.values(gd.historico || {}).forEach(h => allMatches.push(...(h.matches || [])));
+  const ranked = _calcRankingSemana(allMatches, info.weekStart, info.weekEnd, gd.members);
+  const top = ranked.find(p => p.score > 0);
+  if(!top) return; // sem partidas na semana, não salva
+
+  const registro = {
+    key:    info.key,
+    label:  info.label,
+    weekStart: info.weekStart,
+    weekEnd:   info.weekEnd,
+    uid:    top.uid,
+    name:   top.name,
+    score:  top.score,
+    gols:   top.gols,
+    assist: top.assist,
+    penOk:  top.penOk,
+    penErr: top.penErr,
+    savedAt: Date.now(),
+  };
+
+  try {
+    const snap = await getDoc(doc(db, 'groups', groupId));
+    const cur  = snap.data();
+    cur.craquesSemana = cur.craquesSemana || [];
+    // Double-check após fetch
+    if(!cur.craquesSemana.some(c => c.key === info.key)){
+      cur.craquesSemana.push(registro);
+      // Mantém ordenado do mais recente ao mais antigo
+      cur.craquesSemana.sort((a,b) => b.key.localeCompare(a.key));
+      await setDoc(doc(db, 'groups', groupId), cur);
+      window._gd = cur;
+      gd = cur;
+    }
+  } catch(e){ console.warn('salvarCraqueSemana erro:', e); }
+};
+
+// ── RENDERIZAÇÃO DO MODAL ──────────────────────────────────────────
+let _craque_tab = 'semana'; // 'semana' | 'historico'
+
+function _renderCraqueModalContent(){
+  const gd = window._gd;
+  const body  = document.getElementById('craque-modal-body');
+  const periodoEl = document.getElementById('craque-modal-periodo');
+  if(!body || !gd) return;
+
+  if(_craque_tab === 'semana'){
+    const info = _calcLastWeekInfo();
+    periodoEl.textContent = info.label;
+    const allMatches = [...(gd.matches || [])];
+    Object.values(gd.historico || {}).forEach(h => allMatches.push(...(h.matches || [])));
+    const ranked = _calcRankingSemana(allMatches, info.weekStart, info.weekEnd, gd.members);
+
+    if(!ranked.length || !ranked.some(p => p.score > 0)){
+      body.innerHTML = '<div class="craque-modal-empty">Nenhuma partida registrada esta semana.</div>';
+    } else {
+      const posEmoji = ['🥇','🥈','🥉'];
+      const posClass = ['gold','silver','bronze'];
+      body.innerHTML = ranked.map((p, i) => {
+        const isTop  = i === 0 && p.score > 0;
+        const isMe   = p.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+        const pos    = i + 1;
+        const posLabel = pos <= 3 ? posEmoji[i] : pos;
+        const pClass   = pos <= 3 ? posClass[i] : '';
+        const av = typeof avatarHTML === 'function'
+          ? avatarHTML(p.name, 36, p.uid)
+          : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
+        const gChip  = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
+        const aChip  = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
+        const pkChip = p.penOk  > 0 ? `<span class="craque-rank-chip" style="color:#4dffb0">🟢 ${p.penOk}PK</span>` : '';
+        const zeroLabel = (!gChip && !aChip && !pkChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
+        return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
+          <div class="craque-rank-pos ${pClass}">${posLabel}</div>
+          <div onclick="${p.uid ? `event.stopPropagation();openPlayerProfile('${p.uid}')` : ''}" style="cursor:${p.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+          <div class="craque-rank-info">
+            <div class="craque-rank-name${isTop ? ' top-name' : ''}">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+            <div class="craque-rank-chips">${gChip}${aChip}${pkChip}${zeroLabel}</div>
+          </div>
+          <div class="craque-rank-score">
+            <div class="craque-rank-score-num${isTop ? ' top-score' : ''}">${p.score}</div>
+            <div class="craque-rank-score-lbl">pts</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
   } else {
-    const posEmoji = ['🥇','🥈','🥉'];
-    const posClass = ['gold','silver','bronze'];
-    body.innerHTML = ranked.map((p, i) => {
-      const isTop  = i === 0 && p.score > 0;
-      const isMe   = p.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
-      const pos    = i + 1;
-      const posLabel = pos <= 3 ? posEmoji[i] : pos;
-      const pClass   = pos <= 3 ? posClass[i] : '';
-      const av = typeof avatarHTML === 'function'
-        ? avatarHTML(p.name, 36, p.uid)
-        : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
-      const gChip = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
-      const aChip = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
-      const pkChip = p.penOk > 0 ? `<span class="craque-rank-chip" style="color:#4dffb0">🟢 ${p.penOk}PK</span>` : '';
-      const zeroLabel = (!gChip && !aChip && !pkChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
-      return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
-        <div class="craque-rank-pos ${pClass}">${posLabel}</div>
-        <div onclick="${p.uid ? `event.stopPropagation();openPlayerProfile('${p.uid}')` : ''}" style="cursor:${p.uid?'pointer':'default'};flex-shrink:0">${av}</div>
-        <div class="craque-rank-info">
-          <div class="craque-rank-name${isTop ? ' top-name' : ''}">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
-          <div class="craque-rank-chips">${gChip}${aChip}${pkChip}${zeroLabel}</div>
-        </div>
-        <div class="craque-rank-score">
-          <div class="craque-rank-score-num${isTop ? ' top-score' : ''}">${p.score}</div>
-          <div class="craque-rank-score-lbl">pts</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
+    // ── ABA HISTÓRICO ──
+    periodoEl.textContent = 'todos os tempos';
+    const hist = (gd.craquesSemana || []).slice().sort((a,b) => b.key.localeCompare(a.key));
+    if(!hist.length){
+      body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O histórico é gravado automaticamente<br>ao final de cada semana.</div>';
+    } else {
+      // Conta quantas vezes cada jogador foi craque
+      const contagem = {};
+      hist.forEach(c => {
+        const k = c.uid || c.name;
+        contagem[k] = (contagem[k] || 0) + 1;
+      });
 
+      body.innerHTML = hist.map((c, i) => {
+        const isMe = c.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+        const av = typeof avatarHTML === 'function'
+          ? avatarHTML(c.name, 36, c.uid)
+          : `<div class="av av0">${(c.name||'?')[0].toUpperCase()}</div>`;
+        const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
+        const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
+        const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
+        const vezes  = contagem[c.uid || c.name];
+        const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
+        return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
+          <div class="craque-hist-crown">${i === 0 ? '🥇' : '👑'}</div>
+          <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+          <div class="craque-hist-info">
+            <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+            <div class="craque-hist-periodo">${c.label}</div>
+            <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+          </div>
+          <div>
+            <div class="craque-hist-score">${c.score}</div>
+            <div class="craque-hist-score-lbl">pts</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+window.abrirCraqueSemana = function(){
+  const modal = document.getElementById('modal-craque-semana');
+  if(!modal || !window._gd) return;
+  _craque_tab = 'semana';
+  _atualizarTabsCraque();
+  _renderCraqueModalContent();
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Tenta gravar o craque da semana passada ao abrir
+  window._salvarCraqueSemana();
 };
+
+window._setCraqueTab = function(tab){
+  _craque_tab = tab;
+  _atualizarTabsCraque();
+  _renderCraqueModalContent();
+};
+
+function _atualizarTabsCraque(){
+  document.querySelectorAll('.craque-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === _craque_tab);
+  });
+}
 
 window.fecharCraqueSemana = function(){
   const modal = document.getElementById('modal-craque-semana');
@@ -11748,6 +11921,11 @@ document.addEventListener('keydown', e => {
     const m = document.getElementById('modal-craque-semana');
     if(m && m.classList.contains('open')) fecharCraqueSemana();
   }
+});
+
+// Tenta gravar automaticamente quando o app carrega (para não perder semanas)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if(window._gd && groupId) window._salvarCraqueSemana(); }, 4000);
 });
 </script>
 
