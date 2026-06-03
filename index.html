@@ -2907,7 +2907,22 @@ html, body {
   margin-top:1px;
 }
 
-/* ── MODAL CRAQUE DA SEMANA ── */
+.craque-ver-todos-btn{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,215,0,.35);
+  border-radius:99px;
+  color:rgba(255,215,0,.85);
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.06em;
+  padding:3px 10px;
+  cursor:pointer;white-space:nowrap;
+  transition:all .15s;
+}
+.craque-ver-todos-btn:hover{
+  background:rgba(255,215,0,.18);
+  border-color:rgba(255,215,0,.6);
+  color:#FFD700;
+}
 #modal-craque-semana{
   display:none;
   position:fixed;inset:0;z-index:3000;
@@ -4517,25 +4532,32 @@ window.removerApelido=async()=>{
 function calcCraqueRodada(){
   if(!gd) return null;
 
-  // ── Calcula a janela da semana atual: segunda-feira a domingo ──
-  // A semana vai de SEG (inclusive) a DOM (inclusive) da semana corrente.
-  // Se hoje é segunda, a janela começa hoje.
-  // Formato das datas nos matches: "YYYY-MM-DD"
+  const pad = n => String(n).padStart(2,'0');
+  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fmtShort  = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+
   const today = new Date();
   const dow = today.getDay(); // 0=dom,1=seg,...,6=sab
-  const diffToMon = (dow === 0) ? -6 : 1 - dow; // dias até a última segunda
-  const mondayDate = new Date(today);
-  mondayDate.setDate(today.getDate() + diffToMon);
+
+  // ── Define qual semana exibir ──
+  // Sempre exibe a semana ANTERIOR (seg a dom passados)
+
+  // Segunda-feira da semana atual
+  const diffToMonCurrent = (dow === 0) ? -6 : 1 - dow;
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() + diffToMonCurrent);
+  currentMonday.setHours(0,0,0,0);
+
+  // Semana anterior: 7 dias antes da segunda atual
+  const mondayDate = new Date(currentMonday);
+  mondayDate.setDate(currentMonday.getDate() - 7);
   mondayDate.setHours(0,0,0,0);
   const sundayDate = new Date(mondayDate);
   sundayDate.setDate(mondayDate.getDate() + 6);
   sundayDate.setHours(23,59,59,999);
 
-  // Converte para string "YYYY-MM-DD" para comparação direta com m.date
-  const pad = n => String(n).padStart(2,'0');
-  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const weekStart = toDateStr(mondayDate); // "YYYY-MM-DD"
-  const weekEnd   = toDateStr(sundayDate); // "YYYY-MM-DD"
+  const weekStart = toDateStr(mondayDate);
+  const weekEnd   = toDateStr(sundayDate);
 
   // ── Coleta todos os matches (mês ativo + histórico) ──
   const allMatches = [];
@@ -4565,16 +4587,22 @@ function calcCraqueRodada(){
         name: m.player || m.name || key,
         gols:   0,
         assist: 0,
+        penOk:  0,
+        penErr: 0,
       };
     }
     byPlayer[key].gols   += (m.gols   || 0);
     byPlayer[key].assist += (m.assist || 0);
+    const pb = (m.penBat || 0);
+    const pk = (m.penOk  || 0);
+    byPlayer[key].penOk  += pk;
+    byPlayer[key].penErr += Math.max(0, pb - pk);
   });
 
-  // ── Fórmula: (Gols × 5) + (Assistências × 3) ──
+  // ── Fórmula: (Gols × 5) + (Assistências × 3) + (Pên. convertidos × 2) − (Pên. errados × 3) ──
   const players = Object.values(byPlayer).map(p => ({
     ...p,
-    score: (p.gols * 5) + (p.assist * 3),
+    score: (p.gols * 5) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3),
   }));
 
   // Filtra pontuação > 0 — se todos zerados, omite o card
@@ -4593,9 +4621,8 @@ function calcCraqueRodada(){
   const mb = (gd.members || []).find(m => m.uid === craque.uid);
   craque.photo = mb?.photo || null;
 
-  // Label da semana, ex: "Seg 02/06 – Dom 08/06"
-  const fmtShort = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
-  const rodadaLabel = `${fmtShort(mondayDate)} – ${fmtShort(sundayDate)}`;
+  // Label da semana, ex: "Seg 26/05 – Dom 01/06"
+  const rodadaLabel = `Seg ${fmtShort(mondayDate)} – Dom ${fmtShort(sundayDate)}`;
 
   return { ...craque, rodadaLabel };
 }
@@ -4611,8 +4638,10 @@ function renderCraqueRodada(){
       : `<div class="av av0">${(craque.name||'?')[0].toUpperCase()}</div>`
   }</div>`;
 
-  const golapiace = craque.gols  > 0 ? `<span class="craque-stat-chip">⚽ ${craque.gols}G</span>` : '';
-  const assistace = craque.assist > 0 ? `<span class="craque-stat-chip">👟 ${craque.assist}A</span>` : '';
+  const golapiace = craque.gols   > 0 ? `<span class="craque-stat-chip">⚽ ${craque.gols}G</span>` : "";
+  const assistace = craque.assist > 0 ? `<span class="craque-stat-chip">👟 ${craque.assist}A</span>` : "";
+  const penOkChip  = craque.penOk  > 0 ? `<span class="craque-stat-chip">🟢 ${craque.penOk}P</span>` : "";
+  const penErrChip = craque.penErr > 0 ? `<span class="craque-stat-chip" style="color:#ff6b6b">🔴 ${craque.penErr}PE</span>` : "";
 
   return `<div class="craque-banner">
     <span class="craque-crown-icon">👑</span>
@@ -4622,14 +4651,14 @@ function renderCraqueRodada(){
     <div class="craque-left">
       <div class="craque-label">🏆 CRAQUE DA SEMANA · <span style="opacity:.7">${craque.rodadaLabel}</span></div>
       <div class="craque-name">${craque.name}${isMe ? ' <span style="font-size:12px;opacity:.7">(você)</span>' : ''}</div>
-      <div class="craque-stats">${golapiace}${assistace}</div>
+      <div class="craque-stats">${golapiace}${assistace}${penOkChip}${penErrChip}</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
       <div class="craque-score">
         ${craque.score}
         <div class="craque-score-lbl">pts</div>
       </div>
-      <button onclick="event.stopPropagation();abrirCraqueSemana()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,215,0,.35);border-radius:99px;color:rgba(255,215,0,.85);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:all .15s" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">Ver todos</button>
+      <button onclick="event.stopPropagation();abrirCraqueSemana()" class="craque-ver-todos-btn">Ver todos</button>
     </div>
   </div>`;
 }
