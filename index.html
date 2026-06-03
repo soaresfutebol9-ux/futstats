@@ -3511,6 +3511,7 @@ body::before{
           <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000" id="pperfil-nome">—</div>
           <div style="font-size:12px;color:#494a48;margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
           <div style="font-size:10px;color:#353635;margin-top:4px;font-family:'DM Mono',monospace">Toque na foto para alterar</div>
+          <div id="pperfil-xp-bar"></div>
         </div>
       </div>
     </div>
@@ -4139,6 +4140,11 @@ function renderPanPerfilAvatar(){
   // Preenche info do grupo
   const gname=$('pperfil-gname');if(gname)gname.textContent=gd?.name||'—';
   const gcode=$('pperfil-gcode');if(gcode)gcode.textContent=groupId||'—';
+  // Barra de XP/Nível
+  const xpBarEl = $('pperfil-xp-bar');
+  if(xpBarEl && currentUser && gd && window._renderXPBar){
+    xpBarEl.innerHTML = window._renderXPBar(currentUser.uid, gd);
+  }
 }
 
 function renderPerfilPanelStats(){
@@ -6761,6 +6767,15 @@ function _buildPlayerProfile(uid){
   const totalPK=allMonths.reduce((s,m)=>s+m.pk,0);
 
   document.getElementById('mp-sub').textContent=`${anos.length} temporada${anos.length!==1?'s':''}`;
+  // Barra de XP no perfil público
+  let _mpXpEl = document.getElementById('mp-xp-bar');
+  if(!_mpXpEl){
+    _mpXpEl = document.createElement('div');
+    _mpXpEl.id = 'mp-xp-bar';
+    const _mpSubRef = document.getElementById('mp-sub');
+    if(_mpSubRef && _mpSubRef.parentNode) _mpSubRef.parentNode.insertBefore(_mpXpEl, _mpSubRef.nextSibling);
+  }
+  if(_mpXpEl && window._renderXPBar) _mpXpEl.innerHTML = window._renderXPBar(uid, gd);
   // Apelido no header do perfil
   const _mpApelidoEl=document.getElementById('mp-apelido');
   const _mbApelido=mb.apelido||'';
@@ -7094,7 +7109,10 @@ function _buildPlayerProfile(uid){
         <svg viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Conquistas em destaque
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8a6a00;font-weight:700;cursor:pointer" onclick="abrirConquistas('${uid}')">${cqDesb.length}/${cqTotal} →</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${window._calcXP ? `<div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a6a00;opacity:.8">⚡ ${window._calcXP(uid,gd).toLocaleString()} XP</div>` : ''}
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8a6a00;font-weight:700;cursor:pointer" onclick="abrirConquistas('${uid}')">${cqDesb.length}/${cqTotal} →</div>
+      </div>
     </div>
     ${conquistasCardInner}
   </div>` : '';
@@ -10127,6 +10145,212 @@ window._checkConquistas = async function(db, currentUser, gd){
 // Expõe helpers para o módulo principal
 window._calcConquistas = calcConquistas;
 window._CONQUISTAS = CONQUISTAS;
+
+// ══════════════════════════════════════════════════════════════
+//  SISTEMA DE XP E NÍVEIS
+// ══════════════════════════════════════════════════════════════
+(function(){
+
+// ── Tabela de XP por conquista ─────────────────────────────────
+const XP_CONQUISTAS = {
+  // 🥇 Ouros Consecutivos — difícil, escala crescente
+  ouro_consec_2: 80, ouro_consec_3: 120, ouro_consec_4: 180,
+  ouro_consec_5: 260, ouro_semestre: 360,
+  // 🥇 Ouros Acumulativos — médio, escala crescente
+  ouro_acum_3: 40, ouro_acum_5: 60, ouro_acum_10: 90,
+  ouro_acum_15: 130, ouro_acum_20: 180, ouro_acum_25: 240, ouro_acum_30: 310,
+  // 🥈 Pratas Consecutivos — pouquíssimo XP
+  prata_consec_2: 10, prata_consec_3: 15, prata_consec_4: 20, prata_consec_5: 25,
+  // 💀 Último Consecutivo — pouquíssimo XP
+  ultimo_consec_2: 5, ultimo_consec_3: 8, ultimo_consec_4: 11, ultimo_consec_5: 14,
+  // 💀 Último Acumulativo — pouquíssimo XP
+  ultimo_acum_5: 5, ultimo_acum_10: 8, ultimo_acum_20: 12,
+  // ⚽ Gols no Mês — começa baixo, dispara no fim
+  gols_10: 30, gols_15: 50, gols_20: 80, gols_25: 130,
+  gols_30: 200, gols_35: 300, gols_40: 450,
+  // 👟 Assistências no Mês — começa baixo, dispara no fim
+  assist_10: 30, assist_15: 50, assist_20: 80, assist_25: 130,
+  assist_30: 200, assist_35: 300,
+  // 📅 Assistências no Ano — muito difícil
+  assist_ano_100: 200, assist_ano_150: 320, assist_ano_200: 480,
+  assist_ano_250: 680, assist_ano_300: 920,
+  // 🌎 Assistências Geral — muito difícil
+  assist_total_200: 250, assist_total_350: 420, assist_total_500: 640,
+  assist_total_700: 920, assist_total_1000: 1300,
+  // ⚡ G+A no Mês — muito crescente
+  ga_30: 60, ga_35: 100, ga_40: 160, ga_45: 240,
+  ga_50: 350, ga_55: 500, ga_60: 700,
+  // 📅 Gols no Ano — muito difícil
+  gols_ano_150: 300, gols_ano_200: 480, gols_ano_250: 700, gols_ano_300: 980,
+  // 💀 Gols Geral — extremamente difícil
+  gols_total_300: 400, gols_total_350: 560, gols_total_400: 760,
+  gols_total_500: 1000, gols_total_600: 1300, gols_total_700: 1650,
+  gols_total_800: 2050, gols_total_1000: 2500,
+  // 🎩 Sequencial de Gols — muito difícil
+  seq_hattrick: 150, seq_poker: 250, seq_manita: 380,
+  seq_hexa: 540, seq_hepta: 730, seq_maradona: 950,
+  // 🥅 Pênalti Sequencial — muito difícil
+  pen_seq_3: 150, pen_seq_5: 280, pen_seq_7: 460, pen_seq_10: 700,
+  // 🥅 Aproveitamento de Pênaltis no Ano — difícil
+  pen_ano_40: 80, pen_ano_50: 130, pen_ano_60: 190,
+  pen_ano_70: 270, pen_ano_75: 360, pen_ano_80: 470, pen_ano_85: 600,
+};
+
+// ── XP por ação ────────────────────────────────────────────────
+const XP_GOL      = 10;
+const XP_ASSIST   = 6;
+const XP_PEN_OK   = 8;
+const XP_OURO     = 100;
+const XP_PRATA    = 50;
+const XP_BRONZE   = 25;
+const XP_CRAQUE   = 40;
+
+// ── Conquistas repetíveis (mensais/sequenciais) ────────────────
+// Conquistas cujo tipo pode se repetir pagam metade na 2ª vez em diante
+const TIPOS_REPETIVEIS = new Set([
+  'gols_mes','assist_mes','ga_mes','ouro_consec','prata_consec',
+  'ultimo_consec','seq_gols','pen_seq','pen_ano'
+]);
+
+// ── Níveis: XP necessário para alcançar cada nível ─────────────
+// Fórmula: xp_para_nivel(n) = 300 * n^1.6  (cresce mas não exagera)
+function xpParaNivel(n){
+  if(n <= 1) return 0;
+  return Math.round(300 * Math.pow(n - 1, 1.6));
+}
+
+// Títulos por nível
+const TITULOS_NIVEL = [
+  '', // índice 0 não usado
+  'Calouro','Amador','Promessa','Regular','Veterano',
+  'Talento','Experiente','Destaque','Especialista','Referência',
+  'Craque','Ídolo','Artilheiro','Maestro','Lenda',
+  'Superlenda','Imortal','Mítico','Transcendente','Eterno',
+];
+function tituloNivel(n){
+  return TITULOS_NIVEL[Math.min(n, TITULOS_NIVEL.length-1)] || `Nível ${n}`;
+}
+
+// Calcula nível e progresso a partir do XP total
+function calcNivel(xpTotal){
+  let nivel = 1;
+  while(true){
+    const xpProx = xpParaNivel(nivel + 1);
+    if(xpTotal < xpProx) break;
+    nivel++;
+    if(nivel >= 100) break; // segurança
+  }
+  const xpAtual = xpParaNivel(nivel);
+  const xpProximo = xpParaNivel(nivel + 1);
+  const xpNestaNivel = xpTotal - xpAtual;
+  const xpParaSubir = xpProximo - xpAtual;
+  const pct = Math.min(100, Math.round(xpNestaNivel / xpParaSubir * 100));
+  return { nivel, titulo: tituloNivel(nivel), xpTotal, xpNestaNivel, xpParaSubir, pct };
+}
+
+// ── Calcula XP total de um jogador ─────────────────────────────
+function calcXP(uid, gd){
+  if(!gd || !uid) return 0;
+  const hist   = gd.historico || {};
+  const mbs    = gd.members   || [];
+  const mb     = mbs.find(m => m.uid === uid);
+  if(!mb) return 0;
+
+  let xp = 0;
+
+  const pMatches = (matches) =>
+    (matches||[]).filter(x => x.uid ? x.uid===uid : x.player===mb.name);
+
+  // ── XP por partidas (gols, assistências, pênaltis) ─────────
+  const allMonthKeys = Object.keys(hist).sort();
+  const todasPartidas = [];
+  allMonthKeys.forEach(k => pMatches(hist[k].matches).forEach(x => todasPartidas.push(x)));
+  pMatches(gd.matches).forEach(x => todasPartidas.push(x));
+
+  todasPartidas.forEach(m => {
+    xp += (m.gols   || 0) * XP_GOL;
+    xp += (m.assist || 0) * XP_ASSIST;
+    xp += (m.penOk  || 0) * XP_PEN_OK;
+  });
+
+  // ── XP por pódio mensal ─────────────────────────────────────
+  function rankMes(matches, membros){
+    const scored = membros.map(m2 => {
+      const ms = (matches||[]).filter(x => x.uid ? x.uid===m2.uid : x.player===m2.name);
+      return { uid: m2.uid, ga: ms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0) };
+    }).sort((a,b) => b.ga - a.ga);
+    const idx = scored.findIndex(r => r.uid === uid);
+    if(idx < 0) return null;
+    return idx + 1; // posição 1-indexed
+  }
+
+  allMonthKeys.forEach(k => {
+    const h = hist[k];
+    const pos = rankMes(h.matches, h.members || mbs);
+    if(pos === 1) xp += XP_OURO;
+    else if(pos === 2) xp += XP_PRATA;
+    else if(pos === 3) xp += XP_BRONZE;
+  });
+  // Mês atual
+  {
+    const pos = rankMes(gd.matches, mbs);
+    if(pos === 1) xp += XP_OURO;
+    else if(pos === 2) xp += XP_PRATA;
+    else if(pos === 3) xp += XP_BRONZE;
+  }
+
+  // ── XP por conquistas ───────────────────────────────────────
+  const calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : {};
+  (window._CONQUISTAS || []).forEach(cq => {
+    const res = calcCq[cq.id];
+    if(!res || !res.achieved) return;
+    const base = XP_CONQUISTAS[cq.id] || 50;
+    // conquistas repetíveis: count vezes desbloqueadas
+    if(TIPOS_REPETIVEIS.has(cq.tipo) && res.count > 1){
+      // 1ª vez: XP cheio; demais: metade (arredondado para cima)
+      xp += base;
+      xp += Math.ceil(base / 2) * (res.count - 1);
+    } else {
+      xp += base;
+    }
+  });
+
+  return xp;
+}
+
+// ── Renderiza barra de XP/nível ─────────────────────────────────
+function renderXPBar(uid, gd){
+  const xpTotal = calcXP(uid, gd);
+  const { nivel, titulo, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
+  const cor = nivel < 5 ? '#4dfeb0' : nivel < 10 ? '#FFD700' : nivel < 15 ? '#ff6b35' : '#bf5fff';
+  return `
+  <div id="xp-bar-wrap" style="margin-top:8px;background:rgba(0,0,0,.12);border-radius:10px;padding:8px 10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:${cor};font-weight:700;letter-spacing:.06em">
+        ⚡ NÍV. ${nivel} · ${titulo}
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:#666;letter-spacing:.04em">
+        ${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border-radius:99px;height:6px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cor},${cor}cc);border-radius:99px;transition:width .6s ease;box-shadow:0 0 8px ${cor}88"></div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:#888;margin-top:4px;text-align:right">
+      ${xpTotal.toLocaleString()} XP total
+    </div>
+  </div>`;
+}
+
+// ── Expõe funções globais ───────────────────────────────────────
+window._calcXP      = calcXP;
+window._calcNivel   = calcNivel;
+window._renderXPBar = renderXPBar;
+window._XP_CONQUISTAS = XP_CONQUISTAS;
+
+})();
+// ── FIM SISTEMA DE XP ─────────────────────────────────────────
+
 
 // ── ABRIR CONQUISTAS ───────────────────────────────────────────
 // ── SELETOR DE CONQUISTAS PINADAS ──────────────────────────────
