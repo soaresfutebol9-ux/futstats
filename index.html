@@ -2838,7 +2838,7 @@ html, body {
   overflow: visible;
 }
 
-/* ── CRAQUE DA RODADA ── */
+/* ── CRAQUE DA SEMANA ── */
 .craque-banner{
   position:relative;overflow:visible;
   background:linear-gradient(120deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);
@@ -2905,6 +2905,116 @@ html, body {
   font-family:'DM Mono',monospace;font-size:9px;
   color:rgba(255,215,0,.6);letter-spacing:.05em;text-transform:uppercase;
   margin-top:1px;
+}
+
+/* ── MODAL CRAQUE DA SEMANA ── */
+#modal-craque-semana{
+  display:none;
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(0,0,0,.82);
+  align-items:center;justify-content:center;
+  padding:16px;
+}
+#modal-craque-semana.open{
+  display:flex;
+  animation:modalBgIn .22s ease forwards;
+}
+.craque-modal-inner{
+  background:var(--bg2);
+  border:1px solid rgba(255,215,0,.18);
+  border-radius:22px;
+  width:100%;max-width:480px;
+  max-height:88vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(255,215,0,.1),0 8px 40px rgba(0,0,0,.6),var(--glow-card);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+.craque-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--bo2);
+  flex-shrink:0;
+}
+.craque-modal-title{
+  display:flex;flex-direction:column;gap:2px;
+}
+.craque-modal-title strong{
+  font-family:'VarsityTeam',serif;font-size:17px;
+  color:var(--tx);letter-spacing:.3px;
+}
+.craque-modal-title span{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;
+}
+.craque-modal-close{
+  background:var(--bg3);border:1px solid var(--bo2);
+  border-radius:50%;width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;
+  transition:all .15s;flex-shrink:0;
+}
+.craque-modal-close:hover{background:var(--bg4);color:var(--tx);border-color:var(--bo3)}
+.craque-modal-body{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:12px 16px 20px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.craque-modal-body::-webkit-scrollbar{width:3px}
+.craque-modal-body::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px}
+.craque-rank-row{
+  display:grid;
+  grid-template-columns:28px 44px 1fr auto;
+  align-items:center;gap:12px;
+  padding:11px 14px;
+  border-radius:13px;
+  background:var(--bg3);
+  border:1px solid var(--bo);
+  transition:border-color .15s;
+}
+.craque-rank-row.is-top{
+  background:linear-gradient(120deg,rgba(26,26,46,.9) 0%,rgba(22,33,62,.9) 40%,rgba(15,52,96,.9) 100%);
+  border-color:rgba(255,215,0,.4);
+  box-shadow:0 0 20px rgba(255,215,0,.08);
+}
+.craque-rank-pos{
+  font-family:'DM Mono',monospace;font-size:13px;
+  font-weight:700;color:var(--tx3);text-align:center;
+}
+.craque-rank-pos.gold{color:#FFD700;filter:drop-shadow(0 0 4px rgba(255,215,0,.5))}
+.craque-rank-pos.silver{color:#c0c0c0}
+.craque-rank-pos.bronze{color:#cd7f32}
+.craque-rank-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.craque-rank-name{
+  font-size:14px;font-weight:600;color:var(--tx);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.craque-rank-name.top-name{color:#FFD700}
+.craque-rank-chips{display:flex;gap:5px;flex-wrap:wrap}
+.craque-rank-chip{
+  font-family:'DM Mono',monospace;font-size:10px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:99px;padding:1px 7px;color:var(--tx3);
+}
+.craque-rank-score{
+  display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0;
+}
+.craque-rank-score-num{
+  font-family:'ClassyVogue',sans-serif;font-size:20px;line-height:1;
+  color:var(--tx2);
+}
+.craque-rank-score-num.top-score{
+  color:#FFD700;
+  text-shadow:0 0 10px rgba(255,215,0,.4);
+}
+.craque-rank-score-lbl{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:var(--tx3);letter-spacing:.05em;text-transform:uppercase;
+}
+.craque-modal-empty{
+  text-align:center;padding:40px 20px;
+  font-family:'DM Mono',monospace;font-size:13px;color:var(--tx3);
 }
 
 /* ── SURVEY/CARD: evita overflow ── */
@@ -4398,7 +4508,7 @@ window.removerApelido=async()=>{
 };
 // ── FIM APELIDO ──────────────────────────────────────────────────
 
-// ── CRAQUE DA RODADA (MVP da Semana) ─────────────────────────────
+// ── CRAQUE DA SEMANA (MVP da Semana) ─────────────────────────────
 // Fórmula: Pontuação = (Gols × 5) + (Assistências × 3)
 // Desempate: mais gols. Se todos zerados → ocultar banner.
 // Baseado no ÚLTIMO lote fechado do histórico (rodada mais recente),
@@ -4407,36 +4517,53 @@ window.removerApelido=async()=>{
 function calcCraqueRodada(){
   if(!gd) return null;
 
-  // Determina a fonte de dados: última rodada fechada no histórico
-  const hist = gd.historico || {};
-  const histKeys = Object.keys(hist).sort();
+  // ── Calcula a janela da semana atual: segunda-feira a domingo ──
+  // A semana vai de SEG (inclusive) a DOM (inclusive) da semana corrente.
+  // Se hoje é segunda, a janela começa hoje.
+  // Formato das datas nos matches: "YYYY-MM-DD"
+  const today = new Date();
+  const dow = today.getDay(); // 0=dom,1=seg,...,6=sab
+  const diffToMon = (dow === 0) ? -6 : 1 - dow; // dias até a última segunda
+  const mondayDate = new Date(today);
+  mondayDate.setDate(today.getDate() + diffToMon);
+  mondayDate.setHours(0,0,0,0);
+  const sundayDate = new Date(mondayDate);
+  sundayDate.setDate(mondayDate.getDate() + 6);
+  sundayDate.setHours(23,59,59,999);
 
-  let rodadaMatches = null;
-  let rodadaLabel   = null;
+  // Converte para string "YYYY-MM-DD" para comparação direta com m.date
+  const pad = n => String(n).padStart(2,'0');
+  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const weekStart = toDateStr(mondayDate); // "YYYY-MM-DD"
+  const weekEnd   = toDateStr(sundayDate); // "YYYY-MM-DD"
 
-  if(histKeys.length > 0){
-    // Pega o último mês fechado
-    const lastKey = histKeys[histKeys.length - 1];
-    rodadaMatches = hist[lastKey].matches || [];
-    rodadaLabel   = getMesLabel ? getMesLabel(lastKey) : lastKey;
-  } else {
-    // Fallback: mês ativo
-    rodadaMatches = gd.matches || [];
-    rodadaLabel   = 'Rodada Atual';
-  }
+  // ── Coleta todos os matches (mês ativo + histórico) ──
+  const allMatches = [];
+  allMatches.push(...(gd.matches || []));
+  Object.values(gd.historico || {}).forEach(h => {
+    allMatches.push(...(h.matches || []));
+  });
 
-  if(!rodadaMatches.length) return null;
+  // Filtra apenas os matches desta semana (segunda a domingo)
+  // m.date é "YYYY-MM-DD" — comparação lexicográfica funciona corretamente
+  const weekMatches = allMatches.filter(m => {
+    if(!m.date) return false;
+    const d = m.date.slice(0,10); // garante formato correto
+    return d >= weekStart && d <= weekEnd;
+  });
 
-  // Agrega por jogador
+  if(!weekMatches.length) return null;
+
+  // ── Agrega por jogador ──
   const byPlayer = {};
-  rodadaMatches.forEach(m => {
+  weekMatches.forEach(m => {
     const key = m.uid || m.player;
     if(!key) return;
     if(!byPlayer[key]){
       byPlayer[key] = {
-        uid: m.uid || null,
+        uid:  m.uid || null,
         name: m.player || m.name || key,
-        gols: 0,
+        gols:   0,
         assist: 0,
       };
     }
@@ -4444,16 +4571,17 @@ function calcCraqueRodada(){
     byPlayer[key].assist += (m.assist || 0);
   });
 
+  // ── Fórmula: (Gols × 5) + (Assistências × 3) ──
   const players = Object.values(byPlayer).map(p => ({
     ...p,
     score: (p.gols * 5) + (p.assist * 3),
   }));
 
-  // Filtra pontuação > 0
+  // Filtra pontuação > 0 — se todos zerados, omite o card
   const ativos = players.filter(p => p.score > 0);
-  if(!ativos.length) return null; // Todos zerados → omitir
+  if(!ativos.length) return null;
 
-  // Ordena: maior score, desempate por mais gols
+  // ── Desempate: maior score → mais gols ──
   ativos.sort((a, b) => {
     if(b.score !== a.score) return b.score - a.score;
     return b.gols - a.gols;
@@ -4461,9 +4589,13 @@ function calcCraqueRodada(){
 
   const craque = ativos[0];
 
-  // Enriquece com foto do membro atual
+  // Enriquece com foto do membro
   const mb = (gd.members || []).find(m => m.uid === craque.uid);
   craque.photo = mb?.photo || null;
+
+  // Label da semana, ex: "Seg 02/06 – Dom 08/06"
+  const fmtShort = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+  const rodadaLabel = `${fmtShort(mondayDate)} – ${fmtShort(sundayDate)}`;
 
   return { ...craque, rodadaLabel };
 }
@@ -4488,13 +4620,16 @@ function renderCraqueRodada(){
       ${avWrap}
     </div>
     <div class="craque-left">
-      <div class="craque-label">🏆 CRAQUE DA RODADA · <span style="opacity:.7">${craque.rodadaLabel}</span></div>
+      <div class="craque-label">🏆 CRAQUE DA SEMANA · <span style="opacity:.7">${craque.rodadaLabel}</span></div>
       <div class="craque-name">${craque.name}${isMe ? ' <span style="font-size:12px;opacity:.7">(você)</span>' : ''}</div>
       <div class="craque-stats">${golapiace}${assistace}</div>
     </div>
-    <div class="craque-score">
-      ${craque.score}
-      <div class="craque-score-lbl">pts</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+      <div class="craque-score">
+        ${craque.score}
+        <div class="craque-score-lbl">pts</div>
+      </div>
+      <button onclick="event.stopPropagation();abrirCraqueSemana()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,215,0,.35);border-radius:99px;color:rgba(255,215,0,.85);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:all .15s" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">Ver todos</button>
     </div>
   </div>`;
 }
@@ -10935,6 +11070,136 @@ function _cartaFallbackDownload(card){
 }
 
 /* _getStGeral já é exposto pelo módulo principal via window._getStGeral */
+</script>
+
+<!-- ── MODAL CRAQUE DA SEMANA ── -->
+<div id="modal-craque-semana" onclick="if(event.target===this)fecharCraqueSemana()">
+  <div class="craque-modal-inner">
+    <div class="craque-modal-header">
+      <div class="craque-modal-title">
+        <strong>👑 Craque da Semana</strong>
+        <span id="craque-modal-periodo">—</span>
+      </div>
+      <button class="craque-modal-close" onclick="fecharCraqueSemana()">✕</button>
+    </div>
+    <div class="craque-modal-body" id="craque-modal-body">
+    </div>
+  </div>
+</div>
+
+<script>
+window.abrirCraqueSemana = function(){
+  const modal = document.getElementById('modal-craque-semana');
+  const body  = document.getElementById('craque-modal-body');
+  const periodoEl = document.getElementById('craque-modal-periodo');
+  if(!modal || !gd) return;
+
+  // Calcula a mesma janela da semana
+  const today = new Date();
+  const dow = today.getDay();
+  const diffToMon = (dow === 0) ? -6 : 1 - dow;
+  const mondayDate = new Date(today);
+  mondayDate.setDate(today.getDate() + diffToMon);
+  mondayDate.setHours(0,0,0,0);
+  const sundayDate = new Date(mondayDate);
+  sundayDate.setDate(mondayDate.getDate() + 6);
+  sundayDate.setHours(23,59,59,999);
+
+  const pad = n => String(n).padStart(2,'0');
+  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fmtShort  = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+  const weekStart = toDateStr(mondayDate);
+  const weekEnd   = toDateStr(sundayDate);
+
+  periodoEl.textContent = `Seg ${fmtShort(mondayDate)} – Dom ${fmtShort(sundayDate)}`;
+
+  // Coleta todos os matches da semana
+  const allMatches = [...(gd.matches || [])];
+  Object.values(gd.historico || {}).forEach(h => allMatches.push(...(h.matches || [])));
+
+  const weekMatches = allMatches.filter(m => {
+    if(!m.date) return false;
+    const d = m.date.slice(0,10);
+    return d >= weekStart && d <= weekEnd;
+  });
+
+  // Agrega por jogador
+  const byPlayer = {};
+  weekMatches.forEach(m => {
+    const key = m.uid || m.player;
+    if(!key) return;
+    if(!byPlayer[key]){
+      byPlayer[key] = { uid: m.uid||null, name: m.player||m.name||key, gols:0, assist:0 };
+    }
+    byPlayer[key].gols   += (m.gols   || 0);
+    byPlayer[key].assist += (m.assist || 0);
+  });
+
+  // Inclui todos os membros do grupo, mesmo os com zero
+  (gd.members || []).forEach(mb => {
+    const key = mb.uid || mb.name;
+    if(!byPlayer[key]){
+      byPlayer[key] = { uid: mb.uid||null, name: mb.name||key, gols:0, assist:0 };
+    }
+  });
+
+  const ranked = Object.values(byPlayer)
+    .map(p => ({ ...p, score: (p.gols * 5) + (p.assist * 3) }))
+    .sort((a, b) => {
+      if(b.score !== a.score) return b.score - a.score;
+      return b.gols - a.gols;
+    });
+
+  if(!ranked.length){
+    body.innerHTML = '<div class="craque-modal-empty">Nenhuma partida registrada esta semana.</div>';
+  } else {
+    const posEmoji = ['🥇','🥈','🥉'];
+    const posClass = ['gold','silver','bronze'];
+    body.innerHTML = ranked.map((p, i) => {
+      const isTop  = i === 0 && p.score > 0;
+      const isMe   = p.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+      const pos    = i + 1;
+      const posLabel = pos <= 3 ? posEmoji[i] : pos;
+      const pClass   = pos <= 3 ? posClass[i] : '';
+      const av = typeof avatarHTML === 'function'
+        ? avatarHTML(p.name, 36, p.uid)
+        : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
+      const gChip = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
+      const aChip = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
+      const zeroLabel = (!gChip && !aChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
+      return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
+        <div class="craque-rank-pos ${pClass}">${posLabel}</div>
+        <div onclick="${p.uid ? `event.stopPropagation();openPlayerProfile('${p.uid}')` : ''}" style="cursor:${p.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+        <div class="craque-rank-info">
+          <div class="craque-rank-name${isTop ? ' top-name' : ''}">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+          <div class="craque-rank-chips">${gChip}${aChip}${zeroLabel}</div>
+        </div>
+        <div class="craque-rank-score">
+          <div class="craque-rank-score-num${isTop ? ' top-score' : ''}">${p.score}</div>
+          <div class="craque-rank-score-lbl">pts</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.fecharCraqueSemana = function(){
+  const modal = document.getElementById('modal-craque-semana');
+  if(!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+// Fecha com ESC
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    const m = document.getElementById('modal-craque-semana');
+    if(m && m.classList.contains('open')) fecharCraqueSemana();
+  }
+});
 </script>
 </body>
 </html>
