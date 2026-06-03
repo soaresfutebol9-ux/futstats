@@ -7922,6 +7922,7 @@ function _renderDueloBody(){
         {lbl:'Pên.OK',a:sA.penOk,b:sB.penOk},
         {lbl:'% Pên.',a:sA.penBat>0?Math.round(sA.penOk/sA.penBat*100):0,b:sB.penBat>0?Math.round(sB.penOk/sB.penBat*100):0,suffix:'%'},
       ]:[]),
+      ...(new Date() >= new Date('2026-06-01') ? [{lbl:'G+A/Jogo',a:sA.n>0?Math.round((sA.gols+sA.assist)/sA.n*10)/10:0,b:sB.n>0?Math.round((sB.gols+sB.assist)/sB.n*10)/10:0,suffix:'',isDecimal:true}] : []),
       {lbl:'Partidas',a:sA.n,b:sB.n},
     ];
 
@@ -7963,7 +7964,7 @@ function _renderDueloBody(){
         const barColorA=clsA==='win'?'#40c960':clsA==='lose'?'rgba(255,90,122,.55)':'rgba(150,160,190,.4)';
         const barColorB=clsB==='win'?'#40c960':clsB==='lose'?'rgba(255,90,122,.55)':'rgba(150,160,190,.4)';
         // Para valores com sufixo (%) não usamos contagem animada
-        const useCount=!suf;
+        const useCount=!suf && !s.isDecimal;
         return`<div style="padding:12px 16px;${i<stats.length-1?'border-bottom:1px solid var(--bo)':''}">
           <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:8px">${s.lbl}</div>
           <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px">
@@ -7996,14 +7997,16 @@ function _renderDueloBody(){
     setTimeout(()=>{
       // 1) Animar contagem dos números
       el.querySelectorAll('.duelo-count').forEach(node=>{
-        const target=parseInt(node.dataset.val)||0;
+        const target=parseFloat(node.dataset.val)||0;
         const suf=node.dataset.suf||'';
+        const isDecimal=target!==Math.floor(target);
         if(target===0){node.textContent='0'+suf;return;}
         const dur=650,steps=35;
         let t=0;
         const tick=setInterval(()=>{
           t++;
-          node.textContent=(t>=steps?target:Math.round((target/steps)*t))+suf;
+          const v=t>=steps?target:(target/steps)*t;
+          node.textContent=(isDecimal?Math.round(v*10)/10:Math.round(v))+suf;
           if(t>=steps)clearInterval(tick);
         },dur/steps);
       });
@@ -8958,6 +8961,9 @@ document.addEventListener('click', e=>{
           suffix: '%',
         }
       );
+    }
+    if (new Date() >= new Date('2026-06-01')) {
+      stats.push({ lbl: 'G+A/Jogo', a: sA.n>0?Math.round((sA.gols+sA.assist)/sA.n*10)/10:0, b: sB.n>0?Math.round((sB.gols+sB.assist)/sB.n*10)/10:0 });
     }
     stats.push({ lbl: 'Partidas', a: sA.n, b: sB.n });
 
@@ -10407,6 +10413,9 @@ const XP_OURO     = 200;
 const XP_PRATA    = 100;
 const XP_BRONZE   = 50;
 const XP_CRAQUE   = 40;
+const XP_DESAFIO_VITORIA  = 75;
+const XP_DESAFIO_EMPATE   = 30;
+const XP_DESAFIO_DERROTA  = 15;
 
 // ── Conquistas repetíveis (mensais/sequenciais) ────────────────
 // Conquistas cujo tipo pode se repetir pagam metade na 2ª vez em diante
@@ -10516,6 +10525,26 @@ function calcXP(uid, gd){
     } else {
       xp += base;
     }
+  });
+
+  // ── XP por desafios encerrados ──────────────────────────────────
+  (gd.desafios || []).forEach(d => {
+    if(d.status !== 'encerrado') return;
+    if(d.uidA !== uid && d.uidB !== uid) return;
+    // Calcula placar do desafio
+    function dcScore(u) {
+      const src = [...(gd.matches||[])].filter(x => x.uid === u && x.ts >= d.startTs && x.ts <= d.endTs);
+      if(d.tipo === 'gols')   return src.reduce((s,x) => s+(x.gols||0), 0);
+      if(d.tipo === 'assist') return src.reduce((s,x) => s+(x.assist||0), 0);
+      return src.reduce((s,x) => s+(x.gols||0)+(x.assist||0), 0);
+    }
+    const sA = dcScore(d.uidA);
+    const sB = dcScore(d.uidB);
+    const myScore  = uid === d.uidA ? sA : sB;
+    const oppScore = uid === d.uidA ? sB : sA;
+    if(myScore > oppScore)       xp += XP_DESAFIO_VITORIA;
+    else if(myScore === oppScore) xp += XP_DESAFIO_EMPATE;
+    else                          xp += XP_DESAFIO_DERROTA;
   });
 
   return xp;
@@ -11668,7 +11697,7 @@ function _cartaFallbackDownload(card){
 .craque-hist-score-lbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,215,0,.5);text-align:center}
 .craque-hist-empty{
   text-align:center;padding:28px 16px;
-  font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,215,0,.35);
+  font-family:'DM Mono',monospace;font-size:11px;color:#000;
   letter-spacing:.06em;
 }
 </style>
