@@ -582,13 +582,37 @@ body.light .ah::after{
 .notif-list{overflow-y:auto;flex:1;padding:6px 0;}
 .notif-list::-webkit-scrollbar{width:3px;}
 .notif-list::-webkit-scrollbar-thumb{background:var(--bo2);border-radius:99px;}
+.notif-swipe-wrap{
+  position:relative;overflow:hidden;
+}
+.notif-swipe-delete{
+  position:absolute;right:0;top:0;bottom:0;
+  width:64px;
+  background:linear-gradient(90deg,rgba(255,70,90,0),#e53e3e 40%);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:20px;
+  transform:translateX(100%);
+  transition:transform .22s ease;
+  pointer-events:none;
+  border-radius:0 6px 6px 0;
+}
+.notif-swipe-wrap.swiped .notif-swipe-delete{
+  transform:translateX(0);
+  pointer-events:auto;
+}
 .notif-item{
   display:flex;align-items:flex-start;gap:10px;
-  padding:10px 16px;transition:background .15s;
+  padding:10px 16px;
+  transition:background .15s, transform .22s ease;
   border-left:3px solid transparent;
+  position:relative;
+  background:var(--bg2);
+  touch-action:pan-y;
+  user-select:none;
 }
 .notif-item.unread{background:rgba(77,255,176,.04);border-left-color:var(--g);}
 .notif-item:hover{background:var(--bg3);}
+.notif-swipe-wrap.swiped .notif-item{transform:translateX(-64px);}
 .notif-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
 .notif-body{flex:1;min-width:0;}
 .notif-text{font-size:13px;color:var(--tx);line-height:1.4;word-break:break-word;}
@@ -4815,17 +4839,54 @@ window._apagarNotif = async function(id){
   }catch(e){ console.warn('apagarNotif:',e); }
 };
 
-function _btnDel(id){
-  return `<button onclick="_apagarNotif('${id}')" title="Apagar" style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s" onmouseover="this.style.background='rgba(255,90,122,.35)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'">×</button>`;
+// ── Helpers de expiração (2 dias = 172800000 ms) ──────────────────
+const _NOTIF_TTL = 2 * 24 * 60 * 60 * 1000;
+function _isExpired(ts){ return ts && (Date.now() - ts) > _NOTIF_TTL; }
+
+// Remove do feed itens com mais de 2 dias (só localmente para exibição)
+function _feedVivos(feed){
+  return (feed||[]).filter(ev => !_isExpired(ev.ts));
 }
+// Remove notifs pessoais com mais de 2 dias (só localmente para exibição)
+function _notifsVivas(notifs){
+  return (notifs||[]).filter(n => !_isExpired(n.ts));
+}
+
+// Wrap de swipe com lixeira para qualquer notif
+function _swipeWrap(id, innerHtml, isPersonal){
+  const delFn = isPersonal ? `_apagarNotif('${id}')` : `_apagarFeedItem('${id}')`;
+  return `<div class="notif-swipe-wrap" id="sw-${id}" data-notif-id="${id}">
+    ${innerHtml}
+    <div class="notif-swipe-delete" onclick="${delFn}">🗑️</div>
+  </div>`;
+}
+
+function _btnDel(id){
+  return ''; // botão × removido — lixeira agora aparece via swipe
+}
+
+// Apaga item do feed do grupo (localStorage hide + rebaixa badge)
+window._apagarFeedItem = function(id){
+  const hidden = JSON.parse(localStorage.getItem('notif_feed_hidden_'+groupId)||'[]');
+  if(!hidden.includes(id)) hidden.push(id);
+  localStorage.setItem('notif_feed_hidden_'+groupId, JSON.stringify(hidden));
+  // também marca como lido
+  const lidasF = JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  if(!lidasF.includes(id)) lidasF.push(id);
+  localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(lidasF));
+  _updateNotifBadge();
+  _renderNotifPanel();
+};
 
 function _renderNotifPanel(){
   const list=document.getElementById('notif-list');
   if(!list)return;
-  const personalNotifs=_getMyPersonalNotifs();
+  const allPersonal=_getMyPersonalNotifs();
+  const personalNotifs=_notifsVivas(allPersonal); // filtra >2 dias
   const feed=(gd?.feed||[]).slice().reverse();
   const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
   const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const hiddenF=JSON.parse(localStorage.getItem('notif_feed_hidden_'+groupId)||'[]');
 
   let html='';
 
@@ -4836,6 +4897,7 @@ function _renderNotifPanel(){
       const unread=!lidasP.includes(n.id);
       const del=_btnDel(n.id);
 
+      let inner='';
       if(n.tipo==='desafio_solicitacao'){
         const d=(gd.desafios||[]).find(x=>x.id===n.desafioId);
         const podeResponder=d&&d.status==='pendente'&&d.uidB===currentUser.uid;
@@ -4845,7 +4907,7 @@ function _renderNotifPanel(){
             +'<button onclick="_dcCancelar(\u0027'+n.desafioId+'\u0027)" style="flex:1;padding:6px;border-radius:8px;border:none;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:11px;font-weight:600;cursor:pointer">❌ Recusar</button>'
             +'</div>'
           :(d&&d.status!=='pendente'?'<div style="font-size:10px;color:var(--tx3);margin-top:4px">'+(d.status==='ativo'?'✅ Aceito':'🚫 Encerrado/Recusado')+'</div>':'');
-        return`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
+        inner=`<div class="notif-item${unread?' unread':''}" style="flex-direction:column;align-items:flex-start;gap:0">
           <div style="display:flex;align-items:center;gap:8px;width:100%">
             <div class="notif-icon">⚔️</div>
             <div class="notif-body">
@@ -4856,78 +4918,92 @@ function _renderNotifPanel(){
           </div>
           ${btns}
         </div>`;
-      }
-      if(n.tipo==='desafio_aceito'){
-        return`<div class="notif-item${unread?' unread':''}">
+      } else if(n.tipo==='desafio_aceito'){
+        inner=`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🎉</div>
           <div class="notif-body">
             <div class="notif-text"><strong>${n.de}</strong> aceitou seu desafio! O jogo começa agora.</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-          ${del}
+          </div>${del}
         </div>`;
-      }
-      if(n.tipo==='desafio_recusado'){
-        return`<div class="notif-item${unread?' unread':''}">
+      } else if(n.tipo==='desafio_recusado'){
+        inner=`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">❌</div>
           <div class="notif-body">
             <div class="notif-text"><strong>${n.de}</strong> recusou seu desafio.</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-          ${del}
+          </div>${del}
         </div>`;
-      }
-      if(n.tipo==='desafio_ganho'){
-        return`<div class="notif-item${unread?' unread':''}">
+      } else if(n.tipo==='desafio_ganho'){
+        inner=`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🏆</div>
           <div class="notif-body">
             <div class="notif-text">Você <strong>venceu</strong> o desafio contra <strong>${n.rival}</strong>! ${n.scoreW}×${n.scoreL} em ${n.tipoLabel}.</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-          ${del}
+          </div>${del}
         </div>`;
-      }
-      if(n.tipo==='desafio_perdido'){
-        return`<div class="notif-item${unread?' unread':''}">
+      } else if(n.tipo==='desafio_perdido'){
+        inner=`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">😤</div>
           <div class="notif-body">
             <div class="notif-text">Você <strong>perdeu</strong> o desafio contra <strong>${n.rival}</strong>. Placar: ${n.scoreL}×${n.scoreW} em ${n.tipoLabel}. Da próxima!</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-          ${del}
+          </div>${del}
         </div>`;
-      }
-      if(n.tipo==='desafio_empate'){
-        return`<div class="notif-item${unread?' unread':''}">
+      } else if(n.tipo==='desafio_empate'){
+        inner=`<div class="notif-item${unread?' unread':''}">
           <div class="notif-icon">🤝</div>
           <div class="notif-body">
             <div class="notif-text">Empate no desafio contra <strong>${n.rival}</strong>! ${n.score}×${n.score} em ${n.tipoLabel}. Ninguém venceu dessa vez.</div>
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
-          </div>
-          ${del}
+          </div>${del}
         </div>`;
-      }
-      if(n.tipo==='voto_registrado'||n.tipo==='craque_rodada'||n.tipo==='mvp_mes'||n.tipo==='nota_individual'||n.tipo==='nota_recebida') return '';
-      return'';
+      } else if(n.tipo==='conquista_desbloqueada'){
+        const stack = n.stackCount ? ` <span style="opacity:.6;font-size:11px">(×${n.stackCount})</span>` : '';
+        inner=`<div class="notif-item${unread?' unread':''}" style="border-left-color:#FFD700">
+          <div class="notif-icon">${n.icon||'🏅'}</div>
+          <div class="notif-body">
+            <div class="notif-text">Você desbloqueou a conquista <strong>${n.icon||'🏅'} ${n.nome||''}</strong>${stack}!</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      } else if(n.tipo==='levelup'){
+        inner=`<div class="notif-item${unread?' unread':''}" style="border-left-color:#3b82f6">
+          <div class="notif-icon">⚡</div>
+          <div class="notif-body">
+            <div class="notif-text">Você evoluiu para o <strong>Nível ${n.nivel}</strong> — <strong>${n.titulo||('Nível '+n.nivel)}</strong>! ${n.xp?`(${n.xp.toLocaleString()} XP)`:''}.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
+      } else if(n.tipo==='voto_registrado'||n.tipo==='craque_rodada'||n.tipo==='mvp_mes'||n.tipo==='nota_individual'||n.tipo==='nota_recebida'){
+        return '';
+      } else { return ''; }
+
+      return _swipeWrap(n.id, inner, true);
     }).join('');
-    if(feed.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
+    const feedVisiveis2=(gd?.feed||[]).filter(ev=>ev.uid!==currentUser?.uid||ev.tipo==='membro');
+    if(feedVisiveis2.length) html+='<div style="height:1px;background:var(--bo);margin:6px 0"></div>';
   }
 
   // ── Feed do grupo (partidas, metas, conquistas, membros) ──
-  const feedVisiveis=feed.filter(ev=>ev.uid!==currentUser?.uid||ev.tipo==='membro');
+  const feedVivos=_feedVivos(feed);
+  const feedVisiveis=feedVivos.filter(ev=>
+    (ev.uid!==currentUser?.uid||ev.tipo==='membro') && !hiddenF.includes(ev.id)
+  );
   if(feedVisiveis.length){
     html+='<div style="font-family:DM Mono,monospace;font-size:9px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;padding:8px 14px 4px">Atividade do grupo</div>';
-    const feedIcons={partida:'⚽',meta:'🎯',conquista:'🏅',nota:'⚔️',membro:'👋'};
+    const feedIcons={partida:'⚽',meta:'🎯',conquista:'🏅',nota:'⚔️',membro:'👋',levelup:'⚡'};
     html+=feedVisiveis.slice(0,30).map(ev=>{
       const unread=!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid;
       const icon=feedIcons[ev.tipo]||'🔔';
-      return`<div class="notif-item${unread?' unread':''}">
+      const inner=`<div class="notif-item${unread?' unread':''}">
         <div class="notif-icon">${icon}</div>
         <div class="notif-body">
           <div class="notif-text">${ev.texto||''}</div>
           <div class="notif-time">${_notifTimeAgo(ev.ts)}</div>
         </div>
       </div>`;
+      return _swipeWrap(ev.id, inner, false);
     }).join('');
   }
 
@@ -4937,16 +5013,22 @@ function _renderNotifPanel(){
   }
 
   list.innerHTML=html||'<div class="notif-empty">🏃 Nenhuma atividade ainda.</div>';
+
+  // Ativa swipe touch em cada wrap
+  _initSwipe(list);
 }
 function _updateNotifBadge(){
   const badge=document.getElementById('notif-badge');
   if(!badge)return;
-  const personalNotifs=_getMyPersonalNotifs();
+  const personalNotifs=_notifsVivas(_getMyPersonalNotifs());
   const lidasP=JSON.parse(localStorage.getItem('notif_pers_lidas_'+groupId)||'[]');
-  const feed=gd?.feed||[];
+  const feed=_feedVivos(gd?.feed||[]);
   const lidasF=JSON.parse(localStorage.getItem('notif_lidas_'+groupId)||'[]');
+  const hiddenF=JSON.parse(localStorage.getItem('notif_feed_hidden_'+groupId)||'[]');
   const naoLidasP=personalNotifs.filter(n=>!lidasP.includes(n.id)).length;
-  const naoLidasF=feed.filter(ev=>!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid).length;
+  const naoLidasF=feed.filter(ev=>
+    !lidasF.includes(ev.id) && ev.uid!==currentUser?.uid && !hiddenF.includes(ev.id)
+  ).length;
   const total=naoLidasP+naoLidasF;
   if(total>0){
     badge.textContent=total>9?'9+':total;
@@ -4969,7 +5051,64 @@ window.toggleNotifPanel=()=>{
   _renderNotifPanel();
   panel.classList.add('open');
   if(overlay) overlay.classList.add('open');
+  // Marca tudo como lido ao abrir — badge some imediatamente
+  _marcarLidasAoAbrir();
 };
+
+function _marcarLidasAoAbrir(){
+  if(!groupId) return;
+  const personalNotifs=_notifsVivas(_getMyPersonalNotifs());
+  const idsP=personalNotifs.map(n=>n.id);
+  localStorage.setItem('notif_pers_lidas_'+groupId, JSON.stringify(idsP));
+  const feed=_feedVivos(gd?.feed||[]);
+  const idsF=feed.map(ev=>ev.id);
+  localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(idsF));
+  _updateNotifBadge();
+}
+
+// ── Swipe para deletar ───────────────────────────────────────────
+function _initSwipe(container){
+  const wraps=container.querySelectorAll('.notif-swipe-wrap');
+  wraps.forEach(wrap=>{
+    let startX=0, startY=0, dragging=false;
+    const THRESHOLD=52;
+
+    wrap.addEventListener('touchstart',e=>{
+      // Fecha outros swipes abertos
+      container.querySelectorAll('.notif-swipe-wrap.swiped').forEach(w=>{
+        if(w!==wrap) w.classList.remove('swiped');
+      });
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+      dragging=false;
+    },{passive:true});
+
+    wrap.addEventListener('touchmove',e=>{
+      const dx=e.touches[0].clientX-startX;
+      const dy=e.touches[0].clientY-startY;
+      if(!dragging && Math.abs(dy)>Math.abs(dx)) return; // scroll vertical — ignora
+      dragging=true;
+      if(dx<-8) e.preventDefault(); // previne scroll ao arrastar p/ esquerda
+    },{passive:false});
+
+    wrap.addEventListener('touchend',e=>{
+      if(!dragging) return;
+      const dx=e.changedTouches[0].clientX-startX;
+      if(dx<-THRESHOLD){
+        wrap.classList.add('swiped');
+      } else {
+        wrap.classList.remove('swiped');
+      }
+    },{passive:true});
+
+    // Fechar swipe ao clicar fora (no item já aberto)
+    wrap.addEventListener('click',e=>{
+      if(wrap.classList.contains('swiped') && !e.target.closest('.notif-swipe-delete')){
+        wrap.classList.remove('swiped');
+      }
+    });
+  });
+}
 
 // Fechar painel ao clicar fora
 document.addEventListener('click',e=>{
@@ -4983,10 +5122,10 @@ document.addEventListener('click',e=>{
 });
 
 window.marcarTodasLidas=()=>{
-  const personalNotifs=_getMyPersonalNotifs();
+  const personalNotifs=_notifsVivas(_getMyPersonalNotifs());
   const idsP=personalNotifs.map(n=>n.id);
   localStorage.setItem('notif_pers_lidas_'+groupId, JSON.stringify(idsP));
-  const feed=gd?.feed||[];
+  const feed=_feedVivos(gd?.feed||[]);
   const idsF=feed.map(ev=>ev.id);
   localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(idsF));
   _updateNotifBadge();
@@ -5006,6 +5145,60 @@ async function _publishFeed(tipo, texto){
     if(feed.length>100) feed.splice(0, feed.length-100);
     await updateDoc(doc(db,'groups',groupId),{feed});
   } catch(e){ console.warn('feed publish:',e); }
+}
+
+// ── Processa conquistas novas: notif pessoal no sino + feed do grupo ──────────
+async function _processarNovasConquistas(novas, publicarFeed){
+  if(!novas || novas.length === 0) return;
+  const uid = currentUser.uid;
+  const now = Date.now();
+
+  // Atualiza badge FAB
+  const badge = document.getElementById('conquistas-fab-badge');
+  if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
+
+  // Toast visual
+  window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
+
+  // Notificação pessoal no sino (uma por conquista, sem duplicata)
+  try {
+    const snap = await getDoc(doc(db, 'groups', groupId));
+    const cur  = snap.data();
+    cur.notifs = cur.notifs || {};
+    cur.notifs[uid] = cur.notifs[uid] || [];
+    let mudou = false;
+    for(const cq of novas){
+      const notifId = now + '_cq_' + cq.id;
+      const jaTem = cur.notifs[uid].some(n => n.tipo === 'conquista_desbloqueada' && n.cqId === cq.id && (now - n.ts) < 60000);
+      if(!jaTem){
+        cur.notifs[uid].push({
+          id: notifId,
+          tipo: 'conquista_desbloqueada',
+          cqId: cq.id,
+          icon: cq.icon || '🏅',
+          nome: cq.nome || cq.id,
+          stackCount: cq._stackCount || null,
+          ts: now,
+          lida: false,
+        });
+        mudou = true;
+      }
+    }
+    if(mudou){
+      await setDoc(doc(db, 'groups', groupId), cur);
+      gd = cur;
+      _updateNotifBadge();
+      if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
+    }
+  } catch(e){ console.warn('conquista notif sino:', e); }
+
+  // Feed do grupo (só publica se solicitado — evita duplicata no enterApp)
+  if(publicarFeed){
+    for(const cq of novas){
+      const stackSufx = cq._stackCount ? ` (×${cq._stackCount})` : '';
+      await _publishFeed('conquista', `<strong>${myProfile.displayName}</strong> desbloqueou a conquista <strong>${cq.icon} ${cq.nome}</strong>${stackSufx}!`);
+    }
+  }
 }
 
 // Expõe para uso externo
@@ -5571,9 +5764,7 @@ function enterApp(){
       const novas = await window._checkConquistas(db, currentUser, gd);
       window._checkLevelUp && window._checkLevelUp(_gdAntesLoad, gd);
       if(novas && novas.length > 0){
-        const badge=$('conquistas-fab-badge');
-        if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
-        window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
+        await _processarNovasConquistas(novas, true);
       } else {
         // Verifica se há não vistas para mostrar badge
         _checkBadgeConquistas();
@@ -5633,13 +5824,7 @@ window.addMatch=async()=>{
         // Verifica level up (partida + possíveis conquistas novas)
         window._checkLevelUp && window._checkLevelUp(gdAntes, gd);
         if(novas&&novas.length>0){
-          const badge=$('conquistas-fab-badge');
-          if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
-          window._mostrarToastConquistas&&window._mostrarToastConquistas(novas);
-          // Publica conquistas no feed
-          for(const cq of novas){
-            await _publishFeed('conquista',`<strong>${myProfile.displayName}</strong> desbloqueou a conquista <strong>${cq.icon} ${cq.nome}</strong>!`);
-          }
+          await _processarNovasConquistas(novas, true);
         }
       }
     },800);
@@ -10361,6 +10546,7 @@ function renderXPBar(uid, gd){
 // ── Expõe funções globais ───────────────────────────────────────
 window._calcXP      = calcXP;
 window._calcNivel   = calcNivel;
+window.tituloNivel  = tituloNivel;
 window._renderXPBar = renderXPBar;
 
 // ── TOAST DE LEVEL UP ─────────────────────────────────────────
@@ -10375,6 +10561,40 @@ window._checkLevelUp = function(gdAntes, gdDepois){
   const nivelDepois = window._calcNivel(xpDepois).nivel;
   if(nivelDepois > nivelAntes){
     setTimeout(() => window._mostrarLevelUpToast(nivelDepois, xpDepois), 600);
+
+    // ── Notificação pessoal no sino ─────────────────────────────
+    const titulo = window.tituloNivel ? window.tituloNivel(nivelDepois) : ('Nível ' + nivelDepois);
+    const now = Date.now();
+    const notifId = now + '_lvlup_' + uid;
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, 'groups', groupId));
+        const cur  = snap.data();
+        cur.notifs = cur.notifs || {};
+        cur.notifs[uid] = cur.notifs[uid] || [];
+        // Evita duplicata do mesmo nível
+        const jaTem = cur.notifs[uid].some(n => n.tipo === 'levelup' && n.nivel === nivelDepois);
+        if(!jaTem){
+          cur.notifs[uid].push({
+            id: notifId,
+            tipo: 'levelup',
+            nivel: nivelDepois,
+            titulo,
+            xp: xpDepois,
+            ts: now,
+            lida: false,
+          });
+          await setDoc(doc(db, 'groups', groupId), cur);
+          gd = cur;
+          _updateNotifBadge();
+          if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
+        }
+      } catch(e){ console.warn('levelup notif:', e); }
+    })();
+
+    // ── Feed do grupo ───────────────────────────────────────────
+    const nome = window.myProfile?.displayName || 'Jogador';
+    _publishFeed('levelup', `⚡ <strong>${nome}</strong> evoluiu para o <strong>Nível ${nivelDepois}</strong> — ${titulo}!`);
   }
 };
 
