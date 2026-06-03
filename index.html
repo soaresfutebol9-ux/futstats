@@ -10321,23 +10321,23 @@ function calcXP(uid, gd){
 // ── Renderiza barra de XP/nível ─────────────────────────────────
 function renderXPBar(uid, gd){
   const xpTotal = calcXP(uid, gd);
-  const { nivel, titulo, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
-  const cor = nivel < 5 ? '#4dfeb0' : nivel < 10 ? '#FFD700' : nivel < 15 ? '#ff6b35' : '#bf5fff';
+  const { nivel, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
+  const progressLabel = `${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP`;
   return `
-  <div id="xp-bar-wrap" style="margin-top:8px;background:rgba(0,0,0,.12);border-radius:10px;padding:8px 10px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:${cor};font-weight:700;letter-spacing:.06em">
-        ⚡ NÍV. ${nivel} · ${titulo}
+  <div id="xp-bar-wrap" style="margin-top:8px;background:rgba(0,0,0,.1);border-radius:10px;padding:8px 10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:.06em">
+        ⚡ NÍVEL ${nivel}
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:#666;letter-spacing:.04em">
-        ${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:#888">
+        ${xpTotal.toLocaleString()} XP total
       </div>
     </div>
-    <div style="background:rgba(255,255,255,.1);border-radius:99px;height:6px;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cor},${cor}cc);border-radius:99px;transition:width .6s ease;box-shadow:0 0 8px ${cor}88"></div>
-    </div>
-    <div style="font-family:'DM Mono',monospace;font-size:9px;color:#888;margin-top:4px;text-align:right">
-      ${xpTotal.toLocaleString()} XP total
+    <div style="position:relative;background:rgba(0,0,0,.15);border-radius:99px;height:18px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;transition:width .6s ease;box-shadow:0 0 10px rgba(59,130,246,.5)"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#000;letter-spacing:.04em">
+        ${progressLabel}
+      </div>
     </div>
   </div>`;
 }
