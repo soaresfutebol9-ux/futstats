@@ -11126,17 +11126,23 @@ window.abrirCraqueSemana = function(){
   // Calcula a mesma janela da semana
   const today = new Date();
   const dow = today.getDay();
-  const diffToMon = (dow === 0) ? -6 : 1 - dow;
-  const mondayDate = new Date(today);
-  mondayDate.setDate(today.getDate() + diffToMon);
+  const pad = n => String(n).padStart(2,'0');
+  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fmtShort  = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+
+  // Sempre exibe semana ANTERIOR
+  const diffToMonCurrent = (dow === 0) ? -6 : 1 - dow;
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() + diffToMonCurrent);
+  currentMonday.setHours(0,0,0,0);
+
+  const mondayDate = new Date(currentMonday);
+  mondayDate.setDate(currentMonday.getDate() - 7);
   mondayDate.setHours(0,0,0,0);
   const sundayDate = new Date(mondayDate);
   sundayDate.setDate(mondayDate.getDate() + 6);
   sundayDate.setHours(23,59,59,999);
 
-  const pad = n => String(n).padStart(2,'0');
-  const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const fmtShort  = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
   const weekStart = toDateStr(mondayDate);
   const weekEnd   = toDateStr(sundayDate);
 
@@ -11158,22 +11164,26 @@ window.abrirCraqueSemana = function(){
     const key = m.uid || m.player;
     if(!key) return;
     if(!byPlayer[key]){
-      byPlayer[key] = { uid: m.uid||null, name: m.player||m.name||key, gols:0, assist:0 };
+      byPlayer[key] = { uid: m.uid||null, name: m.player||m.name||key, gols:0, assist:0, penOk:0, penErr:0 };
     }
     byPlayer[key].gols   += (m.gols   || 0);
     byPlayer[key].assist += (m.assist || 0);
+    const pb = (m.penBat || 0);
+    const pk = (m.penOk  || 0);
+    byPlayer[key].penOk  += pk;
+    byPlayer[key].penErr += Math.max(0, pb - pk);
   });
 
   // Inclui todos os membros do grupo, mesmo os com zero
   (gd.members || []).forEach(mb => {
     const key = mb.uid || mb.name;
     if(!byPlayer[key]){
-      byPlayer[key] = { uid: mb.uid||null, name: mb.name||key, gols:0, assist:0 };
+      byPlayer[key] = { uid: mb.uid||null, name: mb.name||key, gols:0, assist:0, penOk:0, penErr:0 };
     }
   });
 
   const ranked = Object.values(byPlayer)
-    .map(p => ({ ...p, score: (p.gols * 5) + (p.assist * 3) }))
+    .map(p => ({ ...p, score: (p.gols * 5) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
     .sort((a, b) => {
       if(b.score !== a.score) return b.score - a.score;
       return b.gols - a.gols;
