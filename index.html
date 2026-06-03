@@ -2877,6 +2877,14 @@ html, body {
   font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;
   text-transform:uppercase;color:rgba(255,215,0,.75);
   display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.craque-label-row{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;
+}
+.craque-periodo{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;
+  color:rgba(255,215,0,.5);white-space:nowrap;text-transform:none;flex-shrink:0;
 }
 .craque-name{
   font-family:'VarsityTeam',serif;font-size:18px;font-weight:bold;
@@ -4608,7 +4616,7 @@ function calcCraqueRodada(){
   // ── Fórmula: (Gols × 5) + (Assistências × 3) + (Pên. convertidos × 2) − (Pên. errados × 3) ──
   const players = Object.values(byPlayer).map(p => ({
     ...p,
-    score: (p.gols * 5) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3),
+    score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3),
   }));
 
   // Filtra pontuação > 0 — se todos zerados, omite o card
@@ -4655,7 +4663,10 @@ function renderCraqueRodada(){
       ${avWrap}
     </div>
     <div class="craque-left">
-      <div class="craque-label">🏆 CRAQUE DA SEMANA · <span style="opacity:.7">${craque.rodadaLabel}</span></div>
+      <div class="craque-label-row">
+        <div class="craque-label">🏆 CRAQUE DA SEMANA</div>
+        <div class="craque-periodo">${craque.rodadaLabel}</div>
+      </div>
       <div class="craque-name">${craque.name}${isMe ? ' <span style="font-size:12px;opacity:.7">(você)</span>' : ''}</div>
       <div class="craque-stats">${golapiace}${assistace}${penOkChip}${penErrChip}</div>
     </div>
@@ -5556,7 +5567,9 @@ function enterApp(){
   // Conquistas check após carregar dados
   setTimeout(async()=>{
     if(window._checkConquistas && currentUser && gd){
+      const _gdAntesLoad = JSON.parse(JSON.stringify(gd));
       const novas = await window._checkConquistas(db, currentUser, gd);
+      window._checkLevelUp && window._checkLevelUp(_gdAntesLoad, gd);
       if(novas && novas.length > 0){
         const badge=$('conquistas-fab-badge');
         if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
@@ -5612,10 +5625,13 @@ window.addMatch=async()=>{
       const nomePartida=name&&name!=='Pelada'?` em <strong>${name}</strong>`:'';
       await _publishFeed('partida',`<strong>${myProfile.displayName}</strong> registrou uma partida${nomePartida}${statsStr}`);
     })();
-    // Verifica conquistas após salvar partida
+    // Verifica conquistas e level up após salvar partida
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
+        const gdAntes = JSON.parse(JSON.stringify(gd));
         const novas=await window._checkConquistas(db,currentUser,gd);
+        // Verifica level up (partida + possíveis conquistas novas)
+        window._checkLevelUp && window._checkLevelUp(gdAntes, gd);
         if(novas&&novas.length>0){
           const badge=$('conquistas-fab-badge');
           if(badge){ badge.textContent=novas.length; badge.style.display='flex'; }
@@ -10346,6 +10362,54 @@ function renderXPBar(uid, gd){
 window._calcXP      = calcXP;
 window._calcNivel   = calcNivel;
 window._renderXPBar = renderXPBar;
+
+// ── TOAST DE LEVEL UP ─────────────────────────────────────────
+window._nivelAnterior = null;
+
+window._checkLevelUp = function(gdAntes, gdDepois){
+  if(!window._calcXP || !window._calcNivel || !window.currentUser) return;
+  const uid = window.currentUser.uid;
+  const xpAntes  = gdAntes  ? window._calcXP(uid, gdAntes)  : 0;
+  const xpDepois = window._calcXP(uid, gdDepois);
+  const nivelAntes  = window._calcNivel(xpAntes).nivel;
+  const nivelDepois = window._calcNivel(xpDepois).nivel;
+  if(nivelDepois > nivelAntes){
+    setTimeout(() => window._mostrarLevelUpToast(nivelDepois, xpDepois), 600);
+  }
+};
+
+window._mostrarLevelUpToast = function(nivel, xpTotal){
+  const toast = document.getElementById('levelup-toast');
+  const inner = document.getElementById('levelup-toast-inner');
+  const nivelEl = document.getElementById('levelup-toast-nivel');
+  const xpEl    = document.getElementById('levelup-toast-xp');
+  const bar     = document.getElementById('levelup-toast-bar');
+  if(!toast || !inner) return;
+
+  nivelEl.textContent = 'NÍVEL ' + nivel;
+  xpEl.textContent    = xpTotal.toLocaleString() + ' XP acumulado';
+  bar.style.width = '0%';
+
+  toast.style.display = 'flex';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      inner.style.transform = 'scale(1)';
+      inner.style.opacity   = '1';
+      setTimeout(() => { bar.style.width = '100%'; }, 100);
+    });
+  });
+};
+
+window._fecharLevelUpToast = function(){
+  const toast = document.getElementById('levelup-toast');
+  const inner = document.getElementById('levelup-toast-inner');
+  if(!toast || !inner) return;
+  inner.style.transform = 'scale(.7)';
+  inner.style.opacity   = '0';
+  setTimeout(() => { toast.style.display = 'none'; }, 350);
+};
+// ── FIM TOAST LEVEL UP ────────────────────────────────────────
+
 window._XP_CONQUISTAS = XP_CONQUISTAS;
 
 })();
@@ -11408,7 +11472,7 @@ window.abrirCraqueSemana = function(){
   });
 
   const ranked = Object.values(byPlayer)
-    .map(p => ({ ...p, score: (p.gols * 5) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
+    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
     .sort((a, b) => {
       if(b.score !== a.score) return b.score - a.score;
       return b.gols - a.gols;
@@ -11430,13 +11494,14 @@ window.abrirCraqueSemana = function(){
         : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
       const gChip = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
       const aChip = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
-      const zeroLabel = (!gChip && !aChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
+      const pkChip = p.penOk > 0 ? `<span class="craque-rank-chip" style="color:#4dffb0">🟢 ${p.penOk}PK</span>` : '';
+      const zeroLabel = (!gChip && !aChip && !pkChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
       return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
         <div class="craque-rank-pos ${pClass}">${posLabel}</div>
         <div onclick="${p.uid ? `event.stopPropagation();openPlayerProfile('${p.uid}')` : ''}" style="cursor:${p.uid?'pointer':'default'};flex-shrink:0">${av}</div>
         <div class="craque-rank-info">
           <div class="craque-rank-name${isTop ? ' top-name' : ''}">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
-          <div class="craque-rank-chips">${gChip}${aChip}${zeroLabel}</div>
+          <div class="craque-rank-chips">${gChip}${aChip}${pkChip}${zeroLabel}</div>
         </div>
         <div class="craque-rank-score">
           <div class="craque-rank-score-num${isTop ? ' top-score' : ''}">${p.score}</div>
@@ -11465,6 +11530,20 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
+
+<!-- ══ TOAST LEVEL UP ══ -->
+<div id="levelup-toast" style="display:none;position:fixed;inset:0;z-index:99999;pointer-events:none;align-items:center;justify-content:center">
+  <div id="levelup-toast-inner" style="pointer-events:auto;background:#fff;border:3px solid #3b82f6;border-radius:24px;padding:32px 40px;text-align:center;box-shadow:0 8px 60px rgba(59,130,246,.45),0 2px 20px rgba(0,0,0,.15);max-width:320px;width:90%;transform:scale(.7);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s ease">
+    <div style="font-size:52px;line-height:1;margin-bottom:12px">⚡</div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;letter-spacing:.12em;font-weight:700;margin-bottom:6px;text-transform:uppercase">Subiu de Nível!</div>
+    <div id="levelup-toast-nivel" style="font-family:'Freshman',sans-serif;font-size:48px;color:#000;line-height:1;margin-bottom:4px">—</div>
+    <div style="font-family:'DM Mono',monospace;font-size:12px;color:#555;margin-bottom:20px" id="levelup-toast-xp">—</div>
+    <div style="background:#3b82f6;border-radius:99px;height:4px;overflow:hidden;margin-bottom:20px">
+      <div id="levelup-toast-bar" style="height:100%;width:0%;background:#fff;border-radius:99px;transition:width 1.2s ease .3s"></div>
+    </div>
+    <button onclick="window._fecharLevelUpToast()" style="background:#3b82f6;color:#fff;border:none;border-radius:12px;padding:12px 32px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.04em;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Continuar</button>
+  </div>
+</div>
 </body>
 </html>
 <!-- PHOTO LIGHTBOX -->
