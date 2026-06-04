@@ -5243,8 +5243,17 @@ async function _processarNovasConquistas(novas, publicarFeed){
   const badge = document.getElementById('conquistas-fab-badge');
   if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
 
-  // Toast visual
+  // Toast visual de conquista
   window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
+
+  // Toast de XP por conquista(s)
+  if(window._mostrarXPGanho && window._XP_CONQUISTAS){
+    let xpCq = 0;
+    for(const cq of novas){ xpCq += (window._XP_CONQUISTAS[cq.id] || 50); }
+    const icoCq = novas.length === 1 ? (novas[0].icon || '🏅') : '🏅';
+    const lblCq = novas.length === 1 ? (novas[0].nome || 'Conquista') : novas.length + ' conquistas';
+    setTimeout(() => window._mostrarXPGanho(xpCq, lblCq, icoCq), novas.length > 0 ? 1800 : 400);
+  }
 
   // Notificação pessoal no sino (uma por conquista, sem duplicata)
   try {
@@ -5977,6 +5986,19 @@ window.addMatch=async()=>{
       const nomePartida=name&&name!=='Pelada'?` em <strong>${name}</strong>`:'';
       await _publishFeed('partida',`<strong>${myProfile.displayName}</strong> registrou uma partida${nomePartida}${statsStr}`);
     })();
+    // Toast de XP ganho na partida
+    if(window._mostrarXPGanho){
+      const _XP_GOL=25,_XP_ASSIST=25,_XP_PEN=25;
+      const xpPartida=(gols*_XP_GOL)+(assist*_XP_ASSIST)+(pk*_XP_PEN);
+      if(xpPartida>0){
+        const partes2=[];
+        if(gols>0)   partes2.push(`${gols}G`);
+        if(assist>0) partes2.push(`${assist}A`);
+        if(pk>0)     partes2.push(`${pk}P`);
+        const sublbl = partes2.join(' + ') || 'Partida';
+        setTimeout(()=>window._mostrarXPGanho(xpPartida, sublbl, '⚽'), 400);
+      }
+    }
     // Verifica conquistas e level up após salvar partida
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
@@ -8649,7 +8671,33 @@ document.addEventListener('click', e=>{
    
    COMO USAR NO index.html:
    1. Copie todo este conteúdo dentro de uma tag <script>
-      logo antes do </body>, após os scripts existentes.
+      logo antes do 
+<!-- ══ TOAST DE XP GANHO ══ -->
+<div id="xp-gain-toast" style="
+  position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-12px);
+  z-index:99999;pointer-events:none;
+  opacity:0;transition:opacity .25s ease,transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+  background:#0d1220;
+  border:1px solid rgba(59,130,246,.35);
+  border-radius:50px;padding:7px 16px 7px 12px;
+  box-shadow:0 4px 24px rgba(59,130,246,.25),0 1px 8px rgba(0,0,0,.5);
+  white-space:nowrap;
+">
+  <div id="xp-gain-icon" style="font-size:15px;line-height:1">⚡</div>
+  <div style="display:flex;flex-direction:column;gap:1px">
+    <div id="xp-gain-label" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#fff;letter-spacing:.04em">+25 XP</div>
+    <div id="xp-gain-sub" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(96,165,250,.7);letter-spacing:.06em;text-transform:uppercase">Gol</div>
+  </div>
+  <div style="width:1px;height:20px;background:rgba(59,130,246,.25);margin:0 2px"></div>
+  <div style="display:flex;flex-direction:column;gap:2px">
+    <div style="height:3px;width:48px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
+      <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px;transition:width .9s ease .1s"></div>
+    </div>
+  </div>
+</div>
+
+</body>, após os scripts existentes.
    2. Adicione um botão de compartilhar em cada tela:
       - Ranking:  onclick="shareRanking()"
       - Duelo:    onclick="shareDuelo()"
@@ -10751,6 +10799,11 @@ window._checkLevelUp = function(gdAntes, gdDepois){
   const nivelDepois = window._calcNivel(xpDepois).nivel;
   if(nivelDepois > nivelAntes){
     setTimeout(() => window._mostrarLevelUpToast(nivelDepois, xpDepois), 600);
+    // Toast de XP de level up
+    if(window._mostrarXPGanho){
+      const titulo = window.tituloNivel ? window.tituloNivel(nivelDepois) : ('Nível ' + nivelDepois);
+      setTimeout(() => window._mostrarXPGanho(xpDepois, titulo, '🔥'), 2800);
+    }
 
     // ── Notificação pessoal no sino ─────────────────────────────
     const titulo = window.tituloNivel ? window.tituloNivel(nivelDepois) : ('Nível ' + nivelDepois);
@@ -10819,6 +10872,57 @@ window._fecharLevelUpToast = function(){
   setTimeout(() => { toast.style.display = 'none'; }, 350);
 };
 // ── FIM TOAST LEVEL UP ────────────────────────────────────────
+
+// ── TOAST DE XP GANHO POR AÇÃO ─────────────────────────────────
+window._xpGainTimer = null;
+window._xpGainPct   = 0;
+
+window._mostrarXPGanho = function(xpGanho, label, icone){
+  const toast = document.getElementById('xp-gain-toast');
+  if(!toast) return;
+  const lbl  = document.getElementById('xp-gain-label');
+  const sub  = document.getElementById('xp-gain-sub');
+  const ico  = document.getElementById('xp-gain-icon');
+  const bar  = document.getElementById('xp-gain-bar');
+  if(!lbl||!sub||!ico||!bar) return;
+
+  // Calcula % atual na barra de XP do usuário
+  let pct = 0;
+  if(window._calcXP && window._calcNivel && window.currentUser && window.gd){
+    try {
+      const xpTotal = window._calcXP(window.currentUser.uid, window.gd);
+      const info    = window._calcNivel(xpTotal);
+      pct = info ? Math.min(100, Math.round((info.xpNestaNivel / info.xpParaSubir) * 100)) : 0;
+    } catch(e){}
+  }
+
+  lbl.textContent  = '+' + xpGanho + ' XP';
+  sub.textContent  = label  || 'XP';
+  ico.textContent  = icone  || '⚡';
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+
+  toast.style.opacity   = '0';
+  toast.style.transform = 'translateX(-50%) translateY(-12px)';
+
+  clearTimeout(window._xpGainTimer);
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    toast.style.opacity   = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => {
+      bar.style.transition = 'width .9s ease';
+      bar.style.width = pct + '%';
+    }, 80);
+    window._xpGainTimer = setTimeout(() => {
+      toast.style.opacity   = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-12px)';
+    }, 2400);
+  }));
+};
+// ── FIM TOAST XP GANHO ─────────────────────────────────────────
+
+
 
 window._XP_CONQUISTAS = XP_CONQUISTAS;
 
