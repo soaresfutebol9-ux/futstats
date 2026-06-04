@@ -1261,7 +1261,7 @@ body.light .mes-vigente-titulo{
 .rec-val-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;opacity:.6;text-transform:uppercase;text-align:right}
 .rec-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace;letter-spacing:.04em}
 /* ── BADGE RECORDE ATUAL ── */
-.rec-atual-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.12);border:1px solid rgba(77,255,176,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:var(--g);letter-spacing:.06em;text-transform:uppercase;animation:recAtualPulse 1.8s ease-in-out infinite;white-space:nowrap;margin-top:5px}
+.rec-atual-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.12);border:1px solid rgba(77,255,176,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:#000000;letter-spacing:.06em;text-transform:uppercase;animation:recAtualPulse 1.8s ease-in-out infinite;white-space:nowrap;margin-top:5px}
 .rec-atual-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:recAtualDot 1.8s ease-in-out infinite}
 @keyframes recAtualPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.4),0 0 8px rgba(77,255,176,.15)}50%{box-shadow:0 0 0 5px rgba(77,255,176,.0),0 0 16px rgba(77,255,176,.3)}}
 @keyframes recAtualDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
@@ -5987,18 +5987,18 @@ window.addMatch=async()=>{
       await _publishFeed('partida',`<strong>${myProfile.displayName}</strong> registrou uma partida${nomePartida}${statsStr}`);
     })();
     // Toast de XP ganho na partida
-    if(window._mostrarXPGanho){
-      const _XP_GOL=25,_XP_ASSIST=25,_XP_PEN=25;
-      const xpPartida=(gols*_XP_GOL)+(assist*_XP_ASSIST)+(pk*_XP_PEN);
-      if(xpPartida>0){
+    setTimeout(()=>{
+      if(window._mostrarXPGanho){
+        const _XP_BASE=10,_XP_GOL=25,_XP_ASSIST=25,_XP_PEN=25;
+        const xpPartida=_XP_BASE+(gols*_XP_GOL)+(assist*_XP_ASSIST)+(pk*_XP_PEN);
         const partes2=[];
         if(gols>0)   partes2.push(`${gols}G`);
         if(assist>0) partes2.push(`${assist}A`);
         if(pk>0)     partes2.push(`${pk}P`);
-        const sublbl = partes2.join(' + ') || 'Partida';
-        setTimeout(()=>window._mostrarXPGanho(xpPartida, sublbl, '⚽'), 400);
+        const sublbl = partes2.join(' + ') || 'Participação';
+        window._mostrarXPGanho(xpPartida, sublbl, '⚽');
       }
-    }
+    }, 5200);
     // Verifica conquistas e level up após salvar partida
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
