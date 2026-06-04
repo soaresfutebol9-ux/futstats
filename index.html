@@ -5408,7 +5408,7 @@ window.selectGroup=async function(gid,el){
 async function loadGroup(gid){
   // Mostra skeleton imediatamente enquanto o Firestore responde
   const rl=$('rl');if(rl)rl.innerHTML=`<div class="sk-podium">${[46,46,46].map(s=>`<div class="sk-podium-item"><div class="sk-pulse sk-line" style="width:40px;height:10px"></div><div class="sk-pulse sk-av" style="width:${s}px;height:${s}px;border-radius:50%"></div><div class="sk-pulse sk-line" style="width:60px;height:10px"></div><div class="sk-pulse sk-line" style="width:32px;height:22px"></div></div>`).join('')}</div><div class="rank-list">${[1,2,3].map(()=>`<div class="sk-ri"><div class="sk-pulse sk-line" style="width:24px;height:14px"></div><div class="sk-pulse sk-av" style="width:50px;height:50px;border-radius:50%"></div><div class="sk-ri-info"><div class="sk-pulse sk-line" style="width:55%;height:13px"></div><div class="sk-pulse sk-line" style="width:40%;height:11px"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="sk-pulse sk-line" style="width:38px;height:22px"></div><div class="sk-pulse sk-line" style="width:24px;height:9px"></div></div></div>`).join('')}</div>`;
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
+  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;window.groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -5416,7 +5416,7 @@ window.createGroup=async()=>{
     const ma=mesAtual();const member={uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()};
     const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp(),createdBy:currentUser.uid};
     const ref=await addDoc(collection(db,'groups'),data);
-    groupId=ref.id;gd=data;
+    groupId=ref.id;window.groupId=ref.id;gd=data;
     await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(ref.id),groupId:''});
     myProfile.groupIds=[...(myProfile.groupIds||[]),ref.id];myProfile.groupId='';
     closeP('pc');enterApp();subscribeGroup();
@@ -5429,8 +5429,7 @@ window.joinGroup=async()=>{
     let data=snap.data();data=await checkMesViradaWith(code,data);
     const already=(data.members||[]).some(m=>m.uid===currentUser.uid);
     if(!already){data.members=[...(data.members||[]),{uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()}];await setDoc(doc(db,'groups',code),data);}
-    groupId=code;gd=data;
-    await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(code),groupId:''});
+    groupId=code;window.groupId=code;gd=data;
     myProfile.groupIds=[...(myProfile.groupIds||[]),code];myProfile.groupId='';
     closePCenter('pj');enterApp();subscribeGroup();
     // Publica no feed que novo jogador entrou
@@ -5998,7 +5997,7 @@ window.addMatch=async()=>{
         const sublbl = partes2.join(' + ') || 'Participação';
         window._mostrarXPGanho(xpPartida, sublbl, '⚽');
       }
-    }, 5200);
+    }, 800);
     // Verifica conquistas e level up após salvar partida
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
@@ -8671,32 +8670,7 @@ document.addEventListener('click', e=>{
    
    COMO USAR NO index.html:
    1. Copie todo este conteúdo dentro de uma tag <script>
-      logo antes do 
-<!-- ══ TOAST DE XP GANHO ══ -->
-<div id="xp-gain-toast" style="
-  position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-12px);
-  z-index:99999;pointer-events:none;
-  opacity:0;transition:opacity .25s ease,transform .3s cubic-bezier(.34,1.56,.64,1);
-  display:flex;align-items:center;gap:8px;
-  background:#0d1220;
-  border:1px solid rgba(59,130,246,.35);
-  border-radius:50px;padding:7px 16px 7px 12px;
-  box-shadow:0 4px 24px rgba(59,130,246,.25),0 1px 8px rgba(0,0,0,.5);
-  white-space:nowrap;
-">
-  <div id="xp-gain-icon" style="font-size:15px;line-height:1">⚡</div>
-  <div style="display:flex;flex-direction:column;gap:1px">
-    <div id="xp-gain-label" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#fff;letter-spacing:.04em">+25 XP</div>
-    <div id="xp-gain-sub" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(96,165,250,.7);letter-spacing:.06em;text-transform:uppercase">Gol</div>
-  </div>
-  <div style="width:1px;height:20px;background:rgba(59,130,246,.25);margin:0 2px"></div>
-  <div style="display:flex;flex-direction:column;gap:2px">
-    <div style="height:3px;width:48px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
-      <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px;transition:width .9s ease .1s"></div>
-    </div>
-  </div>
-</div>
-
+      logo antes do fechamento do </body>.
 /* ── FIM DO MÓDULO DE COMPARTILHAMENTO ───────────────── */
 
 (function () {
@@ -12036,8 +12010,9 @@ function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
 
 // Salva o craque da semana passada no Firestore (se ainda não salvo)
 window._salvarCraqueSemana = async function(){
-  if(!window._gd || !groupId || !currentUser) return;
-  const gd = window._gd;
+  if(!window._gd || !window.groupId || !currentUser) return;
+  const groupId = window.groupId;
+  let gd = window._gd;
   const info = _calcLastWeekInfo();
 
   // Verifica se já existe no histórico
@@ -12213,7 +12188,7 @@ document.addEventListener('keydown', e => {
 
 // Tenta gravar automaticamente quando o app carrega (para não perder semanas)
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => { if(window._gd && groupId) window._salvarCraqueSemana(); }, 4000);
+  setTimeout(() => { if(window._gd && window.groupId) window._salvarCraqueSemana(); }, 4000);
 });
 </script>
 
@@ -12230,6 +12205,31 @@ document.addEventListener('DOMContentLoaded', () => {
     <button onclick="window._fecharLevelUpToast()" style="background:#3b82f6;color:#fff;border:none;border-radius:12px;padding:12px 32px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.04em;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Continuar</button>
   </div>
 </div>
+<!-- ══ TOAST DE XP GANHO ══ -->
+<div id="xp-gain-toast" style="
+  position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-12px);
+  z-index:99999;pointer-events:none;
+  opacity:0;transition:opacity .25s ease,transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+  background:#0d1220;
+  border:1px solid rgba(59,130,246,.35);
+  border-radius:50px;padding:7px 16px 7px 12px;
+  box-shadow:0 4px 24px rgba(59,130,246,.25),0 1px 8px rgba(0,0,0,.5);
+  white-space:nowrap;
+">
+  <div id="xp-gain-icon" style="font-size:15px;line-height:1">⚡</div>
+  <div style="display:flex;flex-direction:column;gap:1px">
+    <div id="xp-gain-label" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#fff;letter-spacing:.04em">+25 XP</div>
+    <div id="xp-gain-sub" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(96,165,250,.7);letter-spacing:.06em;text-transform:uppercase">Gol</div>
+  </div>
+  <div style="width:1px;height:20px;background:rgba(59,130,246,.25);margin:0 2px"></div>
+  <div style="display:flex;flex-direction:column;gap:2px">
+    <div style="height:3px;width:48px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
+      <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px;transition:width .9s ease .1s"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
 <!-- PHOTO LIGHTBOX -->
