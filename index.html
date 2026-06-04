@@ -3659,7 +3659,7 @@ body::before{
 
 <!-- PANEL PERFIL (agora completo: conta + grupo + partidas recentes) -->
 <div class="ov" id="pperfil">
-  <div class="pan" style="padding:0;overflow:hidden;border-radius:22px 22px 0 0;background:#ecedeb;box-shadow:0 -8px 40px rgba(0,0,0,.35),0 0 0 1px #b7b8b6">
+  <div class="pan" style="padding:0;overflow:hidden;border-radius:22px 22px 0 0;background:#ecedeb;box-shadow:0 -8px 40px rgba(0,0,0,.35),0 0 0 1px #b7b8b6;display:flex;flex-direction:column;max-height:92vh;">
 
     <!-- Header -->
     <div style="position:relative;background:#b7b8b6;border-bottom:1px solid #b7b8b6;padding:1.4rem 1.4rem 1.2rem">
@@ -3675,9 +3675,23 @@ body::before{
         </div>
         <input type="file" id="photo-input-profile" accept="image/*" onchange="updateProfilePhoto(this)">
         <div style="flex:1;min-width:0">
-          <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000" id="pperfil-nome">—</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000;line-height:1.1" id="pperfil-nome">—</div>
+            <button id="btn-editar-nome-inline" onclick="_abrirEditNomeInline()" title="Editar nome" style="background:none;border:none;cursor:pointer;padding:3px;color:#494a48;display:flex;align-items:center;flex-shrink:0;transition:color .15s;margin-top:1px" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='#494a48'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          </div>
+          <!-- Inline name editor (hidden by default) -->
+          <div id="edit-nome-inline-wrap" style="display:none;margin-top:5px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:rgba(255,255,255,.55);border:1.5px solid rgba(77,255,176,.5);border-radius:8px;color:#000;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-width:0" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='rgba(77,255,176,.5)'" onkeydown="if(event.key==='Enter')salvarNovoNome();if(event.key==='Escape')_fecharEditNomeInline()">
+              <button onclick="salvarNovoNome()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0">✓</button>
+              <button onclick="_fecharEditNomeInline()" style="background:rgba(0,0,0,.08);color:#494a48;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
+            </div>
+            <div id="nome-ok" style="display:none;font-size:11px;color:var(--g);font-family:'DM Mono',monospace;margin-top:4px">✓ Nome atualizado!</div>
+            <div id="nome-err" style="display:none;font-size:11px;color:var(--re);font-family:'DM Mono',monospace;margin-top:4px"></div>
+          </div>
           <div style="font-size:12px;color:#494a48;margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
-          <div style="font-size:10px;color:#353635;margin-top:4px;font-family:'DM Mono',monospace">Toque na foto para alterar</div>
           <!-- FutID badge -->
           <div id="pperfil-futid-wrap" style="display:none;margin-top:6px">
             <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.3);border-radius:8px;padding:3px 8px">
@@ -3693,18 +3707,7 @@ body::before{
     </div>
 
     <!-- Corpo com scroll -->
-    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(88vh - 130px);padding:1.2rem 1.4rem 1.5rem;background:#ecedeb">
-
-      <!-- Editar nome -->
-      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
-        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">✏️ Alterar nome</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s" onfocus="this.style.borderColor='var(--g)';this.style.boxShadow='0 0 0 3px rgba(77,255,176,.12)'" onblur="this.style.borderColor='#b7b8b6';this.style.boxShadow='none'">
-          <button onclick="salvarNovoNome()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3)" onmouseover="this.style.filter='brightness(1.1)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">Salvar</button>
-        </div>
-        <div id="nome-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Nome atualizado!</div>
-        <div id="nome-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
-      </div>
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding:1.2rem 1.4rem 2rem;background:#ecedeb;">
 
       <!-- Apelido no grupo -->
       <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
@@ -4591,12 +4594,32 @@ window.openPerfilPanel=()=>{
   const cfab=document.getElementById('conquistas-fab');if(cfab)cfab.style.display='none';
 };
 
+window._abrirEditNomeInline=()=>{
+  const wrap=$('edit-nome-inline-wrap');
+  const btn=$('btn-editar-nome-inline');
+  const input=$('edit-nome-input');
+  if(wrap){wrap.style.display='block';}
+  if(btn){btn.style.display='none';}
+  if(input){input.value=myProfile?.displayName||'';setTimeout(()=>input.focus(),80);}
+};
+window._fecharEditNomeInline=()=>{
+  const wrap=$('edit-nome-inline-wrap');
+  const btn=$('btn-editar-nome-inline');
+  const ok=$('nome-ok'),err=$('nome-err');
+  if(wrap){wrap.style.display='none';}
+  if(btn){btn.style.display='flex';}
+  if(ok)ok.style.display='none';
+  if(err)err.style.display='none';
+};
 window.salvarNovoNome=async()=>{
   const novo=$('edit-nome-input').value.trim();
   const okEl=$('nome-ok'),errEl=$('nome-err');
-  okEl.style.display='none';errEl.style.display='none';
-  if(!novo||novo.length<2){errEl.textContent='Nome muito curto.';errEl.style.display='block';return;}
-  if(novo===myProfile.displayName){okEl.style.display='block';return;}
+  if(okEl)okEl.style.display='none';if(errEl)errEl.style.display='none';
+  if(!novo||novo.length<2){if(errEl){errEl.textContent='Nome muito curto.';errEl.style.display='block';}return;}
+  if(novo===myProfile.displayName){
+    if(okEl){okEl.style.display='block';setTimeout(()=>okEl.style.display='none',1800);}
+    _fecharEditNomeInline();return;
+  }
   try{
     myProfile.displayName=novo;
     await updateDoc(doc(db,'users',currentUser.uid),{displayName:novo});
@@ -4607,8 +4630,8 @@ window.salvarNovoNome=async()=>{
     }
     renderHeaderAvatar();renderPanPerfilAvatar();
     $('pperfil-nome').textContent=novo;
-    okEl.style.display='block';setTimeout(()=>okEl.style.display='none',2500);
-  }catch(e){errEl.textContent='Erro ao salvar.';errEl.style.display='block';}
+    if(okEl){okEl.style.display='block';setTimeout(()=>{okEl.style.display='none';_fecharEditNomeInline();},1800);}
+  }catch(e){if(errEl){errEl.textContent='Erro ao salvar.';errEl.style.display='block';}}
 };
 
 // ── APELIDO NO GRUPO (baseado em conquistas) ─────────────────────
@@ -5487,8 +5510,14 @@ function _wpInit(){
   // Render swatches
   const grid = document.getElementById('wp-swatch-grid');
   if(!grid) return;
+  // Check if current wp matches a preset
+  const isCustom = currentWp && !_WP_PRESETS.some(p=>p.css===currentWp);
   grid.innerHTML = `<div class="wp-swatch wp-swatch-none${!_wpSelected?' selected':''}" onclick="_wpSelect(null,this)" title="Sem papel de parede">🚫</div>`
-    + _WP_PRESETS.map((p,i)=>`<div class="wp-swatch${_wpSelected===p.css?' selected':''}" style="background:${p.css}" onclick="_wpSelect(${JSON.stringify(p.css)},this)" title="${p.label}"></div>`).join('');
+    + _WP_PRESETS.map((p,i)=>{
+        const sel = _wpSelected === p.css;
+        return `<div class="wp-swatch${sel?' selected':''}" style="background:${p.css}" onclick="_wpSelect(${JSON.stringify(p.css)},this)" title="${p.label}"></div>`;
+      }).join('')
+    + (isCustom ? `<div class="wp-swatch selected" style="background:var(--bg4);border-style:solid;display:flex;align-items:center;justify-content:center;font-size:18px" title="Imagem personalizada">🖼️</div>` : '');
 
   _wpUpdatePreview(currentWp);
 
@@ -5510,23 +5539,31 @@ function _wpUpdatePreview(css){
   const emptyTxt = document.getElementById('wp-preview-empty-txt');
   if(!box) return;
   if(css){
-    box.style.background = css;
-    box.style.backgroundSize = 'cover';
+    // Handle both gradients and url() data images
+    if(css.startsWith('url(')){
+      box.style.backgroundImage = css;
+      box.style.backgroundSize = 'cover';
+      box.style.backgroundPosition = 'center';
+      box.style.background = '';
+      box.style.backgroundImage = css;
+      box.style.backgroundSize = 'cover';
+    } else {
+      box.style.backgroundImage = '';
+      box.style.background = css;
+      box.style.backgroundSize = 'cover';
+    }
     if(emptyTxt) emptyTxt.style.display='none';
-    // Show preview card mock
     let overlay = box.querySelector('.wp-preview-overlay');
     if(!overlay){
       overlay = document.createElement('div');
       overlay.className='wp-preview-overlay';
-      overlay.innerHTML=`<span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)">⚽ ${gd?.name||'Seu grupo'}</span>`;
       box.appendChild(overlay);
-    } else {
-      overlay.style.display='';
-      const nm = overlay.querySelector('span');
-      if(nm) nm.textContent='⚽ '+(gd?.name||'Seu grupo');
     }
+    overlay.style.display='';
+    overlay.innerHTML=`<span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)">⚽ ${gd?.name||'Seu grupo'}</span>`;
   } else {
     box.style.background='var(--bg4)';
+    box.style.backgroundImage='';
     if(emptyTxt) emptyTxt.style.display='';
     const overlay = box.querySelector('.wp-preview-overlay');
     if(overlay) overlay.style.display='none';
@@ -5563,8 +5600,11 @@ window.wpSalvar = async () => {
   }
   try{
     const wpValue = _wpSelected || '';
+    // Salva no Firestore com setDoc para garantir que o campo é escrito
     await updateDoc(doc(db,'groups',groupId),{wallpaper:wpValue});
     gd.wallpaper = wpValue;
+    // Atualiza o card do grupo na tela de seleção em tempo real
+    _wpAtualizarCardAtual(wpValue);
     const removeBtn=document.getElementById('wp-remove-btn');
     if(removeBtn) removeBtn.style.display = wpValue ? '' : 'none';
     if(okEl){okEl.textContent='✅ Papel de parede salvo!';okEl.style.display='';}
@@ -5573,6 +5613,41 @@ window.wpSalvar = async () => {
     if(errEl){errEl.textContent='Erro ao salvar: '+e.message;errEl.style.display='';}
   }
 };
+
+// Atualiza o card do grupo na tela de seleção sem precisar recarregar
+function _wpAtualizarCardAtual(wpValue){
+  // Busca o card pelo groupId no DOM da seleção
+  const cards = document.querySelectorAll('#sg-list-wrap .sg-card');
+  cards.forEach(card => {
+    const onclick = card.getAttribute('onclick') || '';
+    if(!onclick.includes(groupId)) return;
+    // Remove layers antigas
+    card.querySelectorAll('.sg-card-wp, .sg-card-wp-overlay').forEach(el=>el.remove());
+    if(wpValue){
+      card.classList.add('has-wp');
+      const wpDiv = document.createElement('div');
+      wpDiv.className = 'sg-card-wp';
+      // Trata gradiente vs url()
+      if(wpValue.startsWith('url(')){
+        // Extrai a URL/data de dentro do url('...')
+        const match = wpValue.match(/url\(['"]?(.*?)['"]?\)/);
+        const src = match ? match[1] : '';
+        wpDiv.style.backgroundImage = wpValue;
+        wpDiv.style.backgroundSize = 'cover';
+        wpDiv.style.backgroundPosition = 'center';
+      } else {
+        wpDiv.style.background = wpValue;
+        wpDiv.style.backgroundSize = 'cover';
+      }
+      const overlayDiv = document.createElement('div');
+      overlayDiv.className = 'sg-card-wp-overlay';
+      card.prepend(overlayDiv);
+      card.prepend(wpDiv);
+    } else {
+      card.classList.remove('has-wp');
+    }
+  });
+}
 
 window.wpRemover = async () => {
   _wpSelected = null;
@@ -5846,7 +5921,9 @@ function _renderGroupList(grupos){
     +grupos.map(g=>{
       const wp=g.wallpaper||'';
       const hasWp=!!wp;
-      const wpLayers=hasWp?`<div class="sg-card-wp" style="background-image:url('${wp}')"></div><div class="sg-card-wp-overlay"></div>`:'';
+      // Handle both gradient strings and url() data
+      const wpStyle = hasWp ? (wp.startsWith('url(') ? `background-image:${wp};background-size:cover;background-position:center` : `background:${wp};background-size:cover`) : '';
+      const wpLayers=hasWp?`<div class="sg-card-wp" style="${wpStyle}"></div><div class="sg-card-wp-overlay"></div>`:'';
       const membCount=(g.members||[]).length;
       return`<div class="sg-card${hasWp?' has-wp':''}" onclick="selectGroup('${g.id}',this)">
         ${wpLayers}
@@ -7045,7 +7122,27 @@ function showRankingSkeleton(){
 // ── FIM SKELETON LOADERS ─────────────────────────────────────────
 
 function renderRanking(){
-  if(!gd)return;const mbs=gd.members||[];
+  if(!gd)return;
+  // Rastreia mudança de posição para permitir re-disparo da crown quando subir para 1º
+  if(currentUser){
+    const _ranked2=_getRankedByGA&&_getRankedByGA();
+    if(_ranked2&&_ranked2.length){
+      const _myPos2=_ranked2.findIndex(r=>r.uid===currentUser.uid)+1; // 1-indexed
+      const _k=_crownKey&&_crownKey();
+      let _prev2=null;
+      try{_prev2=JSON.parse(localStorage.getItem(_k)||'null');}catch(e){}
+      const _prevPos2=_prev2?.pos??null;
+      // Se posição anterior era 2+ e agora é 1 → reseta flag de sessão para crown disparar
+      if(_prevPos2&&_prevPos2>1&&_myPos2===1&&_crownFired){
+        _crownFired=false;
+      }
+      // Atualiza posição salva (sem alterar o dia — preserva lógica de "primeira visita hoje")
+      if(_prev2&&_myPos2!==_prevPos2){
+        localStorage.setItem(_k,JSON.stringify({pos:_myPos2,day:_prev2.day||new Date().toISOString().slice(0,10)}));
+      }
+    }
+  }
+  const mbs=gd.members||[];
   const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(rankStat==='recordes'||rankStat==='pen')?'none':'flex';
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
@@ -8369,7 +8466,9 @@ function _scheduleCounters(){
 
 
 // ══════════════════════════════════════════
-// CROWN CONFETTI — dispara ao abrir app se 1º colocado
+// CROWN CONFETTI — dispara SOMENTE quando:
+//   1) Você acaba de conquistar o 1º lugar (posição anterior era 2+)
+//   2) Você já está em 1º e é a primeira visita do dia neste grupo
 // ══════════════════════════════════════════
 let _crownFired=false;
 
@@ -8381,15 +8480,53 @@ function _getRankedByGA(){
   }).sort((a,b)=>b.val-a.val);
 }
 
+// Retorna chave de localStorage para o grupo/usuário atual
+function _crownKey(){
+  return 'crown_'+( groupId||'')+'_'+(currentUser?.uid||'');
+}
+
+// Salva a posição atual do usuário no ranking (para comparação futura)
+function _saveCrownState(pos){
+  const today=new Date().toISOString().slice(0,10); // "YYYY-MM-DD"
+  const key=_crownKey();
+  localStorage.setItem(key, JSON.stringify({pos, day:today}));
+}
+
 function maybeFiraCrown(){
   if(_crownFired)return;
   const ranked=_getRankedByGA();
   if(!ranked.length||!currentUser)return;
-  const primeiro=ranked[0];
-  // Só dispara se o usuário logado é o 1º e tem ao menos 1 G+A
-  if(primeiro.uid!==currentUser.uid||primeiro.val===0)return;
+
+  const myPos=ranked.findIndex(r=>r.uid===currentUser.uid); // 0-indexed
+  const isFirst=myPos===0;
+  const hasGA=ranked[0]?.val>0;
+
+  if(!isFirst||!hasGA){ 
+    // Não está em 1º: salva posição atual e sai sem disparar
+    _saveCrownState(myPos+1);
+    return;
+  }
+
+  // Está em 1º — verifica histórico
+  const today=new Date().toISOString().slice(0,10);
+  const key=_crownKey();
+  let prev=null;
+  try{ prev=JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
+
+  const prevPos  = prev?.pos  ?? null;   // posição anterior (null = nunca registrado)
+  const prevDay  = prev?.day  ?? null;   // dia em que foi salvo
+
+  const acabouDeConquistar = prevPos !== null && prevPos > 1; // estava em 2º ou pior
+  const primeiraVisitaHoje = prevDay !== today;               // ainda não disparou hoje
+
+  if(!acabouDeConquistar && !primeiraVisitaHoje){
+    // Já estava em 1º e já disparou hoje: não faz nada
+    return;
+  }
+
   _crownFired=true;
-  _fireCrownEffect(primeiro.name);
+  _saveCrownState(1);
+  _fireCrownEffect(ranked[0].name);
 }
 
 function _fireCrownEffect(name){
