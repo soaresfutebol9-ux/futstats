@@ -464,14 +464,34 @@ body.light .av5{background:rgba(224,32,80,.1);color:#e02050}
   display:flex;align-items:center;gap:.875rem;
   background:var(--c1);border:1px solid var(--bo);border-radius:14px;
   padding:.9rem 1rem;cursor:pointer;transition:all .18s;
-  position:relative;overflow:hidden;
+  position:relative;overflow:hidden;min-height:68px;
 }
+/* Wallpaper layer */
+.sg-card-wp{
+  position:absolute;inset:0;border-radius:14px;
+  background-size:cover;background-position:center;
+  transition:opacity .3s;
+}
+.sg-card-wp-overlay{
+  position:absolute;inset:0;border-radius:14px;
+  background:linear-gradient(90deg,rgba(7,9,13,.78) 0%,rgba(7,9,13,.55) 60%,rgba(7,9,13,.3) 100%);
+}
+.sg-card.has-wp{border-color:rgba(255,255,255,.18);}
+.sg-card.has-wp:hover{border-color:rgba(77,255,176,.6);box-shadow:0 6px 28px rgba(0,0,0,.45);}
+.sg-card.has-wp .sg-card-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.sg-card.has-wp .sg-card-code{color:rgba(255,255,255,.6);}
+.sg-card.has-wp .sg-card-arrow{color:rgba(255,255,255,.5);}
+.sg-card.has-wp:hover .sg-card-arrow{color:var(--g);}
+.sg-card.has-wp .sg-card-icon{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);}
+/* Content must sit above wallpaper layers */
+.sg-card > *:not(.sg-card-wp):not(.sg-card-wp-overlay){position:relative;z-index:1;}
 .sg-card::before{
-  content:'';position:absolute;inset:0;opacity:0;transition:opacity .18s;
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .18s;z-index:2;
   background:linear-gradient(90deg,rgba(77,255,176,.06),transparent);
   border-radius:14px;
 }
-.sg-card:hover{border-color:var(--g);transform:translateY(-1px);box-shadow:0 4px 20px rgba(77,255,176,.12);}
+.sg-card:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(77,255,176,.12);}
+.sg-card:not(.has-wp):hover{border-color:var(--g);}
 .sg-card:hover::before{opacity:1;}
 .sg-card:active{transform:translateY(0);opacity:.85;}
 .sg-card-icon{
@@ -487,6 +507,29 @@ body.light .av5{background:rgba(224,32,80,.1);color:#e02050}
 .sg-card-arrow{color:var(--tx3);font-size:18px;flex-shrink:0;transition:transform .18s;}
 .sg-card:hover .sg-card-arrow{transform:translateX(3px);color:var(--g);}
 .sg-card-loading{opacity:.5;pointer-events:none;}
+/* Wallpaper picker swatch grid */
+.wp-swatch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.wp-swatch{
+  height:52px;border-radius:10px;cursor:pointer;border:2.5px solid transparent;
+  transition:transform .15s,border-color .15s,box-shadow .15s;
+  background-size:cover;background-position:center;position:relative;overflow:hidden;
+}
+.wp-swatch:hover{transform:scale(1.06);box-shadow:0 4px 14px rgba(0,0,0,.35);}
+.wp-swatch.selected{border-color:var(--g)!important;box-shadow:0 0 0 3px rgba(77,255,176,.25);}
+.wp-swatch-none{background:var(--bg4);border:2px dashed var(--bo2);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.wp-custom-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+.wp-preview{
+  width:100%;height:80px;border-radius:12px;border:1.5px solid var(--bo);
+  background:var(--bg4);background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;
+  margin-bottom:12px;transition:all .3s;overflow:hidden;position:relative;
+}
+.wp-preview-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(7,9,13,.75) 0%,rgba(7,9,13,.5) 100%);
+  display:flex;align-items:center;padding:0 14px;
+}
 .sg-empty{
   text-align:center;padding:2rem 1rem;
   font-size:13px;color:var(--tx3);font-family:'DM Sans',sans-serif;
@@ -3213,6 +3256,12 @@ img {
   max-width: 100%;
   height: auto;
 }
+/* ── FUTID ─────────────────────────────────────────────────────────────────── */
+.futid-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.3);border-radius:8px;padding:3px 8px}
+.futid-badge span{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#1a5c2a;letter-spacing:.05em}
+.futid-badge button{background:none;border:none;cursor:pointer;padding:0;font-size:13px;line-height:1;color:#353635;display:flex;align-items:center;transition:color .15s}
+.futid-badge button:hover{color:var(--g)}
+#add-by-futid-input{font-family:'DM Mono',monospace!important;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -3629,6 +3678,15 @@ body::before{
           <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000" id="pperfil-nome">—</div>
           <div style="font-size:12px;color:#494a48;margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
           <div style="font-size:10px;color:#353635;margin-top:4px;font-family:'DM Mono',monospace">Toque na foto para alterar</div>
+          <!-- FutID badge -->
+          <div id="pperfil-futid-wrap" style="display:none;margin-top:6px">
+            <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.3);border-radius:8px;padding:3px 8px">
+              <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#1a5c2a;letter-spacing:.05em" id="pperfil-futid-text">—</span>
+              <button id="pperfil-futid-copybtn" onclick="copyFutId(document.getElementById('pperfil-futid-text').textContent,this)" title="Copiar FutID" style="background:none;border:none;cursor:pointer;padding:0;font-size:13px;line-height:1;color:#353635;display:flex;align-items:center">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
           <div id="pperfil-xp-bar"></div>
         </div>
       </div>
@@ -3711,10 +3769,57 @@ body::before{
       <!-- Últimas partidas -->
       <div id="pperfil-partidas" style="margin-bottom:1rem"></div>
 
+      <!-- Papel de parede do grupo (somente criador) -->
+      <div id="pperfil-wp-wrap" style="display:none;background:var(--bg3);border:1px solid rgba(160,130,255,.3);border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
+        <div style="font-size:10px;color:#4b3ca7;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🖼️ Papel de parede do grupo</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:12px;line-height:1.5">Aparece no card do grupo na tela de seleção. Somente você (criador) pode alterar.</div>
+
+        <!-- Preview -->
+        <div class="wp-preview" id="wp-preview-box">
+          <span id="wp-preview-empty-txt">Sem papel de parede</span>
+        </div>
+
+        <!-- Swatches pré-definidos -->
+        <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Escolher tema</div>
+        <div class="wp-swatch-grid" id="wp-swatch-grid">
+          <!-- preenchido por JS -->
+        </div>
+
+        <!-- Upload personalizado -->
+        <div class="wp-custom-row">
+          <input type="file" id="wp-file-input" accept="image/*" style="display:none" onchange="wpHandleUpload(this)">
+          <button onclick="document.getElementById('wp-file-input').click()" style="flex:1;background:var(--bg4);border:1.5px dashed var(--bo2);color:var(--tx2);border-radius:10px;padding:9px 12px;font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx2)'">📁 Imagem personalizada</button>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button onclick="wpSalvar()" style="flex:1;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s;box-shadow:0 4px 16px rgba(124,58,237,.3)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Salvar</button>
+          <button onclick="wpRemover()" id="wp-remove-btn" style="display:none;background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">Remover</button>
+        </div>
+        <div id="wp-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
+        <div id="wp-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
+      </div>
+
+      <!-- Adicionar membro por FutID (somente criador) -->
+      <div id="pperfil-add-by-id-wrap" style="display:none;background:var(--bg3);border:1px solid rgba(77,255,176,.35);border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
+        <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🔑 Adicionar membro por FutID</div>
+        <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">Cole o FutID do jogador (ex: <span style="color:#1a5c2a;font-weight:700">FST-AB3X7K</span>). O ID é único e nunca se repete.</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="add-by-futid-input" placeholder="FST-XXXXXX" maxlength="10"
+            style="flex:1;background:var(--bg4);border:1.5px solid rgba(77,255,176,.4);border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;transition:border-color .15s,box-shadow .15s"
+            oninput="this.value=this.value.toUpperCase()"
+            onfocus="this.style.borderColor='var(--g)';this.style.boxShadow='0 0 0 3px rgba(77,255,176,.12)'"
+            onblur="this.style.borderColor='rgba(77,255,176,.4)';this.style.boxShadow='none'">
+          <button onclick="adicionarMembroPorFutId()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Adicionar</button>
+        </div>
+        <div id="add-by-futid-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
+        <div id="add-by-futid-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
+      </div>
+
       <!-- Ações -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn bs" onclick="doLogoutKeepGroup()">🔓 Deslogar (manter grupo)</button>
-        <button class="bg2btn" onclick="leaveGroupPerfil()">🚪 Sair do grupo</button>
+      <div style="display:flex;flex-direction:column;gap:8px" id="perfil-acoes-wrap">
+        <button class="btn bs" onclick="doLogoutKeepGroup()">🔓 Deslogar</button>
+        <button class="bg2btn" id="btn-mudar-grupo" onclick="leaveGroupPerfil()" style="display:none">🔄 Mudar de grupo</button>
+        <button id="btn-apagar-grupo" onclick="deleteGroupPerfil()" style="display:none;background:rgba(255,60,60,.12);border:1.5px solid rgba(255,60,60,.4);color:#ff4444;border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.background='rgba(255,60,60,.22)'" onmouseout="this.style.background='rgba(255,60,60,.12)'">🗑️ Apagar grupo</button>
       </div>
     </div>
   </div>
@@ -3734,7 +3839,7 @@ body::before{
     <div class="ib">Grupo: <strong id="ign">—</strong><br>Você: <strong id="ipn">—</strong></div>
     <button class="btn bp" onclick="copyCode()" style="margin-bottom:10px" id="copybtn">📋 Copiar código</button>
     <button class="btn bs" onclick="copyInviteLink()" style="margin-bottom:10px" id="linkbtn">🔗 Copiar link de convite</button>
-    <button class="bg2btn" onclick="leaveGroup()" style="margin-bottom:10px">Sair do grupo</button>
+    <button class="bg2btn" onclick="leaveGroup()" style="margin-bottom:10px" id="btn-mudar-grupo-pi2">🔄 Mudar de grupo</button>
     <button class="bg2btn" onclick="closeP('pi2')">Fechar</button>
   </div>
 </div>
@@ -3823,7 +3928,7 @@ body::before{
 </div>
 
 <!-- ══ TOAST CONQUISTA DESBLOQUEADA ══ -->
-<div id="conquista-toast" style="display:none;position:fixed;inset:0;z-index:999995;pointer-events:none;align-items:center;justify-content:center">
+<div id="conquista-toast" style="visibility:hidden;display:flex;position:fixed;inset:0;z-index:999995;pointer-events:none;align-items:center;justify-content:center">
   <div id="conquista-toast-box" style="
     background:#FFD700;
     border:2px solid #B8960C;
@@ -3918,7 +4023,7 @@ body::before{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, serverTimestamp, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCzmqMAbfKZPS_NLnvbQ5SjKfKlV9afJJk",
@@ -3934,6 +4039,43 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 let currentUser=null,myProfile=null,gd=null,groupId=null,rankStat='ga',editIdx=null,_editingMesKey=null,unsubGroup=null;
+
+// ── SISTEMA DE IDs ÚNICOS (FutID) ──────────────────────────────────────────
+function _genFutIdCandidate(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r='';for(let i=0;i<6;i++)r+=chars[Math.floor(Math.random()*chars.length)];
+  return 'FST-'+r;
+}
+async function _gerarFutIdUnico(){
+  for(let tentativas=0;tentativas<20;tentativas++){
+    const id=_genFutIdCandidate();
+    const snap=await getDoc(doc(db,'futids',id));
+    if(!snap.exists()) return id;
+  }
+  return 'FST-'+Date.now().toString(36).toUpperCase().slice(-6);
+}
+async function _registrarFutId(uid){
+  const futId=await _gerarFutIdUnico();
+  await setDoc(doc(db,'futids',futId),{uid,createdAt:serverTimestamp()});
+  await updateDoc(doc(db,'users',uid),{futId});
+  return futId;
+}
+async function _buscarUidPorFutId(futId){
+  const fid=(futId||'').trim().toUpperCase();
+  const snap=await getDoc(doc(db,'futids',fid));
+  if(!snap.exists()) return null;
+  return snap.data().uid||null;
+}
+window._buscarUidPorFutId=_buscarUidPorFutId;
+window.copyFutId=async(futId,btnEl)=>{
+  try{
+    await navigator.clipboard.writeText(futId);
+    const orig=btnEl.innerHTML;
+    btnEl.innerHTML='✓';btnEl.style.color='var(--g)';
+    setTimeout(()=>{btnEl.innerHTML=orig;btnEl.style.color='';},2000);
+  }catch(e){ prompt('Seu FutID:',futId); }
+};
+
 // Expõe estado para o módulo de compartilhamento
 Object.defineProperties(window,{
   _gd:{get:()=>gd,set:v=>{gd=v;}},
@@ -4169,7 +4311,7 @@ window.doGoogleLogin=async()=>{
   try{
     const result=await signInWithPopup(auth,googleProvider);
     const snap=await getDoc(doc(db,'users',result.user.uid));
-    if(!snap.exists()){await setDoc(doc(db,'users',result.user.uid),{displayName:result.user.displayName||result.user.email,email:result.user.email,photo:result.user.photoURL||'',groupId:'',createdAt:serverTimestamp()});}
+    if(!snap.exists()){await setDoc(doc(db,'users',result.user.uid),{displayName:result.user.displayName||result.user.email,email:result.user.email,photo:result.user.photoURL||'',groupId:'',createdAt:serverTimestamp()});await _registrarFutId(result.user.uid);}
   }catch(e){
     if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')showErr('lerr',fbErrMsg(e.code));
     btn.disabled=false;btn.innerHTML=googleIconHTML;
@@ -4185,7 +4327,7 @@ window.doRegister=async()=>{
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
-    await setDoc(doc(db,'users',cred.user.uid),{displayName:name,email,photo:photo||'',groupId:'',createdAt:serverTimestamp()});
+    await setDoc(doc(db,'users',cred.user.uid),{displayName:name,email,photo:photo||'',groupId:'',createdAt:serverTimestamp()});await _registrarFutId(cred.user.uid);
   }catch(e){showErr('rerr',fbErrMsg(e.code));setBtn('btn-register',false,'Criar conta');}
 };
 
@@ -4198,9 +4340,12 @@ window.doLogin=async()=>{
 };
 
 window.doLogout=async()=>{if(unsubGroup){unsubGroup();unsubGroup=null;}await signOut(auth);};
+// Deslogar mantendo preferência de grupo (agora usa localStorage, não precisa de confirmação extra)
 window.doLogoutKeepGroup=async()=>{
-  if(!confirm('Deslogar? Você volta ao grupo quando entrar de novo.'))return;
-  closeP('pperfil');if(unsubGroup){unsubGroup();unsubGroup=null;}await signOut(auth);
+  if(!confirm('Deslogar? Na próxima vez você voltará direto ao seu grupo.'))return;
+  closeP('pperfil');
+  if(unsubGroup){unsubGroup();unsubGroup=null;}
+  await signOut(auth);
 };
 window.doForgotPassword=async()=>{
   const email=$('l-email').value.trim();if(!email)return showErr('lerr','Digite seu e-mail primeiro.');
@@ -4258,6 +4403,13 @@ function renderPanPerfilAvatar(){
   // Preenche info do grupo
   const gname=$('pperfil-gname');if(gname)gname.textContent=gd?.name||'—';
   const gcode=$('pperfil-gcode');if(gcode)gcode.textContent=groupId||'—';
+  // FutID no perfil
+  const futIdWrap=$('pperfil-futid-wrap');
+  const futIdText=$('pperfil-futid-text');
+  if(futIdWrap&&futIdText&&myProfile?.futId){
+    futIdText.textContent=myProfile.futId;
+    futIdWrap.style.display='';
+  }else if(futIdWrap){futIdWrap.style.display='none';}
   // Barra de XP/Nível
   const xpBarEl = $('pperfil-xp-bar');
   if(xpBarEl && currentUser && gd && window._renderXPBar){
@@ -5306,12 +5458,300 @@ window.copyInviteLinkPerfil=()=>{
   const link=location.href.split('?')[0]+'?join='+groupId;
   navigator.clipboard.writeText(link).then(()=>{const b=$('copy-link-btn-perfil');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));
 };
+// ── SISTEMA DE PAPEL DE PAREDE DO GRUPO ────────────────────────────────────
+const _WP_PRESETS = [
+  // Gradientes futebol
+  {label:'Gramado',css:'linear-gradient(135deg,#1a6b2f 0%,#2ea043 40%,#1a6b2f 80%,#145222 100%)',type:'gradient'},
+  {label:'Noite',css:'linear-gradient(135deg,#0a0e1a 0%,#1a2340 40%,#0d1829 80%,#060a12 100%)',type:'gradient'},
+  {label:'Ouro',css:'linear-gradient(135deg,#2a1a00 0%,#8b6914 30%,#f0c040 60%,#b8860b 100%)',type:'gradient'},
+  {label:'Roxo',css:'linear-gradient(135deg,#1a0a2e 0%,#3d1a6e 40%,#6b21a8 70%,#1a0a2e 100%)',type:'gradient'},
+  {label:'Fire',css:'linear-gradient(135deg,#1a0000 0%,#7c1a00 30%,#e63900 60%,#ff6b00 100%)',type:'gradient'},
+  {label:'Ice',css:'linear-gradient(135deg,#001a2e 0%,#003d6b 40%,#00a8cc 70%,#e0f7ff 100%)',type:'gradient'},
+  {label:'Aurora',css:'linear-gradient(135deg,#0a1a0a 0%,#0d3b1a 30%,#1a7a3a 55%,#4dffb0 80%,#00e5ff 100%)',type:'gradient'},
+  {label:'Carvão',css:'linear-gradient(135deg,#111 0%,#222 40%,#333 70%,#1a1a1a 100%)',type:'gradient'},
+  // Padrões texturizados via SVG inline
+  {label:'Hexágono',css:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='43.3'%3E%3Cpolygon points='25,0 50,12.5 50,37.5 25,50 0,37.5 0,12.5' fill='none' stroke='%234dffb022' stroke-width='1'/%3E%3C/svg%3E"),linear-gradient(135deg,%230a0e1a,%231a2340)`,type:'pattern'},
+  {label:'Losango',css:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect x='20' y='0' width='28' height='28' transform='rotate(45 20 14)' fill='none' stroke='%234dffb018' stroke-width='1'/%3E%3C/svg%3E"),linear-gradient(135deg,%230d1829,%230a1a0f)`,type:'pattern'},
+  {label:'Grade',css:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Crect width='30' height='30' fill='none' stroke='%234dffb015' stroke-width='.5'/%3E%3C/svg%3E"),linear-gradient(135deg,%230a0e1a,%23162032)`,type:'pattern'},
+  {label:'Bola',css:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='8' fill='none' stroke='%234dffb020' stroke-width='1'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%234dffb015'/%3E%3C/svg%3E"),linear-gradient(135deg,%230a1208,%23163020)`,type:'pattern'},
+];
+
+let _wpSelected = null; // css string currently selected in picker
+let _wpCustomData = null; // base64 data from file upload
+
+function _wpInit(){
+  const currentWp = gd?.wallpaper || '';
+  _wpSelected = currentWp || null;
+  _wpCustomData = null;
+
+  // Render swatches
+  const grid = document.getElementById('wp-swatch-grid');
+  if(!grid) return;
+  grid.innerHTML = `<div class="wp-swatch wp-swatch-none${!_wpSelected?' selected':''}" onclick="_wpSelect(null,this)" title="Sem papel de parede">🚫</div>`
+    + _WP_PRESETS.map((p,i)=>`<div class="wp-swatch${_wpSelected===p.css?' selected':''}" style="background:${p.css}" onclick="_wpSelect(${JSON.stringify(p.css)},this)" title="${p.label}"></div>`).join('');
+
+  _wpUpdatePreview(currentWp);
+
+  const removeBtn = document.getElementById('wp-remove-btn');
+  if(removeBtn) removeBtn.style.display = currentWp ? '' : 'none';
+}
+
+window._wpSelect = (css, el) => {
+  _wpSelected = css;
+  _wpCustomData = null;
+  // Update selected state on swatches
+  document.querySelectorAll('#wp-swatch-grid .wp-swatch').forEach(s=>s.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  _wpUpdatePreview(css);
+};
+
+function _wpUpdatePreview(css){
+  const box = document.getElementById('wp-preview-box');
+  const emptyTxt = document.getElementById('wp-preview-empty-txt');
+  if(!box) return;
+  if(css){
+    box.style.background = css;
+    box.style.backgroundSize = 'cover';
+    if(emptyTxt) emptyTxt.style.display='none';
+    // Show preview card mock
+    let overlay = box.querySelector('.wp-preview-overlay');
+    if(!overlay){
+      overlay = document.createElement('div');
+      overlay.className='wp-preview-overlay';
+      overlay.innerHTML=`<span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)">⚽ ${gd?.name||'Seu grupo'}</span>`;
+      box.appendChild(overlay);
+    } else {
+      overlay.style.display='';
+      const nm = overlay.querySelector('span');
+      if(nm) nm.textContent='⚽ '+(gd?.name||'Seu grupo');
+    }
+  } else {
+    box.style.background='var(--bg4)';
+    if(emptyTxt) emptyTxt.style.display='';
+    const overlay = box.querySelector('.wp-preview-overlay');
+    if(overlay) overlay.style.display='none';
+  }
+}
+
+window.wpHandleUpload = (input) => {
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 4*1024*1024){ alert('Imagem muito grande! Use menor que 4MB.'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    resizeImage(e.target.result, 800, 500, data => {
+      _wpCustomData = data;
+      _wpSelected = `url('${data}')`;
+      // Deselect all presets
+      document.querySelectorAll('#wp-swatch-grid .wp-swatch').forEach(s=>s.classList.remove('selected'));
+      _wpUpdatePreview(_wpSelected);
+    });
+  };
+  reader.readAsDataURL(file);
+};
+
+window.wpSalvar = async () => {
+  const okEl=document.getElementById('wp-ok');
+  const errEl=document.getElementById('wp-err');
+  if(okEl)okEl.style.display='none';
+  if(errEl)errEl.style.display='none';
+  if(!gd||!groupId||!currentUser){
+    if(errEl){errEl.textContent='Erro: sem grupo ativo.';errEl.style.display='';}return;
+  }
+  if(gd.createdBy!==currentUser.uid){
+    if(errEl){errEl.textContent='Somente o criador pode alterar o papel de parede.';errEl.style.display='';}return;
+  }
+  try{
+    const wpValue = _wpSelected || '';
+    await updateDoc(doc(db,'groups',groupId),{wallpaper:wpValue});
+    gd.wallpaper = wpValue;
+    const removeBtn=document.getElementById('wp-remove-btn');
+    if(removeBtn) removeBtn.style.display = wpValue ? '' : 'none';
+    if(okEl){okEl.textContent='✅ Papel de parede salvo!';okEl.style.display='';}
+    setTimeout(()=>{if(okEl)okEl.style.display='none';},3000);
+  }catch(e){
+    if(errEl){errEl.textContent='Erro ao salvar: '+e.message;errEl.style.display='';}
+  }
+};
+
+window.wpRemover = async () => {
+  _wpSelected = null;
+  _wpCustomData = null;
+  document.querySelectorAll('#wp-swatch-grid .wp-swatch').forEach(s=>s.classList.remove('selected'));
+  const noneBtn=document.querySelector('#wp-swatch-grid .wp-swatch-none');
+  if(noneBtn) noneBtn.classList.add('selected');
+  _wpUpdatePreview(null);
+  await wpSalvar();
+};
+
+// ── Adicionar membro por FutID (somente criador) ────────────────────────────
+window.adicionarMembroPorFutId=async()=>{
+  const input=document.getElementById('add-by-futid-input');
+  const okEl=document.getElementById('add-by-futid-ok');
+  const errEl=document.getElementById('add-by-futid-err');
+  const futIdRaw=(input?.value||'').trim().toUpperCase();
+  if(okEl)okEl.style.display='none';
+  if(errEl)errEl.style.display='none';
+  if(!futIdRaw){if(errEl){errEl.textContent='⚠️ Digite um FutID.';errEl.style.display='';}return;}
+  // Valida formato básico
+  if(!/^FST-[A-Z0-9]{6}$/.test(futIdRaw)){
+    if(errEl){errEl.textContent='⚠️ Formato inválido. Ex: FST-AB3X7K';errEl.style.display='';}return;
+  }
+  if(!gd||!groupId||!currentUser){if(errEl){errEl.textContent='Erro: sem grupo ativo.';errEl.style.display='';}return;}
+  if(gd.createdBy!==currentUser.uid){if(errEl){errEl.textContent='Somente o criador pode adicionar por ID.';errEl.style.display='';}return;}
+  try{
+    // Busca o UID do jogador pelo FutID
+    const targetUid=await _buscarUidPorFutId(futIdRaw);
+    if(!targetUid){if(errEl){errEl.textContent='❌ FutID não encontrado. Verifique e tente novamente.';errEl.style.display='';}return;}
+    // Verifica se já é membro
+    const jaEh=(gd.members||[]).some(m=>m.uid===targetUid);
+    if(jaEh){if(errEl){errEl.textContent='ℹ️ Este jogador já é membro do grupo.';errEl.style.display='';}return;}
+    // Busca perfil do usuário
+    const userSnap=await getDoc(doc(db,'users',targetUid));
+    if(!userSnap.exists()){if(errEl){errEl.textContent='❌ Perfil não encontrado.';errEl.style.display='';}return;}
+    const userDataTarget=userSnap.data();
+    const novoMembro={uid:targetUid,name:userDataTarget.displayName||'Jogador',photo:userDataTarget.photo||'',joined:Date.now()};
+    const cur=JSON.parse(JSON.stringify(gd));
+    cur.members=[...(cur.members||[]),novoMembro];
+    await setDoc(doc(db,'groups',groupId),cur);
+    // Também adiciona o groupId ao perfil do jogador adicionado
+    await updateDoc(doc(db,'users',targetUid),{groupIds:arrayUnion(groupId)});
+    gd=cur;
+    if(okEl){okEl.textContent='✅ '+novoMembro.name+' adicionado ao grupo!';okEl.style.display='';}
+    if(input)input.value='';
+    // Publica no feed
+    try{await _publishFeed('membro',`<strong>${novoMembro.name}</strong> foi adicionado por ID! 🔑`);}catch(e){}
+    renderGal&&renderGal();renderRanking&&renderRanking();
+  }catch(e){
+    if(errEl){errEl.textContent='Erro ao adicionar: '+e.message;errEl.style.display='';}
+  }
+};
+
 window.leaveGroupPerfil=async()=>{
-  if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
-  const gidSaindo=groupId;
-  await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayRemove(gidSaindo),groupId:''});
-  myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==gidSaindo);
-  myProfile.groupId='';groupId=null;gd=null;closeP('pperfil');enterGroupSelect();
+  // "Mudar de grupo" — não remove, só troca
+  closeP('pperfil');
+  await _abrirSeletorGrupo();
+};
+
+// Apaga grupo (apenas criador)
+window.deleteGroupPerfil=async()=>{
+  if(!gd || !currentUser || gd.createdBy !== currentUser.uid){
+    alert('Só o criador do grupo pode apagá-lo.');return;
+  }
+  const nome = gd.name || 'este grupo';
+  const confirmTxt = prompt(`⚠️ ATENÇÃO: Esta ação é IRREVERSÍVEL!\n\nDigite o nome do grupo para confirmar a exclusão:\n"${nome}"`);
+  if(confirmTxt === null) return; // cancelou
+  if(confirmTxt.trim() !== nome.trim()){
+    alert('Nome incorreto. Operação cancelada.');return;
+  }
+  try{
+    if(unsubGroup){unsubGroup();unsubGroup=null;}
+    // Remove grupo de todos os membros
+    const membros = gd.members || [];
+    await Promise.all(membros.map(mb =>
+      updateDoc(doc(db,'users',mb.uid),{groupIds:arrayRemove(groupId),groupId:''}).catch(()=>{})
+    ));
+    // Deleta o documento do grupo
+    await deleteDoc(doc(db,'groups',groupId));
+    myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==groupId);
+    myProfile.groupId='';
+    localStorage.removeItem('futstats-last-group');
+    groupId=null;gd=null;
+    closeP('pperfil');
+    enterGroupSelect();
+  }catch(e){alert('Erro ao apagar grupo: '+e.message);}
+};
+
+// Abre seletor de grupo (mudar de grupo ou selecionar inicial)
+async function _abrirSeletorGrupo(modoInicial){
+  const ids = myProfile.groupIds || [];
+  if(!modoInicial && ids.length <= 1){
+    // Sem outros grupos para mudar — não faz nada
+    return;
+  }
+  // Busca dados dos grupos
+  let grupos = [];
+  try{
+    const snaps = await Promise.all(ids.map(id=>getDoc(doc(db,'groups',id))));
+    grupos = snaps.map((s,i)=>s.exists()?{id:ids[i],...s.data()}:null).filter(Boolean);
+  }catch(e){}
+
+  if(!modoInicial && grupos.length <= 1){ enterGroupSelect(); return; }
+
+  // Monta o overlay do seletor
+  const overlay = document.createElement('div');
+  overlay.id = 'mudar-grupo-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);animation:_mgFadeIn .2s ease both';
+
+  const isLight = document.body.classList.contains('light');
+  const cardBg = isLight ? '#ffffff' : '#0d1220';
+  const borderCol = isLight ? 'rgba(77,255,176,.3)' : 'rgba(77,255,176,.25)';
+  const txCol = isLight ? '#111' : '#e8eaf0';
+  const tx2Col = isLight ? '#555' : '#8a8fa8';
+  const itemBg = isLight ? '#f4f6f8' : '#131a2b';
+  const itemBorder = isLight ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.07)';
+  const itemHover = isLight ? '#e8f5ee' : '#1a2540';
+
+  const currentGid = groupId || '';
+
+  overlay.innerHTML = `
+    <style>
+      @keyframes _mgFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+      @keyframes _mgCardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+      .mg-item{
+        display:flex;align-items:center;gap:14px;padding:14px 16px;
+        background:${itemBg};border:1.5px solid ${itemBorder};
+        border-radius:16px;cursor:pointer;transition:all .18s;
+        animation:_mgCardIn .25s ease both;
+      }
+      .mg-item:hover{background:${itemHover};border-color:rgba(77,255,176,.4);transform:translateY(-1px)}
+      .mg-item.active{border-color:rgba(77,255,176,.7);background:rgba(77,255,176,.08)}
+      .mg-item-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(77,255,176,.25),rgba(77,255,176,.08));border:1.5px solid rgba(77,255,176,.35);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+      .mg-item-name{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:${txCol};line-height:1.2}
+      .mg-item-sub{font-family:'DM Mono',monospace;font-size:10px;color:${tx2Col};letter-spacing:.06em;margin-top:3px}
+      .mg-item-badge{margin-left:auto;font-size:11px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:99px;background:rgba(77,255,176,.15);color:#4dffa0;border:1px solid rgba(77,255,176,.3);white-space:nowrap;flex-shrink:0}
+    </style>
+    <div style="background:${cardBg};border:1.5px solid ${borderCol};border-radius:28px;padding:28px 20px 24px;width:100%;max-width:400px;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(77,255,176,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-family:'VarsityTeam',serif;font-size:20px;color:${txCol}">Mudar de Grupo</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:${tx2Col};letter-spacing:.08em;margin-top:2px">SELECIONE UM GRUPO</div>
+        </div>
+        ${!modoInicial?`<button onclick="document.getElementById('mudar-grupo-overlay').remove()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,90,122,.12);border:1px solid rgba(255,90,122,.3);color:#ff5a7a;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;padding-right:2px">
+        ${grupos.map((g,i)=>`
+          <div class="mg-item${g.id===currentGid?' active':''}" onclick="window._selecionarGrupoModal('${g.id}')" style="animation-delay:${i*0.05}s">
+            <div class="mg-item-icon">⚽</div>
+            <div style="flex:1;min-width:0">
+              <div class="mg-item-name">${g.name||'Grupo'}</div>
+              <div class="mg-item-sub">${g.id}</div>
+            </div>
+            ${g.id===currentGid?'<div class="mg-item-badge">atual</div>':''}
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid ${itemBorder};display:flex;flex-direction:column;gap:8px">
+        <button onclick="closeP('pi2');openPCenter('pj')" style="width:100%;padding:12px;border-radius:14px;background:rgba(77,255,176,.12);border:1.5px solid rgba(77,255,176,.3);color:#4dffa0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,176,.2)'" onmouseout="this.style.background='rgba(77,255,176,.12)'">+ Entrar em outro grupo</button>
+        <button onclick="closeP('pi2');openP('pc')" style="width:100%;padding:12px;border-radius:14px;background:rgba(77,255,176,.06);border:1px solid rgba(77,255,176,.15);color:${tx2Col};font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(77,255,176,.12)'" onmouseout="this.style.background='rgba(77,255,176,.06)'">✦ Criar novo grupo</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  // Fecha ao clicar no backdrop
+  overlay.addEventListener('click', e=>{
+    if(e.target===overlay && !modoInicial) overlay.remove();
+  });
+}
+
+window._selecionarGrupoModal = async function(gid){
+  const overlay = document.getElementById('mudar-grupo-overlay');
+  if(overlay) overlay.remove();
+  if(gid === groupId) return; // já está nesse grupo
+  if(unsubGroup){unsubGroup();unsubGroup=null;}
+  groupId=null;gd=null;
+  await loadGroup(gid);
 };
 
 onAuthStateChanged(auth,async user=>{
@@ -5329,11 +5769,24 @@ onAuthStateChanged(auth,async user=>{
         myProfile.groupIds=migIds;myProfile.groupId='';
       }
       if(!myProfile.groupIds){myProfile.groupIds=[];}
+      // Migração: usuários sem futId recebem um gerado agora
+      if(!myProfile.futId){
+        try{ myProfile.futId=await _registrarFutId(user.uid); }catch(e){}
+      }
     }else{
       myProfile={displayName:user.displayName||user.email,email:user.email,photo:user.photoURL||'',groupId:'',groupIds:[]};
       await setDoc(doc(db,'users',user.uid),{...myProfile,createdAt:serverTimestamp()});
     }
-    enterGroupSelect();
+    // Auto-carregar último grupo visitado
+    const lastGid = localStorage.getItem('futstats-last-group');
+    const ids = myProfile.groupIds || [];
+    if(lastGid && ids.includes(lastGid)){
+      await loadGroup(lastGid);
+    } else if(ids.length === 1){
+      await loadGroup(ids[0]);
+    } else {
+      enterGroupSelect();
+    }
   }else{
     currentUser=null;myProfile=null;gd=null;groupId=null;
     if(unsubGroup){unsubGroup();unsubGroup=null;}
@@ -5390,14 +5843,21 @@ function _renderGroupList(grupos){
     return;
   }
   wrap.innerHTML='<div class="sg-section-label">Meus grupos</div><div class="sg-list">'
-    +grupos.map(g=>`<div class="sg-card" onclick="selectGroup('${g.id}',this)">
-      <div class="sg-card-icon">⚽</div>
-      <div class="sg-card-info">
-        <div class="sg-card-name">${g.name||'Grupo'}</div>
-        <div class="sg-card-code">Código: ${g.id}</div>
-      </div>
-      <div class="sg-card-arrow">›</div>
-    </div>`).join('')
+    +grupos.map(g=>{
+      const wp=g.wallpaper||'';
+      const hasWp=!!wp;
+      const wpLayers=hasWp?`<div class="sg-card-wp" style="background-image:url('${wp}')"></div><div class="sg-card-wp-overlay"></div>`:'';
+      const membCount=(g.members||[]).length;
+      return`<div class="sg-card${hasWp?' has-wp':''}" onclick="selectGroup('${g.id}',this)">
+        ${wpLayers}
+        <div class="sg-card-icon">⚽</div>
+        <div class="sg-card-info">
+          <div class="sg-card-name">${g.name||'Grupo'}</div>
+          <div class="sg-card-code">${membCount} membro${membCount!==1?'s':''} · ${g.id}</div>
+        </div>
+        <div class="sg-card-arrow">›</div>
+      </div>`;
+    }).join('')
     +'</div>';
 }
 
@@ -5408,7 +5868,16 @@ window.selectGroup=async function(gid,el){
 async function loadGroup(gid){
   // Mostra skeleton imediatamente enquanto o Firestore responde
   const rl=$('rl');if(rl)rl.innerHTML=`<div class="sk-podium">${[46,46,46].map(s=>`<div class="sk-podium-item"><div class="sk-pulse sk-line" style="width:40px;height:10px"></div><div class="sk-pulse sk-av" style="width:${s}px;height:${s}px;border-radius:50%"></div><div class="sk-pulse sk-line" style="width:60px;height:10px"></div><div class="sk-pulse sk-line" style="width:32px;height:22px"></div></div>`).join('')}</div><div class="rank-list">${[1,2,3].map(()=>`<div class="sk-ri"><div class="sk-pulse sk-line" style="width:24px;height:14px"></div><div class="sk-pulse sk-av" style="width:50px;height:50px;border-radius:50%"></div><div class="sk-ri-info"><div class="sk-pulse sk-line" style="width:55%;height:13px"></div><div class="sk-pulse sk-line" style="width:40%;height:11px"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="sk-pulse sk-line" style="width:38px;height:22px"></div><div class="sk-pulse sk-line" style="width:24px;height:9px"></div></div></div>`).join('')}</div>`;
-  try{const snap=await getDoc(doc(db,'groups',gid));if(!snap.exists())return;groupId=gid;window.groupId=gid;gd=snap.data();gd=await checkMesVirada(gd);enterApp();subscribeGroup();}catch(e){console.error('loadGroup erro:',e);}
+  try{
+    const snap=await getDoc(doc(db,'groups',gid));
+    if(!snap.exists())return;
+    groupId=gid;window.groupId=gid;
+    gd=snap.data();
+    gd=await checkMesVirada(gd);
+    localStorage.setItem('futstats-last-group', gid);
+    enterApp();
+    subscribeGroup();
+  }catch(e){console.error('loadGroup erro:',e);}
 }
 window.createGroup=async()=>{
   const gn=$('cgn').value.trim();if(!gn)return showErr('cerr','Digite um nome para o grupo.');
@@ -5419,6 +5888,7 @@ window.createGroup=async()=>{
     groupId=ref.id;window.groupId=ref.id;gd=data;
     await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(ref.id),groupId:''});
     myProfile.groupIds=[...(myProfile.groupIds||[]),ref.id];myProfile.groupId='';
+    localStorage.setItem('futstats-last-group', ref.id);
     closeP('pc');enterApp();subscribeGroup();
   }catch(e){showErr('cerr','Erro: '+e.message)}
 };
@@ -5431,6 +5901,7 @@ window.joinGroup=async()=>{
     if(!already){data.members=[...(data.members||[]),{uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()}];await setDoc(doc(db,'groups',code),data);}
     groupId=code;window.groupId=code;gd=data;
     myProfile.groupIds=[...(myProfile.groupIds||[]),code];myProfile.groupId='';
+    localStorage.setItem('futstats-last-group', code);
     closePCenter('pj');enterApp();subscribeGroup();
     // Publica no feed que novo jogador entrou
     setTimeout(()=>_publishFeed('membro',`<strong>${myProfile.displayName}</strong> entrou no grupo! 👋`),500);
@@ -5904,6 +6375,32 @@ async function checkMesViradaWith(gid,cur){
   }
   return cur;
 }
+function _atualizarBotoesPerfilGrupo(){
+  const ids = myProfile ? (myProfile.groupIds||[]) : [];
+  const isCriador = gd && currentUser && gd.createdBy === currentUser.uid;
+
+  // "Mudar de grupo" — só aparece se tiver 2+ grupos
+  const btnMudar = document.getElementById('btn-mudar-grupo');
+  if(btnMudar) btnMudar.style.display = ids.length > 1 ? '' : 'none';
+
+  // "Apagar grupo" — só aparece para o criador
+  const btnApagar = document.getElementById('btn-apagar-grupo');
+  if(btnApagar) btnApagar.style.display = isCriador ? '' : 'none';
+  // Seção "Adicionar por FutID" — somente para o criador
+  const addByIdWrap = document.getElementById('pperfil-add-by-id-wrap');
+  if(addByIdWrap) addByIdWrap.style.display = isCriador ? '' : 'none';
+  // Seção "Papel de parede" — somente para o criador
+  const wpWrap = document.getElementById('pperfil-wp-wrap');
+  if(wpWrap){
+    wpWrap.style.display = isCriador ? '' : 'none';
+    if(isCriador) _wpInit();
+  }
+
+  // Botão de mudar grupo no panel pi2 — só se tiver 2+ grupos
+  const btnMudarPi2 = document.getElementById('btn-mudar-grupo-pi2');
+  if(btnMudarPi2) btnMudarPi2.style.display = ids.length > 1 ? '' : 'none';
+}
+
 function enterApp(){
   const _hn=$('hname');if(_hn)_hn.textContent=gd.name;
   // Mostra sino e atualiza badge
@@ -5915,6 +6412,8 @@ function enterApp(){
   $('icode').textContent=groupId;$('ign').textContent=gd.name;$('ipn').textContent=myProfile.displayName;
   $('fdate').value=new Date().toISOString().split('T')[0];
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();setTimeout(renderFeedCard,300);
+  // Mostra/oculta botões de ação no perfil com base no número de grupos e papel
+  _atualizarBotoesPerfilGrupo();
   // Mostra FABs
   document.body.classList.add('duelo-fab-visible');
   document.body.classList.add('conquistas-fab-visible');
@@ -5955,11 +6454,8 @@ async function _checkBadgeConquistas(){
 }
 
 window.leaveGroup=async()=>{
-  if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
-  const gidSaindo=groupId;
-  await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayRemove(gidSaindo),groupId:''});
-  myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==gidSaindo);
-  myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterGroupSelect();
+  closeP('pi2');
+  await _abrirSeletorGrupo();
 };
 window.copyCode=()=>{navigator.clipboard.writeText(groupId).then(()=>{const b=$('copybtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));};
 window.copyInviteLink=()=>{const link=location.href.split('?')[0]+'?join='+groupId;navigator.clipboard.writeText(link).then(()=>{const b=$('linkbtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));};
@@ -6935,10 +7431,30 @@ function renderPerfil(){
 function renderGal(){
   if(!gd)return;const mbs=gd.members||[];const el=$('galcontent');
   if(!mbs.length){el.innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
-  el.innerHTML=mbs.map(m=>{const s=getSt(m.uid||m.name,null,!!m.uid);const isMe=m.uid===currentUser?.uid;
-    return`<div class="pc"><div class="ph">${isMe?`<div class="av-you-ring">${avatarHTML(m.name,38,m.uid)}</div>`:avatarHTML(m.name,38,m.uid)}<div style="flex:1"><div style="font-family:'Freshman',sans-serif;font-size:13px;font-weight:normal;letter-spacing:.5px">${m.name}</div><div style="font-size:12px;color:var(--tx2);font-family:'ClassyVogue',sans-serif">${s.gols}G · ${s.assist}A · ${s.gols+s.assist} G+A</div></div></div>
-    <div class="ms"><div class="ms2"><strong>${s.gols}</strong> gols</div><div class="ms2"><strong>${s.assist}</strong> assist.</div>${s.penBat>0?`<div class="ms2"><strong>${s.penOk}/${s.penBat}</strong> pên (${Math.round(s.penOk/s.penBat*100)}%)</div>`:''}</div></div>`;
-  }).join('');
+  // Pré-carrega futIds dos membros de forma assíncrona
+  const _renderGalCards=async()=>{
+    const futIdMap={};
+    await Promise.all(mbs.map(async m=>{
+      if(!m.uid)return;
+      try{
+        const uSnap=await getDoc(doc(db,'users',m.uid));
+        if(uSnap.exists()&&uSnap.data().futId) futIdMap[m.uid]=uSnap.data().futId;
+      }catch(e){}
+    }));
+    el.innerHTML=mbs.map(m=>{
+      const s=getSt(m.uid||m.name,null,!!m.uid);const isMe=m.uid===currentUser?.uid;
+      const fid=m.uid?futIdMap[m.uid]:'';
+      const fidHTML=fid?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);border-radius:6px;padding:2px 6px">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:#1a5c2a;font-weight:700">${fid}</span>
+        <button onclick="copyFutId('${fid}',this)" title="Copiar FutID" style="background:none;border:none;cursor:pointer;padding:0;font-size:11px;line-height:1;color:#353635;display:flex;align-items:center">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>`:'';
+      return`<div class="pc"><div class="ph">${isMe?`<div class="av-you-ring">${avatarHTML(m.name,38,m.uid)}</div>`:avatarHTML(m.name,38,m.uid)}<div style="flex:1"><div style="font-family:'Freshman',sans-serif;font-size:13px;font-weight:normal;letter-spacing:.5px">${m.name}</div><div style="font-size:12px;color:var(--tx2);font-family:'ClassyVogue',sans-serif">${s.gols}G · ${s.assist}A · ${s.gols+s.assist} G+A</div>${fidHTML}</div></div>
+      <div class="ms"><div class="ms2"><strong>${s.gols}</strong> gols</div><div class="ms2"><strong>${s.assist}</strong> assist.</div>${s.penBat>0?`<div class="ms2"><strong>${s.penOk}/${s.penBat}</strong> pên (${Math.round(s.penOk/s.penBat*100)}%)</div>`:''}</div></div>`;
+    }).join('');
+  };
+  _renderGalCards();
 }
 
 // ── HISTÓRICO por ano ──
@@ -10880,26 +11396,30 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
   lbl.textContent  = '+' + xpGanho + ' XP';
   sub.textContent  = label  || 'XP';
   ico.textContent  = icone  || '\u26a1';
-  bar.style.transition = 'none';
-  bar.style.width = pctAntes + '%';
 
   toast.style.opacity   = '0';
   toast.style.transform = 'translateX(-50%) translateY(-12px)';
 
   clearTimeout(window._xpGainTimer);
 
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    toast.style.opacity   = '1';
-    toast.style.transform = 'translateX(-50%) translateY(0)';
-    setTimeout(() => {
-      bar.style.transition = 'width 1.2s cubic-bezier(.25,.8,.25,1)';
-      bar.style.width = pctDepois + '%';
-    }, 200);
-    window._xpGainTimer = setTimeout(() => {
-      toast.style.opacity   = '0';
-      toast.style.transform = 'translateX(-50%) translateY(-16px)';
-    }, 4500);
-  }));
+  // 1º rAF: reseta a barra sem transição para o ponto de partida (pctAntes)
+  requestAnimationFrame(() => {
+    bar.style.transition = 'none';
+    bar.style.width = pctAntes + '%';
+    // 2º rAF: browser já pintou o estado inicial, agora anima para pctDepois
+    requestAnimationFrame(() => {
+      toast.style.opacity   = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => {
+        bar.style.transition = 'width 1.2s cubic-bezier(.25,.8,.25,1)';
+        bar.style.width = pctDepois + '%';
+      }, 200);
+      window._xpGainTimer = setTimeout(() => {
+        toast.style.opacity   = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-16px)';
+      }, 4500);
+    });
+  });
 };
 // ── FIM TOAST XP GANHO ─────────────────────────────────────────
 
@@ -11232,12 +11752,17 @@ function _mostrarUmToast(cq, cb){
   nome.textContent = cq.nome;
   desc.textContent = cq.desc;
 
-  overlay.style.display='flex';
+  // Usa visibility em vez de display:none/flex para preservar transições CSS
   box.style.opacity='0';
   box.style.transform='scale(.7)';
+  overlay.style.visibility='visible';
+  overlay.style.pointerEvents='none';
 
   if(progFill){ progFill.style.transition='none'; progFill.style.transform='scaleX(1)'; }
   if(cdLabel) cdLabel.textContent='10s';
+
+  // Guarda timestamp para evitar que o listener de clique feche o toast imediatamente
+  window._cqToastOpenedAt = Date.now();
 
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
@@ -11275,7 +11800,8 @@ function _esconderToastConquista(cb){
   box.style.opacity='0';
   box.style.transform='scale(.7)';
   setTimeout(()=>{
-    overlay.style.display='none';
+    overlay.style.visibility='hidden';
+    overlay.style.pointerEvents='none';
     if(cb) cb();
   },380);
 }
@@ -11283,7 +11809,9 @@ function _esconderToastConquista(cb){
 // ── Clique fora para fechar conquista toast ────────────────────
 document.addEventListener('click', e=>{
   const overlay = document.getElementById('conquista-toast');
-  if(!overlay || overlay.style.display==='none') return;
+  if(!overlay || overlay.style.visibility==='hidden') return;
+  // Ignora cliques nos primeiros 600ms após abrir (evita que cliques do modal de partida salva fechem o toast)
+  if(window._cqToastOpenedAt && (Date.now() - window._cqToastOpenedAt) < 600) return;
   const box = document.getElementById('conquista-toast-box');
   if(box && !box.contains(e.target)){
     _esconderToastConquista();
