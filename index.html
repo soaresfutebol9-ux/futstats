@@ -8203,6 +8203,8 @@ function showErr(id,msg){const e=$(id);e.textContent=msg;e.style.display='block'
 /* ── PREMIUM PANEL OPEN/CLOSE ── */
 window.openP=id=>{
   const el=$(id);if(!el)return;
+  // Garantir que o splash não cobre o painel
+  const sp=$('splash');if(sp){sp.classList.add('hide');sp.style.display='none';}
   el.style.display='';
   void el.offsetHeight;
   el.classList.add('open');
@@ -8343,7 +8345,7 @@ window.closePCenter=id=>{
   }
 })();
 // ── FIM BACK NAVIGATION ──────────────────────────────────────────────
-function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
+function showScr(id){const sp=$('splash');if(sp){sp.classList.add('hide');setTimeout(()=>{if(sp.classList.contains('hide'))sp.style.display='none';},650);}document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
 window.switchAuth=mode=>{
