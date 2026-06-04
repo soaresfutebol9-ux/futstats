@@ -104,10 +104,7 @@ html.os-ios .bn{
   padding-bottom:calc(env(safe-area-inset-bottom,0px) + 4px);
 }
 html.os-ios .ov,html.os-ios .ov-center,
-html.os-ios #modal-player,html.os-ios 
-/* ── Accordion grid transitions ── */
-.cfg-open { grid-template-rows: 1fr !important; }
-#modal-partidas{
+html.os-ios #modal-player,html.os-ios #modal-partidas{
   padding-top:env(safe-area-inset-top,0px);
 }
 
@@ -922,8 +919,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   position:fixed;inset:0;z-index:2000;
   background:rgba(0,0,0,.75);
   align-items:center;justify-content:center;
-  padding:env(safe-area-inset-top,20px) 16px env(safe-area-inset-bottom,20px);
-  box-sizing:border-box;
+  padding:0 12px;
   animation:none;
 }
 #modal-partidas.open{
@@ -935,7 +931,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   background:var(--bg2);
   border-radius:20px;
   width:100%;max-width:520px;
-  max-height:min(82vh,calc(100vh - 60px));
+  max-height:82vh;
   display:flex;flex-direction:column;
   box-shadow:0 8px 40px rgba(0,0,0,.5),var(--glow-card);
   animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
@@ -3267,19 +3263,6 @@ img {
 .futid-badge button:hover{color:var(--g)}
 #add-by-futid-input{font-family:'DM Mono',monospace!important;text-transform:uppercase}
 </style>
-<style>
-/* ── Badge Admin ── */
-.ri-admin-badge{
-  display:inline-flex;align-items:center;gap:3px;
-  background:linear-gradient(135deg,#f59e0b,#d97706);
-  color:#fff;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 6px;border-radius:99px;
-  box-shadow:0 1px 4px rgba(217,119,6,.4);
-  flex-shrink:0;line-height:1.4;
-  vertical-align:middle;
-}
-</style>
 </head>
 <body>
 <!-- noise grain filter -->
@@ -3743,14 +3726,8 @@ body::before{
         .pac-title{font-size:13px;font-weight:700;color:#111;font-family:'DM Sans',sans-serif;line-height:1.2}
         .pac-sub{font-size:10px;color:#666;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
         .pac-chevron{flex-shrink:0;transition:transform .25s ease;color:#888}
-        .pac-body{
-          display:grid;
-          grid-template-rows:0fr;
-          transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);
-          background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px;
-          overflow:hidden}
-        .pac-body.open{grid-template-rows:1fr}
-        .pac-body-inner-wrap{overflow:hidden;min-height:0}
+        .pac-body{overflow:hidden;max-height:0;transition:max-height .32s ease;
+          background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px}
         .pac-inner{padding:14px 16px 16px}
       </style>
 
@@ -3763,7 +3740,7 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-titulo"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-titulo">
           <div class="pac-inner">
             <!-- MODO COMPACTO -->
             <div id="apelido-modo-compacto" style="display:none">
@@ -3791,7 +3768,7 @@ body::before{
             <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
             <div id="apelido-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
       <!-- ② Estatísticas do mês -->
@@ -3803,12 +3780,12 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-mes"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-mes">
           <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
             <div id="pperfil-stats-mes"></div>
-            <div id="pperfil-meta" style="margin-top:14px"></div>
+            <div id="pperfil-meta"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
       <!-- ③ Histórico geral -->
@@ -3820,12 +3797,12 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-historico"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-historico">
           <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
             <div id="pperfil-stats-total"></div>
             <div id="pperfil-partidas"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
       >
@@ -4749,8 +4726,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   position:fixed;inset:0;z-index:2000;
   background:rgba(0,0,0,.75);
   align-items:center;justify-content:center;
-  padding:env(safe-area-inset-top,20px) 16px env(safe-area-inset-bottom,20px);
-  box-sizing:border-box;
+  padding:0 12px;
   animation:none;
 }
 #modal-partidas.open{
@@ -4762,7 +4738,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   background:var(--bg2);
   border-radius:20px;
   width:100%;max-width:520px;
-  max-height:min(82vh,calc(100vh - 60px));
+  max-height:82vh;
   display:flex;flex-direction:column;
   box-shadow:0 8px 40px rgba(0,0,0,.5),var(--glow-card);
   animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
@@ -7557,14 +7533,8 @@ body::before{
         .pac-title{font-size:13px;font-weight:700;color:#111;font-family:'DM Sans',sans-serif;line-height:1.2}
         .pac-sub{font-size:10px;color:#666;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
         .pac-chevron{flex-shrink:0;transition:transform .25s ease;color:#888}
-        .pac-body{
-          display:grid;
-          grid-template-rows:0fr;
-          transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);
-          background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px;
-          overflow:hidden}
-        .pac-body.open{grid-template-rows:1fr}
-        .pac-body-inner-wrap{overflow:hidden;min-height:0}
+        .pac-body{overflow:hidden;max-height:0;transition:max-height .32s ease;
+          background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px}
         .pac-inner{padding:14px 16px 16px}
       </style>
 
@@ -7577,7 +7547,7 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-titulo"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-titulo">
           <div class="pac-inner">
             <!-- MODO COMPACTO -->
             <div id="apelido-modo-compacto" style="display:none">
@@ -7605,7 +7575,7 @@ body::before{
             <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
             <div id="apelido-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
       <!-- ② Estatísticas do mês -->
@@ -7617,12 +7587,12 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-mes"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-mes">
           <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
             <div id="pperfil-stats-mes"></div>
-            <div id="pperfil-meta" style="margin-top:14px"></div>
+            <div id="pperfil-meta"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
       <!-- ③ Histórico geral -->
@@ -7634,12 +7604,12 @@ body::before{
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="pac-body" id="pac-body-historico"><div class="pac-body-inner-wrap">
+        <div class="pac-body" id="pac-body-historico">
           <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
             <div id="pperfil-stats-total"></div>
             <div id="pperfil-partidas"></div>
           </div>
-        </div></div>
+        </div>
       </div>
 
             <!-- ════════════════════════════════════════════
@@ -7658,7 +7628,7 @@ body::before{
             <span style="font-size:18px;flex-shrink:0">⚙️</span>
             <div>
               <div style="font-size:13px;font-weight:700;color:#000000;font-family:'DM Sans',sans-serif;letter-spacing:-.01em">Configurações do grupo</div>
-              <div id="cfg-accordion-sub" style="font-size:10px;color:#4b3ca7;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px">Somente criador</div>
+              <div style="font-size:10px;color:#4b3ca7;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px">Somente criador</div>
             </div>
           </div>
           <!-- Chevron animado -->
@@ -7671,11 +7641,10 @@ body::before{
 
         <!-- ── Corpo colapsável ── -->
         <div id="cfg-accordion-body" style="
-          display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);
+          overflow:hidden;max-height:0;transition:max-height .35s ease;
           background:var(--bg3);border:1px solid rgba(160,130,255,.25);border-top:none;
-          border-radius:0 0 14px 14px;overflow:hidden;
+          border-radius:0 0 14px 14px;
         ">
-          <div style="min-height:0;overflow:hidden">
           <div style="padding:4px 0 6px">
 
             <!-- ── Item 0: Info do grupo ── -->
@@ -7697,7 +7666,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-grupo-body" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);overflow:hidden"><div style="min-height:0;overflow:hidden">
+              <div id="cfg-grupo-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:16px;font-weight:700;margin-bottom:3px;color:#000" id="pperfil-gname">—</div>
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;word-break:break-all;margin-bottom:12px" id="pperfil-gcode">—</div>
@@ -7706,7 +7675,7 @@ body::before{
                     <button onclick="copyInviteLinkPerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-link-btn-perfil">🔗 Link convite</button>
                   </div>
                 </div>
-              </div></div>
+              </div>
             </div>
 
             <!-- ── Item 1: Papel de parede ── -->
@@ -7728,7 +7697,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-wp-body" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);overflow:hidden"><div style="min-height:0;overflow:hidden">
+              <div id="cfg-wp-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:12px;line-height:1.5">Aparece no card do grupo na tela de seleção. Somente você (criador) pode alterar.</div>
                   <div class="wp-preview" id="wp-preview-box">
@@ -7747,7 +7716,7 @@ body::before{
                   <div id="wp-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
                   <div id="wp-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
                 </div>
-              </div></div>
+              </div>
             </div>
 
             <!-- ── Item 2: Adicionar membro ── -->
@@ -7769,7 +7738,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-addmember-body" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);overflow:hidden"><div style="min-height:0;overflow:hidden">
+              <div id="cfg-addmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">Cole o FutID do jogador (ex: <span style="color:#1a5c2a;font-weight:700">FST-AB3X7K</span>). O ID é único e nunca se repete.</div>
                   <div style="display:flex;gap:8px;align-items:center">
@@ -7783,11 +7752,11 @@ body::before{
                   <div id="add-by-futid-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
                   <div id="add-by-futid-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
                 </div>
-              </div></div>
+              </div>
             </div>
 
             <!-- ── Item 3: Renomear grupo ── -->
-            <div id="pperfil-rename-wrap" style="border-bottom:1px solid rgba(255,209,102,.12)">
+            <div style="border-bottom:1px solid rgba(255,209,102,.12)">
               <button class="_cfg-item-btn" onclick="_cfgItemToggle('cfg-rename-body','cfg-rename-chevron')" style="
                 width:100%;display:flex;align-items:center;justify-content:space-between;
                 background:none;border:none;padding:13px 16px;cursor:pointer;gap:10px;text-align:left
@@ -7805,7 +7774,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-rename-body" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);overflow:hidden"><div style="min-height:0;overflow:hidden">
+              <div id="cfg-rename-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">O novo nome ficará visível para todos os membros do grupo.</div>
                   <div style="display:flex;gap:8px;align-items:center">
@@ -7818,11 +7787,11 @@ body::before{
                   <div id="cfg-rename-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
                   <div id="cfg-rename-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
                 </div>
-              </div></div>
+              </div>
             </div>
 
             <!-- ── Item 4: Remover membro ── -->
-            <div id="pperfil-kick-wrap">
+            <div>
               <button class="_cfg-item-btn" onclick="_cfgItemToggle('cfg-kickmember-body','cfg-kickmember-chevron')" style="
                 width:100%;display:flex;align-items:center;justify-content:space-between;
                 background:none;border:none;padding:13px 16px;cursor:pointer;gap:10px;text-align:left
@@ -7840,7 +7809,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-kickmember-body" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1);overflow:hidden"><div style="min-height:0;overflow:hidden">
+              <div id="cfg-kickmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">Informe o FutID do jogador que deseja remover do grupo.</div>
                   <div style="display:flex;gap:8px;align-items:center">
@@ -7854,11 +7823,11 @@ body::before{
                   <div id="cfg-kick-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:8px"></div>
                   <div id="cfg-kick-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:8px"></div>
                 </div>
-              </div></div>
+              </div>
             </div>
 
           </div>
-        </div></div>
+        </div>
       </div>
       <!-- ════════ fim accordion ════════ -->
 
@@ -8079,7 +8048,7 @@ body::before{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, query, where, getDocs, deleteField } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCzmqMAbfKZPS_NLnvbQ5SjKfKlV9afJJk",
@@ -8095,8 +8064,6 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 let currentUser=null,myProfile=null,gd=null,groupId=null,rankStat='ga',editIdx=null,_editingMesKey=null,unsubGroup=null;
-// Expõe currentUser globalmente para funções em outros escopos
-Object.defineProperty(window,'currentUser',{get:()=>currentUser,set:(v)=>{currentUser=v;},configurable:true});
 
 // ── SISTEMA DE IDs ÚNICOS (FutID) ──────────────────────────────────────────
 function _genFutIdCandidate(){
@@ -8203,8 +8170,6 @@ function showErr(id,msg){const e=$(id);e.textContent=msg;e.style.display='block'
 /* ── PREMIUM PANEL OPEN/CLOSE ── */
 window.openP=id=>{
   const el=$(id);if(!el)return;
-  // Garantir que o splash não cobre o painel
-  const sp=$('splash');if(sp){sp.classList.add('hide');sp.style.display='none';}
   el.style.display='';
   void el.offsetHeight;
   el.classList.add('open');
@@ -8345,7 +8310,7 @@ window.closePCenter=id=>{
   }
 })();
 // ── FIM BACK NAVIGATION ──────────────────────────────────────────────
-function showScr(id){const sp=$('splash');if(sp){sp.classList.add('hide');setTimeout(()=>{if(sp.classList.contains('hide'))sp.style.display='none';},650);}document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
+function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
 window.switchAuth=mode=>{
@@ -8516,8 +8481,7 @@ function renderPerfilPanelStats(){
   const metaEl=$('pperfil-meta');
   if(metaEl){
     const mesKey=gd.mesAtivo||mesAtual();
-    const _metaKey=`${groupId}_${mesKey}`;
-    const metaSalva=(myProfile.metas&&myProfile.metas[_metaKey])||null;
+    const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
     const metaGols  = metaSalva?.alvoGols  || 0;
     const metaAssist= metaSalva?.alvoAssist || 0;
     const temMeta = metaGols>0 || metaAssist>0;
@@ -9045,8 +9009,7 @@ window.abrirEditarMeta=()=>{
   const [mkAno,mkMes]=mesKey.split('-').map(Number);
   const ehMesAtual=hoje.getFullYear()===mkAno&&(hoje.getMonth()+1)===mkMes;
   const prazoExpirou=ehMesAtual&&hoje.getDate()>3;
-  const _metaKey2=`${groupId}_${mesKey}`;
-  const metaSalva=(myProfile.metas&&myProfile.metas[_metaKey2])||null;
+  const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
   const temMeta=metaSalva&&(metaSalva.alvoGols>0||metaSalva.alvoAssist>0);
   if(prazoExpirou){
     // Mostra toast de aviso em vez de abrir
@@ -9057,7 +9020,7 @@ window.abrirEditarMeta=()=>{
     setTimeout(()=>t.remove(),2800);
     return;
   }
-  const metaSalvaVal=(myProfile.metas&&myProfile.metas[_metaKey2])||null;
+  const metaSalvaVal=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
   const gi=$('meta-gols-input');
   const ai=$('meta-assist-input');
   if(gi) gi.value=metaSalvaVal?.alvoGols||0;
@@ -9086,18 +9049,16 @@ window.salvarMeta=async()=>{
   const [mkAno,mkMes]=mesKey.split('-').map(Number);
   const ehMesAtual=hoje.getFullYear()===mkAno&&(hoje.getMonth()+1)===mkMes;
   const prazoExpirou=ehMesAtual&&hoje.getDate()>3;
-  const _metaSaveKey=`${groupId}_${mesKey}`;
-  const metaExistente=myProfile.metas&&myProfile.metas[_metaSaveKey]&&(myProfile.metas[_metaSaveKey].alvoGols>0||myProfile.metas[_metaSaveKey].alvoAssist>0);
+  const metaExistente=myProfile.meta&&myProfile.meta.mesKey===mesKey&&(myProfile.meta.alvoGols>0||myProfile.meta.alvoAssist>0);
   if(prazoExpirou){fecharEditarMeta();return;}
   const gi=$('meta-gols-input');
   const ai=$('meta-assist-input');
   const alvoGols  =Math.max(0,Math.min(999,parseInt(gi?.value)||0));
   const alvoAssist=Math.max(0,Math.min(999,parseInt(ai?.value)||0));
   const meta={alvoGols,alvoAssist,mesKey};
-  if(!myProfile.metas) myProfile.metas={};
-  myProfile.metas[_metaSaveKey]=meta;
+  myProfile.meta=meta;
   try{
-    await updateDoc(doc(db,'users',currentUser.uid),{[`metas.${_metaSaveKey}`]:meta});
+    await updateDoc(doc(db,'users',currentUser.uid),{meta});
   }catch(e){console.warn('meta save:',e);}
   fecharEditarMeta();
   renderPerfilPanelStats();
@@ -9113,9 +9074,8 @@ window.salvarMeta=async()=>{
 
 window.removerMeta=async()=>{
   if(!currentUser)return;
-  const _rmKey=`${groupId}_${(gd?.mesAtivo||mesAtual())}`;
-  if(myProfile.metas) delete myProfile.metas[_rmKey];
-  try{await updateDoc(doc(db,'users',currentUser.uid),{[`metas.${_rmKey}`]:deleteField()});}catch(e){}
+  myProfile.meta=null;
+  try{await updateDoc(doc(db,'users',currentUser.uid),{meta:null});}catch(e){}
   fecharEditarMeta();
   renderPerfilPanelStats();
 };
@@ -9926,8 +9886,16 @@ onAuthStateChanged(auth,async user=>{
       myProfile={displayName:user.displayName||user.email,email:user.email,photo:user.photoURL||'',groupId:'',groupIds:[]};
       await setDoc(doc(db,'users',user.uid),{...myProfile,createdAt:serverTimestamp()});
     }
-    // Sempre direciona para a tela de seleção de grupo ao logar
-    enterGroupSelect();
+    // Auto-carregar último grupo visitado
+    const lastGid = localStorage.getItem('futstats-last-group');
+    const ids = myProfile.groupIds || [];
+    if(lastGid && ids.includes(lastGid)){
+      await loadGroup(lastGid);
+    } else if(ids.length === 1){
+      await loadGroup(ids[0]);
+    } else {
+      enterGroupSelect();
+    }
   }else{
     currentUser=null;myProfile=null;gd=null;groupId=null;
     if(unsubGroup){unsubGroup();unsubGroup=null;}
@@ -10531,20 +10499,9 @@ function _atualizarBotoesPerfilGrupo(){
   if(btnApagar) btnApagar.style.display = isCriador ? '' : 'none';
   // Seção "Adicionar por FutID" — somente para o criador
   // Accordion "Configurações do grupo" — somente para o criador
-  // Accordion sempre visível — itens exclusivos do criador controlados individualmente
   const cfgAccordion = document.getElementById('pperfil-cfg-accordion');
-  if(cfgAccordion) cfgAccordion.style.display = '';
-  // Itens exclusivos do criador
-  const criadorItems = ['pperfil-wp-wrap','pperfil-add-by-id-wrap','pperfil-rename-wrap','pperfil-kick-wrap'];
-  criadorItems.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.style.display = isCriador ? '' : 'none';
-  });
-  // Botão apagar também só para criador
+  if(cfgAccordion) cfgAccordion.style.display = isCriador ? '' : 'none';
   if(isCriador) _wpInit();
-  // Atualiza subtítulo do accordion
-  const cfgSub = document.getElementById('cfg-accordion-sub');
-  if(cfgSub) cfgSub.textContent = isCriador ? 'Criador · Acesso total' : 'Info do grupo';
 
   // Botão de mudar grupo no panel pi2 — só se tiver 2+ grupos
   const btnMudarPi2 = document.getElementById('btn-mudar-grupo-pi2');
@@ -11194,14 +11151,6 @@ function showRankingSkeleton(){
 }
 // ── FIM SKELETON LOADERS ─────────────────────────────────────────
 
-
-function _adminBadge(uid){
-  if(!gd) return '';
-  const adminUid = gd.createdBy || (gd.members&&gd.members[0]?.uid);
-  if(!adminUid || uid !== adminUid) return '';
-  return '<span class="ri-admin-badge">👑 ADM</span>';
-}
-
 function renderRanking(){
   if(!gd)return;
   // Rastreia mudança de posição para permitir re-disparo da crown quando subir para 1º
@@ -11269,7 +11218,7 @@ function renderRanking(){
           <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div>
           <div class="ri-info">
-            <div class="ri-name">${p.name}${_adminBadge(p.uid)}</div>
+            <div class="ri-name">${p.name}</div>
             ${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}
             <div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div>
           </div>
@@ -11437,7 +11386,7 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}${_adminBadge(p.uid)}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
@@ -12251,9 +12200,7 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
     }
   }
   const nomeEl=document.getElementById('mp-nome');
-  const _adminBadgeHtml = (gd?.createdBy && uid === gd.createdBy)
-    ? '<span class="ri-admin-badge" style="font-size:7px;padding:2px 5px;vertical-align:middle;margin-left:5px">👑 ADM</span>' : '';
-  nomeEl.innerHTML = mb.name.replace(/</g,'&lt;') + _adminBadgeHtml;
+  nomeEl.textContent=mb.name;
   // Reduz fonte progressivamente para nomes longos
   const nLen=mb.name.length;
   nomeEl.style.fontSize=nLen>18?'11px':nLen>14?'13px':nLen>10?'14px':'15px';
@@ -15477,14 +15424,14 @@ function renderXPBar(uid, gd){
   const { nivel, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
   const progressLabel = `${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP`;
   return `
-  <div id="xp-bar-wrap" style="background:rgba(0,0,0,.18);padding:7px 1.4rem 10px;border-radius:0 0 18px 18px">
+  <div id="xp-bar-wrap" style="background:rgba(0,0,0,.18);padding:7px 1.4rem 8px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:.06em">⚡ NÍVEL ${nivel}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.45)">${xpTotal.toLocaleString()} XP total</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(0,0,0,.45)">${xpTotal.toLocaleString()} XP total</div>
     </div>
-    <div style="position:relative;background:rgba(0,0,0,.25);border-radius:99px;height:17px;overflow:hidden;border:1px solid rgba(255,255,255,.08)">
+    <div style="position:relative;background:rgba(0,0,0,.18);border-radius:99px;height:16px;overflow:hidden">
       <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;transition:width .6s ease;box-shadow:0 0 10px rgba(59,130,246,.4)"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#000;letter-spacing:.04em">${progressLabel}</div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#fff;letter-spacing:.04em;text-shadow:0 1px 3px rgba(0,0,0,.4)">${progressLabel}</div>
     </div>
   </div>`;
 }
@@ -15611,34 +15558,29 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
   sub.textContent  = label  || 'XP';
   ico.textContent  = icone  || '\u26a1';
 
-  clearTimeout(window._xpGainTimer);
-
-  // Esconde e reseta barra instantaneamente
-  toast.style.transition = 'none';
   toast.style.opacity   = '0';
   toast.style.transform = 'translateX(-50%) translateY(-12px)';
-  bar.style.transition  = 'none';
-  bar.style.width       = pctAntes + '%';
 
-  // Força repaint antes de animar
-  void bar.offsetWidth;
-  void toast.offsetWidth;
+  clearTimeout(window._xpGainTimer);
 
-  // Pequeno delay para garantir que o browser registrou o estado inicial
-  setTimeout(() => {
-    toast.style.transition = 'opacity .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1)';
-    toast.style.opacity   = '1';
-    toast.style.transform = 'translateX(-50%) translateY(0)';
-    // Anima a barra após o toast aparecer
-    setTimeout(() => {
-      bar.style.transition = 'width 1.2s cubic-bezier(.25,.8,.25,1)';
-      bar.style.width = pctDepois + '%';
-    }, 150);
-    window._xpGainTimer = setTimeout(() => {
-      toast.style.opacity   = '0';
-      toast.style.transform = 'translateX(-50%) translateY(-16px)';
-    }, 4500);
-  }, 30);
+  // 1º rAF: reseta a barra sem transição para o ponto de partida (pctAntes)
+  requestAnimationFrame(() => {
+    bar.style.transition = 'none';
+    bar.style.width = pctAntes + '%';
+    // 2º rAF: browser já pintou o estado inicial, agora anima para pctDepois
+    requestAnimationFrame(() => {
+      toast.style.opacity   = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => {
+        bar.style.transition = 'width 1.2s cubic-bezier(.25,.8,.25,1)';
+        bar.style.width = pctDepois + '%';
+      }, 200);
+      window._xpGainTimer = setTimeout(() => {
+        toast.style.opacity   = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-16px)';
+      }, 4500);
+    });
+  });
 };
 // ── FIM TOAST XP GANHO ─────────────────────────────────────────
 
@@ -16983,7 +16925,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <div style="width:1px;height:26px;background:rgba(59,130,246,.3);margin:0 2px"></div>
   <div style="display:flex;flex-direction:column;gap:3px">
     <div style="height:4px;width:64px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
-      <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px"></div>
+      <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px;transition:width .9s ease .1s"></div>
     </div>
   </div>
 </div>
@@ -17659,13 +17601,13 @@ window.abrirCartaJogador = function(){
 function _pacToggle(btn, bodyId) {
   const body = document.getElementById(bodyId);
   if (!body) return;
-  const isOpen = body.classList.contains('open');
+  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
   if (isOpen) {
-    body.classList.remove('open');
+    body.style.maxHeight = '0';
     btn.classList.remove('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(0deg)';
   } else {
-    body.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 600 + 'px';
     btn.classList.add('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(180deg)';
   }
@@ -17678,14 +17620,15 @@ function _cfgAccordionToggle() {
   const body = document.getElementById('cfg-accordion-body');
   const chevron = document.getElementById('cfg-accordion-chevron');
   const toggle = document.getElementById('cfg-accordion-toggle');
-  if (!body) return;
-  const isOpen = body.classList.contains('cfg-open');
+  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+
   if (isOpen) {
-    body.classList.remove('cfg-open');
+    body.style.maxHeight = '0';
     chevron.style.transform = 'rotate(0deg)';
     toggle.style.borderRadius = '14px';
+    toggle.style.borderBottom = '';
   } else {
-    body.classList.add('cfg-open');
+    body.style.maxHeight = body.scrollHeight + 600 + 'px'; // extra para sub-itens
     chevron.style.transform = 'rotate(180deg)';
     toggle.style.borderRadius = '14px 14px 0 0';
   }
@@ -17696,13 +17639,17 @@ function _cfgItemToggle(bodyId, chevronId) {
   const body = document.getElementById(bodyId);
   const chevron = document.getElementById(chevronId);
   if (!body) return;
-  const isOpen = body.classList.contains('cfg-open');
+  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+
   if (isOpen) {
-    body.classList.remove('cfg-open');
+    body.style.maxHeight = '0';
     if (chevron) chevron.style.transform = 'rotate(0deg)';
   } else {
-    body.classList.add('cfg-open');
+    body.style.maxHeight = body.scrollHeight + 40 + 'px';
     if (chevron) chevron.style.transform = 'rotate(180deg)';
+    // Expande o pai também
+    const parentBody = document.getElementById('cfg-accordion-body');
+    if (parentBody) parentBody.style.maxHeight = parseInt(parentBody.style.maxHeight || 0) + body.scrollHeight + 100 + 'px';
   }
 }
 
