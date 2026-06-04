@@ -3823,7 +3823,7 @@ body::before{
 </div>
 
 <!-- ══ TOAST CONQUISTA DESBLOQUEADA ══ -->
-<div id="conquista-toast" style="display:none;position:fixed;inset:0;z-index:9990;pointer-events:none;align-items:center;justify-content:center">
+<div id="conquista-toast" style="display:none;position:fixed;inset:0;z-index:999995;pointer-events:none;align-items:center;justify-content:center">
   <div id="conquista-toast-box" style="
     background:#FFD700;
     border:2px solid #B8960C;
@@ -5987,15 +5987,23 @@ window.addMatch=async()=>{
     })();
     // Toast de XP ganho na partida
     setTimeout(()=>{
-      if(window._mostrarXPGanho){
-        const _XP_BASE=10,_XP_GOL=25,_XP_ASSIST=25,_XP_PEN=25;
-        const xpPartida=_XP_BASE+(gols*_XP_GOL)+(assist*_XP_ASSIST)+(pk*_XP_PEN);
-        const partes2=[];
-        if(gols>0)   partes2.push(`${gols}G`);
-        if(assist>0) partes2.push(`${assist}A`);
-        if(pk>0)     partes2.push(`${pk}P`);
-        const sublbl = partes2.join(' + ') || 'Participação';
-        window._mostrarXPGanho(xpPartida, sublbl, '⚽');
+      if(window._mostrarXPGanho && window._calcXP && currentUser && gd){
+        const gdAntes = JSON.parse(JSON.stringify(gd));
+        // Remove a partida recém adicionada para calcular XP antes
+        if(gdAntes.matches && gdAntes.matches.length > 0){
+          gdAntes.matches = gdAntes.matches.slice(0, -1);
+        }
+        const xpAntes  = window._calcXP(currentUser.uid, gdAntes);
+        const xpDepois = window._calcXP(currentUser.uid, gd);
+        const xpPartida = xpDepois - xpAntes;
+        if(xpPartida > 0){
+          const partes2=[];
+          if(gols>0)   partes2.push(`${gols}G`);
+          if(assist>0) partes2.push(`${assist}A`);
+          if(pk>0)     partes2.push(`${pk}P`);
+          const sublbl = partes2.join(' + ') || 'Partida';
+          window._mostrarXPGanho(xpPartida, sublbl, '⚽');
+        }
       }
     }, 800);
     // Verifica conquistas e level up após salvar partida
@@ -10856,21 +10864,24 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
   const bar  = document.getElementById('xp-gain-bar');
   if(!lbl||!sub||!ico||!bar) return;
 
-  // Calcula % atual na barra de XP do usuário
-  let pct = 0;
+  // Calcula % antes e depois do XP ganho
+  let pctAntes = 0, pctDepois = 0;
   if(window._calcXP && window._calcNivel && window.currentUser && window.gd){
     try {
-      const xpTotal = window._calcXP(window.currentUser.uid, window.gd);
-      const info    = window._calcNivel(xpTotal);
-      pct = info ? Math.min(100, Math.round((info.xpNestaNivel / info.xpParaSubir) * 100)) : 0;
+      const xpTotal  = window._calcXP(window.currentUser.uid, window.gd);
+      const infoAnte = window._calcNivel(Math.max(0, xpTotal - xpGanho));
+      const infoDepo = window._calcNivel(xpTotal);
+      pctAntes  = infoAnte ? Math.min(100, Math.round((infoAnte.xpNestaNivel / infoAnte.xpParaSubir) * 100)) : 0;
+      pctDepois = infoDepo ? Math.min(100, Math.round((infoDepo.xpNestaNivel / infoDepo.xpParaSubir) * 100)) : 0;
+      if(infoDepo.nivel > infoAnte.nivel){ pctAntes = 0; }
     } catch(e){}
   }
 
   lbl.textContent  = '+' + xpGanho + ' XP';
   sub.textContent  = label  || 'XP';
-  ico.textContent  = icone  || '⚡';
+  ico.textContent  = icone  || '\u26a1';
   bar.style.transition = 'none';
-  bar.style.width = '0%';
+  bar.style.width = pctAntes + '%';
 
   toast.style.opacity   = '0';
   toast.style.transform = 'translateX(-50%) translateY(-12px)';
@@ -10881,13 +10892,13 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
     toast.style.opacity   = '1';
     toast.style.transform = 'translateX(-50%) translateY(0)';
     setTimeout(() => {
-      bar.style.transition = 'width .9s ease';
-      bar.style.width = pct + '%';
-    }, 80);
+      bar.style.transition = 'width 1.2s cubic-bezier(.25,.8,.25,1)';
+      bar.style.width = pctDepois + '%';
+    }, 200);
     window._xpGainTimer = setTimeout(() => {
       toast.style.opacity   = '0';
-      toast.style.transform = 'translateX(-50%) translateY(-12px)';
-    }, 2400);
+      toast.style.transform = 'translateX(-50%) translateY(-16px)';
+    }, 4500);
   }));
 };
 // ── FIM TOAST XP GANHO ─────────────────────────────────────────
@@ -12207,24 +12218,24 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 <!-- ══ TOAST DE XP GANHO ══ -->
 <div id="xp-gain-toast" style="
-  position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-12px);
+  position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-16px);
   z-index:99999;pointer-events:none;
-  opacity:0;transition:opacity .25s ease,transform .3s cubic-bezier(.34,1.56,.64,1);
-  display:flex;align-items:center;gap:8px;
+  opacity:0;transition:opacity .3s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:12px;
   background:#0d1220;
-  border:1px solid rgba(59,130,246,.35);
-  border-radius:50px;padding:7px 16px 7px 12px;
-  box-shadow:0 4px 24px rgba(59,130,246,.25),0 1px 8px rgba(0,0,0,.5);
+  border:1px solid rgba(59,130,246,.4);
+  border-radius:50px;padding:10px 22px 10px 16px;
+  box-shadow:0 6px 32px rgba(59,130,246,.3),0 2px 12px rgba(0,0,0,.6);
   white-space:nowrap;
 ">
-  <div id="xp-gain-icon" style="font-size:15px;line-height:1">⚡</div>
-  <div style="display:flex;flex-direction:column;gap:1px">
-    <div id="xp-gain-label" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#fff;letter-spacing:.04em">+25 XP</div>
-    <div id="xp-gain-sub" style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(96,165,250,.7);letter-spacing:.06em;text-transform:uppercase">Gol</div>
-  </div>
-  <div style="width:1px;height:20px;background:rgba(59,130,246,.25);margin:0 2px"></div>
+  <div id="xp-gain-icon" style="font-size:20px;line-height:1">⚡</div>
   <div style="display:flex;flex-direction:column;gap:2px">
-    <div style="height:3px;width:48px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
+    <div id="xp-gain-label" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#fff;letter-spacing:.04em">+25 XP</div>
+    <div id="xp-gain-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(96,165,250,.75);letter-spacing:.06em;text-transform:uppercase">Gol</div>
+  </div>
+  <div style="width:1px;height:26px;background:rgba(59,130,246,.3);margin:0 2px"></div>
+  <div style="display:flex;flex-direction:column;gap:3px">
+    <div style="height:4px;width:64px;background:rgba(59,130,246,.2);border-radius:2px;overflow:hidden">
       <div id="xp-gain-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px;transition:width .9s ease .1s"></div>
     </div>
   </div>
