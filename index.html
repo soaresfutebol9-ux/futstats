@@ -3662,115 +3662,172 @@ body::before{
   <div class="pan" style="padding:0;overflow:hidden;border-radius:22px 22px 0 0;background:#ecedeb;box-shadow:0 -8px 40px rgba(0,0,0,.35),0 0 0 1px #b7b8b6;display:flex;flex-direction:column;max-height:92vh;">
 
     <!-- Header -->
-    <div style="position:relative;background:#b7b8b6;border-bottom:1px solid #b7b8b6;padding:1.4rem 1.4rem 1.2rem">
+    <div style="position:relative;background:#b7b8b6;border-bottom:1px solid #9a9b99;padding:1.1rem 1.4rem 0">
       <!-- Botão X -->
-      <button onclick="closeP('pperfil')" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#ecedeb;border:1px solid #b7b8b6;color:#494a48;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='var(--re)';this.style.color='#fff';this.style.borderColor='transparent'" onmouseout="this.style.background='#ecedeb';this.style.color='#494a48';this.style.borderColor='#b7b8b6'">×</button>
-      <!-- Avatar + info -->
-      <div style="display:flex;align-items:center;gap:16px">
-        <div style="position:relative">
-          <div class="profile-panel-avatar" id="pperfil-av" onclick="document.getElementById('photo-input-profile').click()" style="width:72px;height:72px;border:2px solid rgba(77,255,176,.4);box-shadow:0 0 20px rgba(77,255,176,.2)">
+      <button onclick="closeP('pperfil')" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:#ecedeb;border:1px solid #b7b8b6;color:#494a48;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='var(--re)';this.style.color='#fff';this.style.borderColor='transparent'" onmouseout="this.style.background='#ecedeb';this.style.color='#494a48';this.style.borderColor='#b7b8b6'">×</button>
+
+      <!-- Avatar centralizado, levemente saindo do header -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:0">
+        <div style="position:relative;margin-top:-4px">
+          <div class="profile-panel-avatar" id="pperfil-av" onclick="document.getElementById('photo-input-profile').click()" style="width:78px;height:78px;border:3px solid rgba(77,255,176,.5);box-shadow:0 0 24px rgba(77,255,176,.25),0 4px 16px rgba(0,0,0,.2)">
             <div class="edit-overlay">📷</div>
           </div>
-          <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:var(--g);border-radius:50%;border:2px solid #b7b8b6;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
+          <div style="position:absolute;bottom:0px;right:0px;width:20px;height:20px;background:var(--g);border-radius:50%;border:2px solid #b7b8b6;display:flex;align-items:center;justify-content:center;font-size:10px">✓</div>
         </div>
         <input type="file" id="photo-input-profile" accept="image/*" onchange="updateProfilePhoto(this)">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="font-family:'Freshman',sans-serif;font-size:20px;font-weight:normal;letter-spacing:.5px;color:#000000;line-height:1.1" id="pperfil-nome">—</div>
-            <button id="btn-editar-nome-inline" onclick="_abrirEditNomeInline()" title="Editar nome" style="background:none;border:none;cursor:pointer;padding:3px;color:#494a48;display:flex;align-items:center;flex-shrink:0;transition:color .15s;margin-top:1px" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='#494a48'">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+
+        <!-- Nome + botão editar -->
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="font-family:'Freshman',sans-serif;font-size:22px;font-weight:normal;letter-spacing:.5px;color:#000000;line-height:1" id="pperfil-nome">—</div>
+          <button id="btn-editar-nome-inline" onclick="_abrirEditNomeInline()" title="Editar nome" style="background:none;border:none;cursor:pointer;padding:3px;color:#494a48;display:flex;align-items:center;flex-shrink:0;transition:color .15s" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='#494a48'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
+
+        <!-- Inline name editor -->
+        <div id="edit-nome-inline-wrap" style="display:none;width:100%;padding:0 8px 6px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:rgba(255,255,255,.55);border:1.5px solid rgba(77,255,176,.5);border-radius:8px;color:#000;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-width:0" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='rgba(77,255,176,.5)'" onkeydown="if(event.key==='Enter')salvarNovoNome();if(event.key==='Escape')_fecharEditNomeInline()">
+            <button onclick="salvarNovoNome()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0">✓</button>
+            <button onclick="_fecharEditNomeInline()" style="background:rgba(0,0,0,.08);color:#494a48;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
+          </div>
+          <div id="nome-ok" style="display:none;font-size:11px;color:var(--g);font-family:'DM Mono',monospace;margin-top:4px;text-align:center">✓ Nome atualizado!</div>
+          <div id="nome-err" style="display:none;font-size:11px;color:var(--re);font-family:'DM Mono',monospace;margin-top:4px;text-align:center"></div>
+        </div>
+
+        <!-- FutID badge -->
+        <div id="pperfil-futid-wrap" style="display:none;margin-bottom:10px">
+          <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.3);border-radius:8px;padding:4px 10px">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:#1a5c2a;letter-spacing:.05em" id="pperfil-futid-text">—</span>
+            <button id="pperfil-futid-copybtn" onclick="copyFutId(document.getElementById('pperfil-futid-text').textContent,this)" title="Copiar FutID" style="background:none;border:none;cursor:pointer;padding:0;font-size:13px;line-height:1;color:#353635;display:flex;align-items:center">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
           </div>
-          <!-- Inline name editor (hidden by default) -->
-          <div id="edit-nome-inline-wrap" style="display:none;margin-top:5px">
-            <div style="display:flex;gap:6px;align-items:center">
-              <input type="text" id="edit-nome-input" placeholder="Novo nome" style="flex:1;background:rgba(255,255,255,.55);border:1.5px solid rgba(77,255,176,.5);border-radius:8px;color:#000;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-width:0" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='rgba(77,255,176,.5)'" onkeydown="if(event.key==='Enter')salvarNovoNome();if(event.key==='Escape')_fecharEditNomeInline()">
-              <button onclick="salvarNovoNome()" style="background:var(--grad-green);color:#07090d;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0">✓</button>
-              <button onclick="_fecharEditNomeInline()" style="background:rgba(0,0,0,.08);color:#494a48;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
-            </div>
-            <div id="nome-ok" style="display:none;font-size:11px;color:var(--g);font-family:'DM Mono',monospace;margin-top:4px">✓ Nome atualizado!</div>
-            <div id="nome-err" style="display:none;font-size:11px;color:var(--re);font-family:'DM Mono',monospace;margin-top:4px"></div>
-          </div>
-          <div style="font-size:12px;color:#494a48;margin-top:3px;font-family:'DM Mono',monospace" id="pperfil-email">—</div>
-          <!-- FutID badge -->
-          <div id="pperfil-futid-wrap" style="display:none;margin-top:6px">
-            <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.3);border-radius:8px;padding:3px 8px">
-              <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#1a5c2a;letter-spacing:.05em" id="pperfil-futid-text">—</span>
-              <button id="pperfil-futid-copybtn" onclick="copyFutId(document.getElementById('pperfil-futid-text').textContent,this)" title="Copiar FutID" style="background:none;border:none;cursor:pointer;padding:0;font-size:13px;line-height:1;color:#353635;display:flex;align-items:center">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
-            </div>
-          </div>
-          <div id="pperfil-xp-bar"></div>
         </div>
       </div>
+
+      <!-- XP bar: de ponta a ponta, colada na borda inferior do header -->
+      <div id="pperfil-xp-bar" style="margin:0 -1.4rem"></div>
     </div>
 
     <!-- Corpo com scroll -->
     <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding:1.2rem 1.4rem 2rem;background:#ecedeb;">
 
-      <!-- Apelido no grupo -->
-      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
-        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">🏷️ Título no ranking</div>
+      <!-- helper JS inline p/ accordion genérico do perfil -->
+      <style>
+        .pac-wrap{margin-bottom:.75rem}
+        .pac-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;
+          background:var(--bg3);border:1.5px solid #c8c9c7;border-radius:14px;
+          padding:13px 15px;cursor:pointer;transition:border-color .18s,border-radius .25s;text-align:left;gap:10px;
+          box-shadow:0 1px 6px rgba(0,0,0,.08)}
+        .pac-toggle:hover{border-color:#888}
+        .pac-toggle.open{border-radius:14px 14px 0 0;border-color:#aaa;border-bottom-color:transparent}
+        .pac-icon{font-size:18px;flex-shrink:0}
+        .pac-title{font-size:13px;font-weight:700;color:#111;font-family:'DM Sans',sans-serif;line-height:1.2}
+        .pac-sub{font-size:10px;color:#666;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+        .pac-chevron{flex-shrink:0;transition:transform .25s ease;color:#888}
+        .pac-body{overflow:hidden;max-height:0;transition:max-height .32s ease;
+          background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px}
+        .pac-inner{padding:14px 16px 16px}
+      </style>
 
-        <!-- MODO COMPACTO: exibido quando já há título salvo -->
-        <div id="apelido-modo-compacto" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg4);border-radius:10px;border:1px solid rgba(77,255,176,.3)">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span id="apelido-compacto-icon" style="font-size:18px"></span>
-              <span id="apelido-compacto-nome" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--g)"></span>
+      <!-- ① Título no ranking -->
+      <div class="pac-wrap">
+        <button class="pac-toggle" onclick="_pacToggle(this,'pac-body-titulo')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="pac-icon">🏷️</span>
+            <div><div class="pac-title">Título no ranking</div><div class="pac-sub">Conquista exibida no placar</div></div>
+          </div>
+          <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="pac-body" id="pac-body-titulo">
+          <div class="pac-inner">
+            <!-- MODO COMPACTO -->
+            <div id="apelido-modo-compacto" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg4);border-radius:10px;border:1px solid rgba(77,255,176,.3)">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span id="apelido-compacto-icon" style="font-size:18px"></span>
+                  <span id="apelido-compacto-nome" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--g)"></span>
+                </div>
+                <button onclick="_apelidoModoEditar()" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;white-space:nowrap;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx2)'">✏️ Editar</button>
+              </div>
             </div>
-            <button onclick="_apelidoModoEditar()" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;white-space:nowrap;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--g)';this.style.color='var(--g)'" onmouseout="this.style.borderColor='var(--bo2)';this.style.color='var(--tx2)'">✏️ Editar</button>
+            <!-- MODO EDIÇÃO -->
+            <div id="apelido-modo-edicao" style="display:block">
+              <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Escolha uma conquista desbloqueada para exibir abaixo do seu nome.</div>
+              <div id="apelido-conquistas-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
+              <div id="apelido-vazio" style="display:none;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:10px;padding:10px;background:var(--bg4);border-radius:10px;text-align:center">🔒 Desbloqueie conquistas para escolher seu título</div>
+              <div id="apelido-preview" style="display:none;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx2);margin-bottom:10px;padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2)">Título atual: <span id="apelido-preview-txt" style="color:var(--g)"></span></div>
+              <div style="display:flex;gap:8px">
+                <button onclick="salvarApelido()" id="apelido-salvar-btn" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);display:none" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Usar este título</button>
+                <button onclick="removerApelido()" id="apelido-remover-btn" style="background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Remover</button>
+                <button onclick="_apelidoCancelarEdicao()" id="apelido-cancelar-btn" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Cancelar</button>
+              </div>
+            </div>
+            <input type="hidden" id="apelido-input">
+            <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
+            <div id="apelido-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
           </div>
-        </div>
-
-        <!-- MODO EDIÇÃO: grid completo (inicial ou ao clicar em editar) -->
-        <div id="apelido-modo-edicao" style="display:block">
-          <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px">Escolha uma conquista desbloqueada para exibir abaixo do seu nome.</div>
-          <!-- Grid de conquistas desbloqueadas -->
-          <div id="apelido-conquistas-grid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
-          <div id="apelido-vazio" style="display:none;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:10px;padding:10px;background:var(--bg4);border-radius:10px;text-align:center">
-            🔒 Desbloqueie conquistas para escolher seu título
-          </div>
-          <!-- Preview do título selecionado no grid -->
-          <div id="apelido-preview" style="display:none;font-size:11px;font-family:'DM Mono',monospace;color:var(--tx2);margin-bottom:10px;padding:8px 12px;background:var(--bg4);border-radius:10px;border:1px solid var(--bo2)">
-            Título atual: <span id="apelido-preview-txt" style="color:var(--g)"></span>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button onclick="salvarApelido()" id="apelido-salvar-btn" style="flex:1;background:var(--grad-green);color:#07090d;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:filter .15s,transform .15s;white-space:nowrap;box-shadow:0 4px 16px rgba(77,255,176,.3);display:none" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Usar este título</button>
-            <button onclick="removerApelido()" id="apelido-remover-btn" style="background:none;border:1px solid rgba(255,90,122,.35);color:#FF5A7A;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Remover</button>
-            <button onclick="_apelidoCancelarEdicao()" id="apelido-cancelar-btn" style="background:none;border:1px solid var(--bo2);color:var(--tx2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none">Cancelar</button>
-          </div>
-        </div>
-
-        <!-- input hidden para guardar o valor selecionado -->
-        <input type="hidden" id="apelido-input">
-        <div id="apelido-ok" style="display:none;font-size:12px;color:var(--g);font-family:'DM Mono',monospace;margin-top:6px">✓ Título salvo!</div>
-        <div id="apelido-err" style="display:none;font-size:12px;color:var(--re);font-family:'DM Mono',monospace;margin-top:6px"></div>
-      </div>
-
-      <!-- Stats do mês atual -->
-      <div id="pperfil-stats-mes" style="margin-bottom:1rem"></div>
-
-      <!-- Meta pessoal do mês -->
-      <div id="pperfil-meta" style="margin-bottom:1rem"></div>
-
-      <!-- Stats totais -->
-      <div id="pperfil-stats-total" style="margin-bottom:1rem"></div>
-
-      <!-- Info do grupo -->
-      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:14px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.15)">
-        <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏟️ Grupo</div>
-        <div style="font-size:17px;font-weight:700;margin-bottom:4px;color:#000000" id="pperfil-gname">—</div>
-        <div style="font-size:11px;color:#353635;font-family:'DM Mono',monospace;word-break:break-all;margin-bottom:12px" id="pperfil-gcode">—</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="copyCodePerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-code-btn-perfil">📋 Copiar código</button>
-          <button onclick="copyInviteLinkPerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-link-btn-perfil">🔗 Link convite</button>
         </div>
       </div>
 
-      <!-- Últimas partidas -->
-      <div id="pperfil-partidas" style="margin-bottom:1rem"></div>
+      <!-- ② Estatísticas do mês -->
+      <div class="pac-wrap">
+        <button class="pac-toggle" onclick="_pacToggle(this,'pac-body-mes')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="pac-icon">📊</span>
+            <div><div class="pac-title">Estatísticas do mês</div><div class="pac-sub">Gols, assistências e meta</div></div>
+          </div>
+          <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="pac-body" id="pac-body-mes">
+          <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
+            <div id="pperfil-stats-mes"></div>
+            <div id="pperfil-meta"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ Histórico geral -->
+      <div class="pac-wrap">
+        <button class="pac-toggle" onclick="_pacToggle(this,'pac-body-historico')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="pac-icon">📈</span>
+            <div><div class="pac-title">Histórico geral</div><div class="pac-sub">Totais e últimas partidas</div></div>
+          </div>
+          <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="pac-body" id="pac-body-historico">
+          <div class="pac-inner" style="padding-top:8px;padding-bottom:8px">
+            <div id="pperfil-stats-total"></div>
+            <div id="pperfil-partidas"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ Grupo -->
+      <div class="pac-wrap">
+        <button class="pac-toggle" onclick="_pacToggle(this,'pac-body-grupo')">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="pac-icon">🏟️</span>
+            <div>
+              <div class="pac-title" id="pperfil-gname-badge">Grupo</div>
+              <div class="pac-sub" id="pperfil-gcode-badge">—</div>
+            </div>
+          </div>
+          <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="pac-body" id="pac-body-grupo">
+          <div class="pac-inner">
+            <div style="font-size:16px;font-weight:700;margin-bottom:3px;color:#000" id="pperfil-gname">—</div>
+            <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;word-break:break-all;margin-bottom:12px" id="pperfil-gcode">—</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onclick="copyCodePerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-code-btn-perfil">📋 Copiar código</button>
+              <button onclick="copyInviteLinkPerfil()" style="flex:1;background:var(--bg4);border:1px solid #b7b8b6;color:#494a48;border-radius:10px;padding:10px 12px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" id="copy-link-btn-perfil">🔗 Link convite</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- ════════════════════════════════════════════
            ACCORDION: Configurações do grupo (somente criador)
@@ -3959,6 +4016,15 @@ body::before{
         </div>
       </div>
       <!-- ════════ fim accordion ════════ -->
+
+      <!-- Email (visível só depois de rolar) -->
+      <div style="background:var(--bg3);border:1px solid #b7b8b6;border-radius:14px;padding:12px 16px;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,.1);display:flex;align-items:center;gap:10px">
+        <span style="font-size:15px;flex-shrink:0">📧</span>
+        <div>
+          <div style="font-size:10px;color:#353635;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px">E-mail da conta</div>
+          <div style="font-size:12px;color:#494a48;font-family:'DM Mono',monospace;word-break:break-all" id="pperfil-email">—</div>
+        </div>
+      </div>
 
       <!-- Ações -->
       <div style="display:flex;flex-direction:column;gap:8px" id="perfil-acoes-wrap">
@@ -4548,6 +4614,9 @@ function renderPanPerfilAvatar(){
   // Preenche info do grupo
   const gname=$('pperfil-gname');if(gname)gname.textContent=gd?.name||'—';
   const gcode=$('pperfil-gcode');if(gcode)gcode.textContent=groupId||'—';
+  // Atualiza badges no cabeçalho do accordion de grupo
+  const gnameBadge=$('pperfil-gname-badge');if(gnameBadge)gnameBadge.textContent=gd?.name||'Grupo';
+  const gcodeBadge=$('pperfil-gcode-badge');if(gcodeBadge)gcodeBadge.textContent=groupId||'—';
   // FutID no perfil
   const futIdWrap=$('pperfil-futid-wrap');
   const futIdText=$('pperfil-futid-text');
@@ -5919,10 +5988,18 @@ async function _abrirSeletorGrupo(modoInicial){
         display:flex;align-items:center;gap:14px;padding:14px 16px;
         background:${itemBg};border:1.5px solid ${itemBorder};
         border-radius:16px;cursor:pointer;transition:all .18s;
-        animation:_mgCardIn .25s ease both;
+        animation:_mgCardIn .25s ease both;position:relative;overflow:hidden;
       }
       .mg-item:hover{background:${itemHover};border-color:rgba(77,255,176,.4);transform:translateY(-1px)}
       .mg-item.active{border-color:rgba(77,255,176,.7);background:rgba(77,255,176,.08)}
+      .mg-item.has-wp{border-color:rgba(255,255,255,.18);}
+      .mg-item.has-wp:hover{border-color:rgba(77,255,176,.6);}
+      .mg-item-wp{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;border-radius:14px;}
+      .mg-item-wp-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.25) 100%);z-index:1;border-radius:14px;}
+      .mg-item > *:not(.mg-item-wp):not(.mg-item-wp-overlay){position:relative;z-index:2;}
+      .mg-item.has-wp .mg-item-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7);}
+      .mg-item.has-wp .mg-item-sub{color:rgba(255,255,255,.6);}
+      .mg-item.has-wp .mg-item-icon{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);}
       .mg-item-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(77,255,176,.25),rgba(77,255,176,.08));border:1.5px solid rgba(77,255,176,.35);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
       .mg-item-name{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:${txCol};line-height:1.2}
       .mg-item-sub{font-family:'DM Mono',monospace;font-size:10px;color:${tx2Col};letter-spacing:.06em;margin-top:3px}
@@ -5938,7 +6015,8 @@ async function _abrirSeletorGrupo(modoInicial){
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;padding-right:2px">
         ${grupos.map((g,i)=>`
-          <div class="mg-item${g.id===currentGid?' active':''}" onclick="window._selecionarGrupoModal('${g.id}')" style="animation-delay:${i*0.05}s">
+          <div class="mg-item${g.id===currentGid?' active':''}${g.wallpaper?' has-wp':''}" onclick="window._selecionarGrupoModal('${g.id}')" style="animation-delay:${i*0.05}s">
+            ${g.wallpaper?(()=>{ const wpStyle=g.wallpaper.startsWith('url(')?`background-image:${g.wallpaper};background-size:cover;background-position:center`:`background:${g.wallpaper};background-size:cover`; return `<div class="mg-item-wp" style="${wpStyle}"></div><div class="mg-item-wp-overlay"></div>`; })():''}
             <div class="mg-item-icon">⚽</div>
             <div style="flex:1;min-width:0">
               <div class="mg-item-name">${g.name||'Grupo'}</div>
@@ -11532,20 +11610,14 @@ function renderXPBar(uid, gd){
   const { nivel, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
   const progressLabel = `${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP`;
   return `
-  <div id="xp-bar-wrap" style="margin-top:8px;background:rgba(0,0,0,.1);border-radius:10px;padding:8px 10px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:.06em">
-        ⚡ NÍVEL ${nivel}
-      </div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:#888">
-        ${xpTotal.toLocaleString()} XP total
-      </div>
+  <div id="xp-bar-wrap" style="background:rgba(0,0,0,.18);padding:7px 1.4rem 8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:.06em">⚡ NÍVEL ${nivel}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(0,0,0,.45)">${xpTotal.toLocaleString()} XP total</div>
     </div>
-    <div style="position:relative;background:rgba(0,0,0,.15);border-radius:99px;height:18px;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;transition:width .6s ease;box-shadow:0 0 10px rgba(59,130,246,.5)"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#000;letter-spacing:.04em">
-        ${progressLabel}
-      </div>
+    <div style="position:relative;background:rgba(0,0,0,.18);border-radius:99px;height:16px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;transition:width .6s ease;box-shadow:0 0 10px rgba(59,130,246,.4)"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#fff;letter-spacing:.04em;text-shadow:0 1px 3px rgba(0,0,0,.4)">${progressLabel}</div>
     </div>
   </div>`;
 }
@@ -13711,6 +13783,22 @@ window.abrirCartaJogador = function(){
 </script>
 
 <script>
+// ── Accordion genérico do perfil ───────────────────────────────────────────
+function _pacToggle(btn, bodyId) {
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+  if (isOpen) {
+    body.style.maxHeight = '0';
+    btn.classList.remove('open');
+    btn.querySelector('.pac-chevron').style.transform = 'rotate(0deg)';
+  } else {
+    body.style.maxHeight = body.scrollHeight + 600 + 'px';
+    btn.classList.add('open');
+    btn.querySelector('.pac-chevron').style.transform = 'rotate(180deg)';
+  }
+}
+
 // ── Accordion: Configurações do grupo ──────────────────────────────────────
 
 // Abre/fecha o accordion principal
