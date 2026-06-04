@@ -3267,6 +3267,19 @@ img {
 .futid-badge button:hover{color:var(--g)}
 #add-by-futid-input{font-family:'DM Mono',monospace!important;text-transform:uppercase}
 </style>
+<style>
+/* ── Badge Admin ── */
+.ri-admin-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  color:#fff;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 6px;border-radius:99px;
+  box-shadow:0 1px 4px rgba(217,119,6,.4);
+  flex-shrink:0;line-height:1.4;
+  vertical-align:middle;
+}
+</style>
 </head>
 <body>
 <!-- noise grain filter -->
@@ -11179,18 +11192,6 @@ function showRankingSkeleton(){
 }
 // ── FIM SKELETON LOADERS ─────────────────────────────────────────
 
-
-/* ── Badge Admin ── */
-.ri-admin-badge{
-  display:inline-flex;align-items:center;gap:3px;
-  background:linear-gradient(135deg,#f59e0b,#d97706);
-  color:#fff;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 6px;border-radius:99px;
-  box-shadow:0 1px 4px rgba(217,119,6,.4);
-  flex-shrink:0;line-height:1.4;
-  vertical-align:middle;
-}
 
 function _adminBadge(uid){
   if(!gd) return '';
