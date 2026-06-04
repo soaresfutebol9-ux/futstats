@@ -439,6 +439,65 @@ body.light .av5{background:rgba(224,32,80,.1);color:#e02050}
 }
 
 /* ── APP ── */
+/* ── SELETOR DE GRUPOS ── */
+#sgroups{
+  align-items:center;justify-content:flex-start;padding:0;
+  background:var(--bg);
+  position:relative;overflow-y:auto;overflow-x:hidden;
+}
+#sgroups::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 0%,rgba(77,255,176,.06) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 35% at 80% 100%,rgba(96,165,250,.04) 0%,transparent 55%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 56px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0px,rgba(255,255,255,.014) 1px,transparent 1px,transparent 56px);
+}
+#sgroups-inner{position:relative;z-index:1;width:100%;max-width:420px;margin:0 auto;padding:2rem 1.25rem 3rem;}
+.sgroups-header{text-align:center;margin-bottom:1.75rem;padding-top:.5rem;}
+.sgroups-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px;color:var(--tx);margin-bottom:.25rem;}
+.sgroups-subtitle{font-size:13px;color:var(--tx2);font-family:'DM Sans',sans-serif;}
+.sgroups-subtitle span{color:var(--g);font-weight:600;}
+.sg-section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:.75rem;padding-left:2px;}
+.sg-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;}
+.sg-card{
+  display:flex;align-items:center;gap:.875rem;
+  background:var(--c1);border:1px solid var(--bo);border-radius:14px;
+  padding:.9rem 1rem;cursor:pointer;transition:all .18s;
+  position:relative;overflow:hidden;
+}
+.sg-card::before{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .18s;
+  background:linear-gradient(90deg,rgba(77,255,176,.06),transparent);
+  border-radius:14px;
+}
+.sg-card:hover{border-color:var(--g);transform:translateY(-1px);box-shadow:0 4px 20px rgba(77,255,176,.12);}
+.sg-card:hover::before{opacity:1;}
+.sg-card:active{transform:translateY(0);opacity:.85;}
+.sg-card-icon{
+  width:44px;height:44px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(77,255,176,.15),rgba(96,165,250,.1));
+  border:1px solid rgba(77,255,176,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.sg-card-info{flex:1;min-width:0;}
+.sg-card-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+.sg-card-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);letter-spacing:.05em;}
+.sg-card-arrow{color:var(--tx3);font-size:18px;flex-shrink:0;transition:transform .18s;}
+.sg-card:hover .sg-card-arrow{transform:translateX(3px);color:var(--g);}
+.sg-card-loading{opacity:.5;pointer-events:none;}
+.sg-empty{
+  text-align:center;padding:2rem 1rem;
+  font-size:13px;color:var(--tx3);font-family:'DM Sans',sans-serif;
+  background:var(--c1);border:1px dashed var(--bo);border-radius:14px;
+  margin-bottom:1.5rem;
+}
+.sg-empty-icon{font-size:32px;margin-bottom:.5rem;}
+.sg-divider{height:1px;background:var(--bo);margin:1.25rem 0;}
+.sg-actions{display:flex;flex-direction:column;gap:.6rem;}
+.sg-skeleton{height:66px;border-radius:14px;background:var(--c1);border:1px solid var(--bo);animation:sk-pulse 1.4s ease-in-out infinite;}
+
 #sa{background:var(--bg);height:100dvh;height:calc(var(--vh,1vh)*100);display:flex;flex-direction:column;overflow:hidden;position:relative}
 #sa::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
@@ -3306,6 +3365,33 @@ body::before{
   </div>
 </div>
 
+
+<!-- ══ SELETOR DE GRUPOS ══ -->
+<div id="sgroups" class="screen">
+  <div id="sgroups-inner">
+    <div class="sgroups-header">
+      <div class="sgroups-title">⚽ FutStats</div>
+      <div class="sgroups-subtitle">Olá, <span id="sgroups-name">—</span></div>
+    </div>
+
+    <!-- Lista de grupos (preenchida por JS) -->
+    <div id="sg-list-wrap"></div>
+
+    <div class="sg-divider"></div>
+
+    <!-- Ações: criar / entrar -->
+    <div class="sg-section-label">Novo grupo</div>
+    <div class="sg-actions">
+      <button class="btn bp" onclick="openP('pc')" style="margin-bottom:0">⚡ Criar grupo</button>
+      <button class="btn bs" onclick="openPCenter('pj')">🔑 Entrar com código</button>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:center;">
+      <button class="bg2btn" onclick="doLogout()">Sair da conta</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ APP ══ -->
 <div id="sa" class="screen">
   <div class="ah">
@@ -3832,7 +3918,7 @@ body::before{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, onSnapshot, serverTimestamp, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCzmqMAbfKZPS_NLnvbQ5SjKfKlV9afJJk",
@@ -5213,7 +5299,10 @@ window.copyInviteLinkPerfil=()=>{
 };
 window.leaveGroupPerfil=async()=>{
   if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
-  await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pperfil');enterLobby();
+  const gidSaindo=groupId;
+  await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayRemove(gidSaindo),groupId:''});
+  myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==gidSaindo);
+  myProfile.groupId='';groupId=null;gd=null;closeP('pperfil');enterGroupSelect();
 };
 
 onAuthStateChanged(auth,async user=>{
@@ -5224,11 +5313,18 @@ onAuthStateChanged(auth,async user=>{
       myProfile=snap.data();
       if(!myProfile.photo&&user.photoURL){myProfile.photo=user.photoURL;await updateDoc(doc(db,'users',user.uid),{photo:user.photoURL});}
       if(!myProfile.displayName&&user.displayName){myProfile.displayName=user.displayName;await updateDoc(doc(db,'users',user.uid),{displayName:user.displayName});}
+      // Migração: groupId (string) → groupIds (array)
+      if(myProfile.groupId&&!myProfile.groupIds){
+        const migIds=[myProfile.groupId];
+        await updateDoc(doc(db,'users',user.uid),{groupIds:migIds,groupId:''});
+        myProfile.groupIds=migIds;myProfile.groupId='';
+      }
+      if(!myProfile.groupIds){myProfile.groupIds=[];}
     }else{
-      myProfile={displayName:user.displayName||user.email,email:user.email,photo:user.photoURL||'',groupId:''};
+      myProfile={displayName:user.displayName||user.email,email:user.email,photo:user.photoURL||'',groupId:'',groupIds:[]};
       await setDoc(doc(db,'users',user.uid),{...myProfile,createdAt:serverTimestamp()});
     }
-    enterLobby();
+    enterGroupSelect();
   }else{
     currentUser=null;myProfile=null;gd=null;groupId=null;
     if(unsubGroup){unsubGroup();unsubGroup=null;}
@@ -5237,13 +5333,69 @@ onAuthStateChanged(auth,async user=>{
   }
 });
 
-function enterLobby(){
-  $('lobby-name').textContent=myProfile.displayName;
+function enterLobby(){enterGroupSelect();}
+
+async function enterGroupSelect(){
+  // Atualiza nomes na tela de seleção
+  $('sgroups-name').textContent=myProfile.displayName||'';
+  $('lobby-name').textContent=myProfile.displayName||'';
+
+  // Se veio via link de convite, vai pra seleção mas abre modal de entrar
   const params=new URLSearchParams(location.search);const joinCode=params.get('join');
-  if(joinCode){showScr('sloby');$('jcode').value=joinCode;openPCenter('pj');return;}
-  if(myProfile.groupId){loadGroup(myProfile.groupId);return;}
-  showScr('sloby');
+  if(joinCode){
+    showScr('sgroups');
+    $('jcode').value=joinCode;
+    _renderGroupList([]);  // renderiza lista vazia enquanto abre o modal
+    openPCenter('pj');
+    return;
+  }
+
+  showScr('sgroups');
+  const ids=myProfile.groupIds||[];
+
+  if(!ids.length){
+    _renderGroupList([]);
+    return;
+  }
+
+  // Mostra skeletons enquanto carrega
+  const wrap=$('sg-list-wrap');
+  wrap.innerHTML='<div class="sg-section-label">Meus grupos</div><div class="sg-list">'
+    +ids.map(()=>'<div class="sg-skeleton"></div>').join('')+'</div>';
+
+  // Busca todos os grupos em paralelo
+  try{
+    const snaps=await Promise.all(ids.map(id=>getDoc(doc(db,'groups',id))));
+    const grupos=snaps.map((s,i)=>s.exists()?{id:ids[i],...s.data()}:null).filter(Boolean);
+    _renderGroupList(grupos);
+  }catch(e){
+    console.error('enterGroupSelect erro:',e);
+    _renderGroupList([]);
+  }
 }
+
+function _renderGroupList(grupos){
+  const wrap=$('sg-list-wrap');
+  if(!grupos.length){
+    wrap.innerHTML='<div class="sg-empty"><div class="sg-empty-icon">🏟️</div>Você ainda não tem nenhum grupo.<br>Crie um ou entre com código!</div>';
+    return;
+  }
+  wrap.innerHTML='<div class="sg-section-label">Meus grupos</div><div class="sg-list">'
+    +grupos.map(g=>`<div class="sg-card" onclick="selectGroup('${g.id}',this)">
+      <div class="sg-card-icon">⚽</div>
+      <div class="sg-card-info">
+        <div class="sg-card-name">${g.name||'Grupo'}</div>
+        <div class="sg-card-code">Código: ${g.id}</div>
+      </div>
+      <div class="sg-card-arrow">›</div>
+    </div>`).join('')
+    +'</div>';
+}
+
+window.selectGroup=async function(gid,el){
+  if(el){el.classList.add('sg-card-loading');el.querySelector('.sg-card-arrow').textContent='...';}
+  await loadGroup(gid);
+};
 async function loadGroup(gid){
   // Mostra skeleton imediatamente enquanto o Firestore responde
   const rl=$('rl');if(rl)rl.innerHTML=`<div class="sk-podium">${[46,46,46].map(s=>`<div class="sk-podium-item"><div class="sk-pulse sk-line" style="width:40px;height:10px"></div><div class="sk-pulse sk-av" style="width:${s}px;height:${s}px;border-radius:50%"></div><div class="sk-pulse sk-line" style="width:60px;height:10px"></div><div class="sk-pulse sk-line" style="width:32px;height:22px"></div></div>`).join('')}</div><div class="rank-list">${[1,2,3].map(()=>`<div class="sk-ri"><div class="sk-pulse sk-line" style="width:24px;height:14px"></div><div class="sk-pulse sk-av" style="width:50px;height:50px;border-radius:50%"></div><div class="sk-ri-info"><div class="sk-pulse sk-line" style="width:55%;height:13px"></div><div class="sk-pulse sk-line" style="width:40%;height:11px"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="sk-pulse sk-line" style="width:38px;height:22px"></div><div class="sk-pulse sk-line" style="width:24px;height:9px"></div></div></div>`).join('')}</div>`;
@@ -5255,7 +5407,9 @@ window.createGroup=async()=>{
     const ma=mesAtual();const member={uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()};
     const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp(),createdBy:currentUser.uid};
     const ref=await addDoc(collection(db,'groups'),data);
-    groupId=ref.id;gd=data;await updateDoc(doc(db,'users',currentUser.uid),{groupId:ref.id});myProfile.groupId=ref.id;
+    groupId=ref.id;gd=data;
+    await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(ref.id),groupId:''});
+    myProfile.groupIds=[...(myProfile.groupIds||[]),ref.id];myProfile.groupId='';
     closeP('pc');enterApp();subscribeGroup();
   }catch(e){showErr('cerr','Erro: '+e.message)}
 };
@@ -5266,7 +5420,9 @@ window.joinGroup=async()=>{
     let data=snap.data();data=await checkMesViradaWith(code,data);
     const already=(data.members||[]).some(m=>m.uid===currentUser.uid);
     if(!already){data.members=[...(data.members||[]),{uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()}];await setDoc(doc(db,'groups',code),data);}
-    groupId=code;gd=data;await updateDoc(doc(db,'users',currentUser.uid),{groupId:code});myProfile.groupId=code;
+    groupId=code;gd=data;
+    await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(code),groupId:''});
+    myProfile.groupIds=[...(myProfile.groupIds||[]),code];myProfile.groupId='';
     closePCenter('pj');enterApp();subscribeGroup();
     // Publica no feed que novo jogador entrou
     setTimeout(()=>_publishFeed('membro',`<strong>${myProfile.displayName}</strong> entrou no grupo! 👋`),500);
@@ -5792,7 +5948,10 @@ async function _checkBadgeConquistas(){
 
 window.leaveGroup=async()=>{
   if(!confirm('Sair do grupo?'))return;if(unsubGroup){unsubGroup();unsubGroup=null;}
-  await updateDoc(doc(db,'users',currentUser.uid),{groupId:''});myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterLobby();
+  const gidSaindo=groupId;
+  await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayRemove(gidSaindo),groupId:''});
+  myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==gidSaindo);
+  myProfile.groupId='';groupId=null;gd=null;closeP('pi2');enterGroupSelect();
 };
 window.copyCode=()=>{navigator.clipboard.writeText(groupId).then(()=>{const b=$('copybtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));};
 window.copyInviteLink=()=>{const link=location.href.split('?')[0]+'?join='+groupId;navigator.clipboard.writeText(link).then(()=>{const b=$('linkbtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));};
