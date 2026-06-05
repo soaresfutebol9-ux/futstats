@@ -12907,7 +12907,7 @@ function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
 
 // Salva o craque da semana passada no Firestore (se ainda não salvo)
 window._salvarCraqueSemana = async function(){
-  if(!window._gd || !window.groupId || !currentUser) return;
+  if(!window._gd || !window.groupId || !window._currentUserUid) return;
   const groupId = window.groupId;
   let gd = window._gd;
   const info = _calcLastWeekInfo();
