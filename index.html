@@ -6211,6 +6211,14 @@ async function loadGroup(gid){
     if(!snap.exists())return;
     groupId=gid;window.groupId=gid;
     gd=snap.data();
+    // Migração silenciosa: grupos antigos sem createdBy recebem members[0] como criador
+    if(!gd.createdBy && (gd.members||[]).length > 0){
+      const primeiroUid = gd.members[0].uid;
+      if(primeiroUid){
+        gd.createdBy = primeiroUid;
+        updateDoc(doc(db,'groups',gid),{createdBy:primeiroUid}).catch(()=>{});
+      }
+    }
     gd=await checkMesVirada(gd);
     localStorage.setItem('futstats-last-group', gid);
     enterApp();
@@ -6715,7 +6723,12 @@ async function checkMesViradaWith(gid,cur){
 }
 function _atualizarBotoesPerfilGrupo(){
   const ids = myProfile ? (myProfile.groupIds||[]) : [];
-  const isCriador = gd && currentUser && gd.createdBy === currentUser.uid;
+  // Fallback para groups antigos que não têm campo createdBy: considera members[0] como criador
+  const isCriador = gd && currentUser && (
+    gd.createdBy
+      ? gd.createdBy === currentUser.uid
+      : (gd.members||[])[0]?.uid === currentUser.uid
+  );
 
   // "Mudar de grupo" — só aparece se tiver 2+ grupos
   const btnMudar = document.getElementById('btn-mudar-grupo');
