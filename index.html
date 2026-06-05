@@ -3707,7 +3707,7 @@ body::before{
       </div>
 
       <!-- XP bar: de ponta a ponta, colada na borda inferior do header -->
-      <div id="pperfil-xp-bar" style="margin:0 -1.4rem"></div>
+      <div id="pperfil-xp-bar"></div>
     </div>
 
     <!-- Corpo com scroll -->
@@ -11610,14 +11610,14 @@ function renderXPBar(uid, gd){
   const { nivel, xpNestaNivel, xpParaSubir, pct } = calcNivel(xpTotal);
   const progressLabel = `${xpNestaNivel.toLocaleString()} / ${xpParaSubir.toLocaleString()} XP`;
   return `
-  <div id="xp-bar-wrap" style="background:rgba(0,0,0,.18);padding:7px 1.4rem 8px">
+  <div id="xp-bar-wrap" style="background:rgba(0,0,0,.18);padding:7px 1.4rem 8px;border-radius:12px;margin:0 1.4rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
       <div style="font-family:'DM Mono',monospace;font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:.06em">⚡ NÍVEL ${nivel}</div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(0,0,0,.45)">${xpTotal.toLocaleString()} XP total</div>
     </div>
-    <div style="position:relative;background:rgba(0,0,0,.18);border-radius:99px;height:16px">
+    <div style="position:relative;background:rgba(0,0,0,.18);border-radius:99px;height:16px;overflow:hidden">
       <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:99px;transition:width .6s ease;box-shadow:0 0 10px rgba(59,130,246,.4)"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#000;letter-spacing:.04em;text-shadow:0 1px 2px rgba(255,255,255,.3)">${progressLabel}</div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#fff;letter-spacing:.04em;text-shadow:0 1px 3px rgba(0,0,0,.4)">${progressLabel}</div>
     </div>
   </div>`;
 }
