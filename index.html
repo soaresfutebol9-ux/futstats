@@ -4812,6 +4812,8 @@ function renderPerfilPanelStats(){
       }).join('')}</div></div>
       ${myMatches.length>3?`<button class="mr-expand-btn" onclick="openModalPartidas()" style="margin-top:8px"><svg viewBox='0 0 24 24' style='width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2'><polyline points='15 3 21 3 21 9'/><polyline points='9 21 3 21 3 15'/><line x1='21' y1='3' x2='14' y2='10'/><line x1='3' y1='21' x2='10' y2='14'/></svg> Ver todas (${myMatches.length})</button>`:''}
     </div>`;
+  // Sempre sincroniza visibilidade dos controles de ADM com o grupo ativo
+  _atualizarBotoesPerfilGrupo();
 }
 
 window.deleteMatchAndRefresh=async gi=>{
@@ -6746,6 +6748,8 @@ function enterApp(){
   renderHeaderAvatar();renderPanPerfilAvatar();showScr('sa');renderRanking();setTimeout(renderFeedCard,300);
   // Mostra/oculta botões de ação no perfil com base no número de grupos e papel
   _atualizarBotoesPerfilGrupo();
+  // Atualiza FAB do survey refletindo papel no grupo atual
+  if(typeof _surveyUpdateFAB === 'function') _surveyUpdateFAB();
   // Mostra FABs
   document.body.classList.add('duelo-fab-visible');
   document.body.classList.add('conquistas-fab-visible');
