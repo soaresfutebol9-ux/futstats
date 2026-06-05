@@ -4305,6 +4305,7 @@ Object.defineProperties(window,{
   _dueloB_:{get:()=>_dueloB,set:v=>{_dueloB=v;}},
   _dueloScope_:{get:()=>_dueloScope,set:v=>{_dueloScope=v;}},
   _currentUserUid:{get:()=>currentUser?.uid},
+  currentUser:{get:()=>currentUser},
   _groupId:{get:()=>groupId},
 });
 window._getSt=(...a)=>getSt(...a);
@@ -4312,6 +4313,7 @@ window._getStGeral=(...a)=>getStGeral(...a);
 window._getDueloStats_=(...a)=>_getDueloStats(...a);
 // Expõe helpers Firestore para módulo de conquistas
 window._db_getDoc = (ref)=>getDoc(ref);
+window._db_setDoc = (ref,data)=>setDoc(ref,data);
 window._db_updateDoc = (ref,data)=>updateDoc(ref,data);
 window._db_updateDoc_safe = async (uid,data)=>{ try{ await updateDoc(doc(db,'users',uid),data); }catch(e){} };
 window._db_doc = (col,id)=>doc(db,col,id);
@@ -4462,11 +4464,19 @@ window.closePCenter=id=>{
   });
 
   // Hook nos abridores de modais para empurrar estado na pilha
-  const _origOpenPlayer=window.openPlayerProfile;
-  window.openPlayerProfile=function(...args){
-    _origOpenPlayer?.(...args);
+  // Usa wrapper tardio para garantir que window.openPlayerProfile já esteja definido
+  const _openPlayerProfileProxy=function(...args){
+    window._openPlayerProfileOrig?.(...args);
     history.pushState({futstatsBack:'modal-player',type:'modal'},'');
   };
+  window._installOpenPlayerHook=function(){
+    if(window.openPlayerProfile && window.openPlayerProfile!==_openPlayerProfileProxy){
+      window._openPlayerProfileOrig=window.openPlayerProfile;
+      window.openPlayerProfile=_openPlayerProfileProxy;
+    }
+  };
+  window._installOpenPlayerHook();
+  setTimeout(window._installOpenPlayerHook,0);
 
   const _origOpenPartidas=window.openModalPartidas||null;
   // modal-partidas é aberto inline — hookamos no close ao abrir
@@ -5921,6 +5931,25 @@ window.adicionarMembroPorFutId=async()=>{
   }catch(e){
     if(errEl){errEl.textContent='Erro ao adicionar: '+e.message;errEl.style.display='';}
   }
+};
+
+window.removerMembroPorFutId=async(futId)=>{
+  if(!gd||!groupId||!currentUser) throw new Error('Sem grupo ativo.');
+  if(gd.createdBy!==currentUser.uid) throw new Error('Somente o criador pode remover membros.');
+  if(!futId||!/^FST-[A-Z0-9]{6}$/.test(futId)) throw new Error('FutID inválido.');
+  const targetUid=await _buscarUidPorFutId(futId);
+  if(!targetUid) throw new Error('FutID não encontrado.');
+  if(targetUid===currentUser.uid) throw new Error('O criador não pode remover a si mesmo.');
+  const membros=(gd.members||[]);
+  const idx=membros.findIndex(m=>m.uid===targetUid);
+  if(idx===-1) throw new Error('Este jogador não é membro do grupo.');
+  const cur=JSON.parse(JSON.stringify(gd));
+  cur.members=membros.filter(m=>m.uid!==targetUid);
+  await setDoc(doc(db,'groups',groupId),cur);
+  await updateDoc(doc(db,'users',targetUid),{groupIds:arrayRemove(groupId)}).catch(()=>{});
+  gd=cur;
+  try{await _publishFeed('membro',`<strong>${membros[idx].name||'Jogador'}</strong> foi removido do grupo. 🚪`);}catch(e){}
+  renderGal&&renderGal();renderRanking&&renderRanking();
 };
 
 window.leaveGroupPerfil=async()=>{
@@ -8422,6 +8451,8 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   const modal=document.getElementById('modal-player');
   modal.classList.add('open');
 };
+// Garante que o hook de histórico seja re-instalado sobre esta definição
+if(typeof window._installOpenPlayerHook==='function') window._installOpenPlayerHook();
 
 window._mpDesafiarClick=function(){
   if(!_mpUid)return;
@@ -11663,7 +11694,9 @@ window._checkLevelUp = function(gdAntes, gdDepois){
     const notifId = now + '_lvlup_' + uid;
     (async () => {
       try {
-        const snap = await getDoc(doc(db, 'groups', groupId));
+        const _gid = window.groupId || window._groupId;
+        if(!_gid || !window._db_getDoc || !window._db_doc) return;
+        const snap = await window._db_getDoc(window._db_doc('groups', _gid));
         const cur  = snap.data();
         cur.notifs = cur.notifs || {};
         cur.notifs[uid] = cur.notifs[uid] || [];
@@ -11679,17 +11712,17 @@ window._checkLevelUp = function(gdAntes, gdDepois){
             ts: now,
             lida: false,
           });
-          await setDoc(doc(db, 'groups', groupId), cur);
-          gd = cur;
-          _updateNotifBadge();
-          if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
+          await window._db_setDoc(window._db_doc('groups', _gid), cur);
+          if(window._gd) window._gd = cur;
+          if(typeof _updateNotifBadge === 'function') _updateNotifBadge();
+          if(document.getElementById('notif-panel')?.classList.contains('open') && typeof _renderNotifPanel === 'function') _renderNotifPanel();
         }
       } catch(e){ console.warn('levelup notif:', e); }
     })();
 
     // ── Feed do grupo ───────────────────────────────────────────
     const nome = window.myProfile?.displayName || 'Jogador';
-    _publishFeed('levelup', `⚡ <strong>${nome}</strong> evoluiu para o <strong>Nível ${nivelDepois}</strong> — ${titulo}!`);
+    _publishFeed('levelup', `⚡ <strong>${nome}</strong> evoluiu para o <strong>Nível ${nivelDepois}</strong> — ${titulo}!`).catch(console.warn);
   }
 };
 
@@ -11740,9 +11773,9 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
 
   // Calcula % antes e depois do XP ganho
   let pctAntes = 0, pctDepois = 0;
-  if(window._calcXP && window._calcNivel && window.currentUser && window.gd){
+  if(window._calcXP && window._calcNivel && window.currentUser && (window._gd || gd)){
     try {
-      const xpTotal  = window._calcXP(window.currentUser.uid, window.gd);
+      const xpTotal  = window._calcXP(window.currentUser.uid, window._gd || gd);
       const infoAnte = window._calcNivel(Math.max(0, xpTotal - xpGanho));
       const infoDepo = window._calcNivel(xpTotal);
       pctAntes  = infoAnte ? Math.min(100, Math.round((infoAnte.xpNestaNivel / infoAnte.xpParaSubir) * 100)) : 0;
@@ -12487,7 +12520,12 @@ window._attachTemaLongPress = function(){
 window._selecionarTema = function(temaId){
   _cartaTemaAtivo = temaId;
   try { localStorage.setItem('futstats-carta-tema', temaId); } catch(e) {}
-  const card = document.getElementById('player-card-el');
+  // Detecta qual carta está visível: survey-card-el tem prioridade se existir no DOM visível
+  const surveyCard = document.getElementById('survey-card-el');
+  const playerCard = document.getElementById('player-card-el');
+  const card = (surveyCard && surveyCard.offsetParent !== null) ? surveyCard
+             : (playerCard && playerCard.offsetParent !== null) ? playerCard
+             : surveyCard || playerCard;
   if(!card) return;
 
   // Remove todas as classes de tema
@@ -12938,7 +12976,7 @@ window._salvarCraqueSemana = async function(){
   };
 
   try {
-    const snap = await getDoc(doc(db, 'groups', groupId));
+    const snap = await window._db_getDoc(window._db_doc('groups', groupId));
     const cur  = snap.data();
     cur.craquesSemana = cur.craquesSemana || [];
     // Double-check após fetch
@@ -12946,7 +12984,7 @@ window._salvarCraqueSemana = async function(){
       cur.craquesSemana.push(registro);
       // Mantém ordenado do mais recente ao mais antigo
       cur.craquesSemana.sort((a,b) => b.key.localeCompare(a.key));
-      await setDoc(doc(db, 'groups', groupId), cur);
+      await window._db_setDoc(window._db_doc('groups', groupId), cur);
       window._gd = cur;
       gd = cur;
     }
@@ -13636,7 +13674,7 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
     </div>`).join('');
 
   return `
-  <div id="player-card-el" style="
+  <div id="survey-card-el" style="
     width:280px;height:390px;border-radius:22px;
     position:relative;overflow:hidden;
     display:flex;flex-direction:column;align-items:center;
@@ -13718,9 +13756,9 @@ window.abrirCartaJogador = function(){
 
       inner.innerHTML = `
         ${_buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, gd?.name||'FutStats')}
-        <div id="carta-temas-wrap" style="width:100%;margin-bottom:14px">
+        <div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
           <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-          <div id="carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
+          <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
         </div>
         <div class="carta-btns">
           <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
