@@ -11705,6 +11705,15 @@ window._checkLevelUp = function(gdAntes, gdDepois){
       setTimeout(() => window._mostrarXPGanho(xpDepois, titulo, '🔥'), 2800);
     }
 
+    // REGRA C: Se atingiu o nível mínimo do survey, injeta dinamicamente no questionário ativo
+    if(nivelAntes < SURVEY_NIVEL_MINIMO && nivelDepois >= SURVEY_NIVEL_MINIMO){
+      setTimeout(() => {
+        if(typeof window._injetarMembroNoSurvey === 'function'){
+          window._injetarMembroNoSurvey(uid);
+        }
+      }, 1500);
+    }
+
     // ── Notificação pessoal no sino ─────────────────────────────
     const titulo = window.tituloNivel ? window.tituloNivel(nivelDepois) : ('Nível ' + nivelDepois);
     const now = Date.now();
@@ -13234,14 +13243,33 @@ function _isAdmin(){
   return (gd.members||[])[0]?.uid === uid;
 }
 
-/* Mostra botão do FAB: admin sempre vê, membros veem quando há questionário ativo */
+/* ── REGRA A: FAB de gerenciamento do Questionário — visível APENAS para o ADM do grupo ──
+   Membros comuns acessam o questionário pela aba/card, não pelo FAB de configuração.       */
 function _surveyUpdateFAB(){
   const wrap = document.getElementById('mfab-survey-wrap');
   if(!wrap) return;
-  const survey = window._gd?.survey || null;
   const isAdmin = _isAdmin();
-  // Admin vê sempre; membro comum só vê se houver questionário ativo
-  wrap.style.display = (isAdmin || survey) ? '' : 'none';
+  // Somente o ADM vê o botão FAB do questionário (gerenciar/criar/editar)
+  wrap.style.display = isAdmin ? '' : 'none';
+}
+
+/* ── REGRA B: Trava de Nível — "Questionário do Card do Jogador" exige Nível 5 ──
+   Verifica se o usuário atual atingiu o nível mínimo para participar do questionário.
+   A trava é INDIVIDUAL: membros com nível < 5 ficam bloqueados enquanto os demais
+   continuam usando normalmente. Assim que o membro atingir o Nível 5 o botão é
+   liberado automaticamente (a função é chamada novamente no listener de dados).        */
+const SURVEY_NIVEL_MINIMO = 5;
+
+function _usuarioElegivelSurvey(uid){
+  const gd = window._gd;
+  if(!gd) return false;
+  const member = (gd.members || []).find(m => m.uid === uid);
+  if(!member) return false;
+  // Usa o XP salvo no membro para calcular o nível atual
+  const xpTotal = member.xp || member.xpTotal || 0;
+  if(typeof window._calcNivel !== 'function') return true; // fallback: libera se a função não existir
+  const { nivel } = window._calcNivel(xpTotal);
+  return nivel >= SURVEY_NIVEL_MINIMO;
 }
 
 /* ── ABRIR SURVEY ── */
@@ -13266,13 +13294,20 @@ window.abrirSurvey = function(){
       // Admin já respondeu — vai para tela de gerenciamento
       _renderSurveyAdmin(inner, gd);
     } else {
-      // Admin ainda não respondeu — vai para o formulário
-      _renderSurveyForm(inner, survey, members, uid);
+      // Admin ainda não respondeu — verifica elegibilidade antes do formulário
+      if(!_usuarioElegivelSurvey(uid)){
+        _renderSurveyBloqueado(inner);
+      } else {
+        _renderSurveyForm(inner, survey, members, uid);
+      }
     }
   } else if(survey){
     const jaRespondeu = !!(survey.responses||{})[uid];
     if(jaRespondeu){
       _renderSurveyResultado(inner, survey, members, uid);
+    } else if(!_usuarioElegivelSurvey(uid)){
+      // REGRA B: Membro ainda não atingiu o Nível 5 — exibe tela de bloqueio
+      _renderSurveyBloqueado(inner);
     } else {
       _renderSurveyForm(inner, survey, members, uid);
     }
@@ -13293,6 +13328,7 @@ window.abrirSurvey = function(){
 window.fecharSurvey = function(){
   const modal = document.getElementById('modal-survey');
   if(modal) modal.style.display = 'none';
+
   document.body.style.overflow = '';
 };
 
@@ -13300,33 +13336,59 @@ document.getElementById('modal-survey').addEventListener('click', e => {
   if(e.target === document.getElementById('modal-survey')) fecharSurvey();
 });
 
-/* ── TELA ADMIN: criar ou resetar survey ── */
+/* ── REGRA B: Tela exibida quando o membro ainda não atingiu o Nível mínimo ── */
+function _renderSurveyBloqueado(inner){
+  inner.innerHTML = `
+    <div style="text-align:center;padding:40px 0">
+      <div style="font-size:48px;margin-bottom:16px">🔒</div>
+      <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:10px">
+        Questionário do Card do Jogador
+      </div>
+      <div style="font-size:14px;color:var(--tx2);line-height:1.6;max-width:300px;margin:0 auto 20px">
+        Você precisa atingir o <strong style="color:#a855f7">Nível ${SURVEY_NIVEL_MINIMO}</strong> para participar do
+        questionário e ter seu Card do Jogador gerado.<br><br>
+        Continue jogando e acumulando XP para desbloquear! ⚡
+      </div>
+      <div style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 20px;display:inline-block;margin-bottom:24px">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">Nível mínimo necessário</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:28px;color:#a855f7">★ Nível ${SURVEY_NIVEL_MINIMO}</div>
+      </div>
+      <br>
+      <button onclick="fecharSurvey()" style="padding:10px 28px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
+    </div>`;
+}
+
+/* ── REGRA B/C: Tela ADMIN — criar ou resetar survey ── */
 function _renderSurveyAdmin(inner, gd){
   const survey = gd.survey || null;
   const members = gd.members || [];
+  // Apenas membros elegíveis (Nível >= 5) entram na contagem
+  const membrosElegiveis = members.filter(m => _usuarioElegivelSurvey(m.uid));
   const totalRespostas = survey ? Object.keys(survey.responses||{}).length : 0;
-  const totalMembros = members.length;
+  const totalMembros = membrosElegiveis.length;
+  const totalGeral = members.length;
 
   inner.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
+      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário do Card</div>
       <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
 
     ${survey ? `
     <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">Questionário ativo</div>
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">Questionário ativo — Elegíveis: ${totalMembros} de ${totalGeral} membros (Nível ${SURVEY_NIVEL_MINIMO}+)</div>
       <div style="font-size:15px;font-family:'DM Mono',monospace;color:#4dffb0">${totalRespostas} / ${totalMembros} responderam</div>
-      ${totalRespostas===totalMembros && totalMembros>0 ? `<div style="font-size:12px;color:#4dffb0;margin-top:6px">✅ Todos responderam — cards gerados!</div>` : ''}
+      ${totalRespostas===totalMembros && totalMembros>0 ? `<div style="font-size:12px;color:#4dffb0;margin-top:6px">✅ Todos os elegíveis responderam — cards gerados!</div>` : ''}
     </div>
     ` : `
     <div style="background:rgba(255,255,255,.04);border:1px solid var(--bo);border-radius:12px;padding:14px 16px;margin-bottom:16px">
       <div style="font-size:13px;color:var(--tx2)">Nenhum questionário ativo no momento.</div>
+      ${totalMembros < totalGeral ? `<div style="font-size:12px;color:#a855f7;margin-top:6px">⚡ ${totalGeral - totalMembros} membro(s) ainda abaixo do Nível ${SURVEY_NIVEL_MINIMO} — serão incluídos ao atingir o nível.</div>` : ''}
     </div>
     `}
 
     <div style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.5">
-      Ao criar um novo questionário, todos os membros poderão avaliar uns aos outros nas 6 características. O questionário anterior (se houver) será substituído.
+      Membros com <strong>Nível ${SURVEY_NIVEL_MINIMO}+</strong> podem avaliar uns aos outros nas 6 características e ter seu Card do Jogador gerado. Novos membros são incluídos automaticamente ao atingir o nível — sem perder respostas existentes.
     </div>
 
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
@@ -13343,8 +13405,9 @@ function _renderSurveyAdmin(inner, gd){
     ` : ''}
 
     <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      ${survey ? '🔄 Criar novo questionário' : '✨ Criar questionário'}
+      ${survey ? '🔄 Novo questionário (zera respostas)' : '✨ Criar questionário'}
     </button>
+    <div style="font-size:11px;color:var(--tx2);text-align:center;margin-top:8px;opacity:.6">🔒 Visível apenas para o administrador do grupo</div>
   `;
 }
 
@@ -13436,7 +13499,7 @@ function _renderSurveyTodasRespostas(inner, survey, members){
 window._criarSurvey = async function(){
   const gid = window._groupId;
   if(!gid) return;
-  if(!confirm('Criar um novo questionário? Isso apagará o anterior e todas as respostas.')) return;
+  if(!confirm('Criar um novo questionário? Isso substituirá o questionário atual e todas as respostas serão reiniciadas.')) return;
 
   const survey = { createdAt: Date.now(), responses: {}, results: {} };
   try{
@@ -13449,16 +13512,66 @@ window._criarSurvey = async function(){
   }
 };
 
+/* ── REGRA C: Injeção Dinâmica — ao atingir Nível 5, o novo membro é adicionado
+   ao survey ativo SEM apagar votos/respostas/cards existentes dos outros membros.
+   Chamada automaticamente quando o nível do usuário é atualizado.                 */
+window._injetarMembroNoSurvey = async function(uid){
+  const gid = window._groupId;
+  const gd = window._gd;
+  if(!gid || !gd) return;
+
+  const survey = gd.survey;
+  if(!survey) return; // Nenhum questionário ativo
+
+  // Já é elegível? Se não, não injeta
+  if(!_usuarioElegivelSurvey(uid)) return;
+
+  // Já está nas respostas? Não faz nada
+  const respostas = survey.responses || {};
+  if(respostas[uid] !== undefined) return;
+
+  // Verifica no Firestore (fonte da verdade)
+  try{
+    const snap = await window._db_getDoc(window._db_doc('groups', gid));
+    if(!snap.exists()) return;
+    const cur = snap.data();
+    const curSurvey = cur.survey || {};
+
+    // Confirma que o membro ainda não está nas respostas remotas
+    if((curSurvey.responses || {})[uid] !== undefined) return;
+
+    // Atualiza apenas o status "completed" baseado nos membros elegíveis totais
+    const allMembers = cur.members || [];
+    const elegiveisCount = allMembers.filter(m => _usuarioElegivelSurvey(m.uid)).length;
+    const responderam = Object.keys(curSurvey.responses || {}).length;
+    const todos = elegiveisCount > 0 && responderam >= elegiveisCount;
+
+    await window._db_updateDoc(window._db_doc('groups', gid), {
+      'survey.completed': todos,
+    });
+
+    // Atualiza o cache local (sem resetar responses/results)
+    window._gd.survey = { ...curSurvey, completed: todos };
+
+    console.log('[Survey] Membro', uid, 'injetado dinamicamente. Elegíveis:', elegiveisCount, '| Responderam:', responderam);
+  } catch(e){
+    console.warn('[Survey] Erro ao injetar membro dinamicamente:', e.message);
+  }
+};
+
 /* ── TELA DO FORMULÁRIO DE RESPOSTA ── */
 function _renderSurveyForm(inner, survey, members, uid){
+  // REGRA B/C: Apenas membros elegíveis (Nível >= 5) aparecem como opções de voto
+  const membersElegiveis = members.filter(m => _usuarioElegivelSurvey(m.uid));
+
   const state = {};
-  members.forEach(m=>{
+  membersElegiveis.forEach(m=>{
     state[m.uid] = {};
     SURVEY_ATTRS.forEach(a=>{ state[m.uid][a.id] = 50; });
   });
 
   function buildForm(confirming){
-    const membersHTML = members.map(m => {
+    const membersHTML = membersElegiveis.map(m => {
       const isMe = m.uid === uid;
       const vals = state[m.uid];
       return `
@@ -13531,7 +13644,7 @@ function _renderSurveyForm(inner, survey, members, uid){
     if(!gid) return;
 
     const myResponse = {};
-    members.forEach(m=>{
+    membersElegiveis.forEach(m=>{
       myResponse[m.uid] = {};
       SURVEY_ATTRS.forEach(a=>{ myResponse[m.uid][a.id] = state[m.uid][a.id]; });
     });
@@ -13543,8 +13656,10 @@ function _renderSurveyForm(inner, survey, members, uid){
       const curSurvey = cur.survey || {};
       const responses = { ...(curSurvey.responses||{}), [uid]: myResponse };
       const allMembers = cur.members || [];
-      const results = _calcSurveyResults(responses, allMembers);
-      const todos = allMembers.length > 0 && Object.keys(responses).length >= allMembers.length;
+      // REGRA C: "todos" baseia-se apenas nos membros elegíveis (Nível >= 5)
+      const elegiveisNoFirestore = allMembers.filter(m => _usuarioElegivelSurvey(m.uid));
+      const results = _calcSurveyResults(responses, elegiveisNoFirestore);
+      const todos = elegiveisNoFirestore.length > 0 && Object.keys(responses).length >= elegiveisNoFirestore.length;
 
       await window._db_updateDoc(window._db_doc('groups', gid), {
         'survey.responses': responses,
