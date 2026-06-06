@@ -8666,16 +8666,21 @@ window.addMatchMembro = async () => {
   const assist = parseInt($('adm-fassist')?.value)||0;
   const pb = parseInt($('adm-fpb')?.value)||0;
   const pk = Math.min(parseInt($('adm-fpk')?.value)||0, pb);
-  try{
-    const snap = await getDoc(doc(db,'groups',groupId));
-    const cur = snap.data();
-    if(!cur.matches) cur.matches=[];
-    cur.matches.push({player:mb.name, uid:mb.uid, date, name, gols, assist, penBat:pb, penOk:pk, ts:Date.now(), addedByAdm:true});
-    await setDoc(doc(db,'groups',groupId),cur);
-    gd=cur;
-    if(errEl) errEl.style.display='none';
+  const newMatch = {player:mb.name, uid:mb.uid, date, name, gols, assist, penBat:pb, penOk:pk, ts:Date.now(), addedByAdm:true};
+
+  // Atualização otimista: reflete na UI imediatamente
+  if(!gd.matches) gd.matches = [];
+  gd.matches.push(newMatch);
+  if(errEl) errEl.style.display='none';
+  _renderAdmPartidasModal();
+
+  // Salva no Firestore em background
+  updateDoc(doc(db,'groups',groupId), {matches: gd.matches}).catch(e=>{
+    // Reverte em caso de erro
+    gd.matches.pop();
     _renderAdmPartidasModal();
-  }catch(e){ if(errEl){errEl.textContent='Erro: '+(e.message||e);errEl.style.display='block';} }
+    if(errEl){errEl.textContent='Erro ao salvar: '+(e.message||e);errEl.style.display='block';}
+  });
 };
 
 window.admOpenEdit = gi => {
@@ -8696,13 +8701,17 @@ window.admOpenEdit = gi => {
 
 window.admDeleteMatch = async gi => {
   if(!confirm('Deletar essa partida?')) return;
-  const snap = await getDoc(doc(db,'groups',groupId)).catch(()=>null);
-  if(!snap) return;
-  const cur = snap.data();
-  cur.matches.splice(gi,1);
-  await setDoc(doc(db,'groups',groupId),cur);
-  gd=cur;
+
+  // Atualização otimista: remove da UI imediatamente
+  const removed = (gd.matches||[]).splice(gi, 1)[0];
   _renderAdmPartidasModal();
+
+  // Salva no Firestore em background
+  updateDoc(doc(db,'groups',groupId), {matches: gd.matches}).catch(e=>{
+    // Reverte em caso de erro
+    if(removed) gd.matches.splice(gi, 0, removed);
+    _renderAdmPartidasModal();
+  });
 };
 
 // fechar modal ao clicar no backdrop
