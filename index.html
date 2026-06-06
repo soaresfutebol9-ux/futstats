@@ -2977,18 +2977,18 @@ html, body {
 /* ── CRAQUE DA SEMANA ── */
 .craque-banner{
   position:relative;overflow:visible;
-  background:linear-gradient(120deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);
-  border:1.5px solid rgba(255,215,0,.55);
+  background:var(--bg2);
+  border:1.5px solid var(--bo2);
   border-radius:14px;
   padding:13px 16px;
   margin-bottom:1.1rem;
   display:flex;flex-direction:row;align-items:center;
   gap:14px;
-  box-shadow:0 0 36px rgba(255,215,0,.2),0 0 18px rgba(255,185,0,.12),0 4px 20px rgba(0,0,0,.6);
+  box-shadow:var(--shadow-card);
 }
 .craque-banner::before{
   content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,215,0,.06) 0%,transparent 60%);
+  background:linear-gradient(135deg,var(--gl) 0%,transparent 60%);
   pointer-events:none;
 }
 .craque-crown-icon{
@@ -3004,14 +3004,14 @@ html, body {
 .craque-av-wrap{position:relative;display:inline-flex;flex-shrink:0}
 .craque-av-wrap::after{
   content:'';position:absolute;inset:-3px;border-radius:50%;
-  border:2px solid #FFD700;
+  border:2px solid var(--am);
   animation:mvpRingPulse 2.2s ease-in-out infinite;
   pointer-events:none;z-index:1;
 }
 .craque-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
 .craque-label{
   font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;
-  text-transform:uppercase;color:rgba(255,215,0,.75);
+  text-transform:uppercase;color:var(--am);
   display:flex;align-items:center;gap:6px;
   white-space:nowrap;overflow:hidden;min-width:0;
 }
@@ -3020,42 +3020,42 @@ html, body {
 }
 .craque-periodo{
   font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;
-  color:rgba(255,215,0,.5);white-space:nowrap;text-transform:none;flex-shrink:0;
+  color:var(--tx2);white-space:nowrap;text-transform:none;flex-shrink:0;
 }
 .craque-name{
   font-family:'VarsityTeam',serif;font-size:18px;font-weight:bold;
-  color:#FFD700;
+  color:var(--am);
   letter-spacing:.4px;line-height:1.15;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-shadow:0 0 12px rgba(255,215,0,.4),0 1px 6px rgba(0,0,0,.7);
+  text-shadow:none;
 }
 .craque-stats{
   display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap;
 }
 .craque-stat-chip{
   font-family:'DM Mono',monospace;font-size:11px;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:99px;padding:2px 8px;color:rgba(255,255,255,.75);
+  background:var(--bg3);border:1px solid var(--bo);
+  border-radius:99px;padding:2px 8px;color:var(--tx2);
   display:flex;align-items:center;gap:3px;
 }
 .craque-score{
   font-family:'ClassyVogue',sans-serif;font-size:22px;line-height:1;
-  color:#FFD700;
-  text-shadow:0 0 14px rgba(255,215,0,.5);
+  color:var(--am);
+  text-shadow:none;
   min-width:44px;text-align:right;flex-shrink:0;
   display:flex;flex-direction:column;align-items:center;
 }
 .craque-score-lbl{
   font-family:'DM Mono',monospace;font-size:9px;
-  color:rgba(255,215,0,.6);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--tx3);letter-spacing:.05em;text-transform:uppercase;
   margin-top:1px;
 }
 
 .craque-ver-todos-btn{
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,215,0,.35);
+  background:var(--bg3);
+  border:1px solid var(--bo2);
   border-radius:99px;
-  color:rgba(255,215,0,.85);
+  color:var(--am);
   font-family:'DM Mono',monospace;
   font-size:10px;letter-spacing:.06em;
   padding:3px 10px;
@@ -3063,9 +3063,9 @@ html, body {
   transition:all .15s;
 }
 .craque-ver-todos-btn:hover{
-  background:rgba(255,215,0,.18);
-  border-color:rgba(255,215,0,.6);
-  color:#FFD700;
+  background:var(--bg4);
+  border-color:var(--bo3);
+  color:var(--am);
 }
 #modal-craque-semana{
   display:none;
@@ -3080,12 +3080,12 @@ html, body {
 }
 .craque-modal-inner{
   background:var(--bg2);
-  border:1px solid rgba(255,215,0,.18);
+  border:1px solid var(--bo2);
   border-radius:22px;
   width:100%;max-width:480px;
   max-height:88vh;
   display:flex;flex-direction:column;
-  box-shadow:0 0 60px rgba(255,215,0,.1),0 8px 40px rgba(0,0,0,.6),var(--glow-card);
+  box-shadow:var(--shadow-card),var(--glow-card);
   animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
   overflow:hidden;
 }
@@ -3133,27 +3133,27 @@ html, body {
   transition:border-color .15s;
 }
 .craque-rank-row.is-top{
-  background:linear-gradient(120deg,rgba(26,26,46,.9) 0%,rgba(22,33,62,.9) 40%,rgba(15,52,96,.9) 100%);
-  border-color:rgba(255,215,0,.4);
-  box-shadow:0 0 20px rgba(255,215,0,.08);
+  background:var(--bg3);
+  border-color:var(--am);
+  box-shadow:var(--shadow-card);
 }
 .craque-rank-pos{
   font-family:'DM Mono',monospace;font-size:13px;
   font-weight:700;color:var(--tx3);text-align:center;
 }
-.craque-rank-pos.gold{color:#FFD700;filter:drop-shadow(0 0 4px rgba(255,215,0,.5))}
-.craque-rank-pos.silver{color:#c0c0c0}
-.craque-rank-pos.bronze{color:#cd7f32}
+.craque-rank-pos.gold{color:var(--am);filter:none}
+.craque-rank-pos.silver{color:#8190a1}
+.craque-rank-pos.bronze{color:#966c45}
 .craque-rank-info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .craque-rank-name{
   font-size:14px;font-weight:600;color:var(--tx);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.craque-rank-name.top-name{color:#FFD700}
+.craque-rank-name.top-name{color:var(--am)}
 .craque-rank-chips{display:flex;gap:5px;flex-wrap:wrap}
 .craque-rank-chip{
   font-family:'DM Mono',monospace;font-size:10px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  background:var(--bg3);border:1px solid var(--bo);
   border-radius:99px;padding:1px 7px;color:var(--tx3);
 }
 .craque-rank-score{
@@ -3164,8 +3164,8 @@ html, body {
   color:var(--tx2);
 }
 .craque-rank-score-num.top-score{
-  color:#FFD700;
-  text-shadow:0 0 10px rgba(255,215,0,.4);
+  color:var(--am);
+  text-shadow:none;
 }
 .craque-rank-score-lbl{
   font-family:'DM Mono',monospace;font-size:9px;
