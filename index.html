@@ -3623,9 +3623,8 @@ body::before{
     <!-- GALERA removida -->
     <!-- HISTÓRICO -->
     <div class="tv" id="thist">
-      <div class="rank-header" style="margin-bottom:1.1rem">
+      <div style="margin-bottom:1.1rem;text-align:center">
         <div class="stit" style="margin-bottom:0">Histórico</div>
-        <button onclick="openNovoMes()" style="width:56px;height:56px;border-radius:50%;background:var(--g);border:none;cursor:pointer;font-size:26px;font-weight:700;color:#07090d;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(77,255,176,.35);transition:transform .15s,box-shadow .15s;flex-shrink:0" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform=''">+</button>
       </div>
       <div id="hist-list"></div>
     </div>
@@ -7880,7 +7879,7 @@ function renderHistTab(){
   const el=$('hist-list');
 
   if(!anos.length){
-    el.innerHTML=`<div class="card" style="text-align:center;padding:2rem 1rem"><div style="font-size:36px;margin-bottom:14px">📅</div><div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px">Nenhum mês no histórico</div><div style="font-size:14px;color:var(--tx3);line-height:1.6">Clique em <strong style="color:var(--tx2)">+</strong> para inserir dados de meses anteriores.</div></div>`;
+    el.innerHTML=`<div class="card" style="text-align:center;padding:2rem 1rem"><div style="font-size:36px;margin-bottom:14px">📅</div><div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px">Nenhum mês no histórico</div><div style="font-size:14px;color:var(--tx3);line-height:1.6">Os meses encerrados aparecerão aqui automaticamente.</div></div>`;
     return;
   }
 
@@ -7913,7 +7912,7 @@ function renderHistTab(){
           <div class="hist-mes-actions">
             <div class="hist-mes-btn" onclick="verMesHist('${k}')">🏆 Ranking</div>
             <div class="hist-mes-btn" onclick="editarMesHist('${k}')">✏️ Editar</div>
-            <div class="hist-mes-btn del" onclick="deletarMesHist('${k}')">🗑</div>
+            ${_isAdmin()?`<div class="hist-mes-btn del" onclick="deletarMesHist('${k}')">🗑</div>`:''}
           </div>
         </div>`;
       }),
