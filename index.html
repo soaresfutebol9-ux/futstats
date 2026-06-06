@@ -13437,7 +13437,7 @@ function _renderSurveyAdmin(inner, gd){
     ` : `
     <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
       <div style="font-size:32px;margin-bottom:8px">✨</div>
-      <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx);margin-bottom:6px">Nenhum questionário ativo</div>
+      <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx);margin-bottom:6px">Nenhum question<span style="font-family:'DM Sans',sans-serif">á</span>rio ativo</div>
       <div style="font-size:13px;color:var(--tx2);margin-bottom:${totalMembros < totalGeral ? '8px' : '0'}">Crie um questionário para que os membros avaliem uns aos outros e gerem seus Cards.</div>
       ${totalMembros < totalGeral ? `<div style="font-size:12px;color:#a855f7;margin-top:4px">⚡ ${totalGeral - totalMembros} membro(s) ainda abaixo do Nível ${SURVEY_NIVEL_MINIMO} — serão incluídos ao atingir o nível.</div>` : ''}
     </div>
@@ -13461,7 +13461,7 @@ function _renderSurveyAdmin(inner, gd){
     ` : ''}
 
     <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      ${survey ? '🔄 Novo questionário (zera respostas)' : '✨ Criar questionário'}
+      ${survey ? '🔄 Novo Question<span style="font-family:\'DM Sans\',sans-serif">á</span>rio (zera respostas)' : '✨ Criar Question<span style="font-family:\'DM Sans\',sans-serif">á</span>rio'}
     </button>
     <div style="font-size:11px;color:var(--tx2);text-align:center;margin-top:8px;opacity:.6">🔒 Visível apenas para o administrador do grupo</div>
   `;
