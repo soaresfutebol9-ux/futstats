@@ -6905,6 +6905,7 @@ window.saveEdit=async()=>{
   const cur=snap.data();const m=cur.matches[editIdx];if(!m)return;
   m.date=$('edate').value;m.name=$('ename').value.trim()||'Pelada';m.gols=parseInt($('egols').value)||0;m.assist=parseInt($('eassist').value)||0;m.penBat=parseInt($('epb').value)||0;m.penOk=Math.min(parseInt($('epk').value)||0,m.penBat);
   await setDoc(doc(db,'groups',groupId),cur);gd=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
+  if(typeof window._admEditCallback==='function'){const cb=window._admEditCallback;window._admEditCallback=null;cb();}
 };
 window.deleteMatch=async gi=>{
   if(!confirm('Deletar essa partida?'))return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return;
@@ -7494,7 +7495,7 @@ function renderRanking(){
           <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div>
           <div class="ri-info">
-            <div class="ri-name">${p.name}</div>
+            <div class="ri-name">${p.name}${p.uid===_getAdminUid()?_admBadgeHTML():''}</div>
             ${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}
             <div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div>
           </div>
@@ -8476,7 +8477,8 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
     }
   }
   const nomeEl=document.getElementById('mp-nome');
-  nomeEl.textContent=mb.name;
+  const _isThisAdm = uid === _getAdminUid();
+  nomeEl.innerHTML = mb.name + (_isThisAdm ? ' ' + _admBadgeHTML() : '');
   // Reduz fonte progressivamente para nomes longos
   const nLen=mb.name.length;
   nomeEl.style.fontSize=nLen>18?'11px':nLen>14?'13px':nLen>10?'14px':'15px';
@@ -8492,6 +8494,19 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
       desafiarBtn.title='Desafiar ' + mb.name;
     } else {
       desafiarBtn.style.display='none';
+    }
+  }
+
+  // Botão "Gerenciar partidas" — visível apenas para o ADM quando vendo outro jogador
+  const admPartidasBtn = document.getElementById('mp-adm-partidas-btn');
+  if(admPartidasBtn){
+    const isMe = uid === currentUser?.uid;
+    const euSouAdm = _isAdmin();
+    if(!isMe && euSouAdm){
+      admPartidasBtn.style.display = 'flex';
+      admPartidasBtn.onclick = () => openModalPartidasMembro(uid, mb.name);
+    } else {
+      admPartidasBtn.style.display = 'none';
     }
   }
 
@@ -8582,6 +8597,112 @@ window.deleteMatchModal=async gi=>{
   renderPerfilPanelStats();
   renderPerfil();
   openModalPartidas();
+};
+
+// ── ADM: Modal de partidas de outro membro ──────────────────────────
+let _admTargetUid = null;
+let _admTargetName = '';
+
+window.openModalPartidasMembro = (uid, name) => {
+  if(!_isAdmin() || !gd) return;
+  _admTargetUid = uid;
+  _admTargetName = name;
+  _renderAdmPartidasModal();
+};
+
+function _renderAdmPartidasModal(){
+  const uid = _admTargetUid;
+  const name = _admTargetName;
+  const allMatches = gd.matches || [];
+  const memberMatches = allMatches.map((m,i)=>({...m,_gi:i}))
+    .filter(m => m.uid === uid)
+    .sort((a,b) => (b.ts||0)-(a.ts||0));
+
+  const countEl = $('modal-partidas-count');
+  const listEl = $('modal-partidas-items');
+  const titleEl = document.querySelector('.modal-partidas-title');
+  if(titleEl) titleEl.innerHTML = `Partidas de <strong>${name}</strong> <span style="font-family:'DM Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;color:#fff;background:#0a0e1a;border-radius:4px;padding:2px 6px;margin-left:6px">ADM</span>`;
+  if(countEl) countEl.textContent = `${memberMatches.length} partida${memberMatches.length!==1?'s':''}`;
+
+  // Formulário de nova partida (ADM adicionando para o membro)
+  const formHTML = `<div id="adm-add-form" style="background:#f5f7fc;border:1.5px dashed rgba(0,0,0,.15);border-radius:12px;padding:14px 16px;margin-bottom:12px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;color:#1a1a1a;margin-bottom:10px">ADICIONAR PARTIDA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Data</label><input type="date" id="adm-fdate" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"></div>
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Nome</label><input type="text" id="adm-fname" placeholder="Ex: Pelada" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Gols</label><input type="number" id="adm-fgols" min="0" value="0" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 8px;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none"></div>
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Assist.</label><input type="number" id="adm-fassist" min="0" value="0" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 8px;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none"></div>
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Pên.bat</label><input type="number" id="adm-fpb" min="0" value="0" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 8px;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none"></div>
+      <div><label style="font-size:11px;color:#666;font-family:'DM Mono',monospace">Pên.ok</label><input type="number" id="adm-fpk" min="0" value="0" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;color:#000;padding:7px 8px;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none"></div>
+    </div>
+    <button onclick="addMatchMembro()" style="width:100%;padding:10px;border-radius:10px;background:#0a0e1a;color:#fff;border:none;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer">SALVAR PARTIDA</button>
+    <div id="adm-form-err" style="display:none;color:#e02050;font-size:11px;font-family:'DM Mono',monospace;margin-top:6px;text-align:center"></div>
+  </div>`;
+
+  if(listEl) listEl.innerHTML = formHTML + memberMatches.map(m=>{
+    const pl=[];
+    if(m.gols>0) pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);
+    if(m.assist>0) pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);
+    if((m.penBat||0)>0) pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
+    return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
+  }).join('');
+
+  const modal = $('modal-partidas');
+  modal.style.display = 'flex';
+  requestAnimationFrame(()=>modal.classList.add('open'));
+}
+
+window.addMatchMembro = async () => {
+  if(!_isAdmin()) return;
+  const mb = (gd.members||[]).find(m=>m.uid===_admTargetUid);
+  if(!mb) return;
+  const date = $('adm-fdate')?.value;
+  const errEl = $('adm-form-err');
+  if(!date){ if(errEl){errEl.textContent='Selecione a data.';errEl.style.display='block';} return; }
+  const name = $('adm-fname')?.value.trim()||'Pelada';
+  const gols = parseInt($('adm-fgols')?.value)||0;
+  const assist = parseInt($('adm-fassist')?.value)||0;
+  const pb = parseInt($('adm-fpb')?.value)||0;
+  const pk = Math.min(parseInt($('adm-fpk')?.value)||0, pb);
+  try{
+    const snap = await getDoc(doc(db,'groups',groupId));
+    const cur = snap.data();
+    if(!cur.matches) cur.matches=[];
+    cur.matches.push({player:mb.name, uid:mb.uid, date, name, gols, assist, penBat:pb, penOk:pk, ts:Date.now(), addedByAdm:true});
+    await setDoc(doc(db,'groups',groupId),cur);
+    gd=cur;
+    if(errEl) errEl.style.display='none';
+    _renderAdmPartidasModal();
+  }catch(e){ if(errEl){errEl.textContent='Erro: '+(e.message||e);errEl.style.display='block';} }
+};
+
+window.admOpenEdit = gi => {
+  const m = (gd.matches||[])[gi];
+  if(!m) return;
+  editIdx=gi;
+  $('edate').value=m.date||'';
+  $('ename').value=m.name||'';
+  $('egols').value=m.gols||0;
+  $('eassist').value=m.assist||0;
+  $('epb').value=m.penBat||0;
+  $('epk').value=m.penOk||0;
+  // Ao salvar, volta para o modal do membro
+  window._admEditCallback = () => _renderAdmPartidasModal();
+  closeModalPartidas();
+  openP('pedit');
+};
+
+window.admDeleteMatch = async gi => {
+  if(!confirm('Deletar essa partida?')) return;
+  const snap = await getDoc(doc(db,'groups',groupId)).catch(()=>null);
+  if(!snap) return;
+  const cur = snap.data();
+  cur.matches.splice(gi,1);
+  await setDoc(doc(db,'groups',groupId),cur);
+  gd=cur;
+  _renderAdmPartidasModal();
 };
 
 // fechar modal ao clicar no backdrop
@@ -9302,6 +9423,7 @@ window.irParaRankingGA=()=>{
       <!-- Ações -->
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
         <button id="mp-desafiar-btn" onclick="_mpDesafiarClick()" title="Desafiar este jogador" style="display:none;background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:8px;padding:5px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">⚔️</button>
+        <button id="mp-adm-partidas-btn" title="Gerenciar partidas (ADM)" style="display:none;align-items:center;gap:4px;background:#0a0e1a;border:none;color:#fff;border-radius:8px;padding:6px 11px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.08em;transition:opacity .15s;white-space:nowrap">PARTIDAS</button>
         <button onclick="sharePlayerProfile()" title="Compartilhar perfil" style="width:28px;height:28px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0;flex-shrink:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="15" height="15" style="display:block"></button>
         <div class="mp-close" onclick="closePlayerProfile()">×</div>
       </div>
@@ -13239,6 +13361,19 @@ function _isAdmin(){
   if(gd.createdBy) return gd.createdBy === uid;
   return (gd.members||[])[0]?.uid === uid;
 }
+
+// Retorna o uid do ADM do grupo atual
+function _getAdminUid(){
+  if(!gd) return null;
+  if(gd.createdBy) return gd.createdBy;
+  return (gd.members||[])[0]?.uid || null;
+}
+
+// Badge "ADM" — discreto, só texto, sem emojis
+function _admBadgeHTML(){
+  return '<span style="display:inline-flex;align-items:center;font-family:\'DM Mono\',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;color:#fff;background:#0a0e1a;border-radius:4px;padding:2px 6px;line-height:1.5;flex-shrink:0;vertical-align:middle;margin-left:5px">ADM</span>';
+}
+window._admBadgeHTML = _admBadgeHTML;
 
 /* ── REGRA A: FAB de gerenciamento do Questionário — visível APENAS para o ADM do grupo ──
    Membros comuns acessam o questionário pela aba/card, não pelo FAB de configuração.       */
