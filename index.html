@@ -13364,9 +13364,10 @@ function _isAdmin(){
 
 // Retorna o uid do ADM do grupo atual
 function _getAdminUid(){
-  if(!gd) return null;
-  if(gd.createdBy) return gd.createdBy;
-  return (gd.members||[])[0]?.uid || null;
+  const _gd = (typeof gd !== 'undefined' && gd) || window._gd;
+  if(!_gd) return null;
+  if(_gd.createdBy) return _gd.createdBy;
+  return (_gd.members||[])[0]?.uid || null;
 }
 
 // Badge "ADM" — discreto, só texto, sem emojis
