@@ -3543,8 +3543,8 @@ body::before{
           <span style="flex:1;height:1px;background:var(--bo3);display:inline-block"></span>
         </div>
 
-        <!-- Grid 2x2 para gols/assists/pênaltis batidos/pênaltis ok -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <!-- Linha 1: Gols + Assistências -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
 
           <!-- Gols -->
           <div style="background:linear-gradient(135deg,rgba(255,220,50,.15),rgba(255,209,102,.05));border:1px solid rgba(255,209,102,.4);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 20px rgba(255,209,102,.12)">
@@ -3577,6 +3577,18 @@ body::before{
               <button onclick="stepField('fassist',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
             </div>
           </div>
+
+        </div><!-- /grid linha 1 -->
+
+        <!-- Separador pênaltis -->
+        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="width:16px;height:1px;background:var(--bo3);display:inline-block"></span>
+          Pênaltis
+          <span style="flex:1;height:1px;background:var(--bo3);display:inline-block"></span>
+        </div>
+
+        <!-- Linha 2: Pênaltis -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 
           <!-- Pênaltis batidos -->
           <div style="background:linear-gradient(135deg,rgba(160,170,190,.12),rgba(140,150,170,.04));border:1px solid rgba(160,170,190,.35);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 16px rgba(140,150,170,.1)">
