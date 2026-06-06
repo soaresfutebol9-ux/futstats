@@ -5220,12 +5220,16 @@ window.abrirEditarMeta=()=>{
   const metaSalva=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
   const temMeta=metaSalva&&(metaSalva.alvoGols>0||metaSalva.alvoAssist>0);
   if(prazoExpirou){
-    // Mostra toast de aviso em vez de abrir
-    const t=document.createElement('div');
-    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-family:DM Mono,monospace;font-size:12px;padding:10px 18px;border-radius:10px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;border:1px solid rgba(255,90,122,.4)';
-    t.textContent='🔒 Prazo encerrado. Meta disponível a partir do dia 1.';
-    document.body.appendChild(t);
-    setTimeout(()=>t.remove(),2800);
+    // Mostra toast de aviso em vez de abrir — usa slot global de rodapé
+    if(window._showFooterToast){
+      window._showFooterToast('🔒 Prazo encerrado. Meta disponível a partir do dia 1.', 2800, 'rgba(255,90,122,.4)');
+    } else {
+      const t=document.createElement('div');
+      t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-family:DM Mono,monospace;font-size:12px;padding:10px 18px;border-radius:10px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;border:1px solid rgba(255,90,122,.4)';
+      t.textContent='🔒 Prazo encerrado. Meta disponível a partir do dia 1.';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),2800);
+    }
     return;
   }
   const metaSalvaVal=myProfile.meta&&myProfile.meta.mesKey===mesKey?myProfile.meta:null;
@@ -6680,16 +6684,109 @@ function _dcCheckEncerrar(){
   }
 }
 
-function _showSimpleToast(msg){
-  let t=document.getElementById('_simple-toast');
-  if(!t){
-    t=document.createElement('div');t.id='_simple-toast';
-    t.style.cssText='position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:rgba(20,25,40,.95);border:1px solid rgba(77,255,176,.35);border-radius:12px;padding:10px 18px;font-family:\"DM Sans\",sans-serif;font-size:14px;color:#fff;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:opacity .3s ease;white-space:nowrap;pointer-events:none;';
-    document.body.appendChild(t);
+// ══════════════════════════════════════════════════════════════════
+// ORQUESTRADOR GLOBAL DE TOASTS
+// Garante que apenas um toast "central" (overlay de tela) fique
+// visível por vez. Toasts de rodapé e de topo têm slots próprios
+// e não se sobrepõem entre si.
+// ══════════════════════════════════════════════════════════════════
+(function(){
+
+  // ── Fila central (levelup / conquista / crown) ─────────────────
+  const _centralQueue = [];
+  let   _centralBusy  = false;
+
+  function _runNextCentral(){
+    if(_centralBusy || !_centralQueue.length) return;
+    _centralBusy = true;
+    const job = _centralQueue.shift();
+    job(_releaseCentral);
   }
-  t.textContent=msg; t.style.opacity='1';
-  clearTimeout(t._timer);
-  t._timer=setTimeout(()=>{ t.style.opacity='0'; },2800);
+
+  function _releaseCentral(){
+    _centralBusy = false;
+    // Pequena pausa entre toasts seguidos
+    setTimeout(_runNextCentral, 350);
+  }
+
+  // Enfileira um job central; cb deve ser chamado pelo job quando
+  // o toast for fechado/expirado.
+  window._toastEnqueueCentral = function(jobFn){
+    _centralQueue.push(jobFn);
+    _runNextCentral();
+  };
+
+  // ── Slot de rodapé (simple-toast / tema-req / prazo) ───────────
+  // Um único elemento reutilizável; novas mensagens substituem a
+  // atual sem criar elementos novos acumulados na tela.
+  let _footerEl   = null;
+  let _footerTimer = null;
+
+  function _getFooterEl(){
+    if(!_footerEl || !document.body.contains(_footerEl)){
+      _footerEl = document.createElement('div');
+      _footerEl.id = '_global-footer-toast';
+      _footerEl.style.cssText = [
+        'position:fixed',
+        'bottom:calc(env(safe-area-inset-bottom,0px) + 80px)',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'background:rgba(20,25,40,.95)',
+        'border:1px solid rgba(77,255,176,.35)',
+        'border-radius:12px',
+        'padding:10px 18px',
+        'font-family:"DM Sans",sans-serif',
+        'font-size:14px',
+        'color:#fff',
+        'z-index:99998',
+        'box-shadow:0 4px 20px rgba(0,0,0,.5)',
+        'opacity:0',
+        'transition:opacity .25s ease',
+        'pointer-events:none',
+        'text-align:center',
+        'max-width:320px',
+        'white-space:normal',
+        'line-height:1.4',
+      ].join(';');
+      document.body.appendChild(_footerEl);
+    }
+    return _footerEl;
+  }
+
+  window._showFooterToast = function(html, dur, borderColor){
+    const el = _getFooterEl();
+    clearTimeout(_footerTimer);
+    // Muda border-color se fornecida
+    if(borderColor){
+      el.style.border = '1px solid ' + borderColor;
+    } else {
+      el.style.border = '1px solid rgba(77,255,176,.35)';
+    }
+    el.innerHTML = html;
+    el.style.opacity = '1';
+    _footerTimer = setTimeout(()=>{
+      el.style.opacity = '0';
+    }, dur || 2800);
+  };
+
+})();
+// ── FIM ORQUESTRADOR GLOBAL ────────────────────────────────────────
+
+function _showSimpleToast(msg){
+  // Usa o slot global de rodapé em vez de criar um elemento separado
+  window._showFooterToast
+    ? window._showFooterToast(msg.replace(/</g,'&lt;').replace(/>/g,'&gt;'))
+    : (()=>{
+        let t=document.getElementById('_simple-toast');
+        if(!t){
+          t=document.createElement('div');t.id='_simple-toast';
+          t.style.cssText='position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 80px);left:50%;transform:translateX(-50%);background:rgba(20,25,40,.95);border:1px solid rgba(77,255,176,.35);border-radius:12px;padding:10px 18px;font-family:"DM Sans",sans-serif;font-size:14px;color:#fff;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:opacity .3s ease;white-space:nowrap;pointer-events:none;';
+          document.body.appendChild(t);
+        }
+        t.textContent=msg; t.style.opacity='1';
+        clearTimeout(t._timer);
+        t._timer=setTimeout(()=>{ t.style.opacity='0'; },2800);
+      })();
 }
 
 function renderDesafiosRanking(){
@@ -8812,10 +8909,21 @@ function maybeFiraCrown(){
 }
 
 function _fireCrownEffect(name){
+  // Enfileira na fila central para não sobrepor levelup/conquista toasts
+  if(window._toastEnqueueCentral){
+    window._toastEnqueueCentral(function(done){
+      _executarCrownEffect(name, done);
+    });
+  } else {
+    _executarCrownEffect(name, null);
+  }
+}
+
+function _executarCrownEffect(name, done){
   const canvas=document.getElementById('crown-canvas');
   const toast=document.getElementById('crown-toast');
   const toastName=document.getElementById('crown-toast-name');
-  if(!canvas||!toast)return;
+  if(!canvas||!toast){ if(done) done(); return; }
 
   // Setup canvas
   canvas.width=window.innerWidth;
@@ -8825,6 +8933,9 @@ function _fireCrownEffect(name){
   // Show toast
   toastName.textContent=name+'!';
   toast.classList.add('show');
+
+  // Salva callback de release
+  window._crownDone = done;
 
   // Confete de coroas 👑
   const ctx=canvas.getContext('2d');
@@ -8872,21 +8983,30 @@ function _fireCrownEffect(name){
     else{
       ctx.clearRect(0,0,canvas.width,canvas.height);
       canvas.classList.remove('active');
-      // Esconde toast após animação
-      toast.classList.remove('show');
+      // Esconde toast após animação e libera fila central
+      _encerrarCrownToast();
     }
   }
   animate();
 
   // Auto-hide toast após 7s
   if(window._crownToastTimer) clearTimeout(window._crownToastTimer);
-  window._crownToastTimer=setTimeout(()=>{toast.classList.remove('show');},7000);
+  window._crownToastTimer=setTimeout(()=>{ _encerrarCrownToast(); },7000);
 }
 
-window._fecharCrownToast=function(){
+function _encerrarCrownToast(){
   const toast=document.getElementById('crown-toast');
   if(toast) toast.classList.remove('show');
   if(window._crownToastTimer) clearTimeout(window._crownToastTimer);
+  if(typeof window._crownDone === 'function'){
+    const cb = window._crownDone;
+    window._crownDone = null;
+    cb();
+  }
+}
+
+window._fecharCrownToast=function(){
+  _encerrarCrownToast();
 };
 
 // ══════════════════════════════════════════
@@ -11760,13 +11880,30 @@ window._checkLevelUp = function(gdAntes, gdDepois){
   }
 };
 
+// _releaseLevelUp: callback chamado quando o levelup-toast é fechado pelo usuário
+window._releaseLevelUp = null;
+
 window._mostrarLevelUpToast = function(nivel, xpTotal){
+  // Enfileira na fila central para não sobrepor conquista/crown toasts
+  if(window._toastEnqueueCentral){
+    window._toastEnqueueCentral(function(done){
+      _abrirLevelUpToastImediato(nivel, xpTotal, done);
+    });
+  } else {
+    _abrirLevelUpToastImediato(nivel, xpTotal, null);
+  }
+};
+
+function _abrirLevelUpToastImediato(nivel, xpTotal, done){
   const toast = document.getElementById('levelup-toast');
   const inner = document.getElementById('levelup-toast-inner');
   const nivelEl = document.getElementById('levelup-toast-nivel');
   const xpEl    = document.getElementById('levelup-toast-xp');
   const bar     = document.getElementById('levelup-toast-bar');
-  if(!toast || !inner) return;
+  if(!toast || !inner){ if(done) done(); return; }
+
+  // Guarda o callback de release para o botão Continuar chamar
+  window._releaseLevelUp = done;
 
   nivelEl.textContent = 'NÍVEL ' + nivel;
   xpEl.textContent    = xpTotal.toLocaleString() + ' XP acumulado';
@@ -11780,7 +11917,7 @@ window._mostrarLevelUpToast = function(nivel, xpTotal){
       setTimeout(() => { bar.style.width = '100%'; }, 100);
     });
   });
-};
+}
 
 window._fecharLevelUpToast = function(){
   const toast = document.getElementById('levelup-toast');
@@ -11788,15 +11925,45 @@ window._fecharLevelUpToast = function(){
   if(!toast || !inner) return;
   inner.style.transform = 'scale(.7)';
   inner.style.opacity   = '0';
-  setTimeout(() => { toast.style.display = 'none'; }, 350);
+  setTimeout(() => {
+    toast.style.display = 'none';
+    // Libera a fila central
+    if(typeof window._releaseLevelUp === 'function'){
+      const cb = window._releaseLevelUp;
+      window._releaseLevelUp = null;
+      cb();
+    }
+  }, 350);
 };
 // ── FIM TOAST LEVEL UP ────────────────────────────────────────
 
 // ── TOAST DE XP GANHO POR AÇÃO ─────────────────────────────────
-window._xpGainTimer = null;
-window._xpGainPct   = 0;
+// Usa debounce de 300ms: chamadas em sequência rápida são acumuladas
+// e exibidas como uma entrada única (soma de XP), evitando múltiplos
+// toasts sobrepostos no topo da tela.
+window._xpGainTimer   = null;
+window._xpGainDebounce = null;
+window._xpGainPendente = null; // { xp, label, icone }
 
 window._mostrarXPGanho = function(xpGanho, label, icone){
+  // Acumula chamadas próximas no tempo
+  if(window._xpGainPendente){
+    window._xpGainPendente.xp += xpGanho;
+    // Mantém o label/ícone da primeira chamada (mais significativa)
+  } else {
+    window._xpGainPendente = { xp: xpGanho, label: label, icone: icone };
+  }
+
+  clearTimeout(window._xpGainDebounce);
+  window._xpGainDebounce = setTimeout(() => {
+    const p = window._xpGainPendente;
+    window._xpGainPendente = null;
+    if(!p) return;
+    _executarXPGainToast(p.xp, p.label, p.icone);
+  }, 300);
+};
+
+function _executarXPGainToast(xpGanho, label, icone){
   const toast = document.getElementById('xp-gain-toast');
   if(!toast) return;
   const lbl  = document.getElementById('xp-gain-label');
@@ -11845,7 +12012,7 @@ window._mostrarXPGanho = function(xpGanho, label, icone){
       }, 4500);
     });
   });
-};
+}
 // ── FIM TOAST XP GANHO ─────────────────────────────────────────
 
 
@@ -12143,23 +12310,25 @@ async function _marcarConquistasVistas(uid){
 }
 
 // ── Toast de nova conquista ────────────────────────────────────
-let _toastQueue = [];
-let _toastShowing = false;
+// A fila interna foi substituída pelo orquestrador central (_toastEnqueueCentral).
+// Cada conquista é enfileirada individualmente, garantindo que não
+// sobreponha levelup-toast, crown-toast ou outras conquistas.
 
 window._mostrarToastConquistas = function(conquistas){
   if(!conquistas || !conquistas.length) return;
-  _toastQueue.push(...conquistas);
-  if(!_toastShowing) _processarFilaToast();
+  conquistas.forEach(cq => {
+    if(window._toastEnqueueCentral){
+      window._toastEnqueueCentral(function(done){
+        _mostrarUmToast(cq, done);
+      });
+    } else {
+      _mostrarUmToast(cq, null);
+    }
+  });
 };
 
-function _processarFilaToast(){
-  if(!_toastQueue.length){ _toastShowing=false; return; }
-  _toastShowing=true;
-  const cq = _toastQueue.shift();
-  _mostrarUmToast(cq, ()=>{
-    setTimeout(_processarFilaToast, 400);
-  });
-}
+// Mantido para compatibilidade; gerenciamento agora é feito pelo orquestrador central
+function _processarFilaToast(){ /* noop */ }
 
 function _mostrarUmToast(cq, cb){
   const overlay   = document.getElementById('conquista-toast');
@@ -12239,9 +12408,8 @@ document.addEventListener('click', e=>{
   if(window._cqToastOpenedAt && (Date.now() - window._cqToastOpenedAt) < 600) return;
   const box = document.getElementById('conquista-toast-box');
   if(box && !box.contains(e.target)){
+    if(window._cqCountInterval) clearInterval(window._cqCountInterval);
     _esconderToastConquista();
-    _toastQueue = [];
-    _toastShowing = false;
   }
 });
 
@@ -12488,41 +12656,37 @@ window._buildTemasHTML = function(){
 window._mostrarReqTema = function(temaId, desbloqueado){
   const t = CARTA_TEMAS.find(x=>x.id===temaId);
   if(!t) return;
+
   // Padrão (sem conquista): só mostra toast se for long press em desbloqueado
   if(!t.cqId){
     if(!desbloqueado) return;
-    const old = document.getElementById('tema-req-toast');
-    if(old) old.remove();
-    const toast = document.createElement('div');
-    toast.id = 'tema-req-toast';
-    toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(14,16,26,.97);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:12px 18px;border-radius:14px;z-index:9999;max-width:290px;text-align:center;box-shadow:0 6px 28px rgba(0,0,0,.6);pointer-events:none;animation:toastIn .25s ease';
-    toast.innerHTML = '<div style="color:rgba(77,255,176,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">✅ Disponível para todos</div>'
-      + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:6px">✕ Padrão</div>'
-      + '<div style="color:rgba(255,255,255,.45);font-size:10px">Sem tema — usa o visual original da raridade do jogador.</div>';
-    document.body.appendChild(toast);
-    setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, 2500);
+    if(window._showFooterToast){
+      window._showFooterToast(
+        '<div style="color:rgba(77,255,176,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">✅ Disponível para todos</div>'
+        + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:6px">✕ Padrão</div>'
+        + '<div style="color:rgba(255,255,255,.45);font-size:10px">Sem tema — usa o visual original da raridade do jogador.</div>',
+        2500, 'rgba(255,255,255,.2)'
+      );
+    }
     return;
   }
-  const old = document.getElementById('tema-req-toast');
-  if(old) old.remove();
-  const toast = document.createElement('div');
-  toast.id = 'tema-req-toast';
+
   const borderColor = desbloqueado ? 'rgba(255,215,0,.5)' : 'rgba(255,100,100,.4)';
-  toast.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(14,16,26,.97);border:1px solid '+borderColor+';color:#fff;font-family:\'DM Mono\',monospace;font-size:11px;padding:12px 18px;border-radius:14px;z-index:9999;max-width:290px;text-align:center;box-shadow:0 6px 28px rgba(0,0,0,.6);pointer-events:none;animation:toastIn .25s ease';
   const cqMatch = window._CONQUISTAS ? window._CONQUISTAS.find(c=>c.id===t.cqId) : null;
   const conquNome = cqMatch ? cqMatch.icon+' '+cqMatch.nome : (t.reqIcon||'🏆');
   const condLine = t.desc.includes('—') ? t.desc.split('—')[1].trim() : t.desc;
   const statusLine = desbloqueado
     ? '<div style="color:rgba(77,255,176,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">✅ Tema desbloqueado</div>'
     : '<div style="color:rgba(255,120,120,.9);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">🔒 Tema bloqueado</div>';
-  toast.innerHTML = statusLine
+  const html = statusLine
     + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:6px">'+(t.reqIcon||'🎨')+' '+t.label+'</div>'
     + '<div style="color:rgba(255,255,255,.6);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">'+(desbloqueado?'Desbloqueado com':'Conquista necessária')+':</div>'
     + '<div style="color:#ffd700;font-size:12px;font-weight:700;margin-bottom:2px">'+conquNome+'</div>'
     + '<div style="color:rgba(255,255,255,.45);font-size:10px">'+condLine+'</div>';
-  document.body.appendChild(toast);
   const dur = desbloqueado ? 3000 : 2800;
-  setTimeout(()=>{ toast.style.transition='opacity .3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, dur);
+  if(window._showFooterToast){
+    window._showFooterToast(html, dur, borderColor);
+  }
 };
 
 // Long press em temas desbloqueados
@@ -13169,9 +13333,16 @@ function _usuarioElegivelSurvey(uid){
   if(!gd) return false;
   const member = (gd.members || []).find(m => m.uid === uid);
   if(!member) return false;
-  // Usa o XP salvo no membro para calcular o nível atual
-  const xpTotal = member.xp || member.xpTotal || 0;
   if(typeof window._calcNivel !== 'function') return true; // fallback: libera se a função não existir
+
+  // Tenta calcular o XP de forma dinâmica primeiro (mais preciso)
+  let xpTotal = 0;
+  if(typeof window._calcXP === 'function'){
+    try { xpTotal = window._calcXP(uid, gd); } catch(e){}
+  }
+  // Fallback: usa o XP salvo no membro se o cálculo dinâmico retornar 0
+  if(!xpTotal) xpTotal = member.xp || member.xpTotal || 0;
+
   const { nivel } = window._calcNivel(xpTotal);
   return nivel >= SURVEY_NIVEL_MINIMO;
 }
@@ -13216,12 +13387,25 @@ window.abrirSurvey = function(){
       _renderSurveyForm(inner, survey, members, uid);
     }
   } else {
+    // Não-admin, sem survey ativo
     inner.innerHTML = `
-      <div style="text-align:center;padding:40px 0">
-        <div style="font-size:40px;margin-bottom:16px">📋</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:8px">Nenhum questionário ativo</div>
-        <div style="font-size:13px;color:var(--tx2)">Aguarde o admin criar um questionário.</div>
-        <button onclick="fecharSurvey()" style="margin-top:24px;padding:10px 28px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:16px">📋</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:12px">
+          Nenhum questionário ativo
+        </div>
+        <div style="font-size:14px;color:var(--tx2);line-height:1.6;max-width:290px;margin:0 auto 24px">
+          Solicite ao seu administrador que crie um novo questionário para gerar os Cards do Jogador.
+        </div>
+        <div style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px 20px;display:inline-flex;align-items:center;gap:10px;margin-bottom:28px;max-width:290px">
+          <span style="font-size:22px">💬</span>
+          <div style="text-align:left">
+            <div style="font-size:11px;color:rgba(168,85,247,.8);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">O que fazer</div>
+            <div style="font-size:13px;color:var(--tx);font-weight:600">Peça ao admin para criar o questionário</div>
+          </div>
+        </div>
+        <br>
+        <button onclick="fecharSurvey()" style="padding:10px 28px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
       </div>`;
   }
 
@@ -13249,8 +13433,7 @@ function _renderSurveyBloqueado(inner){
         Questionário do Card do Jogador
       </div>
       <div style="font-size:14px;color:var(--tx2);line-height:1.6;max-width:300px;margin:0 auto 20px">
-        Você precisa atingir o <strong style="color:#a855f7">Nível ${SURVEY_NIVEL_MINIMO}</strong> para participar do
-        questionário e ter seu Card do Jogador gerado.<br><br>
+        Você ainda não atingiu o <strong style="color:#a855f7">Nível ${SURVEY_NIVEL_MINIMO}</strong> necessário.<br><br>
         Continue jogando e acumulando XP para desbloquear! ⚡
       </div>
       <div style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 20px;display:inline-block;margin-bottom:24px">
@@ -13285,9 +13468,11 @@ function _renderSurveyAdmin(inner, gd){
       ${totalRespostas===totalMembros && totalMembros>0 ? `<div style="font-size:12px;color:#4dffb0;margin-top:6px">✅ Todos os elegíveis responderam — cards gerados!</div>` : ''}
     </div>
     ` : `
-    <div style="background:rgba(255,255,255,.04);border:1px solid var(--bo);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:13px;color:var(--tx2)">Nenhum questionário ativo no momento.</div>
-      ${totalMembros < totalGeral ? `<div style="font-size:12px;color:#a855f7;margin-top:6px">⚡ ${totalGeral - totalMembros} membro(s) ainda abaixo do Nível ${SURVEY_NIVEL_MINIMO} — serão incluídos ao atingir o nível.</div>` : ''}
+    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">✨</div>
+      <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx);margin-bottom:6px">Nenhum questionário ativo</div>
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:${totalMembros < totalGeral ? '8px' : '0'}">Crie um questionário para que os membros avaliem uns aos outros e gerem seus Cards.</div>
+      ${totalMembros < totalGeral ? `<div style="font-size:12px;color:#a855f7;margin-top:4px">⚡ ${totalGeral - totalMembros} membro(s) ainda abaixo do Nível ${SURVEY_NIVEL_MINIMO} — serão incluídos ao atingir o nível.</div>` : ''}
     </div>
     `}
 
