@@ -5469,6 +5469,14 @@ function _renderNotifPanel(){
             <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
           </div>
         </div>`;
+      } else if(n.tipo==='survey_ciclo_lembrete'){
+        inner=`<div class="notif-item${unread?' unread':''}" style="border-left-color:#a855f7">
+          <div class="notif-icon">📋</div>
+          <div class="notif-body">
+            <div class="notif-text"><strong>Novo ciclo do Questionário</strong> — O semestre <strong>${n.ciclo||''}</strong> chegou ao fim. Libere o questionário para que o grupo avalie os jogadores e gere os cards da nova temporada.</div>
+            <div class="notif-time">${_notifTimeAgo(n.ts)}</div>
+          </div>
+        </div>`;
       } else if(n.tipo==='voto_registrado'||n.tipo==='craque_rodada'||n.tipo==='mvp_mes'||n.tipo==='nota_individual'||n.tipo==='nota_recebida'){
         return '';
       } else { return ''; }
@@ -12657,112 +12665,8 @@ window._selecionarTema = function(temaId){
   });
 };
 
-window.abrirCartaJogador = function(){
-  const uid = window._currentUserUid;
-  if(!uid){ alert('Faça login para ver sua carta.'); return; }
-
-  const modal=document.getElementById('modal-carta');
-  const inner=document.getElementById('carta-inner');
-  if(!modal||!inner) return;
-
-  // Coleta dados
-  const gd = window._gd;
-  const mb = (gd?.members||[]).find(m=>m.uid===uid);
-  const name = mb?.name || mb?.displayName || 'Jogador';
-  const photo = mb?.photo || null;
-  const groupName = gd?.name || 'FutStats';
-
-  let s;
-  try{
-    s = mb && window._getStGeral
-      ? window._getStGeral(mb)
-      : window._getSt
-        ? window._getSt(uid, null, true)
-        : {n:0,gols:0,assist:0,penBat:0,penOk:0};
-  }catch(e){
-    s={n:0,gols:0,assist:0,penBat:0,penOk:0};
-  }
-
-  const rating=_cartaRating(s);
-  const rarity=_cartaRarity(rating);
-
-  // 1. Abre modal com loading
-  _renderCartaLoading(inner);
-  modal.classList.add('open');
-  document.body.style.overflow='hidden';
-
-  // 2. Anima o loading e no fim faz o reveal
-  _animateCartaLoading(()=>{
-    // Flash de luz
-    const flash=document.createElement('div');
-    flash.className='carta-flash';
-    document.body.appendChild(flash);
-    setTimeout(()=>flash.remove(), 450);
-
-    // Substitui loading pela carta real
-    // Restaura tema salvo (não reseta para padrão toda vez)
-    try {
-      const saved = localStorage.getItem('futstats-carta-tema');
-      if(saved && CARTA_TEMAS.find(t=>t.id===saved)) _cartaTemaAtivo = saved;
-      else _cartaTemaAtivo = 'padrao';
-    } catch(e) { _cartaTemaAtivo = 'padrao'; }
-
-    // Gera botões de tema inline
-    const _calcCq = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
-    const _temasInlineHTML = CARTA_TEMAS.map(t => {
-      const desbloqueado = !t.cqId || !!(_calcCq[t.cqId] && _calcCq[t.cqId].achieved);
-      const ativo = t.id === _cartaTemaAtivo && desbloqueado;
-      const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
-      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
-        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden" class="${t.preview}"></div>
-        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap">${t.label}</span>
-        ${reqLabel}
-      </button>`;
-    }).join('');
-
-    inner.innerHTML=`
-      ${_buildCardHTML(name,photo,s,rating,rarity,groupName)}
-      <div id="carta-temas-wrap" style="width:100%;margin-bottom:14px">
-        <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-        <div id="carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasInlineHTML}</div>
-      </div>
-      <div class="carta-btns">
-        <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar
-        </button>
-        <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
-      </div>
-    `;
-
-    // Scroll para cima para garantir que a carta apareça primeiro
-    inner.scrollTop = 0;
-
-    // Adiciona classe de reveal na carta
-    const card=document.getElementById('player-card-el');
-    if(card){
-      // Limpa dataset de temas anteriores (carta foi recriada)
-      Object.keys(card.dataset).forEach(k => {
-        if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
-      });
-      card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
-      card.classList.add('revealing');
-      card.addEventListener('animationend',()=>card.classList.remove('revealing'),{once:true});
-      // Aplica tema salvo
-      if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
-        setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 50);
-      }
-    }
-
-    // Anima os botões
-    const btns=inner.querySelector('.carta-btns');
-    if(btns){
-      btns.style.opacity='0';btns.style.transform='translateY(10px)';
-      btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
-      requestAnimationFrame(()=>{ btns.style.opacity='1';btns.style.transform='translateY(0)'; });
-    }
-  });
-};
+/* Stub: substituído pela versão definitiva baseada no questionário (ver abaixo) */
+window.abrirCartaJogador = function(){};
 
 window.fecharCartaJogador = function(){
   const modal=document.getElementById('modal-carta');
@@ -13838,104 +13742,143 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
   </div>`;
 }
 
-/* ── PATCH no abrirCartaJogador: usa survey se disponível ── */
-const _origAbrirCarta = window.abrirCartaJogador;
+/* ── Card do Jogador: exclusivamente via questionário ── */
 window.abrirCartaJogador = function(){
   const gd = window._gd;
   const uid = window._currentUserUid;
+  if(!uid){ alert('Faça login para ver sua carta.'); return; }
+
+  const modal = document.getElementById('modal-carta');
+  const inner = document.getElementById('carta-inner');
+  if(!modal||!inner) return;
+
   const survey = gd?.survey;
+  const temCard = survey?.completed && survey?.results?.[uid];
 
-  // Se o questionário estiver completo, o card FIFA substitui o card antigo para todos
-  if(survey?.completed && survey?.results?.[uid]){
-    const modal = document.getElementById('modal-carta');
-    const inner = document.getElementById('carta-inner');
-    if(!modal||!inner) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
 
-    const members = gd.members || [];
-    const mb = members.find(m=>m.uid===uid);
-    const { attrs, rating } = survey.results[uid];
-    const rarity = rating>=90?'elite': rating>=80?'gold': rating>=70?'silver':'bronze';
+  // ── Sem card gerado: exibe empty state ──
+  if(!temCard){
+    const totalRespostas = Object.keys(survey?.responses||{}).length;
+    const members = gd?.members || [];
+    const totalMembros = members.filter(m => _usuarioElegivelSurvey(m.uid)).length;
+    const jaRespondeu = uid && !!(survey?.responses||{})[uid];
+    const temSurveyAtivo = !!survey;
+    const pct = totalMembros > 0 ? Math.round(totalRespostas / totalMembros * 100) : 0;
 
-    _renderCartaLoading(inner);
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    let subMsg, showProgress = false;
+    if(!temSurveyAtivo){
+      subMsg = 'O administrador ainda não criou o questionário. Assim que ele for criado, você poderá participar.';
+    } else if(!jaRespondeu){
+      subMsg = 'Você ainda não respondeu ao questionário. Acesse-o pelo menu para avaliar seus colegas e liberar seu card.';
+    } else {
+      subMsg = 'Aguardando os outros membros responderem. Assim que todos concluírem, seu card será gerado automaticamente.';
+      showProgress = true;
+    }
 
-    _animateCartaLoading(()=>{
-      const flash = document.createElement('div');
-      flash.className = 'carta-flash';
-      document.body.appendChild(flash);
-      setTimeout(()=>flash.remove(), 450);
-
-      _cartaTemaAtivo = 'padrao';
-      try {
-        const saved2 = localStorage.getItem('futstats-carta-tema');
-        if(saved2 && CARTA_TEMAS.find(t=>t.id===saved2)) _cartaTemaAtivo = saved2;
-      } catch(e) {}
-      const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
-      const _temasHTML2 = CARTA_TEMAS.map(t => {
-        const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
-        const ativo = t.id === _cartaTemaAtivo && desbloqueado;
-        const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
-        const previewInner2 = t.id === 'padrao'
-          ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
-          : '';
-        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" data-tema-id="${t.id}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
-          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden;pointer-events:none;" class="${t.preview}">${previewInner2}</div>
-          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap;pointer-events:none;">${t.label}</span>
-          ${reqLabel}
-        </button>`;
-      }).join('');
-
-      inner.innerHTML = `
-        ${_buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, gd?.name||'FutStats')}
-        <div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
-          <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-          <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
+    inner.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px 32px;text-align:center;min-height:340px">
+        <div style="width:80px;height:80px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:24px">
+          📋
         </div>
-        <div class="carta-btns">
-          <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Baixar
-          </button>
-          <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
+        <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx);letter-spacing:.5px;margin-bottom:10px">
+          Questionário Pendente
         </div>
-      `;
-
-      const card = document.getElementById('player-card-el');
-      if(card){
-        // Limpa dataset de temas anteriores (carta foi recriada)
-        Object.keys(card.dataset).forEach(k => {
-          if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
-        });
-        // Limpa também temaIdx nos filhos
-        card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
-        // Salva estilos originais para restaurar no tema Padrão
-        card.dataset.origBg = card.style.background;
-        card.dataset.origShadow = card.style.boxShadow;
-        card.dataset.origAnim = card.style.animation || '';
-        card.classList.add('survey-card-animated');
-        card.addEventListener('animationend', function h(){
-          card.removeEventListener('animationend', h);
-          card.classList.remove('survey-card-animated');
-          card.classList.add('survey-card-spin');
-        });
-        // Aplica tema salvo
-        if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
-          setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 100);
-        }
-      }
-      const btns = inner.querySelector('.carta-btns');
-      if(btns){
-        btns.style.opacity='0'; btns.style.transform='translateY(10px)';
-        btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
-        requestAnimationFrame(()=>{ btns.style.opacity='1'; btns.style.transform='translateY(0)'; });
-      }
-    });
+        <div style="font-size:13px;color:var(--tx2);line-height:1.65;max-width:280px;margin-bottom:${showProgress?'20px':'28px'}">
+          ${subMsg}
+        </div>
+        ${showProgress ? `
+        <div style="width:100%;max-width:240px;margin-bottom:28px">
+          <div style="font-family:'DM Mono',monospace;font-size:18px;color:#a855f7;margin-bottom:6px">${totalRespostas} / ${totalMembros}</div>
+          <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">membros responderam</div>
+          <div style="background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;height:6px">
+            <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#a855f7,#7c3aed);width:${pct}%;transition:width .5s"></div>
+          </div>
+        </div>` : ''}
+        <button onclick="fecharCartaJogador()" style="padding:11px 32px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">
+          Fechar
+        </button>
+      </div>
+    `;
     return;
   }
 
-  // Questionário não completo — mostra card antigo normalmente
-  _origAbrirCarta();
+  // ── Card oficial do questionário ──
+  const members = gd.members || [];
+  const mb = members.find(m=>m.uid===uid);
+  const { attrs, rating } = survey.results[uid];
+  const rarity = rating>=90?'elite': rating>=80?'gold': rating>=70?'silver':'bronze';
+
+  _renderCartaLoading(inner);
+
+  _animateCartaLoading(()=>{
+    const flash = document.createElement('div');
+    flash.className = 'carta-flash';
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(), 450);
+
+    _cartaTemaAtivo = 'padrao';
+    try {
+      const saved2 = localStorage.getItem('futstats-carta-tema');
+      if(saved2 && CARTA_TEMAS.find(t=>t.id===saved2)) _cartaTemaAtivo = saved2;
+    } catch(e) {}
+    const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
+    const _temasHTML2 = CARTA_TEMAS.map(t => {
+      const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
+      const ativo = t.id === _cartaTemaAtivo && desbloqueado;
+      const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
+      const previewInner2 = t.id === 'padrao'
+        ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
+        : '';
+      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" data-tema-id="${t.id}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden;pointer-events:none;" class="${t.preview}">${previewInner2}</div>
+        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap;pointer-events:none;">${t.label}</span>
+        ${reqLabel}
+      </button>`;
+    }).join('');
+
+    inner.innerHTML = `
+      ${_buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, gd?.name||'FutStats')}
+      <div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
+        <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
+        <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
+      </div>
+      <div class="carta-btns">
+        <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar
+        </button>
+        <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
+      </div>
+    `;
+
+    const card = document.getElementById('player-card-el');
+    if(card){
+      Object.keys(card.dataset).forEach(k => {
+        if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
+      });
+      card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
+      card.dataset.origBg = card.style.background;
+      card.dataset.origShadow = card.style.boxShadow;
+      card.dataset.origAnim = card.style.animation || '';
+      card.classList.add('survey-card-animated');
+      card.addEventListener('animationend', function h(){
+        card.removeEventListener('animationend', h);
+        card.classList.remove('survey-card-animated');
+        card.classList.add('survey-card-spin');
+      });
+      if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
+        setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 100);
+      }
+    }
+    const btns = inner.querySelector('.carta-btns');
+    if(btns){
+      btns.style.opacity='0'; btns.style.transform='translateY(10px)';
+      btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
+      requestAnimationFrame(()=>{ btns.style.opacity='1'; btns.style.transform='translateY(0)'; });
+    }
+  });
 };
 
 /* ── ATUALIZA FAB via polling leve ── */
@@ -13960,6 +13903,99 @@ window.abrirCartaJogador = function(){
 
   // Também atualiza quando a página volta ao foco (útil no mobile)
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) _check(); });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   LEMBRETE SEMESTRAL DO QUESTIONÁRIO — notifica o ADM ao final
+   de cada ciclo fixo: Jan–Jun (aviso em junho) e Jul–Dez (aviso
+   em dezembro). A notificação é gravada no Firestore apenas uma
+   vez por ciclo (chave de deduplicação: survey_ciclo_<chave>).
+   ══════════════════════════════════════════════════════════════════ */
+
+(function _initSurveyCicloLembrete(){
+
+  /* Retorna o ciclo atual como string "S1/YYYY" ou "S2/YYYY",
+     e se hoje está dentro da janela de aviso (últimos 7 dias do semestre). */
+  function _getCicloInfo(){
+    const now  = new Date();
+    const mes  = now.getMonth();   // 0-indexed: junho=5, dezembro=11
+    const dia  = now.getDate();
+    const ano  = now.getFullYear();
+
+    const ehJunho    = mes === 5;
+    const ehDezembro = mes === 11;
+    const diasNoMes  = new Date(ano, mes + 1, 0).getDate(); // último dia do mês
+    const diasRestam = diasNoMes - dia;                     // 0 = último dia
+
+    const naJanela = (ehJunho || ehDezembro) && diasRestam <= 6; // últimos 7 dias
+    const ciclo    = ehJunho ? `S1/${ano}` : `S2/${ano}`;
+
+    return { naJanela, ciclo, ehFimCiclo: naJanela };
+  }
+
+  /* Grava a notificação para o ADM caso ainda não exista neste ciclo.
+     Usa os helpers window._db_* expostos pelo módulo Firebase principal. */
+  async function _dispararLembreteSeNecessario(){
+    if(!window._gd || !window._currentUserUid) return;
+    if(!window._db_getDoc || !window._db_setDoc || !window._db_doc) return;
+
+    const gd  = window._gd;
+    const uid = window._currentUserUid;
+    const groupId = window._groupId;
+    if(!groupId) return;
+
+    // Só executa para o administrador do grupo
+    const isAdm = gd.createdBy ? gd.createdBy === uid : (gd.members||[])[0]?.uid === uid;
+    if(!isAdm) return;
+
+    const { naJanela, ciclo } = _getCicloInfo();
+    if(!naJanela) return;
+
+    // Chave de deduplicação única por ciclo semestral (ex: "survey_ciclo_S1/2025")
+    const chaveDedup = 'survey_ciclo_' + ciclo;
+
+    // Verificação rápida no cache local antes de ir ao servidor
+    if((gd.notifs?.[uid]||[]).some(n => n.id === chaveDedup)) return;
+
+    try {
+      const snap = await window._db_getDoc(window._db_doc('groups', groupId));
+      if(!snap.exists()) return;
+      const cur = snap.data();
+
+      cur.notifs        = cur.notifs      || {};
+      cur.notifs[uid]   = cur.notifs[uid] || [];
+
+      // Deduplicação definitiva nos dados do servidor
+      if(cur.notifs[uid].some(n => n.id === chaveDedup)) return;
+
+      cur.notifs[uid].push({
+        id:    chaveDedup,
+        tipo:  'survey_ciclo_lembrete',
+        ciclo: ciclo,
+        ts:    Date.now(),
+        lida:  false,
+      });
+
+      await window._db_setDoc(window._db_doc('groups', groupId), cur);
+      window._gd = cur;
+      if(typeof _updateNotifBadge === 'function') _updateNotifBadge();
+      const panel = document.getElementById('notif-panel');
+      if(panel?.classList.contains('open') && typeof _renderNotifPanel === 'function') _renderNotifPanel();
+    } catch(e){ console.warn('survey ciclo lembrete:', e); }
+  }
+
+  /* Aguarda o app estar pronto e então verifica. Roda uma vez por sessão. */
+  let _lembreteFired = false;
+  function _tentarDisparo(){
+    if(_lembreteFired) return;
+    if(!window._gd || !window._currentUserUid) return;
+    _lembreteFired = true;
+    _dispararLembreteSeNecessario();
+  }
+
+  const _timerFast = setInterval(()=>{ _tentarDisparo(); if(_lembreteFired) clearInterval(_timerFast); }, 500);
+  // Também verifica ao voltar para a aba
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && !_lembreteFired) _tentarDisparo(); });
 })();
 </script>
 
