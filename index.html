@@ -12852,40 +12852,40 @@ function _cartaFallbackDownload(card){
 
 <style>
 /* ── TABS DO MODAL CRAQUE ── */
-.craque-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,215,0,.2);margin-bottom:12px}
+.craque-tabs{display:flex;gap:0;border-bottom:1px solid rgba(0,0,0,.12);margin-bottom:12px}
 .craque-tab-btn{
   flex:1;padding:8px 4px;background:none;border:none;
   font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  color:rgba(255,215,0,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+  color:rgba(0,0,0,.35);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
 }
-.craque-tab-btn.active{color:#FFD700;border-bottom-color:#FFD700;}
-.craque-tab-btn:hover:not(.active){color:rgba(255,215,0,.75);}
+.craque-tab-btn.active{color:#000000;border-bottom-color:#000000;}
+.craque-tab-btn:hover:not(.active){color:rgba(0,0,0,.6);}
 /* ── HISTÓRICO DE CRAQUES ── */
 .craque-hist-item{
   display:flex;align-items:center;gap:10px;
   padding:10px 12px;border-radius:10px;
-  background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);
+  background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.08);
   margin-bottom:8px;cursor:pointer;transition:background .15s;
 }
-.craque-hist-item:hover{background:rgba(255,215,0,.09);}
+.craque-hist-item:hover{background:rgba(0,0,0,.06);}
 .craque-hist-crown{font-size:18px;flex-shrink:0}
 .craque-hist-info{flex:1;min-width:0}
 .craque-hist-name{
-  font-family:'VarsityTeam',serif;font-size:15px;color:#FFD700;
+  font-family:'VarsityTeam',serif;font-size:15px;color:#000000;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.craque-hist-periodo{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.5);margin-top:1px}
+.craque-hist-periodo{font-family:'DM Mono',monospace;font-size:9px;color:#858585;margin-top:1px}
 .craque-hist-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .craque-hist-chip{
   font-family:'DM Mono',monospace;font-size:10px;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
-  border-radius:99px;padding:1px 7px;color:rgba(255,255,255,.7);
+  background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.08);
+  border-radius:99px;padding:1px 7px;color:#858585;
 }
 .craque-hist-score{
-  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#FFD700;
+  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#858585;
   flex-shrink:0;text-align:right;line-height:1;
 }
-.craque-hist-score-lbl{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,215,0,.5);text-align:center}
+.craque-hist-score-lbl{font-family:'DM Mono',monospace;font-size:8px;color:#858585;text-align:center}
 .craque-hist-empty{
   text-align:center;padding:28px 16px;
   font-family:'DM Mono',monospace;font-size:11px;color:#000;
