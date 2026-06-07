@@ -4790,9 +4790,8 @@ window.avatarHTML=avatarHTML;
   function _onStart(e){
     const card = _getRiCard(e.target);
     if(!card) return;
-    // Não acionar se o alvo for o avatar dentro de um .ri (já tem o long press da carta)
-    // Mas no pódio o .av não abre carta, então permite o popup de stats
-    if(e.target.closest('.av') && !card.classList.contains('podium-item')) return;
+    // Se o toque foi no avatar, a carta do jogador tem prioridade — nunca abre mini stats
+    if(e.target.closest('.av')) return;
     _moved = false;
     _active = false;
     clearTimeout(_timer);
