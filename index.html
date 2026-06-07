@@ -1204,6 +1204,49 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rst{font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
 .pc .ph div div:first-child{font-family:'Manrope',sans-serif}
 
+/* ── MINI STATS CARD (long press no ri) ── */
+#ri-stats-popup{
+  position:fixed;z-index:8000;pointer-events:none;
+  opacity:0;transform:scale(.88) translateY(6px);
+  transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .18s cubic-bezier(.22,1,.36,1);
+  min-width:220px;max-width:260px;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2);
+}
+#ri-stats-popup.visible{
+  opacity:1;transform:scale(1) translateY(0);
+}
+.risp-header{
+  padding:10px 14px 8px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.risp-pos{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;opacity:.75;
+}
+.risp-name{
+  font-family:'Freshman',sans-serif;font-size:14px;letter-spacing:.4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:160px;
+}
+.risp-stats{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:6px;padding:0 10px 12px;
+}
+.risp-stat{
+  border-radius:10px;padding:8px 6px;text-align:center;
+  background:rgba(0,0,0,.15);
+}
+.risp-val{
+  font-family:'ClassyVogue',sans-serif;font-size:22px;line-height:1;
+  font-weight:normal;
+}
+.risp-lbl{
+  font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:3px;opacity:.7;
+}
+
 .tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tr-filter::-webkit-scrollbar{display:none}
 .ft{
@@ -4618,7 +4661,167 @@ window.avatarHTML=avatarHTML;
   document.addEventListener('mousemove', _onMove);
 })();
 
-function renderHeaderAvatar(){
+// ── LONG PRESS NO CARD .ri → MINI STATS POPUP ───────────────────────────────
+(function(){
+  const LP_MS = 480;
+  let _timer = null;
+  let _active = false;
+  let _moved = false;
+  let _popup = null;
+  let _hideTimer = null;
+
+  // Cores por posição (mesmas do ranking)
+  function _posConfig(pos){
+    if(pos===1) return {
+      bg:'linear-gradient(135deg,#f5ec60 0%,#c8ba00 22%,#e8df2c 42%,#f5ed70 55%,#d0c200 72%,#e8df2c 100%)',
+      border:'#c8ba00', text:'#3d2800', statBg:'rgba(0,0,0,.18)', label:'🥇 1º Lugar'
+    };
+    if(pos===2) return {
+      bg:'linear-gradient(135deg,#f0efed 0%,#9ea8b4 22%,#d0d8e0 42%,#ffffff 55%,#a8b4c0 72%,#c0c8d0 100%)',
+      border:'#8090a0', text:'#1a1a2e', statBg:'rgba(0,0,0,.12)', label:'🥈 2º Lugar'
+    };
+    if(pos===3) return {
+      bg:'linear-gradient(135deg,#e8a87c 0%,#8b4513 22%,#cd7f32 42%,#f4a460 55%,#9a5520 72%,#bf9658 100%)',
+      border:'#7a3810', text:'#2a0e00', statBg:'rgba(0,0,0,.18)', label:'🥉 3º Lugar'
+    };
+    return {
+      bg:'linear-gradient(135deg,#f8eeeb 0%,#f0e0dc 50%,#f8eeeb 100%)',
+      border:'#e0c8c0', text:'#1a1a1a', statBg:'rgba(0,0,0,.07)', label:`${pos}º Lugar`
+    };
+  }
+
+  function _getOrCreatePopup(){
+    if(!_popup){
+      _popup = document.createElement('div');
+      _popup.id = 'ri-stats-popup';
+      document.body.appendChild(_popup);
+    }
+    return _popup;
+  }
+
+  function _positionPopup(popup, cardEl){
+    const rect = cardEl.getBoundingClientRect();
+    const pw = popup.offsetWidth || 240;
+    const ph = popup.offsetHeight || 120;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    // Prefere aparecer acima do card; se não couber, abaixo
+    let top = rect.top - ph - 10;
+    if(top < 8) top = rect.bottom + 10;
+    // Centraliza horizontalmente no card, mas nunca sai da tela
+    let left = rect.left + rect.width/2 - pw/2;
+    left = Math.max(10, Math.min(left, vw - pw - 10));
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+  }
+
+  function _showPopup(cardEl){
+    const pos    = parseInt(cardEl.dataset.pos)  || 99;
+    const gols   = parseInt(cardEl.dataset.gols) || 0;
+    const assist = parseInt(cardEl.dataset.assist)|| 0;
+    const penBat = parseInt(cardEl.dataset.penbat)|| 0;
+    const penOk  = parseInt(cardEl.dataset.penok) || 0;
+    const name   = cardEl.dataset.name || '';
+    const cfg    = _posConfig(pos);
+    const penPct = penBat > 0 ? Math.round(penOk/penBat*100) : null;
+    const penLabel = penBat > 0 ? `${penOk}/${penBat}` : '—';
+
+    const popup = _getOrCreatePopup();
+    popup.style.cssText = `position:fixed;z-index:8000;pointer-events:none;opacity:0;transform:scale(.88) translateY(6px);transition:opacity .18s cubic-bezier(.22,1,.36,1),transform .18s cubic-bezier(.22,1,.36,1);min-width:220px;max-width:260px;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2);background:${cfg.bg};border:1.5px solid ${cfg.border};color:${cfg.text}`;
+    popup.innerHTML = `
+      <div class="risp-header">
+        <div class="risp-name" style="color:${cfg.text}">${name}</div>
+        <div class="risp-pos" style="color:${cfg.text}">${cfg.label}</div>
+      </div>
+      <div class="risp-stats">
+        <div class="risp-stat" style="background:${cfg.statBg}">
+          <div class="risp-val" style="color:${cfg.text}">${gols}</div>
+          <div class="risp-lbl" style="color:${cfg.text}">⚽ Gols</div>
+        </div>
+        <div class="risp-stat" style="background:${cfg.statBg}">
+          <div class="risp-val" style="color:${cfg.text}">${assist}</div>
+          <div class="risp-lbl" style="color:${cfg.text}">👟 Assist.</div>
+        </div>
+        <div class="risp-stat" style="background:${cfg.statBg}">
+          <div class="risp-val" style="color:${cfg.text}">${penLabel}</div>
+          <div class="risp-lbl" style="color:${cfg.text}">🎯 Pênaltis${penPct!==null?' ('+penPct+'%)':''}</div>
+        </div>
+      </div>`;
+
+    // Posiciona antes de mostrar para calcular dimensões
+    popup.style.visibility = 'hidden';
+    popup.style.opacity = '0';
+    requestAnimationFrame(()=>{
+      _positionPopup(popup, cardEl);
+      popup.style.visibility = '';
+      popup.style.opacity = '1';
+      popup.style.transform = 'scale(1) translateY(0)';
+    });
+  }
+
+  function _hidePopup(){
+    if(!_popup) return;
+    _popup.style.opacity = '0';
+    _popup.style.transform = 'scale(.88) translateY(6px)';
+    _hideTimer = setTimeout(()=>{
+      if(_popup){ _popup.remove(); _popup = null; }
+    }, 200);
+  }
+
+  function _getRiCard(el){
+    return el.closest && el.closest('.ri[data-pos]');
+  }
+
+  function _onStart(e){
+    const card = _getRiCard(e.target);
+    if(!card) return;
+    // Não acionar se o alvo for o avatar (já tem o long press da carta)
+    if(e.target.closest('.av')) return;
+    _moved = false;
+    _active = false;
+    clearTimeout(_timer);
+    clearTimeout(_hideTimer);
+    _timer = setTimeout(()=>{
+      if(_moved) return;
+      _active = true;
+      if(navigator.vibrate) navigator.vibrate(35);
+      _showPopup(card);
+      // Esconde após 2.5s automaticamente
+      clearTimeout(_hideTimer);
+      _hideTimer = setTimeout(_hidePopup, 2500);
+    }, LP_MS);
+  }
+
+  function _onEnd(){
+    clearTimeout(_timer);
+    _timer = null;
+    if(_active){
+      _active = false;
+      // Deixa o popup visível até o auto-hide, mas permite fechar
+    }
+  }
+
+  function _onMove(){
+    _moved = true;
+    clearTimeout(_timer);
+    _timer = null;
+    if(_active){ _active = false; _hidePopup(); }
+  }
+
+  // Fecha ao tocar fora
+  document.addEventListener('touchstart', e=>{
+    if(_popup && !e.target.closest('#ri-stats-popup')) _hidePopup();
+  }, { passive: true });
+  document.addEventListener('click', e=>{
+    if(_popup && !e.target.closest('#ri-stats-popup')) _hidePopup();
+  });
+
+  document.addEventListener('touchstart', _onStart, { passive: true });
+  document.addEventListener('touchend',   _onEnd,   { passive: true });
+  document.addEventListener('touchmove',  _onMove,  { passive: true });
+  document.addEventListener('mousedown', e=>{ if(e.button===0) _onStart(e); });
+  document.addEventListener('mouseup',   _onEnd);
+  document.addEventListener('mousemove', e=>{ if(e.buttons) _onMove(); });
+})();
   const photo=myProfile?.photo,name=myProfile?.displayName||'',wrap=$('ah-av-wrap');if(!wrap)return;
   if(photo)wrap.innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
   else{wrap.className=`ah-avatar ${avC(name)}`;wrap.innerHTML=ini(name);}
@@ -7718,7 +7921,7 @@ function renderRanking(){
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" data-uid="${p.uid||''}" data-pos="${pos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}<div class="ri-sub"><strong>${p.gols}G</strong> · <strong>${p.assist}A</strong></div></div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
