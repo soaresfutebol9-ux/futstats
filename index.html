@@ -4822,6 +4822,8 @@ window.avatarHTML=avatarHTML;
   document.addEventListener('mouseup',   _onEnd);
   document.addEventListener('mousemove', e=>{ if(e.buttons) _onMove(); });
 })();
+
+function renderHeaderAvatar(){
   const photo=myProfile?.photo,name=myProfile?.displayName||'',wrap=$('ah-av-wrap');if(!wrap)return;
   if(photo)wrap.innerHTML=`<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
   else{wrap.className=`ah-avatar ${avC(name)}`;wrap.innerHTML=ini(name);}
@@ -13074,9 +13076,9 @@ window._attachTemaLongPress = function(){
 /* Tema em prévia (ainda não salvo) */
 let _cartaTemaPendente = null;
 
-window._selecionarTema = function(temaId){
-  _cartaTemaPendente = temaId;
-  _cartaTemaAtivo = temaId; // atualiza visualmente, mas NÃO salva ainda
+/* Aplica o tema visualmente na carta (uso interno, não marca pendente) */
+window._aplicarTemaVisual = function(temaId){
+  _cartaTemaAtivo = temaId;
   // Detecta qual carta está visível: survey-card-el tem prioridade se existir no DOM visível
   const surveyCard = document.getElementById('survey-card-el');
   const playerCard = document.getElementById('player-card-el');
@@ -13191,6 +13193,12 @@ window._selecionarTema = function(temaId){
   _atualizarBotaoAplicar();
 };
 
+/* Chamado pelo clique do usuário: marca pendente e aplica visual */
+window._selecionarTema = function(temaId){
+  _cartaTemaPendente = temaId;
+  window._aplicarTemaVisual(temaId);
+};
+
 /* Confirma e persiste o tema em prévia */
 window._aplicarTema = function(){
   if(!_cartaTemaPendente) return;
@@ -13216,14 +13224,12 @@ window._aplicarTema = function(){
   }
 };
 
-/* Restaura tema salvo ao fechar sem aplicar */
+/* Restaura tema salvo ao cancelar seleção sem aplicar */
 window._cancelarTemaPendente = function(){
   if(!_cartaTemaPendente) return;
   const temaSalvo = (()=>{ try { return localStorage.getItem('futstats-carta-tema') || 'padrao'; } catch(e){ return 'padrao'; } })();
   _cartaTemaPendente = null;
-  window._selecionarTema(temaSalvo);
-  // _selecionarTema vai setar _cartaTemaPendente de novo, limpamos
-  _cartaTemaPendente = null;
+  window._aplicarTemaVisual(temaSalvo);
   _atualizarBotaoAplicar();
 };
 
@@ -13242,7 +13248,8 @@ function _atualizarBotaoAplicar(){
 window.abrirCartaJogador = function(){};
 
 window.fecharCartaJogador = function(){
-  window._cancelarTemaPendente();
+  // Apenas limpa o pendente sem reverter — o tema salvo persiste no localStorage
+  _cartaTemaPendente = null;
   const modal=document.getElementById('modal-carta');
   if(modal) modal.classList.remove('open');
   document.body.style.overflow='';
@@ -14505,7 +14512,7 @@ window.abrirCartaJogador = function(uidParam){
         card.classList.add('survey-card-spin');
       });
       if(isMyCard && _cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
-        setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 100);
+        setTimeout(()=>window._aplicarTemaVisual(_cartaTemaAtivo), 100);
       }
     }
     const btns = inner.querySelector('.carta-btns');
