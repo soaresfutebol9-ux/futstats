@@ -779,8 +779,28 @@ html.is-touch .auth-ball{animation:none}
 }
 
 /* Ranking list switch — sem blur */
-#rl{transition:opacity .18s ease,transform .22s cubic-bezier(.16,1,.3,1)}
-#rl.switching{opacity:0;transform:translateY(8px) scale(.99)}
+#rl-wrap{overflow:hidden;position:relative;}
+#rl{will-change:transform,opacity;}
+@keyframes rl-slide-in-right {
+  0%  {transform:translateX(100%);opacity:0}
+  100%{transform:translateX(0);opacity:1}
+}
+@keyframes rl-slide-in-left {
+  0%  {transform:translateX(-100%);opacity:0}
+  100%{transform:translateX(0);opacity:1}
+}
+@keyframes rl-slide-out-left {
+  0%  {transform:translateX(0);opacity:1}
+  100%{transform:translateX(-100%);opacity:0}
+}
+@keyframes rl-slide-out-right {
+  0%  {transform:translateX(0);opacity:1}
+  100%{transform:translateX(100%);opacity:0}
+}
+#rl.slide-in-right  {animation:rl-slide-in-right  .32s cubic-bezier(.25,1,.5,1) forwards;}
+#rl.slide-in-left   {animation:rl-slide-in-left   .32s cubic-bezier(.25,1,.5,1) forwards;}
+#rl.slide-out-left  {animation:rl-slide-out-left  .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
+#rl.slide-out-right {animation:rl-slide-out-right .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
 
 /* ── BOTTOM NAV — pill indicator + ripple ── */
 .bn{position:relative}
@@ -3480,7 +3500,7 @@ body::before{
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
         <button id="rank-share-btn" onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
-      <div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div>
+      <div id="rl-wrap"><div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div></div>
 
       <!-- ══ FEED DE ATIVIDADE ══ -->
       <div id="feed-card" style="margin-top:1.25rem;display:none;visibility:hidden;height:0;overflow:hidden;margin:0">
@@ -7963,18 +7983,35 @@ function renderRanking(){
   // Feed de atividade
   renderFeedCard();
 }
+const _rankOrder={ga:0,geral:1,recordes:2,pen:3};
+let _rankAtivo='ga';
 window.setRank=(s,el)=>{
+  if(s===_rankAtivo) return;
   const rl=$('rl');
-  rl.classList.add('switching');
+  const dir = (_rankOrder[s]??0) > (_rankOrder[_rankAtivo]??0) ? 'left' : 'right';
+
+  // Remove classes anteriores
+  rl.classList.remove('slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+
+  // Anima saída
+  rl.classList.add(dir==='left' ? 'slide-out-left' : 'slide-out-right');
+
   rankStat=s;
+  _rankAtivo=s;
   document.querySelectorAll('.ft').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(s==='recordes'||s==='pen')?'none':'flex';
   showRankingSkeleton();
+
   setTimeout(()=>{
     renderRanking();
-    rl.classList.remove('switching');
-  },200);
+    rl.classList.remove('slide-out-left','slide-out-right');
+    void rl.offsetHeight;
+    rl.classList.add(dir==='left' ? 'slide-in-right' : 'slide-in-left');
+    rl.addEventListener('animationend', ()=>{
+      rl.classList.remove('slide-in-right','slide-in-left');
+    }, {once:true});
+  }, 200);
 };
 
 // ── RECORDES ─────────────────────────────────────────────────────
