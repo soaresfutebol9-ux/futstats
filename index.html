@@ -14500,22 +14500,23 @@ window.abrirCartaJogador = function(uidParam){
 
     const card = document.getElementById('survey-card-el') || document.getElementById('player-card-el');
     if(card){
-      Object.keys(card.dataset).forEach(k => {
-        if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
-      });
-      card.querySelectorAll('[data-tema-idx]').forEach(el => delete el.dataset.temaIdx);
-      card.dataset.origBg = card.style.background;
+      // Salva estilos originais antes de qualquer modificação
+      card.dataset.origBg     = card.style.background;
       card.dataset.origShadow = card.style.boxShadow;
-      card.dataset.origAnim = card.style.animation || '';
+      card.dataset.origAnim   = card.style.animation || '';
+
+      // Aplica o tema AGORA, de forma síncrona, antes do primeiro frame pintado
+      // Isso elimina o piscar do estilo padrão → tema salvo
+      if(isMyCard && _cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
+        window._aplicarTemaVisual(_cartaTemaAtivo);
+      }
+
       card.classList.add('survey-card-animated');
       card.addEventListener('animationend', function h(){
         card.removeEventListener('animationend', h);
         card.classList.remove('survey-card-animated');
         card.classList.add('survey-card-spin');
       });
-      if(isMyCard && _cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
-        setTimeout(()=>window._aplicarTemaVisual(_cartaTemaAtivo), 150);
-      }
     }
     const btns = inner.querySelector('.carta-btns');
     if(btns){
