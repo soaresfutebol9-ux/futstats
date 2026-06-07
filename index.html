@@ -3755,7 +3755,7 @@ body::before{
         .pac-title{font-size:13px;font-weight:700;color:#111;font-family:'DM Sans',sans-serif;line-height:1.2}
         .pac-sub{font-size:10px;color:#666;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
         .pac-chevron{flex-shrink:0;transition:transform .25s ease;color:#888}
-        .pac-body{overflow:hidden;max-height:0;transition:max-height .32s ease;
+        .pac-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .28s ease;
           background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px}
         .pac-inner{padding:14px 16px 16px}
       </style>
@@ -3951,7 +3951,7 @@ body::before{
               </button>
               <div id="cfg-addmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
-                  <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">Cole o FutID do jogador (ex: <span style="color:#1a5c2a;font-weight:700">FST-AB3X7K</span>). O ID é único e nunca se repete.</div>
+                  
                   <div style="display:flex;gap:8px;align-items:center">
                     <input type="text" id="add-by-futid-input" placeholder="FST-XXXXXX" maxlength="10"
                       style="flex:1;background:var(--bg4);border:1.5px solid rgba(77,255,176,.4);border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;transition:border-color .15s,box-shadow .15s"
@@ -3986,7 +3986,7 @@ body::before{
               </button>
               <div id="cfg-rename-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
-                  <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">O novo nome ficará visível para todos os membros do grupo.</div>
+                  
                   <div style="display:flex;gap:8px;align-items:center">
                     <input type="text" id="cfg-rename-input" placeholder="Novo nome do grupo" maxlength="40"
                       style="flex:1;background:var(--bg4);border:1.5px solid rgba(255,209,102,.4);border-radius:10px;color:var(--tx);padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s"
@@ -4020,7 +4020,7 @@ body::before{
               </button>
               <div id="cfg-kickmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
                 <div style="padding:0 16px 16px">
-                  <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:10px;line-height:1.5">Informe o FutID do jogador que deseja remover do grupo.</div>
+                  
                   <div style="display:flex;gap:8px;align-items:center">
                     <input type="text" id="cfg-kick-input" placeholder="FST-XXXXXX" maxlength="10"
                       style="flex:1;background:var(--bg4);border:1.5px solid rgba(255,90,122,.4);border-radius:10px;color:var(--tx);padding:10px 14px;font-size:15px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;transition:border-color .15s,box-shadow .15s"
@@ -14339,12 +14339,30 @@ function _pacToggle(btn, bodyId) {
   const body = document.getElementById(bodyId);
   if (!body) return;
   const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+
+  // Fecha todos os outros itens pac
+  document.querySelectorAll('.pac-body').forEach(b => {
+    if (b !== body) {
+      b.style.maxHeight = '0';
+      b.style.opacity = '0';
+    }
+  });
+  document.querySelectorAll('.pac-toggle').forEach(t => {
+    if (t !== btn) {
+      t.classList.remove('open');
+      const ch = t.querySelector('.pac-chevron');
+      if (ch) ch.style.transform = 'rotate(0deg)';
+    }
+  });
+
   if (isOpen) {
     body.style.maxHeight = '0';
+    body.style.opacity = '0';
     btn.classList.remove('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(0deg)';
   } else {
     body.style.maxHeight = body.scrollHeight + 600 + 'px';
+    body.style.opacity = '1';
     btn.classList.add('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(180deg)';
   }
