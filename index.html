@@ -621,7 +621,7 @@ html.is-touch .auth-ball{animation:none}
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.55);
   z-index:999990;
-  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  /* backdrop-filter removed */
   animation:notifOverlayIn .2s ease forwards;
 }
 #notif-overlay.open{display:block;}
@@ -1595,7 +1595,7 @@ select option{background:var(--bg3)}
   position:fixed;inset:0;z-index:3000;
   background:rgba(0,0,0,.8);
   align-items:center;justify-content:center;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  
 }
 #modal-duelo.open{display:flex;animation:modalBgIn .25s ease forwards;}
 .duelo-inner{
@@ -1658,7 +1658,7 @@ select option{background:var(--bg3)}
   display:none;position:fixed;inset:0;z-index:4500;
   background:rgba(0,0,0,.92);
   align-items:center;justify-content:center;
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  
 }
 #modal-evol-chart.open{display:flex;animation:modalBgIn .22s ease forwards;}
 #evol-chart-inner{
@@ -1752,7 +1752,7 @@ select option{background:var(--bg3)}
   transition:opacity .1s;
 }
 /* ── DESAFIO DIRETO ── */
-#modal-desafio{display:none;position:fixed;inset:0;z-index:3100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+#modal-desafio{display:none;position:fixed;inset:0;z-index:3100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;}
 #modal-desafio.open{display:flex;animation:modalBgIn .25s ease forwards;}
 .desafio-inner{background:var(--bg2);border-radius:24px;width:92%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 8px 48px rgba(0,0,0,.7),0 0 0 1px rgba(255,90,122,.15);animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;overflow:hidden;}
 .desafio-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem .9rem;border-bottom:1px solid var(--bo);flex-shrink:0;background:linear-gradient(135deg,rgba(255,90,122,.12) 0%,rgba(255,180,0,.06) 60%,transparent 100%);}
@@ -1817,7 +1817,7 @@ select option{background:var(--bg3)}
   display:flex;align-items:center;justify-content:center;
   padding:24px;
   background:rgba(0,0,0,.75);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  
   opacity:0;pointer-events:none;
   transition:opacity .25s ease;
   will-change:opacity;
@@ -1921,7 +1921,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 .mfab-item-label{
   background:rgba(14,18,30,.88);border:1px solid rgba(255,255,255,.13);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  
   border-radius:20px;padding:5px 13px;
   font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
   color:#fff;white-space:nowrap;
@@ -1957,7 +1957,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 #modal-carta{
   position:fixed;inset:0;z-index:3000;
   display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
-  background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.78);
   padding:16px;
 }
 #modal-carta.open{ display:flex; }
@@ -1992,7 +1992,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   position:absolute;left:0;right:0;height:3px;
   background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.0) 10%,rgba(77,255,176,1) 50%,rgba(77,255,176,.0) 90%,transparent 100%);
   box-shadow:0 0 18px 4px rgba(77,255,176,.6),0 0 40px 8px rgba(77,255,176,.2);
-  animation:cartaScan 1.4s ease-in-out infinite;
+  /* animation:cartaScan removed */
   z-index:4;
   top:0;
 }
@@ -2011,7 +2011,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   font-family:'DM Mono',monospace;
   font-size:9px;
   color:rgba(77,255,176,.55);
-  animation:cartaParticle var(--dur,2s) var(--delay,0s) ease-in infinite;
+  /* animation:cartaParticle removed */
   white-space:nowrap;
 }
 @keyframes cartaParticle{
@@ -2023,7 +2023,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 /* Corner scanner brackets */
 .carta-corner{
   position:absolute;width:24px;height:24px;z-index:5;
-  animation:cartaCornerPulse 1.4s ease-in-out infinite;
+  /* animation:cartaCornerPulse removed */
 }
 .carta-corner-tl{ top:14px;left:14px;
   border-top:2px solid #4dffb0;border-left:2px solid #4dffb0; }
@@ -2047,7 +2047,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .carta-ghost-avatar::after{
   content:'';position:absolute;inset:-100%;
   background:linear-gradient(105deg,transparent 35%,rgba(77,255,176,.12) 50%,transparent 65%);
-  animation:cartaShimmer 1.8s ease-in-out infinite;
+  /* animation:cartaShimmer removed */
 }
 /* Blocos de texto fantasma */
 .carta-ghost-block{
@@ -2058,7 +2058,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .carta-ghost-block::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.18) 50%,transparent 100%);
-  animation:cartaShimmer var(--sd,1.8s) var(--sdd,0s) ease-in-out infinite;
+  /* animation:cartaShimmer removed */
 }
 @keyframes cartaShimmer{
   0%   { transform:translateX(-100%); }
@@ -2074,7 +2074,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .carta-ghost-rating::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
-  animation:cartaShimmer 1.6s .1s ease-in-out infinite;
+  /* animation:cartaShimmer removed */
 }
 /* Grid de stats fantasma */
 .carta-ghost-stats{
@@ -2091,7 +2091,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .carta-ghost-stat-val::after{
   content:'';display:block;width:100%;height:100%;
   background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
-  animation:cartaShimmer 1.6s var(--d,0s) ease-in-out infinite;
+  /* animation:cartaShimmer removed */
 }
 .carta-ghost-stat-lbl{
   width:22px;height:6px;border-radius:3px;
@@ -2111,7 +2111,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   transform:translate(-50%,-50%);
   width:160px;height:160px;border-radius:50%;
   background:radial-gradient(circle,rgba(77,255,176,.08) 0%,transparent 70%);
-  animation:cartaGlowPulse 2s ease-in-out infinite;
+  /* animation:cartaGlowPulse removed */
   z-index:1;pointer-events:none;
 }
 @keyframes cartaGlowPulse{
@@ -2124,7 +2124,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   font-size:11px;letter-spacing:.12em;
   color:#4dffb0;text-transform:uppercase;
   min-height:16px;text-align:center;
-  animation:cartaStatusBlink .9s ease-in-out infinite;
+  /* animation:cartaStatusBlink removed */
 }
 @keyframes cartaStatusBlink{
   0%,100%{ opacity:1; } 50%{ opacity:.4; }
@@ -2330,7 +2330,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-neon .card-stat-lbl,.player-card.tema-neon .card-edition{ color:rgba(180,0,255,.7); }
 .player-card.tema-neon .card-divider{ background:linear-gradient(90deg,transparent,#b400ff,transparent); }
 @keyframes neonBorderPulse{0%,100%{box-shadow:0 0 0 2px #b400ff,0 0 30px rgba(180,0,255,.6),0 0 60px rgba(77,255,176,.3),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #4dffb0,0 0 40px rgba(77,255,176,.7),0 0 70px rgba(180,0,255,.4),0 8px 48px rgba(0,0,0,.9)}}
-.player-card.tema-neon{ animation:neonBorderPulse 2s ease-in-out infinite; }
+.player-card.tema-neon{ }
 
 /* FOGO */
 .player-card.tema-fogo{
@@ -2342,7 +2342,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-fogo .card-stat-lbl,.player-card.tema-fogo .card-edition{ color:rgba(255,255,255,.7); }
 .player-card.tema-fogo .card-divider{ background:linear-gradient(90deg,transparent,#ffcc00,transparent); }
 @keyframes fogoGlow{0%,100%{box-shadow:0 0 0 2px #ff4500,0 0 40px rgba(255,69,0,.7),0 8px 48px rgba(0,0,0,.8)}50%{box-shadow:0 0 0 2px #ffcc00,0 0 55px rgba(255,140,0,.8),0 8px 48px rgba(0,0,0,.8)}}
-.player-card.tema-fogo{ animation:fogoGlow 1.5s ease-in-out infinite; }
+.player-card.tema-fogo{ }
 
 /* GALAXY */
 .player-card.tema-galaxy{
@@ -2360,7 +2360,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-galaxy .card-stat-lbl,.player-card.tema-galaxy .card-edition{ color:rgba(224,199,255,.65); }
 .player-card.tema-galaxy .card-divider{ background:linear-gradient(90deg,transparent,#7c3aed,transparent); }
 @keyframes galaxyPulse{0%,100%{box-shadow:0 0 0 2px #7c3aed,0 0 50px rgba(124,58,237,.6),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #a78bfa,0 0 65px rgba(167,139,250,.7),0 8px 48px rgba(0,0,0,.9)}}
-.player-card.tema-galaxy{ animation:galaxyPulse 3s ease-in-out infinite; }
+.player-card.tema-galaxy{ }
 
 /* CROMO */
 .player-card.tema-cromo{
@@ -2383,7 +2383,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-gelo .card-stat-lbl,.player-card.tema-gelo .card-edition{ color:rgba(0,51,102,.65); }
 .player-card.tema-gelo .card-divider{ background:linear-gradient(90deg,transparent,#4da6ff,transparent); }
 @keyframes geloShimmer{0%,100%{box-shadow:0 0 0 2px #4da6ff,0 0 35px rgba(77,166,255,.5),0 8px 40px rgba(0,0,0,.4)}50%{box-shadow:0 0 0 2px #99ddff,0 0 50px rgba(153,221,255,.7),0 8px 40px rgba(0,0,0,.4)}}
-.player-card.tema-gelo{ animation:geloShimmer 2.5s ease-in-out infinite; }
+.player-card.tema-gelo{ }
 
 /* CARBONO */
 .player-card.tema-carbono{
@@ -2405,7 +2405,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-ouro-solido .card-stat-lbl,.player-card.tema-ouro-solido .card-edition{ color:rgba(26,10,0,.65); }
 .player-card.tema-ouro-solido .card-divider{ background:linear-gradient(90deg,transparent,#cc8800,transparent); }
 @keyframes ouroGlow{0%,100%{box-shadow:0 0 0 3px #ffd700,0 0 50px rgba(255,215,0,.8),0 8px 48px rgba(0,0,0,.6)}50%{box-shadow:0 0 0 3px #fff0a0,0 0 70px rgba(255,240,160,.9),0 8px 48px rgba(0,0,0,.6)}}
-.player-card.tema-ouro-solido{ animation:ouroGlow 2s ease-in-out infinite; }
+.player-card.tema-ouro-solido{ }
 
 /* Seletor de temas */
 #carta-temas-wrap{
@@ -2465,7 +2465,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-sangue .card-stat-lbl,.player-card.tema-sangue .card-edition{ color:rgba(255,102,128,.7); }
 .player-card.tema-sangue .card-divider{ background:linear-gradient(90deg,transparent,#c00020,transparent); }
 @keyframes sangueGlow{0%,100%{box-shadow:0 0 0 2px #8b0000,0 0 40px rgba(180,0,20,.7),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #ff1a40,0 0 55px rgba(255,26,64,.6),0 8px 48px rgba(0,0,0,.9)}}
-.player-card.tema-sangue{ animation:sangueGlow 2s ease-in-out infinite; }
+.player-card.tema-sangue{ }
 
 /* VENENO */
 .player-card.tema-veneno{
@@ -2477,7 +2477,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-veneno .card-stat-lbl,.player-card.tema-veneno .card-edition{ color:rgba(0,255,136,.65); }
 .player-card.tema-veneno .card-divider{ background:linear-gradient(90deg,transparent,#00cc33,transparent); }
 @keyframes venenoGlow{0%,100%{box-shadow:0 0 0 2px #00cc33,0 0 35px rgba(0,204,51,.5),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #00ff88,0 0 50px rgba(0,255,136,.65),0 8px 48px rgba(0,0,0,.9)}}
-.player-card.tema-veneno{ animation:venenoGlow 2.2s ease-in-out infinite; }
+.player-card.tema-veneno{ }
 
 /* TITANIO */
 .player-card.tema-titanio{
@@ -2500,7 +2500,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-aurora .card-stat-lbl,.player-card.tema-aurora .card-edition{ color:rgba(224,255,240,.65); }
 .player-card.tema-aurora .card-divider{ background:linear-gradient(90deg,transparent,#00cc77,transparent); }
 @keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.player-card.tema-aurora{ animation:auroraShift 4s ease infinite; }
+.player-card.tema-aurora{ }
 
 /* LAVA */
 .player-card.tema-lava{
@@ -2512,7 +2512,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-lava .card-stat-lbl,.player-card.tema-lava .card-edition{ color:rgba(255,224,178,.65); }
 .player-card.tema-lava .card-divider{ background:linear-gradient(90deg,transparent,#ff6600,transparent); }
 @keyframes lavaGlow{0%,100%{box-shadow:0 0 0 2px #cc4400,0 0 50px rgba(204,68,0,.7),0 8px 48px rgba(0,0,0,.9)}50%{box-shadow:0 0 0 2px #ff6600,0 0 70px rgba(255,102,0,.8),0 8px 48px rgba(0,0,0,.9)}}
-.player-card.tema-lava{ animation:lavaGlow 1.8s ease-in-out infinite; }
+.player-card.tema-lava{ }
 
 /* DIAMANTE */
 .player-card.tema-diamante{
@@ -2524,7 +2524,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .player-card.tema-diamante .card-stat-lbl,.player-card.tema-diamante .card-edition{ color:rgba(0,26,51,.65); }
 .player-card.tema-diamante .card-divider{ background:linear-gradient(90deg,transparent,#4da6ff,transparent); }
 @keyframes diamanteShimmer{0%,100%{box-shadow:0 0 0 2px #80c0ff,0 0 0 4px rgba(200,232,255,.3),0 0 50px rgba(128,200,255,.6),0 8px 48px rgba(0,0,0,.4)}50%{box-shadow:0 0 0 2px #ffffff,0 0 0 4px rgba(255,255,255,.5),0 0 70px rgba(255,255,255,.7),0 8px 48px rgba(0,0,0,.4)}}
-.player-card.tema-diamante{ animation:diamanteShimmer 2s ease-in-out infinite; }
+.player-card.tema-diamante{ }
 
 /* Botão bloqueado com requisito visível */
 .carta-tema-btn.bloqueado .carta-req-label{
@@ -3755,9 +3755,10 @@ body::before{
         .pac-icon{font-size:18px;flex-shrink:0}
         .pac-title{font-size:13px;font-weight:700;color:#111;font-family:'DM Sans',sans-serif;line-height:1.2}
         .pac-sub{font-size:10px;color:#666;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
-        .pac-chevron{flex-shrink:0;transition:transform .25s ease;color:#888}
-        .pac-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .28s ease;
+        .pac-chevron{flex-shrink:0;transition:transform .22s ease;color:#888}
+        .pac-body{overflow:hidden;max-height:0;opacity:0;transition:opacity .2s ease;
           background:var(--bg3);border:1.5px solid #aaa;border-top:none;border-radius:0 0 14px 14px}
+        .pac-body.pac-open{max-height:none;opacity:1;}
         .pac-inner{padding:14px 16px 16px}
       </style>
 
@@ -3886,7 +3887,7 @@ body::before{
 
         <!-- ── Corpo colapsável ── -->
         <div id="cfg-accordion-body" style="
-          overflow:hidden;max-height:0;transition:max-height .35s ease;
+          overflow:hidden;max-height:0;
           background:var(--bg3);border:1px solid rgba(160,130,255,.25);border-top:none;
           border-radius:0 0 14px 14px;
         ">
@@ -3910,7 +3911,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-wp-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
+              <div id="cfg-wp-body" style="overflow:hidden;max-height:0">
                 <div style="padding:0 16px 16px">
                   <div style="font-size:11px;color:#494a48;font-family:'DM Mono',monospace;margin-bottom:12px;line-height:1.5">Aparece no card do grupo na tela de seleção. Somente você (criador) pode alterar.</div>
                   <div class="wp-preview" id="wp-preview-box">
@@ -3950,7 +3951,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-addmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
+              <div id="cfg-addmember-body" style="overflow:hidden;max-height:0">
                 <div style="padding:0 16px 16px">
                   
                   <div style="display:flex;gap:8px;align-items:center">
@@ -3985,7 +3986,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-rename-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
+              <div id="cfg-rename-body" style="overflow:hidden;max-height:0">
                 <div style="padding:0 16px 16px">
                   
                   <div style="display:flex;gap:8px;align-items:center">
@@ -4019,7 +4020,7 @@ body::before{
                   <polyline points="6 9 12 15 18 9"/>
                 </svg>
               </button>
-              <div id="cfg-kickmember-body" style="overflow:hidden;max-height:0;transition:max-height .3s ease">
+              <div id="cfg-kickmember-body" style="overflow:hidden;max-height:0">
                 <div style="padding:0 16px 16px">
                   
                   <div style="display:flex;gap:8px;align-items:center">
@@ -4144,7 +4145,7 @@ body::before{
 <!-- ══ CONQUISTAS FAB (oculto) ══ -->
 
 <!-- ══ MODAL CONQUISTAS ══ -->
-<div id="modal-conquistas" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.8);align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+<div id="modal-conquistas" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.8);align-items:center;justify-content:center">
   <div class="conquistas-inner" id="conquistas-inner">
     <div class="conquistas-header">
       <div style="display:flex;align-items:center;gap:10px">
@@ -5996,7 +5997,7 @@ async function _abrirSeletorGrupo(modoInicial){
   // Monta o overlay do seletor
   const overlay = document.createElement('div');
   overlay.id = 'mudar-grupo-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);animation:_mgFadeIn .2s ease both';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);animation:_mgFadeIn .2s ease both';
 
   const isLight = document.body.classList.contains('light');
   const cardBg = isLight ? '#ffffff' : '#0d1220';
@@ -8966,15 +8967,7 @@ window._pendingCounters = false;
 
 function _runCounters(){
   document.querySelectorAll('.ri-count').forEach(el=>{
-    const target=parseInt(el.dataset.val)||0;
-    if(target===0){el.textContent='0';return;}
-    const dur=650,steps=35;
-    let t=0;
-    const tick=setInterval(()=>{
-      t++;
-      el.textContent=t>=steps?target:Math.round((target/steps)*t);
-      if(t>=steps)clearInterval(tick);
-    },dur/steps);
+    el.textContent=parseInt(el.dataset.val)||0;
   });
 }
 window._runCounters = _runCounters;
@@ -9385,20 +9378,12 @@ function _renderDueloBody(){
   if(_dueloA&&_dueloB){
     // Pequeno delay para o DOM renderizar antes de animar
     setTimeout(()=>{
-      // 1) Animar contagem dos números
+      // 1) Mostrar valores imediatamente (sem animação de contagem)
       el.querySelectorAll('.duelo-count').forEach(node=>{
         const target=parseFloat(node.dataset.val)||0;
         const suf=node.dataset.suf||'';
         const isDecimal=target!==Math.floor(target);
-        if(target===0){node.textContent='0'+suf;return;}
-        const dur=650,steps=35;
-        let t=0;
-        const tick=setInterval(()=>{
-          t++;
-          const v=t>=steps?target:(target/steps)*t;
-          node.textContent=(isDecimal?Math.round(v*10)/10:Math.round(v))+suf;
-          if(t>=steps)clearInterval(tick);
-        },dur/steps);
+        node.textContent=(isDecimal?Math.round(target*10)/10:Math.round(target))+suf;
       });
       // 2) Animar barras (do 0 para o valor real)
       el.querySelectorAll('.duelo-bar-fill').forEach(bar=>{
@@ -9725,7 +9710,7 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL SURVEY (Questionário de Atributos) ══ -->
-<div id="modal-survey" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-y:auto;padding:20px 0">
+<div id="modal-survey" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.72);overflow-y:auto;padding:20px 0">
   <div id="survey-inner" style="max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--bo);border-radius:20px;padding:24px 20px 32px;position:relative">
     <!-- preenchido dinamicamente -->
   </div>
@@ -12186,7 +12171,7 @@ window.abrirSeletorCqPinadas = function(uid){
 
   const overlay = document.createElement('div');
   overlay.id = 'pin-cq-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
   overlay.innerHTML = `
     <div style="background:#1a1a1a;border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;padding:20px 16px 32px;gap:12px;box-sizing:border-box">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -12392,7 +12377,7 @@ window.abrirDetalheCQ = async function(cqId){
   if(!modal){
     modal = document.createElement('div');
     modal.id = 'modal-cq-detalhe';
-    modal.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:16px;box-sizing:border-box';
+    modal.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box';
     modal.innerHTML=`<div id="modal-cq-detalhe-inner" style="background:#ebebeb;border-radius:18px;width:100%;max-width:380px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4)">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #b7b8b6;flex-shrink:0">
         <div id="cq-det-title" style="font-family:'VarsityTeam',serif;font-size:17px;color:#000;letter-spacing:.3px"></div>
@@ -13410,7 +13395,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </body>
 </html>
 <!-- PHOTO LIGHTBOX -->
-<div id="photo-lightbox" onclick="closePhotoLightbox()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+<div id="photo-lightbox" onclick="closePhotoLightbox()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out">
   <div style="position:relative;max-width:92vw;max-height:92vh;display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
     <img id="photo-lightbox-img" src="" alt="" style="width:88vw;height:88vh;border-radius:16px;object-fit:contain;box-shadow:0 8px 60px rgba(0,0,0,.8);display:block;image-rendering:auto">
     <button onclick="closePhotoLightbox()" style="position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:#222;border:1.5px solid #555;color:#fff;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
@@ -14351,14 +14336,11 @@ window.abrirCartaJogador = function(){
 function _pacToggle(btn, bodyId) {
   const body = document.getElementById(bodyId);
   if (!body) return;
-  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+  const isOpen = body.classList.contains('pac-open');
 
   // Fecha todos os outros itens pac
   document.querySelectorAll('.pac-body').forEach(b => {
-    if (b !== body) {
-      b.style.maxHeight = '0';
-      b.style.opacity = '0';
-    }
+    if (b !== body) b.classList.remove('pac-open');
   });
   document.querySelectorAll('.pac-toggle').forEach(t => {
     if (t !== btn) {
@@ -14369,13 +14351,11 @@ function _pacToggle(btn, bodyId) {
   });
 
   if (isOpen) {
-    body.style.maxHeight = '0';
-    body.style.opacity = '0';
+    body.classList.remove('pac-open');
     btn.classList.remove('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(0deg)';
   } else {
-    body.style.maxHeight = body.scrollHeight + 600 + 'px';
-    body.style.opacity = '1';
+    body.classList.add('pac-open');
     btn.classList.add('open');
     btn.querySelector('.pac-chevron').style.transform = 'rotate(180deg)';
   }
@@ -14388,7 +14368,7 @@ function _cfgAccordionToggle() {
   const body = document.getElementById('cfg-accordion-body');
   const chevron = document.getElementById('cfg-accordion-chevron');
   const toggle = document.getElementById('cfg-accordion-toggle');
-  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+  const isOpen = body.style.maxHeight !== '0px' && body.style.maxHeight !== '';
 
   if (isOpen) {
     body.style.maxHeight = '0';
@@ -14396,7 +14376,7 @@ function _cfgAccordionToggle() {
     toggle.style.borderRadius = '14px';
     toggle.style.borderBottom = '';
   } else {
-    body.style.maxHeight = body.scrollHeight + 600 + 'px'; // extra para sub-itens
+    body.style.maxHeight = 'none';
     chevron.style.transform = 'rotate(180deg)';
     toggle.style.borderRadius = '14px 14px 0 0';
   }
@@ -14407,17 +14387,14 @@ function _cfgItemToggle(bodyId, chevronId) {
   const body = document.getElementById(bodyId);
   const chevron = document.getElementById(chevronId);
   if (!body) return;
-  const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+  const isOpen = body.style.maxHeight !== '0px' && body.style.maxHeight !== '';
 
   if (isOpen) {
     body.style.maxHeight = '0';
     if (chevron) chevron.style.transform = 'rotate(0deg)';
   } else {
-    body.style.maxHeight = body.scrollHeight + 40 + 'px';
+    body.style.maxHeight = 'none';
     if (chevron) chevron.style.transform = 'rotate(180deg)';
-    // Expande o pai também
-    const parentBody = document.getElementById('cfg-accordion-body');
-    if (parentBody) parentBody.style.maxHeight = parseInt(parentBody.style.maxHeight || 0) + body.scrollHeight + 100 + 'px';
   }
 }
 
