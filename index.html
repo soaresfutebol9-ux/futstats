@@ -4578,8 +4578,9 @@ function getMemberPhoto(uid){
 function avatarHTML(name,size,uid){
   const sz=size||36;const photo=uid?getMemberPhoto(uid):null;
   const cls=`av ${avC(name)}`;const style=`width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.33)}px;flex-shrink:0`;
-  if(photo)return`<div class="${cls}" style="${style}"><img src="${photo}" alt="${name}" draggable="false" oncontextmenu="return false" style="pointer-events:none"></div>`;
-  return`<div class="${cls}" style="${style}">${ini(name)}</div>`;
+  const dataUid=uid?` data-uid="${uid}"`:'';
+  if(photo)return`<div class="${cls}"${dataUid} style="${style}"><img src="${photo}" alt="${name}" draggable="false" oncontextmenu="return false" style="pointer-events:none"></div>`;
+  return`<div class="${cls}"${dataUid} style="${style}">${ini(name)}</div>`;
 }
 window.avatarHTML=avatarHTML;
 
@@ -13262,7 +13263,7 @@ document.addEventListener('keydown',e=>{
 
 /* Download da carta como PNG usando html2canvas ou canvas nativo */
 window.baixarCarta = async function(){
-  const card=document.getElementById('player-card-el');
+  const card=document.getElementById('survey-card-el')||document.getElementById('player-card-el');
   if(!card){ alert('Carta não encontrada.'); return; }
 
   // Usa html2canvas se disponível, senão SVG fallback
@@ -14496,7 +14497,7 @@ window.abrirCartaJogador = function(uidParam){
       </div>
     `;
 
-    const card = document.getElementById('player-card-el');
+    const card = document.getElementById('survey-card-el') || document.getElementById('player-card-el');
     if(card){
       Object.keys(card.dataset).forEach(k => {
         if(k.startsWith('orig') || k === 'temaIdx' || k === 'origSaved') delete card.dataset[k];
@@ -14512,7 +14513,7 @@ window.abrirCartaJogador = function(uidParam){
         card.classList.add('survey-card-spin');
       });
       if(isMyCard && _cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
-        setTimeout(()=>window._aplicarTemaVisual(_cartaTemaAtivo), 100);
+        setTimeout(()=>window._aplicarTemaVisual(_cartaTemaAtivo), 150);
       }
     }
     const btns = inner.querySelector('.carta-btns');
