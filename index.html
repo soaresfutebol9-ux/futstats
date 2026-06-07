@@ -1967,7 +1967,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 /* ══ MODAL CARTA DO JOGADOR ══ */
 #modal-carta{
   position:fixed;inset:0;z-index:3000;
-  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
+  display:none;align-items:center;justify-content:center;overflow-y:auto;
   background:rgba(0,0,0,.78);
   padding:16px;
 }
@@ -14253,37 +14253,45 @@ window.abrirCartaJogador = function(uidParam){
     document.body.appendChild(flash);
     setTimeout(()=>flash.remove(), 450);
 
+    const isMyCard = uid === window._currentUserUid;
+
     _cartaTemaAtivo = 'padrao';
-    try {
-      const saved2 = localStorage.getItem('futstats-carta-tema');
-      if(saved2 && CARTA_TEMAS.find(t=>t.id===saved2)) _cartaTemaAtivo = saved2;
-    } catch(e) {}
-    const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
-    const _temasHTML2 = CARTA_TEMAS.map(t => {
-      const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
-      const ativo = t.id === _cartaTemaAtivo && desbloqueado;
-      const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
-      const previewInner2 = t.id === 'padrao'
-        ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
-        : '';
-      return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" data-tema-id="${t.id}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
-        <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden;pointer-events:none;" class="${t.preview}">${previewInner2}</div>
-        <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap;pointer-events:none;">${t.label}</span>
-        ${reqLabel}
-      </button>`;
-    }).join('');
+    if(isMyCard){
+      try {
+        const saved2 = localStorage.getItem('futstats-carta-tema');
+        if(saved2 && CARTA_TEMAS.find(t=>t.id===saved2)) _cartaTemaAtivo = saved2;
+      } catch(e) {}
+    }
+
+    const temasEditorHTML = isMyCard ? (()=>{
+      const _calcCq2 = window._calcConquistas ? window._calcConquistas(uid, gd) : (typeof calcConquistas === 'function' ? calcConquistas(uid, gd) : {});
+      const _temasHTML2 = CARTA_TEMAS.map(t => {
+        const desbloqueado = !t.cqId || !!(_calcCq2[t.cqId] && _calcCq2[t.cqId].achieved);
+        const ativo = t.id === _cartaTemaAtivo && desbloqueado;
+        const reqLabel = !desbloqueado && t.desc ? `<span class="carta-req-label" title="${t.desc}">🔒 ${t.reqIcon||''} ${t.desc.split('—')[0].trim()}</span>` : '';
+        const previewInner2 = t.id === 'padrao'
+          ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:rgba(255,255,255,.35);line-height:1;pointer-events:none;">✕</span>`
+          : '';
+        return `<button class="carta-tema-btn${ativo?' ativo':''}${desbloqueado?'':' bloqueado'}" data-tema-id="${t.id}" ${desbloqueado ? `onclick="window._selecionarTema('${t.id}')"` : `onclick="window._mostrarReqTema('${t.id}')" title="🔒 ${t.desc}"`} style="display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:${desbloqueado?'pointer':'not-allowed'};padding:0;flex-shrink:0;opacity:${desbloqueado?'1':'.35'}">
+          <div style="width:38px;height:50px;border-radius:7px;border:2px solid ${ativo?'#fff':'transparent'};position:relative;overflow:hidden;pointer-events:none;" class="${t.preview}">${previewInner2}</div>
+          <span style="font-size:8px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${ativo?'#fff':'rgba(255,255,255,.7)'};white-space:nowrap;pointer-events:none;">${t.label}</span>
+          ${reqLabel}
+        </button>`;
+      }).join('');
+      return `<div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
+        <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
+        <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
+      </div>`;
+    })() : '';
 
     inner.innerHTML = `
       ${_buildSurveyCardHTML(mb?.name||'Jogador', mb?.photo||null, attrs, rating, rarity, gd?.name||'FutStats')}
-      <div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
-        <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
-        <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
-      </div>
+      ${temasEditorHTML}
       <div class="carta-btns">
-        <button class="carta-btn carta-btn-download" onclick="baixarCarta()">
+        ${isMyCard ? `<button class="carta-btn carta-btn-download" onclick="baixarCarta()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Baixar
-        </button>
+        </button>` : ''}
         <button class="carta-btn carta-btn-fechar" onclick="fecharCartaJogador()">Fechar</button>
       </div>
     `;
@@ -14303,7 +14311,7 @@ window.abrirCartaJogador = function(uidParam){
         card.classList.remove('survey-card-animated');
         card.classList.add('survey-card-spin');
       });
-      if(_cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
+      if(isMyCard && _cartaTemaAtivo && _cartaTemaAtivo !== 'padrao') {
         setTimeout(()=>window._selecionarTema(_cartaTemaAtivo), 100);
       }
     }
