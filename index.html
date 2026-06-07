@@ -2861,7 +2861,8 @@ html, body {
 /* ── MODAL PARTIDAS: full screen em mobile ── */
 @media (max-width: 600px) {
   #modal-partidas {
-    padding: 0 12px;
+    padding: 0 16px;
+    box-sizing: border-box;
     align-items: center;
     justify-content: center;
   }
@@ -2871,6 +2872,7 @@ html, body {
     min-height: 0;
     width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
     overflow: hidden;
   }
   .modal-partidas-list {
@@ -2878,6 +2880,20 @@ html, body {
     -webkit-overflow-scrolling: touch;
     flex: 1;
     min-height: 0;
+    box-sizing: border-box;
+  }
+  #adm-add-form {
+    box-sizing: border-box;
+    width: 100%;
+  }
+  #adm-add-form input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  #adm-add-form input[type="number"]::-webkit-outer-spin-button,
+  #adm-add-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
@@ -9477,7 +9493,7 @@ window.irParaRankingGA=()=>{
       <!-- Ações -->
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
         <button id="mp-desafiar-btn" onclick="_mpDesafiarClick()" title="Desafiar este jogador" style="display:none;background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:8px;padding:5px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">⚔️</button>
-        <button id="mp-adm-partidas-btn" title="Gerenciar partidas (ADM)" style="display:none;align-items:center;gap:4px;background:#0a0e1a;border:none;color:#fff;border-radius:8px;padding:6px 11px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.08em;transition:opacity .15s;white-space:nowrap">PARTIDAS</button>
+        <button id="mp-adm-partidas-btn" title="Gerenciar partidas (ADM)" style="display:none;align-items:center;justify-content:center;background:#0a0e1a;border:none;color:#fff;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;cursor:pointer;transition:opacity .15s;flex-shrink:0">+</button>
         <button onclick="sharePlayerProfile()" title="Compartilhar perfil" style="width:28px;height:28px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0;flex-shrink:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="15" height="15" style="display:block"></button>
         <div class="mp-close" onclick="closePlayerProfile()">×</div>
       </div>
