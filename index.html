@@ -2881,19 +2881,33 @@ html, body {
     flex: 1;
     min-height: 0;
     box-sizing: border-box;
+    padding-left: .6rem !important;
+    padding-right: .6rem !important;
   }
   #adm-add-form {
     box-sizing: border-box;
     width: 100%;
+    padding: 12px !important;
+  }
+  #adm-add-form > div[style*="grid"] {
+    gap: 6px !important;
   }
   #adm-add-form input[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
+    min-width: 0;
+    width: 100%;
   }
   #adm-add-form input[type="number"]::-webkit-outer-spin-button,
   #adm-add-form input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+  #adm-add-form div[style*="display:flex"] button {
+    width: 30px !important;
+    height: 34px !important;
+    flex-shrink: 0;
+    font-size: 16px !important;
   }
 }
 
