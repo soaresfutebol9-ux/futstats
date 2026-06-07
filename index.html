@@ -71,6 +71,17 @@ html,body{
   text-rendering:optimizeLegibility;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+/* Reabilita seleção só em inputs e textareas */
+input,textarea,select,[contenteditable]{
+  -webkit-user-select:text;
+  -moz-user-select:text;
+  user-select:text;
+  -webkit-touch-callout:default;
 }
 
 /* ── DEVICE-CLASS RULES ── */
@@ -4614,7 +4625,7 @@ function getMemberPhoto(uid){
 function avatarHTML(name,size,uid){
   const sz=size||36;const photo=uid?getMemberPhoto(uid):null;
   const cls=`av ${avC(name)}`;const style=`width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.33)}px;flex-shrink:0`;
-  if(photo)return`<div class="${cls}" style="${style}"><img src="${photo}" alt="${name}"></div>`;
+  if(photo)return`<div class="${cls}" style="${style}"><img src="${photo}" alt="${name}" draggable="false" oncontextmenu="return false" style="pointer-events:none"></div>`;
   return`<div class="${cls}" style="${style}">${ini(name)}</div>`;
 }
 window.avatarHTML=avatarHTML;
@@ -13431,6 +13442,19 @@ document.addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => { if(window._gd && window.groupId) window._salvarCraqueSemana(); }, 4000);
 });
+
+// ── BLOQUEAR MENU DE CONTEXTO E SELEÇÃO GLOBAL ──────────────────────────
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('selectstart', e => {
+  const t = e.target;
+  if(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable) return;
+  e.preventDefault();
+});
+// Impede menu nativo em imagens no long press (iOS/Android)
+document.addEventListener('touchstart', e => {
+  const img = e.target.closest('img');
+  if(img) img.draggable = false;
+}, { passive: true });
 </script>
 
 <!-- ══ TOAST LEVEL UP ══ -->
