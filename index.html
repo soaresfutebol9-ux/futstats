@@ -1985,159 +1985,67 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .carta-inner::-webkit-scrollbar{ display:none; }
 
 /* ══ LOADING SCREEN DA CARTA ══ */
+/* ── LOADING: Bolas Saltitantes ── */
 .carta-loading{
-  display:flex;flex-direction:column;align-items:center;
-  gap:20px;width:280px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:32px;width:280px;min-height:320px;
 }
-/* Card placeholder durante loading */
-.carta-loading-card{
-  width:280px;height:390px;border-radius:22px;
-  position:relative;overflow:hidden;
-  background:linear-gradient(155deg,#0d1020 0%,#1a1535 40%,#0d1020 100%);
-  border:1px solid rgba(77,255,176,.2);
-  box-shadow:0 0 0 1px rgba(77,255,176,.1),0 8px 48px rgba(0,0,0,.8);
+.carta-bouncing-balls{
+  display:flex;align-items:flex-end;gap:14px;height:70px;
+}
+.carta-ball{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.45) 0%, transparent 60%),
+             linear-gradient(135deg,#4dffb0,#00c97a);
+  box-shadow:0 0 14px rgba(77,255,176,.7),0 0 30px rgba(77,255,176,.3);
+  animation:ballBounce .7s ease-in-out infinite;
   flex-shrink:0;
 }
-/* Scan line que percorre o card */
-.carta-scan-line{
-  position:absolute;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.0) 10%,rgba(77,255,176,1) 50%,rgba(77,255,176,.0) 90%,transparent 100%);
-  box-shadow:0 0 18px 4px rgba(77,255,176,.6),0 0 40px 8px rgba(77,255,176,.2);
-  /* animation:cartaScan removed */
-  z-index:4;
-  top:0;
+.carta-ball:nth-child(1){ animation-delay:0s; }
+.carta-ball:nth-child(2){ animation-delay:.15s; }
+.carta-ball:nth-child(3){ animation-delay:.3s; }
+.carta-ball:nth-child(4){ animation-delay:.45s; }
+.carta-ball-shadow{
+  width:18px;height:5px;border-radius:50%;
+  background:rgba(0,0,0,.35);
+  filter:blur(2px);
+  animation:ballShadow .7s ease-in-out infinite;
+  flex-shrink:0;
+  align-self:flex-end;
+  margin-top:4px;
 }
-@keyframes cartaScan{
-  0%   { top:-4px; opacity:0; }
-  8%   { opacity:1; }
-  92%  { opacity:1; }
-  100% { top:393px; opacity:0; }
+.carta-ball-shadow:nth-child(odd){ animation-delay:0s; }
+.carta-balls-row{ display:flex;align-items:flex-end;gap:14px; }
+.carta-shadows-row{ display:flex;gap:14px;margin-top:6px; }
+.carta-shadow-dot{
+  width:18px;height:5px;border-radius:50%;
+  background:rgba(77,255,176,.2);
+  filter:blur(2px);
+  flex-shrink:0;
+  animation:ballShadow .7s ease-in-out infinite;
 }
-/* Partículas de dados flutuando */
-.carta-particles{
-  position:absolute;inset:0;overflow:hidden;z-index:3;pointer-events:none;
+.carta-shadow-dot:nth-child(1){ animation-delay:0s; }
+.carta-shadow-dot:nth-child(2){ animation-delay:.15s; }
+.carta-shadow-dot:nth-child(3){ animation-delay:.3s; }
+.carta-shadow-dot:nth-child(4){ animation-delay:.45s; }
+@keyframes ballBounce{
+  0%,100%{ transform:translateY(0);   animation-timing-function:cubic-bezier(.33,0,.66,0); }
+  50%    { transform:translateY(-48px);animation-timing-function:cubic-bezier(.33,1,.66,1); }
 }
-.carta-particle{
-  position:absolute;
-  font-family:'DM Mono',monospace;
-  font-size:9px;
-  color:rgba(77,255,176,.55);
-  /* animation:cartaParticle removed */
-  white-space:nowrap;
+@keyframes ballShadow{
+  0%,100%{ transform:scaleX(1);  opacity:.4; }
+  50%    { transform:scaleX(.5); opacity:.15; }
 }
-@keyframes cartaParticle{
-  0%   { opacity:0; transform:translateY(0) scale(.8); }
-  15%  { opacity:1; }
-  80%  { opacity:.6; }
-  100% { opacity:0; transform:translateY(-60px) scale(1); }
-}
-/* Corner scanner brackets */
-.carta-corner{
-  position:absolute;width:24px;height:24px;z-index:5;
-  /* animation:cartaCornerPulse removed */
-}
-.carta-corner-tl{ top:14px;left:14px;
-  border-top:2px solid #4dffb0;border-left:2px solid #4dffb0; }
-.carta-corner-tr{ top:14px;right:14px;
-  border-top:2px solid #4dffb0;border-right:2px solid #4dffb0; }
-.carta-corner-bl{ bottom:14px;left:14px;
-  border-bottom:2px solid #4dffb0;border-left:2px solid #4dffb0; }
-.carta-corner-br{ bottom:14px;right:14px;
-  border-bottom:2px solid #4dffb0;border-right:2px solid #4dffb0; }
-@keyframes cartaCornerPulse{
-  0%,100%{ opacity:.4; } 50%{ opacity:1; }
-}
-/* Silhueta fantasma do avatar */
-.carta-ghost-avatar{
-  position:absolute;top:72px;left:50%;transform:translateX(-50%);
-  width:120px;height:120px;border-radius:50%;z-index:2;
-  background:rgba(77,255,176,.06);
-  border:2px solid rgba(77,255,176,.15);
-  overflow:hidden;
-}
-.carta-ghost-avatar::after{
-  content:'';position:absolute;inset:-100%;
-  background:linear-gradient(105deg,transparent 35%,rgba(77,255,176,.12) 50%,transparent 65%);
-  /* animation:cartaShimmer removed */
-}
-/* Blocos de texto fantasma */
-.carta-ghost-block{
-  position:absolute;border-radius:4px;
-  background:rgba(77,255,176,.07);
-  overflow:hidden;z-index:2;
-}
-.carta-ghost-block::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.18) 50%,transparent 100%);
-  /* animation:cartaShimmer removed */
-}
-@keyframes cartaShimmer{
-  0%   { transform:translateX(-100%); }
-  100% { transform:translateX(100%); }
-}
-/* Rating fantasma grande */
-.carta-ghost-rating{
-  position:absolute;top:22px;left:20px;
-  width:38px;height:48px;border-radius:6px;
-  background:rgba(77,255,176,.08);z-index:2;
-  overflow:hidden;
-}
-.carta-ghost-rating::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
-  /* animation:cartaShimmer removed */
-}
-/* Grid de stats fantasma */
-.carta-ghost-stats{
-  position:absolute;bottom:54px;left:18px;right:18px;
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;z-index:2;
-}
-.carta-ghost-stat{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-}
-.carta-ghost-stat-val{
-  width:32px;height:22px;border-radius:4px;
-  background:rgba(77,255,176,.08);overflow:hidden;
-}
-.carta-ghost-stat-val::after{
-  content:'';display:block;width:100%;height:100%;
-  background:linear-gradient(90deg,transparent 0%,rgba(77,255,176,.2) 50%,transparent 100%);
-  /* animation:cartaShimmer removed */
-}
-.carta-ghost-stat-lbl{
-  width:22px;height:6px;border-radius:3px;
-  background:rgba(77,255,176,.05);
-}
-/* Overlay de scanning com grid */
-.carta-scan-grid{
-  position:absolute;inset:0;z-index:1;
-  background-image:
-    linear-gradient(rgba(77,255,176,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(77,255,176,.04) 1px,transparent 1px);
-  background-size:24px 24px;
-}
-/* Glow central pulsante */
-.carta-loading-glow{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:160px;height:160px;border-radius:50%;
-  background:radial-gradient(circle,rgba(77,255,176,.08) 0%,transparent 70%);
-  /* animation:cartaGlowPulse removed */
-  z-index:1;pointer-events:none;
-}
-@keyframes cartaGlowPulse{
-  0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.6; }
-  50%    { transform:translate(-50%,-50%) scale(1.3); opacity:1; }
-}
-/* Status text abaixo do card */
+/* Status text */
 .carta-loading-status{
   font-family:'DM Mono',monospace;
   font-size:11px;letter-spacing:.12em;
   color:#4dffb0;text-transform:uppercase;
   min-height:16px;text-align:center;
-  /* animation:cartaStatusBlink removed */
+  animation:cartaStatusBlink 1.2s ease-in-out infinite;
 }
 @keyframes cartaStatusBlink{
+
   0%,100%{ opacity:1; } 50%{ opacity:.4; }
 }
 /* Barra de progresso */
@@ -8854,7 +8762,42 @@ window.addMatchMembro = async () => {
   _renderAdmPartidasModal();
 
   // Salva no Firestore em background
-  updateDoc(doc(db,'groups',groupId), {matches: gd.matches}).catch(e=>{
+  updateDoc(doc(db,'groups',groupId), {matches: gd.matches}).then(async ()=>{
+    // Notificação pessoal para o jogador que teve a partida registrada
+    if(mb.uid !== currentUser.uid){
+      try{
+        const snap2 = await getDoc(doc(db,'groups',groupId));
+        const cur2 = snap2.data();
+        cur2.notifs = cur2.notifs || {};
+        cur2.notifs[mb.uid] = cur2.notifs[mb.uid] || [];
+        const partes=[];
+        if(gols>0)  partes.push(`${gols}⚽`);
+        if(assist>0)partes.push(`${assist}👟`);
+        const statsStr=partes.length?` (${partes.join(' ')})`:' ';
+        const nomePartida=name&&name!=='Pelada'?` em <strong>${name}</strong>`:'';
+        cur2.notifs[mb.uid].push({
+          id: Date.now()+'_adm_match_'+mb.uid,
+          tipo: 'partida_adm',
+          icon: '⚽',
+          texto: `O administrador registrou uma partida sua${nomePartida}${statsStr}`,
+          ts: Date.now(),
+          lida: false,
+        });
+        // Mantém máximo 50 notifs pessoais
+        if(cur2.notifs[mb.uid].length > 50) cur2.notifs[mb.uid].splice(0, cur2.notifs[mb.uid].length - 50);
+        await setDoc(doc(db,'groups',groupId), cur2);
+        gd = cur2;
+        _updateNotifBadge && _updateNotifBadge();
+      } catch(e){ console.warn('notif adm match:', e); }
+    }
+    // Feed do grupo
+    const partesFeed=[];
+    if(gols>0)  partesFeed.push(`${gols}⚽`);
+    if(assist>0)partesFeed.push(`${assist}👟`);
+    const statsFeed=partesFeed.length?` (${partesFeed.join(' ')})`:' ';
+    const nomePartidaFeed=name&&name!=='Pelada'?` em <strong>${name}</strong>`:'';
+    _publishFeed('partida',`<strong>${myProfile.displayName}</strong> registrou uma partida de <strong>${mb.name}</strong>${nomePartidaFeed}${statsFeed}`).catch(()=>{});
+  }).catch(e=>{
     // Reverte em caso de erro
     gd.matches.pop();
     _renderAdmPartidasModal();
@@ -12757,63 +12700,46 @@ function _cartaParticlesHTML(){
 function _renderCartaLoading(inner){
   inner.innerHTML=`
     <div class="carta-loading">
-      <div class="carta-loading-card">
-        <div class="carta-scan-grid"></div>
-        <div class="carta-loading-glow"></div>
-        <div class="carta-particles">${_cartaParticlesHTML()}</div>
-        <div class="carta-scan-line"></div>
-        <div class="carta-corner carta-corner-tl"></div>
-        <div class="carta-corner carta-corner-tr"></div>
-        <div class="carta-corner carta-corner-bl"></div>
-        <div class="carta-corner carta-corner-br"></div>
-        <div class="carta-ghost-rating"></div>
-        <div class="carta-ghost-avatar"></div>
-        <!-- nome -->
-        <div class="carta-ghost-block" style="top:210px;left:50%;transform:translateX(-50%);width:140px;height:18px;--sd:1.7s;--sdd:0s"></div>
-        <!-- divisor -->
-        <div class="carta-ghost-block" style="top:242px;left:18px;right:18px;height:1px;--sd:1.9s;--sdd:.1s"></div>
-        <!-- stats grid -->
-        <div class="carta-ghost-stats">
-          ${[0,1,2,3,4,5].map(i=>`
-          <div class="carta-ghost-stat">
-            <div class="carta-ghost-stat-val" style="--d:${(i*.12).toFixed(2)}s"></div>
-            <div class="carta-ghost-stat-lbl"></div>
-          </div>`).join('')}
+      <div class="carta-bouncing-balls">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div class="carta-balls-row">
+            <div class="carta-ball"></div>
+            <div class="carta-ball"></div>
+            <div class="carta-ball"></div>
+            <div class="carta-ball"></div>
+          </div>
+          <div class="carta-shadows-row">
+            <div class="carta-shadow-dot"></div>
+            <div class="carta-shadow-dot"></div>
+            <div class="carta-shadow-dot"></div>
+            <div class="carta-shadow-dot"></div>
+          </div>
         </div>
       </div>
-      <div class="carta-progress-wrap">
-        <div class="carta-progress-bar" id="carta-pgbar"></div>
-      </div>
-      <div class="carta-loading-status" id="carta-status">INICIALIZANDO...</div>
+      <div class="carta-loading-status" id="carta-status">CARREGANDO...</div>
     </div>
   `;
 }
 
-/* Anima a barra e os textos de status, depois chama o reveal */
+/* Anima os textos de status por 3s, depois chama o reveal */
 function _animateCartaLoading(onComplete){
-  const bar=document.getElementById('carta-pgbar');
   const status=document.getElementById('carta-status');
-  if(!bar||!status){ onComplete(); return; }
+  if(!status){ setTimeout(onComplete, 3000); return; }
 
   const steps=[
-    {pct:12, txt:'COLETANDO DADOS...'},
-    {pct:28, txt:'CALCULANDO RATING...'},
-    {pct:47, txt:'ANALISANDO PARTIDAS...'},
-    {pct:63, txt:'PROCESSANDO STATS...'},
-    {pct:81, txt:'DEFININDO RARIDADE...'},
-    {pct:95, txt:'GERANDO CARTA...'},
-    {pct:100,txt:'PRONTO!'},
+    {txt:'CARREGANDO...'},
+    {txt:'CALCULANDO RATING...'},
+    {txt:'GERANDO CARTA...'},
+    {txt:'PRONTO!'},
   ];
 
-  let i=0;
-  const delays=[0, 280, 480, 680, 860, 1080, 1320];
+  const delays=[0, 900, 1900, 2700];
 
   steps.forEach((step,idx)=>{
     setTimeout(()=>{
-      if(bar) bar.style.width=step.pct+'%';
       if(status) status.textContent=step.txt;
       if(idx===steps.length-1){
-        setTimeout(onComplete, 220);
+        setTimeout(onComplete, 300);
       }
     }, delays[idx]);
   });
@@ -12938,9 +12864,12 @@ window._attachTemaLongPress = function(){
   obs.observe(document.body, {childList:true, subtree:true});
 })();
 
+/* Tema em prévia (ainda não salvo) */
+let _cartaTemaPendente = null;
+
 window._selecionarTema = function(temaId){
-  _cartaTemaAtivo = temaId;
-  try { localStorage.setItem('futstats-carta-tema', temaId); } catch(e) {}
+  _cartaTemaPendente = temaId;
+  _cartaTemaAtivo = temaId; // atualiza visualmente, mas NÃO salva ainda
   // Detecta qual carta está visível: survey-card-el tem prioridade se existir no DOM visível
   const surveyCard = document.getElementById('survey-card-el');
   const playerCard = document.getElementById('player-card-el');
@@ -13050,12 +12979,63 @@ window._selecionarTema = function(temaId){
     if(label) label.style.color = ativo ? '#fff' : 'rgba(255,255,255,.7)';
     btn.style.transform = ativo ? 'translateY(-2px)' : '';
   });
+
+  // Atualiza estado do botão Aplicar Tema
+  _atualizarBotaoAplicar();
 };
+
+/* Confirma e persiste o tema em prévia */
+window._aplicarTema = function(){
+  if(!_cartaTemaPendente) return;
+  try { localStorage.setItem('futstats-carta-tema', _cartaTemaPendente); } catch(e) {}
+  const temaAplicado = _cartaTemaPendente;
+  _cartaTemaPendente = null;
+  _atualizarBotaoAplicar();
+
+  // Feedback visual
+  const btn = document.getElementById('btn-aplicar-tema');
+  if(btn){
+    const orig = btn.textContent;
+    btn.textContent = '✓ Tema aplicado!';
+    btn.style.background = 'rgba(77,255,176,.25)';
+    btn.style.borderColor = 'rgba(77,255,176,.6)';
+    btn.style.color = '#4dffb0';
+    setTimeout(()=>{
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 1800);
+  }
+};
+
+/* Restaura tema salvo ao fechar sem aplicar */
+window._cancelarTemaPendente = function(){
+  if(!_cartaTemaPendente) return;
+  const temaSalvo = (()=>{ try { return localStorage.getItem('futstats-carta-tema') || 'padrao'; } catch(e){ return 'padrao'; } })();
+  _cartaTemaPendente = null;
+  window._selecionarTema(temaSalvo);
+  // _selecionarTema vai setar _cartaTemaPendente de novo, limpamos
+  _cartaTemaPendente = null;
+  _atualizarBotaoAplicar();
+};
+
+function _atualizarBotaoAplicar(){
+  const btn = document.getElementById('btn-aplicar-tema');
+  if(!btn) return;
+  const temSalvo = (()=>{ try { return localStorage.getItem('futstats-carta-tema') || 'padrao'; } catch(e){ return 'padrao'; } })();
+  const temPendente = !!_cartaTemaPendente && _cartaTemaPendente !== temSalvo;
+  btn.disabled = !temPendente;
+  btn.style.opacity = temPendente ? '1' : '0.45';
+  btn.style.cursor = temPendente ? 'pointer' : 'default';
+  btn.style.pointerEvents = temPendente ? 'auto' : 'none';
+}
 
 /* Stub: substituído pela versão definitiva baseada no questionário (ver abaixo) */
 window.abrirCartaJogador = function(){};
 
 window.fecharCartaJogador = function(){
+  window._cancelarTemaPendente();
   const modal=document.getElementById('modal-carta');
   if(modal) modal.classList.remove('open');
   document.body.style.overflow='';
@@ -14256,6 +14236,7 @@ window.abrirCartaJogador = function(uidParam){
     const isMyCard = uid === window._currentUserUid;
 
     _cartaTemaAtivo = 'padrao';
+    _cartaTemaPendente = null;
     if(isMyCard){
       try {
         const saved2 = localStorage.getItem('futstats-carta-tema');
@@ -14281,6 +14262,11 @@ window.abrirCartaJogador = function(uidParam){
       return `<div id="survey-carta-temas-wrap" style="width:100%;margin-bottom:14px">
         <div style="font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;text-align:center">🎨 Tema da carta</div>
         <div id="survey-carta-temas-scroll" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none">${_temasHTML2}</div>
+        <div style="display:flex;justify-content:center;margin-top:8px">
+          <button id="btn-aplicar-tema" onclick="window._aplicarTema()" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 22px;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);cursor:default;pointer-events:none;opacity:.45;transition:all .2s ease">
+            Aplicar Tema
+          </button>
+        </div>
       </div>`;
     })() : '';
 
