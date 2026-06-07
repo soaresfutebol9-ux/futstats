@@ -4807,12 +4807,12 @@ window.avatarHTML=avatarHTML;
     if(_active){ _active = false; _hidePopup(); }
   }
 
-  // Fecha ao tocar fora
+  // Fecha ao tocar fora (mas não quando tocar em outro card .ri — deixa o _onStart abrir o novo)
   document.addEventListener('touchstart', e=>{
-    if(_popup && !e.target.closest('#ri-stats-popup')) _hidePopup();
+    if(_popup && !e.target.closest('#ri-stats-popup') && !e.target.closest('.ri[data-pos]')) _hidePopup();
   }, { passive: true });
   document.addEventListener('click', e=>{
-    if(_popup && !e.target.closest('#ri-stats-popup')) _hidePopup();
+    if(_popup && !e.target.closest('#ri-stats-popup') && !e.target.closest('.ri[data-pos]')) _hidePopup();
   });
 
   document.addEventListener('touchstart', _onStart, { passive: true });
