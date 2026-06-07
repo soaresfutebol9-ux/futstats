@@ -4632,6 +4632,8 @@ window.avatarHTML=avatarHTML;
     setTimeout(()=>{ hint.style.opacity='0'; hint.remove(); }, 400);
   }
 
+  let _startX = 0, _startY = 0;
+
   function _onStart(e){
     const av = e.target.closest('.av');
     if(!av) return;
@@ -4641,11 +4643,13 @@ window.avatarHTML=avatarHTML;
     const survey = window._gd?.survey;
     if(!survey?.completed || !survey?.results?.[uid]) return;
 
+    const t = e.touches?.[0] || e;
+    _startX = t.clientX;
+    _startY = t.clientY;
     _lpActive = false;
     _lpTimer = setTimeout(()=>{
       _lpActive = true;
       _showCartaHint(av);
-      // Haptic feedback se disponível
       if(navigator.vibrate) navigator.vibrate(40);
       setTimeout(()=> window.abrirCartaJogador(uid), 120);
     }, LP_MS);
@@ -4654,7 +4658,6 @@ window.avatarHTML=avatarHTML;
   function _onEnd(e){
     if(_lpTimer){ clearTimeout(_lpTimer); _lpTimer = null; }
     if(_lpActive){
-      // Previne o click normal (openPlayerProfile) após long press
       e.preventDefault && e.preventDefault();
       e.stopPropagation && e.stopPropagation();
       _lpActive = false;
@@ -4662,12 +4665,24 @@ window.avatarHTML=avatarHTML;
   }
 
   function _onMove(e){
-    if(_lpTimer){ clearTimeout(_lpTimer); _lpTimer = null; }
+    if(!_lpTimer) return;
+    const t = e.touches?.[0] || e;
+    const dx = Math.abs(t.clientX - _startX);
+    const dy = Math.abs(t.clientY - _startY);
+    // Só cancela se o dedo se moveu mais de 10px (tolerância para mobile)
+    if(dx > 10 || dy > 10){
+      clearTimeout(_lpTimer);
+      _lpTimer = null;
+    }
   }
 
   document.addEventListener('touchstart', _onStart, { passive: true });
   document.addEventListener('touchend',   _onEnd,   { passive: false });
   document.addEventListener('touchmove',  _onMove,  { passive: true });
+  // Suprime o menu de contexto nativo do browser durante long press no avatar
+  document.addEventListener('contextmenu', e=>{
+    if(e.target.closest('.av')) e.preventDefault();
+  });
   // Mouse (desktop): botão direito ou mousedown longo
   document.addEventListener('mousedown', e => {
     if(e.button !== 0) return;
