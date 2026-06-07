@@ -1068,19 +1068,21 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .podium-item.p3{background:linear-gradient(160deg,#e8d0a8 0%,#bf9658 14%,#8a6020 28%,#d4aa70 42%,#7a5010 55%,#bf9658 68%,#a07840 78%,#6a4008 88%,#e0c090 100%);border-color:#8a6020;box-shadow:0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset}
 .podium-item.p1::before,.podium-item.p2::before,.podium-item.p3::before{
   content:'';position:absolute;top:0;left:-80%;width:40%;height:100%;
-  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.65) 50%,transparent 100%);
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.55) 50%,transparent 100%);
   transform:skewX(-18deg);
   animation:podium-shine 4.5s ease-in-out infinite;
+  animation-fill-mode:both;
   pointer-events:none;border-radius:inherit;z-index:1;
+  opacity:0;
 }
 .podium-item.p1::before{animation-delay:0s}
 .podium-item.p2::before{animation-delay:1.5s}
 .podium-item.p3::before{animation-delay:3s}
 @keyframes podium-shine{
-  0%,100%{left:-80%;opacity:0}
+  0%{left:-80%;opacity:0}
   8%{opacity:1}
   38%{left:135%;opacity:0}
-  39%,99%{left:-80%;opacity:0}
+  39%,100%{left:-80%;opacity:0}
 }
 .podium-crown{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .p1 .podium-av{position:relative;}
