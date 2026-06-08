@@ -4528,7 +4528,7 @@ window.closePCenter=id=>{
   }
 })();
 // ── FIM BACK NAVIGATION ──────────────────────────────────────────────
-function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1'))}
+function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');(document.body.classList.contains('lite-mode')?el.style.opacity='1':requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1')))}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
 window.switchAuth=mode=>{
@@ -6723,7 +6723,7 @@ window.abrirCriarDesafio = function(preSelectUid){
   _dcRenderCriarBody();
   const modal = document.getElementById('modal-desafio');
   modal.style.display = 'flex';
-  requestAnimationFrame(() => modal.classList.add('open'));
+  if(document.body.classList.contains('lite-mode')){modal.classList.add('open');}else{requestAnimationFrame(()=>modal.classList.add('open'));}
   const dm = document.getElementById('modal-duelo');
   if(dm){ dm.classList.remove('open'); setTimeout(()=>{dm.style.display='none';},300); }
 };
@@ -8916,7 +8916,7 @@ window.openModalPartidas=()=>{
   }).join('');
   const modal=$('modal-partidas');
   modal.style.display='flex';
-  requestAnimationFrame(()=>modal.classList.add('open'));
+  if(document.body.classList.contains('lite-mode')){modal.classList.add('open');}else{requestAnimationFrame(()=>modal.classList.add('open'));}
 };
 
 window.closeModalPartidas=()=>{
@@ -9028,7 +9028,7 @@ function _renderAdmPartidasModal(){
 
   const modal = $('modal-partidas');
   modal.style.display = 'flex';
-  requestAnimationFrame(()=>modal.classList.add('open'));
+  if(document.body.classList.contains('lite-mode')){modal.classList.add('open');}else{requestAnimationFrame(()=>modal.classList.add('open'));}
 }
 
 window.addMatchMembro = async () => {
@@ -9483,7 +9483,7 @@ window.openDuelo=()=>{
   _renderDueloBody();
   const modal=document.getElementById('modal-duelo');
   modal.style.display='flex';
-  requestAnimationFrame(()=>modal.classList.add('open'));
+  if(document.body.classList.contains('lite-mode')){modal.classList.add('open');}else{requestAnimationFrame(()=>modal.classList.add('open'));}
 };
 window.closeDuelo=()=>{
   const modal=document.getElementById('modal-duelo');
@@ -10950,7 +10950,7 @@ document.addEventListener('click', e=>{
     createShareModal();
     const modal = document.getElementById('share-modal');
     modal.style.display = 'flex';
-    requestAnimationFrame(() => modal.classList.add('show'));
+    if(document.body.classList.contains('lite-mode')){modal.classList.add('show');}else{requestAnimationFrame(()=>modal.classList.add('show'));}
 
     const canvas = document.getElementById('share-canvas');
     canvas.width  = CARD_W;
@@ -11622,7 +11622,7 @@ document.addEventListener('click', e=>{
     opts.innerHTML = optHTML;
 
     modal.style.display = 'flex';
-    requestAnimationFrame(() => modal.classList.add('show'));
+    if(document.body.classList.contains('lite-mode')){modal.classList.add('show');}else{requestAnimationFrame(()=>modal.classList.add('show'));}
   };
 
   window._doSharePlayerSeason = async function(uid, season) {
@@ -13526,6 +13526,25 @@ body.lite-mode .craque-banner {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+/* Remove filter: drop-shadow e blur decorativos */
+body.lite-mode .podium-crown,
+body.lite-mode .podium-av-crown,
+body.lite-mode .rec-medal,
+body.lite-mode .craque-crown-icon,
+body.lite-mode .cq-card-icon,
+body.lite-mode .av,
+body.lite-mode .ri-name,
+body.lite-mode .desafio-player-score,
+body.lite-mode .podium-val {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+body.lite-mode .screen,
+body.lite-mode .modal-bg,
+body.lite-mode .sheet-wrap {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 /* Gradientes do pódio simplificados */
 body.lite-mode .podium-item.p1 { background: #c8a84b !important; }
 body.lite-mode .podium-item.p2 { background: #b0b0b0 !important; }
@@ -14772,7 +14791,8 @@ window.abrirCartaJogador = function(uidParam){
 
   // Polling frequente no início, depois relaxa
   const _fast = setInterval(()=>{ _check(); if(_ready) clearInterval(_fast); }, 300);
-  setInterval(_check, 2000);
+  setInterval(()=>{ if(!document.body.classList.contains('lite-mode')) _check(); }, 2000);
+  setInterval(_check, 10000);
 
   // Também atualiza quando a página volta ao foco (útil no mobile)
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) _check(); });
