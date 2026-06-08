@@ -5992,6 +5992,7 @@ async function _processarNovasConquistas(novas, publicarFeed){
   if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
 
   // Toast visual de conquista
+  console.log('[CQ] _processarNovasConquistas novas:', novas.length, novas.map(c=>c.nome));
   window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
 
   // Toast de XP por conquista(s)
@@ -12115,17 +12116,21 @@ function calcConquistas(uid, gd){
 
 // ── Verificar e salvar novas conquistas para o usuário logado ──
 window._checkConquistas = async function(db, currentUser, gd){
+  console.log('[CQ] checkConquistas', {uid:currentUser?.uid, temGd:!!gd, temDbDoc:!!window._db_doc});
   if(!currentUser || !gd) return [];
   const uid = currentUser.uid;
   const calc = calcConquistas(uid, gd);
+  const conquistasAchieved = Object.entries(calc).filter(([,v])=>v&&v.achieved).map(([k])=>k);
+  console.log('[CQ] achieved:', conquistasAchieved);
   const newlyUnlocked = [];
 
   // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
   let userSnap;
-  try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ return []; }
+  try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ console.error('[CQ] erro getDoc:',e); return []; }
   const userData = userSnap.exists() ? userSnap.data() : {};
   const jaDesbloqueadas = userData.conquistasDesbloqueadas || {};
   const jaVistas         = userData.conquistasVistas || [];
+  console.log('[CQ] jaDesbloqueadas:', Object.keys(jaDesbloqueadas));
 
   const updates = {};
   const novasIds = [];
@@ -12882,10 +12887,13 @@ async function _marcarConquistasVistas(uid){
 // sobreponha levelup-toast, crown-toast ou outras conquistas.
 
 window._mostrarToastConquistas = function(conquistas){
+  console.log('[CQ] _mostrarToastConquistas chamado', conquistas?.length, 'temEnqueue:', !!window._toastEnqueueCentral);
   if(!conquistas || !conquistas.length) return;
   conquistas.forEach(cq => {
+    console.log('[CQ] enfileirando toast:', cq.nome);
     if(window._toastEnqueueCentral){
       window._toastEnqueueCentral(function(done){
+        console.log('[CQ] _mostrarUmToast disparando', cq.nome);
         _mostrarUmToast(cq, done);
       });
     } else {
