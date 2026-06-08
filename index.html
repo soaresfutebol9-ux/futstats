@@ -4037,6 +4037,27 @@ body::before{
             </div>
 
           </div>
+            <!-- ── Item: Modo Lite ── -->
+            <div style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <span style="font-size:18px;flex-shrink:0">⚡</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#000000;font-family:'DM Sans',sans-serif;letter-spacing:-.01em">Modo Lite</div>
+                  <div style="font-size:11px;color:#555;font-family:'DM Mono',monospace;margin-top:2px">Remove animações para celulares lentos</div>
+                </div>
+              </div>
+              <!-- Toggle switch -->
+              <button id="lite-mode-toggle" onclick="toggleLiteMode()" style="
+                position:relative;width:46px;height:26px;border-radius:99px;border:none;cursor:pointer;
+                background:#ccc;transition:background .2s;flex-shrink:0;padding:0;
+              ">
+                <span style="
+                  position:absolute;top:3px;left:3px;width:20px;height:20px;
+                  border-radius:50%;background:#fff;transition:transform .2s;
+                  box-shadow:0 1px 4px rgba(0,0,0,.3);display:block;
+                " id="lite-mode-knob"></span>
+              </button>
+            </div>
         </div>
       </div>
       <!-- ════════ fim accordion ════════ -->
@@ -10175,7 +10196,7 @@ document.addEventListener('click', e=>{
    
    COMO USAR NO index.html:
    1. Copie todo este conteúdo dentro de uma tag <script>
-      logo antes do fechamento do </body>.
+      logo antes do fechamento do 
 */
 /* ── FIM DO MÓDULO DE COMPARTILHAMENTO ───────────────── */
 
@@ -13446,6 +13467,54 @@ function _cartaFallbackDownload(card){
   font-family:'DM Mono',monospace;font-size:11px;color:#000;
   letter-spacing:.06em;
 }
+
+/* ── MODO LITE ────────────────────────────────────────────────────────────── */
+body.lite-mode *,
+body.lite-mode *::before,
+body.lite-mode *::after {
+  animation: none !important;
+  transition: none !important;
+}
+body.lite-mode {
+  background: var(--bg) !important;
+}
+/* Remove blurs e sombras pesadas */
+body.lite-mode .podium-item,
+body.lite-mode .ri,
+body.lite-mode .card,
+body.lite-mode .rec-card,
+body.lite-mode .craque-banner {
+  box-shadow: 0 1px 4px rgba(0,0,0,.15) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body.lite-mode .podium-item::before,
+body.lite-mode .ri::before,
+body.lite-mode #ri-stats-popup::before {
+  display: none !important;
+}
+body.lite-mode .av::after,
+body.lite-mode .craque-av-wrap::after {
+  display: none !important;
+}
+/* Scroll suave desativado */
+body.lite-mode { scroll-behavior: auto !important; }
+/* Gradientes pesados simplificados */
+body.lite-mode .podium-item.p1 { background: #c8a84b !important; }
+body.lite-mode .podium-item.p2 { background: #b0b0b0 !important; }
+body.lite-mode .podium-item.p3 { background: #a0785a !important; }
+/* Indicador visual do modo */
+body.lite-mode #lite-mode-indicator { display: flex !important; }
+#lite-mode-indicator {
+  display: none;
+  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.75); color: #4dffb0;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 99px;
+  z-index: 99999; pointer-events: none;
+  border: 1px solid rgba(77,255,176,.3);
+}
 </style>
 
 <script>
@@ -13755,6 +13824,44 @@ document.addEventListener('touchstart', e => {
     </div>
   </div>
 </div>
+
+<!-- Indicador Modo Lite -->
+<div id="lite-mode-indicator">⚡ MODO LITE</div>
+
+<script>
+// ── MODO LITE ──────────────────────────────────────────────────────────────
+(function(){
+  const KEY = 'futstats-lite-mode';
+
+  function applyLite(on){
+    if(on){
+      document.body.classList.add('lite-mode');
+    } else {
+      document.body.classList.remove('lite-mode');
+    }
+    const btn  = document.getElementById('lite-mode-toggle');
+    const knob = document.getElementById('lite-mode-knob');
+    if(btn)  btn.style.background = on ? '#4dffb0' : '#ccc';
+    if(knob) knob.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+  }
+
+  const saved = localStorage.getItem(KEY);
+  if(saved === '1') applyLite(true);
+
+  window.toggleLiteMode = function(){
+    const next = !document.body.classList.contains('lite-mode');
+    applyLite(next);
+    localStorage.setItem(KEY, next ? '1' : '0');
+  };
+
+  // Sincroniza visual do toggle quando perfil abre
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#pperfil-btn') || e.target.closest('[onclick*="openPerfil"]')){
+      setTimeout(()=> applyLite(document.body.classList.contains('lite-mode')), 50);
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
