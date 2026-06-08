@@ -7294,6 +7294,7 @@ window.addMatch=async()=>{
       }
     }, 800);
     // Verifica conquistas e level up após salvar partida
+    // Delay de 5500ms para disparar depois que o modal de partida salva fechar (5000ms)
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
         const gdAntes = JSON.parse(JSON.stringify(gd));
@@ -7304,7 +7305,7 @@ window.addMatch=async()=>{
           await _processarNovasConquistas(novas, true);
         }
       }
-    },800);
+    },5500);
   }catch(e){showErr('aerr','Erro: '+e.message)}
 };
 window.openEdit=gi=>{const m=(gd.matches||[])[gi];if(!m)return;editIdx=gi;$('edate').value=m.date||'';$('ename').value=m.name||'';$('egols').value=m.gols||0;$('eassist').value=m.assist||0;$('epb').value=m.penBat||0;$('epk').value=m.penOk||0;openP('pedit');};
