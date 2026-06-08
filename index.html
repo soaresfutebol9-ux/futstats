@@ -1351,7 +1351,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rec-card-gold .rec-val-lbl{color:#7a6800}
 .rec-card-silver{
   border-color:#888888!important;
-  background:linear-gradient(135deg,#f0f0f0 0%,#d0d0d0 12%,#707070 25%,#e8e8e8 38%,#505050 50%,#c0c0c0 62%,#f0f0f0 72%,#686868 82%,#d8d8d8 92%,#f4f4f4 100%)!important;
+  background:linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)!important;
   box-shadow:0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset!important}
 .rec-card-silver .rec-name{color:#222222}
 .rec-card-silver .rec-meta{color:#444444}
@@ -7660,7 +7660,7 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
     const pct=d.pb>0?Math.round(d.pk/d.pb*100)+'%':'—';
     return`<tr style="background:${bg};border-bottom:1px solid rgba(255,255,255,.05)">
       <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:${isCur?'#40c960':'rgba(255,255,255,.7)'};font-weight:${isCur?'700':'400'}">${mesNome} ${ano}${isCur?' ●':''}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:18px;color:#fff">${ga}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#fff;font-weight:700">${ga}</td>
       <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.6)">${d.g}</td>
       <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.6)">${d.a}</td>
       <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px">${diffStr}</td>
@@ -7885,7 +7885,6 @@ function renderRanking(){
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
-      ${renderCraqueRodada()}
       ${renderMvpBanner()}
       ${podiumGeralHTML}
       <div class="rank-list">${listGeralItems.map((p,i)=>{
@@ -7999,7 +7998,7 @@ function renderRanking(){
       const isMe=p.uid===currentUser?.uid;
       const cor=penColor(p.pct);
       const isPodium=i<3;
-      const penPodiumBg=i===0?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':i===1?'linear-gradient(135deg,#f0f0f0 0%,#d0d0d0 12%,#707070 25%,#e8e8e8 38%,#505050 50%,#c0c0c0 62%,#f0f0f0 72%,#686868 82%,#d8d8d8 92%,#f4f4f4 100%)':i===2?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';
+      const penPodiumBg=i===0?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':i===1?'linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)':i===2?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';
       const penPodiumBorder=i===0?'#b8a800':i===1?'#888888':i===2?'#8a6020':'#e0c8c0';
       const errados=p.penBat-p.penOk;
       const txtColor=isPodium?'#1a1a1a':'var(--tx)';
@@ -8336,7 +8335,7 @@ function renderHistTab(){
           </div>
           <div class="hist-mes-actions">
             <div class="hist-mes-btn" onclick="verMesHist('${k}')">🏆 Ranking</div>
-            <div class="hist-mes-btn" onclick="editarMesHist('${k}')">✏️ Editar</div>
+            ${_isAdmin()?`<div class="hist-mes-btn" onclick="editarMesHist('${k}')">✏️ Editar</div>`:''}
             ${_isAdmin()?`<div class="hist-mes-btn del" onclick="deletarMesHist('${k}')">🗑</div>`:''}
           </div>
         </div>`;
