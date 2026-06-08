@@ -5982,17 +5982,24 @@ async function _publishFeed(tipo, texto){
 }
 
 // ── Processa conquistas novas: notif pessoal no sino + feed do grupo ──────────
-async function _processarNovasConquistas(novas, publicarFeed){
+async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pendingUid){
   if(!novas || novas.length === 0) return;
   const uid = currentUser.uid;
   const now = Date.now();
+
+  // Salva no Firestore agora (antes do toast, mas após confirmar que temos as novas)
+  // Separado do _checkConquistas para garantir que o toast sempre dispara mesmo se o save falhar
+  if(pendingUpdates && pendingUid && Object.keys(pendingUpdates).length > 0){
+    try {
+      await window._db_updateDoc(window._db_doc('users', pendingUid), pendingUpdates);
+    } catch(e){ console.warn('[CQ] erro ao salvar conquistas:', e); }
+  }
 
   // Atualiza badge FAB
   const badge = document.getElementById('conquistas-fab-badge');
   if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
 
   // Toast visual de conquista
-  console.log('[CQ] _processarNovasConquistas novas:', novas.length, novas.map(c=>c.nome));
   window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
 
   // Toast de XP por conquista(s)
@@ -7216,10 +7223,11 @@ function enterApp(){
   setTimeout(async()=>{
     if(window._checkConquistas && currentUser && gd){
       const _gdAntesLoad = JSON.parse(JSON.stringify(gd));
-      const novas = await window._checkConquistas(db, currentUser, gd);
+      const cqResult = await window._checkConquistas(db, currentUser, gd);
+      const novas = cqResult?.novas || cqResult || [];
       window._checkLevelUp && window._checkLevelUp(_gdAntesLoad, gd);
       if(novas && novas.length > 0){
-        await _processarNovasConquistas(novas, true);
+        await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
       } else {
         // Verifica se há não vistas para mostrar badge
         _checkBadgeConquistas();
@@ -7235,8 +7243,11 @@ async function _checkBadgeConquistas(){
     const snap=await getDoc(doc(db,'users',currentUser.uid));
     if(!snap.exists()) return;
     const data=snap.data();
-    const desb=data.conquistasDesbloqueadas||{};
-    const vistas=data.conquistasVistas||[];
+    const _gid=groupId||'';
+    const desbAll=data.conquistasDesbloqueadas||{};
+    const desb=(desbAll[_gid] && typeof desbAll[_gid]==='object' && !desbAll[_gid].ts) ? desbAll[_gid] : {};
+    const vistasAll=data.conquistasVistas||{};
+    const vistas=Array.isArray(vistasAll)?[]:(vistasAll[_gid]||[]);
     const naoVistas=Object.keys(desb).filter(id=>!vistas.includes(id));
     if(naoVistas.length>0){
       const badge=$('conquistas-fab-badge');
@@ -7299,11 +7310,12 @@ window.addMatch=async()=>{
     setTimeout(async()=>{
       if(window._checkConquistas && currentUser && gd){
         const gdAntes = JSON.parse(JSON.stringify(gd));
-        const novas=await window._checkConquistas(db,currentUser,gd);
+        const cqResult=await window._checkConquistas(db,currentUser,gd);
+        const novas=cqResult?.novas||cqResult||[];
         // Verifica level up (partida + possíveis conquistas novas)
         window._checkLevelUp && window._checkLevelUp(gdAntes, gd);
         if(novas&&novas.length>0){
-          await _processarNovasConquistas(novas, true);
+          await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
         }
       }
     },5500);
@@ -12116,21 +12128,26 @@ function calcConquistas(uid, gd){
 
 // ── Verificar e salvar novas conquistas para o usuário logado ──
 window._checkConquistas = async function(db, currentUser, gd){
-  console.log('[CQ] checkConquistas', {uid:currentUser?.uid, temGd:!!gd, temDbDoc:!!window._db_doc});
   if(!currentUser || !gd) return [];
   const uid = currentUser.uid;
   const calc = calcConquistas(uid, gd);
   const conquistasAchieved = Object.entries(calc).filter(([,v])=>v&&v.achieved).map(([k])=>k);
-  console.log('[CQ] achieved:', conquistasAchieved);
   const newlyUnlocked = [];
 
   // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
   let userSnap;
   try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ console.error('[CQ] erro getDoc:',e); return []; }
   const userData = userSnap.exists() ? userSnap.data() : {};
-  const jaDesbloqueadas = userData.conquistasDesbloqueadas || {};
-  const jaVistas         = userData.conquistasVistas || [];
-  console.log('[CQ] jaDesbloqueadas:', Object.keys(jaDesbloqueadas));
+  const _gid = window._groupId || '';
+  const jaDesbloqueadasAll = userData.conquistasDesbloqueadas || {};
+  // Suporte a estrutura antiga (chave direta) e nova (por grupo)
+  const jaDesbloqueadas = (jaDesbloqueadasAll[_gid] && typeof jaDesbloqueadasAll[_gid] === 'object' && !jaDesbloqueadasAll[_gid].ts)
+    ? jaDesbloqueadasAll[_gid]
+    : {};
+  const jaVistasAll = userData.conquistasVistas || {};
+  const jaVistas = Array.isArray(jaVistasAll)
+    ? [] // formato antigo ignorado por grupo
+    : (jaVistasAll[_gid] || []);
 
   const updates = {};
   const novasIds = [];
@@ -12142,26 +12159,22 @@ window._checkConquistas = async function(db, currentUser, gd){
     const savedCount = savedEntry ? (savedEntry.count || 1) : 0;
     const newCount   = r.count || 1;
     if(savedCount === 0){
-      // Primeira vez desbloqueando
-      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: Date.now(), count: newCount };
+      // Primeira vez desbloqueando neste grupo
+      updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push(cq);
     } else if(newCount > savedCount){
-      // Conquistou de novo (count aumentou)
+      // Conquistou de novo (count aumentou) neste grupo
       const prevTs = savedEntry.ts && savedEntry.ts.seconds ? savedEntry.ts.seconds*1000 : (savedEntry.ts || Date.now());
-      updates[`conquistasDesbloqueadas.${cq.id}`] = { ts: prevTs, tsLast: Date.now(), count: newCount };
+      updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: prevTs, tsLast: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push({...cq, _stackCount: newCount});
     }
   });
 
-  if(novasIds.length > 0){
-    try {
-      await window._db_updateDoc(window._db_doc('users',uid), updates);
-    } catch(e){ console.warn('conquistas save:',e); }
-  }
-
-  return newlyUnlocked;
+  // NÃO salva aqui — o save ocorre após o toast ser exibido (ver _processarNovasConquistas)
+  // Isso evita gravar sem mostrar o toast (ex: se o browser fechar antes ou o toast falhar)
+  return { novas: newlyUnlocked, updates, uid };
 };
 
 // Expõe helpers para o módulo principal
@@ -12725,8 +12738,11 @@ async function _renderConquistasModal(uid){
   try {
     const snap = await window._db_getDoc(document._firestoreDoc(uid));
     if(snap && snap.exists()){
-      jaDesbloqueadas = snap.data().conquistasDesbloqueadas || {};
-      jaVistas        = snap.data().conquistasVistas || [];
+      const _gid2 = window._groupId || '';
+      const _desbAll = snap.data().conquistasDesbloqueadas || {};
+      jaDesbloqueadas = (_desbAll[_gid2] && typeof _desbAll[_gid2]==='object' && !_desbAll[_gid2].ts) ? _desbAll[_gid2] : {};
+      const _vistasAll = snap.data().conquistasVistas || {};
+      jaVistas = Array.isArray(_vistasAll) ? [] : (_vistasAll[_gid2] || []);
     }
   } catch(e){}
 
@@ -12871,9 +12887,11 @@ async function _marcarConquistasVistas(uid){
     const calc = _calcConquistas(uid, window._gd);
     const ids = Object.keys(calc).filter(id=>calc[id].achieved);
     if(!ids.length) return;
-    const updates = { conquistasVistas: ids };
+    const _gid3 = window._groupId || '';
+    const updates = {};
+    updates[`conquistasVistas.${_gid3}`] = ids;
     ids.forEach(id=>{
-      updates[`conquistasDesbloqueadas.${id}.count`] = calc[id].count || 1;
+      updates[`conquistasDesbloqueadas.${_gid3}.${id}.count`] = calc[id].count || 1;
     });
     await window._db_updateDoc_safe(uid, updates);
     const badge = document.getElementById('conquistas-fab-badge');
@@ -12887,13 +12905,10 @@ async function _marcarConquistasVistas(uid){
 // sobreponha levelup-toast, crown-toast ou outras conquistas.
 
 window._mostrarToastConquistas = function(conquistas){
-  console.log('[CQ] _mostrarToastConquistas chamado', conquistas?.length, 'temEnqueue:', !!window._toastEnqueueCentral);
   if(!conquistas || !conquistas.length) return;
   conquistas.forEach(cq => {
-    console.log('[CQ] enfileirando toast:', cq.nome);
     if(window._toastEnqueueCentral){
       window._toastEnqueueCentral(function(done){
-        console.log('[CQ] _mostrarUmToast disparando', cq.nome);
         _mostrarUmToast(cq, done);
       });
     } else {
