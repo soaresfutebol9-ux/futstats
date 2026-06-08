@@ -6565,6 +6565,7 @@ async function loadGroup(gid){
       }
     }
     gd=await checkMesVirada(gd);
+    window._gdRef = gd; // expõe para o calendário
     localStorage.setItem('futstats-last-group', gid);
     enterApp();
     subscribeGroup();
@@ -6605,6 +6606,7 @@ function subscribeGroup(){
     if(!snap.exists())return;
     const prevGd=gd;
     gd=snap.data();
+    window._gdRef = gd; // expõe para o calendário
     // Primeiro disparo é o cache local, já tratado pelo enterApp — ignora
     if(_firstFire){
       _firstFire=false;
@@ -15124,11 +15126,13 @@ window._cfgRemoverMembro = async function() {
 
   function _getAllMatches(){
     const all = [];
-    if(!window.gd) return all;
+    // Tenta pegar gd do escopo local ou pelo ref exposto
+    const _gd = (typeof gd !== 'undefined' && gd) || window._gdRef || null;
+    if(!_gd) return all;
     // Mês ativo
-    (gd.matches||[]).forEach(m => all.push(m));
+    (_gd.matches||[]).forEach(m => all.push(m));
     // Histórico de meses anteriores
-    const hist = gd.historico || {};
+    const hist = _gd.historico || {};
     Object.values(hist).forEach(h => {
       if(h && Array.isArray(h.matches)){
         h.matches.forEach(m => all.push(m));
@@ -15161,12 +15165,22 @@ window._cfgRemoverMembro = async function() {
   }
 
   window.abrirCalendario = function(){
-    if(!window.gd){ alert('Grupo ainda carregando, tente novamente.'); return; }
     const now = new Date();
     _calAno = now.getFullYear();
-    _calMes = now.getMonth(); // 0-indexed
+    _calMes = now.getMonth();
     document.getElementById('cal-popup').classList.remove('open');
     document.getElementById('modal-calendario').classList.add('open');
+
+    const _gdNow = (typeof gd !== 'undefined' && gd) || window._gdRef || null;
+    if(!_gdNow){
+      document.getElementById('cal-month-label').textContent = 'Carregando...';
+      document.getElementById('cal-grid').innerHTML = '';
+      const wait = setInterval(()=>{
+        if(window._gdRef){ clearInterval(wait); _renderCal(); }
+      }, 300);
+      setTimeout(()=> clearInterval(wait), 10000);
+      return;
+    }
     _renderCal();
   };
 
