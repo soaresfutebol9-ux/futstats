@@ -4425,7 +4425,9 @@ window._db_setDoc = (ref,data)=>setDoc(ref,data);
 window._db_updateDoc = (ref,data)=>updateDoc(ref,data);
 window._db_updateDoc_safe = async (uid,data)=>{ try{ await updateDoc(doc(db,'users',uid),data); }catch(e){} };
 window._db_doc = (col,id)=>doc(db,col,id);
-document._firestoreDoc = (uid)=>doc(db,'users',uid);
+// Expõe doc() e db para scripts normais (ex: _checkConquistas) que não têm acesso ao módulo
+window._firestoreDb = db;
+window._firestoreDoc = (col,id)=>doc(db,col,id);
 const $=id=>document.getElementById(id);
 
 
@@ -12119,7 +12121,7 @@ window._checkConquistas = async function(db, currentUser, gd){
 
   // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
   let userSnap;
-  try { userSnap = await window._db_getDoc(doc(db,'users',uid)); } catch(e){ return []; }
+  try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ return []; }
   const userData = userSnap.exists() ? userSnap.data() : {};
   const jaDesbloqueadas = userData.conquistasDesbloqueadas || {};
   const jaVistas         = userData.conquistasVistas || [];
@@ -12149,7 +12151,7 @@ window._checkConquistas = async function(db, currentUser, gd){
 
   if(novasIds.length > 0){
     try {
-      await window._db_updateDoc(doc(db,'users',uid), updates);
+      await window._db_updateDoc(window._db_doc('users',uid), updates);
     } catch(e){ console.warn('conquistas save:',e); }
   }
 
