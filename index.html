@@ -2006,7 +2006,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s;
   pointer-events:none;
 }
-.mfab-items.open{ max-height:300px;opacity:1;pointer-events:all; }
+.mfab-items.open{ max-height:380px;opacity:1;pointer-events:all; }
 .mfab-item-wrap{
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
 }
@@ -2043,6 +2043,86 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   filter:drop-shadow(0 4px 8px rgba(110,231,247,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
   color:#fff;
 }
+.mfab-item-calendario{
+  background:linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%);
+  filter:drop-shadow(0 4px 8px rgba(167,139,250,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  color:#fff;
+}
+
+/* ══ MODAL CALENDÁRIO ══ */
+#modal-calendario{
+  position:fixed;inset:0;z-index:3000;
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);padding:20px 0 40px;
+}
+#modal-calendario.open{display:flex;}
+.cal-box{
+  background:linear-gradient(160deg,#0e1220 0%,#131929 100%);
+  border:1px solid rgba(167,139,250,.22);border-radius:20px;
+  width:min(420px,96vw);padding:24px 20px 28px;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+  font-family:'DM Sans',sans-serif;position:relative;
+}
+.cal-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;
+}
+.cal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
+.cal-close-btn{
+  background:rgba(255,255,255,.08);border:none;cursor:pointer;
+  width:32px;height:32px;border-radius:50%;color:#ccc;font-size:18px;
+  display:flex;align-items:center;justify-content:center;transition:background .2s;
+}
+.cal-close-btn:hover{background:rgba(255,255,255,.15);}
+.cal-nav{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.cal-nav-btn{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  color:#ccc;border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;
+  transition:background .2s;
+}
+.cal-nav-btn:hover{background:rgba(167,139,250,.25);color:#fff;}
+.cal-month-label{font-weight:700;font-size:15px;color:#fff;text-align:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{
+  text-align:center;font-size:10px;font-weight:700;color:#6b7280;
+  padding:4px 0;text-transform:uppercase;letter-spacing:.5px;
+}
+.cal-day{
+  aspect-ratio:1;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#9ca3af;
+  position:relative;cursor:default;transition:background .15s;
+}
+.cal-day.other{color:#374151;}
+.cal-day.has-match{
+  background:rgba(167,139,250,.18);
+  color:#c4b5fd;cursor:pointer;
+}
+.cal-day.has-match:hover{background:rgba(167,139,250,.35);}
+.cal-day .cal-dot{
+  position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:#a78bfa;
+}
+.cal-day.today{outline:2px solid rgba(77,255,176,.5);outline-offset:-2px;}
+/* popup */
+.cal-popup{
+  background:#1a2035;border:1px solid rgba(167,139,250,.3);
+  border-radius:14px;padding:14px 16px;margin-top:16px;
+  display:none;
+}
+.cal-popup.open{display:block;}
+.cal-popup-date{font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:10px;}
+.cal-popup-list{display:flex;flex-direction:column;gap:8px;}
+.cal-popup-player{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;background:rgba(255,255,255,.05);border-radius:10px;
+}
+.cal-popup-name{font-size:13px;font-weight:600;color:#f1f5f9;}
+.cal-popup-stats{display:flex;gap:10px;}
+.cal-popup-stat{font-size:12px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:3px;}
+.cal-popup-stat span{color:#fff;}
+.cal-no-data{text-align:center;color:#6b7280;font-size:13px;padding:12px 0;}
 
 /* ══ MODAL CARTA DO JOGADOR ══ */
 #modal-carta{
@@ -10004,6 +10084,12 @@ window.irParaRankingGA=()=>{
       </button>
     </div>
     <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Calendário</span>
+      <button class="mfab-item mfab-item-calendario" onclick="mfabClose();abrirCalendario()" title="Calendário de Partidas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </button>
+    </div>
+    <div class="mfab-item-wrap">
       <span class="mfab-item-label">Conquistas</span>
       <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();abrirConquistas()" title="Conquistas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -10019,6 +10105,26 @@ window.irParaRankingGA=()=>{
     <span id="mfab-main-icon">＋</span>
     <div class="mfab-main-badge" id="mfab-main-badge"></div>
   </button>
+</div>
+
+<!-- ══ MODAL CALENDÁRIO ══ -->
+<div id="modal-calendario" onclick="if(event.target===this)fecharCalendario()">
+  <div class="cal-box">
+    <div class="cal-header">
+      <span class="cal-title">📅 Calendário de Partidas</span>
+      <button class="cal-close-btn" onclick="fecharCalendario()">✕</button>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calNavMes(-1)">‹ Anterior</button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button class="cal-nav-btn" onclick="calNavMes(1)">Próximo ›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-popup" id="cal-popup">
+      <div class="cal-popup-date" id="cal-popup-date"></div>
+      <div class="cal-popup-list" id="cal-popup-list"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Botões originais ocultos (mantidos para compatibilidade com JS existente) -->
@@ -15009,5 +15115,175 @@ window._cfgRemoverMembro = async function() {
     errEl.textContent = 'Erro: ' + (e.message || e); errEl.style.display = '';
   }
 };
+
+/* ════════════════════════════════
+   CALENDÁRIO DE PARTIDAS
+   ════════════════════════════════ */
+(function(){
+  let _calAno, _calMes;
+
+  function _getAllMatches(){
+    const all = [];
+    if(!window.gd) return all;
+    (gd.matches||[]).forEach(m => all.push(m));
+    const hist = gd.historico || {};
+    Object.values(hist).forEach(h => (h.matches||[]).forEach(m => all.push(m)));
+    return all;
+  }
+
+  // Agrupa matches por data (YYYY-MM-DD)
+  function _groupByDate(matches){
+    const map = {};
+    matches.forEach(m => {
+      const d = m.date || (m.ts ? new Date(m.ts).toISOString().slice(0,10) : null);
+      if(!d) return;
+      if(!map[d]) map[d] = [];
+      map[d].push(m);
+    });
+    return map;
+  }
+
+  window.abrirCalendario = function(){
+    const now = new Date();
+    _calAno = now.getFullYear();
+    _calMes = now.getMonth(); // 0-indexed
+    document.getElementById('cal-popup').classList.remove('open');
+    document.getElementById('modal-calendario').classList.add('open');
+    _renderCal();
+  };
+
+  window.fecharCalendario = function(){
+    document.getElementById('modal-calendario').classList.remove('open');
+  };
+
+  window.calNavMes = function(dir){
+    _calMes += dir;
+    if(_calMes < 0){ _calMes = 11; _calAno--; }
+    if(_calMes > 11){ _calMes = 0; _calAno++; }
+    document.getElementById('cal-popup').classList.remove('open');
+    _renderCal();
+  };
+
+  function _renderCal(){
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    document.getElementById('cal-month-label').textContent = meses[_calMes] + ' ' + _calAno;
+
+    const allMatches = _getAllMatches();
+    const byDate = _groupByDate(allMatches);
+
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    // Cabeçalho dias da semana (Dom-Sáb)
+    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const hoje = new Date();
+    const primeiroDia = new Date(_calAno, _calMes, 1);
+    const ultimoDia  = new Date(_calAno, _calMes + 1, 0);
+    const startDow   = primeiroDia.getDay(); // 0=Dom
+
+    // Dias do mês anterior para preencher
+    const prevUltimo = new Date(_calAno, _calMes, 0).getDate();
+    for(let i = startDow - 1; i >= 0; i--){
+      const el = document.createElement('div');
+      el.className = 'cal-day other';
+      el.textContent = prevUltimo - i;
+      grid.appendChild(el);
+    }
+
+    // Dias do mês atual
+    for(let d = 1; d <= ultimoDia.getDate(); d++){
+      const dateStr = _calAno + '-' + String(_calMes+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      el.textContent = d;
+
+      const isHoje = (hoje.getFullYear()===_calAno && hoje.getMonth()===_calMes && hoje.getDate()===d);
+      if(isHoje) el.classList.add('today');
+
+      if(byDate[dateStr]){
+        el.classList.add('has-match');
+        const dot = document.createElement('div');
+        dot.className = 'cal-dot';
+        el.appendChild(dot);
+        el.onclick = () => _showPopup(dateStr, byDate[dateStr]);
+      }
+      grid.appendChild(el);
+    }
+
+    // Dias do próximo mês
+    const totalCells = startDow + ultimoDia.getDate();
+    const remaining = (7 - (totalCells % 7)) % 7;
+    for(let i = 1; i <= remaining; i++){
+      const el = document.createElement('div');
+      el.className = 'cal-day other';
+      el.textContent = i;
+      grid.appendChild(el);
+    }
+  }
+
+  function _showPopup(dateStr, matches){
+    const parts = dateStr.split('-');
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const label = parseInt(parts[2]) + ' de ' + meses[parseInt(parts[1])-1] + ' de ' + parts[0];
+
+    document.getElementById('cal-popup-date').textContent = label;
+
+    const list = document.getElementById('cal-popup-list');
+    list.innerHTML = '';
+
+    if(!matches || matches.length === 0){
+      list.innerHTML = '<div class="cal-no-data">Nenhum registro neste dia.</div>';
+    } else {
+      // Agrupar por jogador
+      const byPlayer = {};
+      matches.forEach(m => {
+        const key = m.uid || m.player;
+        if(!byPlayer[key]) byPlayer[key] = { name: m.player, gols:0, assist:0, penBat:0, penOk:0, nomes:new Set() };
+        byPlayer[key].gols   += (m.gols||0);
+        byPlayer[key].assist += (m.assist||0);
+        byPlayer[key].penBat += (m.penBat||0);
+        byPlayer[key].penOk  += (m.penOk||0);
+        if(m.name) byPlayer[key].nomes.add(m.name);
+      });
+
+      Object.values(byPlayer).sort((a,b)=>(b.gols+b.assist)-(a.gols+a.assist)).forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'cal-popup-player';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'cal-popup-name';
+        nameDiv.textContent = p.name;
+
+        const statsDiv = document.createElement('div');
+        statsDiv.className = 'cal-popup-stats';
+
+        const mkStat = (icon, val, label) => {
+          const s = document.createElement('div');
+          s.className = 'cal-popup-stat';
+          s.innerHTML = icon + ' <span>' + val + '</span>';
+          s.title = label;
+          return s;
+        };
+        statsDiv.appendChild(mkStat('⚽', p.gols, 'Gols'));
+        statsDiv.appendChild(mkStat('🅰️', p.assist, 'Assistências'));
+        if(p.penBat > 0) statsDiv.appendChild(mkStat('🎯', p.penOk+'/'+p.penBat, 'Pênaltis'));
+
+        row.appendChild(nameDiv);
+        row.appendChild(statsDiv);
+        list.appendChild(row);
+      });
+    }
+
+    document.getElementById('cal-popup').classList.add('open');
+    // Scroll suave para o popup
+    setTimeout(()=>{ document.getElementById('cal-popup').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
+  }
+})();
 </script>
 
