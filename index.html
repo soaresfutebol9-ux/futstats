@@ -13462,16 +13462,35 @@ function _cartaFallbackDownload(card){
 }
 
 /* ── MODO LITE ────────────────────────────────────────────────────────────── */
-body.lite-mode *,
-body.lite-mode *::before,
-body.lite-mode *::after {
+/* Desativa apenas animações decorativas — não afeta transitions de visibilidade */
+body.lite-mode .podium-item,
+body.lite-mode .podium-item::before,
+body.lite-mode .podium-item::after,
+body.lite-mode .ri::before,
+body.lite-mode .ri::after,
+body.lite-mode .craque-banner::before,
+body.lite-mode .craque-banner::after,
+body.lite-mode .av::after,
+body.lite-mode .craque-av-wrap::after,
+body.lite-mode .podium-av-crown,
+body.lite-mode .craque-crown-icon,
+body.lite-mode .bn-indicator,
+body.lite-mode .ri-count,
+body.lite-mode .survey-card-animated,
+body.lite-mode .podium-val {
   animation: none !important;
-  transition: none !important;
 }
-body.lite-mode {
-  background: var(--bg) !important;
+/* Remove brilhos deslizantes */
+body.lite-mode .podium-item::before,
+body.lite-mode .ri::before {
+  display: none !important;
 }
-/* Remove blurs e sombras pesadas */
+/* Remove rings pulsantes */
+body.lite-mode .av::after,
+body.lite-mode .craque-av-wrap::after {
+  display: none !important;
+}
+/* Remove backdrop-filter e sombras pesadas */
 body.lite-mode .podium-item,
 body.lite-mode .ri,
 body.lite-mode .card,
@@ -13481,22 +13500,13 @@ body.lite-mode .craque-banner {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-body.lite-mode .podium-item::before,
-body.lite-mode .ri::before,
-body.lite-mode #ri-stats-popup::before {
-  display: none !important;
-}
-body.lite-mode .av::after,
-body.lite-mode .craque-av-wrap::after {
-  display: none !important;
-}
-/* Scroll suave desativado */
-body.lite-mode { scroll-behavior: auto !important; }
-/* Gradientes pesados simplificados */
+/* Gradientes do pódio simplificados */
 body.lite-mode .podium-item.p1 { background: #c8a84b !important; }
 body.lite-mode .podium-item.p2 { background: #b0b0b0 !important; }
 body.lite-mode .podium-item.p3 { background: #a0785a !important; }
-/* Indicador visual do modo */
+/* Scroll suave desativado */
+body.lite-mode { scroll-behavior: auto !important; }
+/* Indicador visual */
 body.lite-mode #lite-mode-indicator { display: flex !important; }
 #lite-mode-indicator {
   display: none;
