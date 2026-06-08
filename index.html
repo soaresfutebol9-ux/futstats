@@ -8002,13 +8002,12 @@ let _rankAtivo='ga';
 window.setRank=(s,el)=>{
   if(s===_rankAtivo) return;
   const rl=$('rl');
+  const isLite = document.body.classList.contains('lite-mode');
   const dir = (_rankOrder[s]??0) > (_rankOrder[_rankAtivo]??0) ? 'left' : 'right';
 
-  // Remove classes anteriores
   rl.classList.remove('slide-in-right','slide-in-left','slide-out-left','slide-out-right');
 
-  // Anima saída
-  rl.classList.add(dir==='left' ? 'slide-out-left' : 'slide-out-right');
+  if(!isLite) rl.classList.add(dir==='left' ? 'slide-out-left' : 'slide-out-right');
 
   rankStat=s;
   _rankAtivo=s;
@@ -8020,12 +8019,14 @@ window.setRank=(s,el)=>{
   setTimeout(()=>{
     renderRanking();
     rl.classList.remove('slide-out-left','slide-out-right');
-    void rl.offsetHeight;
-    rl.classList.add(dir==='left' ? 'slide-in-right' : 'slide-in-left');
-    rl.addEventListener('animationend', ()=>{
-      rl.classList.remove('slide-in-right','slide-in-left');
-    }, {once:true});
-  }, 200);
+    if(!isLite){
+      void rl.offsetHeight;
+      rl.classList.add(dir==='left' ? 'slide-in-right' : 'slide-in-left');
+      rl.addEventListener('animationend', ()=>{
+        rl.classList.remove('slide-in-right','slide-in-left');
+      }, {once:true});
+    }
+  }, isLite ? 50 : 200);
 };
 
 // ── RECORDES ─────────────────────────────────────────────────────
@@ -13479,6 +13480,31 @@ body.lite-mode .ri-count,
 body.lite-mode .survey-card-animated,
 body.lite-mode .podium-val {
   animation: none !important;
+}
+/* Transitions decorativas desativadas elemento a elemento */
+body.lite-mode .ri,
+body.lite-mode .card,
+body.lite-mode .rec-card,
+body.lite-mode .av,
+body.lite-mode .btn,
+body.lite-mode .ni,
+body.lite-mode .ft,
+body.lite-mode .podium-item,
+body.lite-mode .craque-banner,
+body.lite-mode ._cfg-item-btn,
+body.lite-mode .bg2btn,
+body.lite-mode [class*="btn"],
+body.lite-mode [class*="card"] {
+  transition: none !important;
+}
+/* Troca de abas sem slide */
+body.lite-mode #rl.slide-in-right,
+body.lite-mode #rl.slide-in-left,
+body.lite-mode #rl.slide-out-left,
+body.lite-mode #rl.slide-out-right {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
 }
 /* Remove brilhos deslizantes */
 body.lite-mode .podium-item::before,
