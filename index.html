@@ -13883,6 +13883,32 @@ document.addEventListener('touchstart', e => {
     localStorage.setItem(KEY, next ? '1' : '0');
   };
 
+  // Intercepta toasts no modo lite
+  const _origFooterToast = window._showFooterToast;
+  const _origSimpleToast = window._showSimpleToast;
+  const _origEnqueue     = window._toastEnqueueCentral;
+
+  function _patchToasts(){
+    window._showFooterToast = function(html, dur, borderColor){
+      if(document.body.classList.contains('lite-mode')) return;
+      (_origFooterToast || function(){})(html, dur, borderColor);
+    };
+    window._showSimpleToast = function(msg){
+      if(document.body.classList.contains('lite-mode')) return;
+      (_origSimpleToast || function(){})(msg);
+    };
+    window._toastEnqueueCentral = function(jobFn){
+      if(document.body.classList.contains('lite-mode')){ jobFn && jobFn(); return; }
+      (_origEnqueue || function(){})(jobFn);
+    };
+  }
+  // Aplica após os originais serem definidos
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _patchToasts);
+  } else {
+    setTimeout(_patchToasts, 0);
+  }
+
   // Sincroniza visual do toggle quando perfil abre
   document.addEventListener('click', function(e){
     if(e.target.closest('#pperfil-btn') || e.target.closest('[onclick*="openPerfil"]')){
