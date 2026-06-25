@@ -2103,12 +2103,8 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   -webkit-backdrop-filter:blur(8px);
   opacity:0;
   visibility:hidden;
-  transform:translateZ(0);
-  -webkit-transform:translateZ(0);
-  will-change:opacity,backdrop-filter;
-  isolation:isolate;
-  transition:opacity .25s ease, visibility .25s ease;
   pointer-events:none;
+  transition:opacity .25s ease, visibility .25s ease;
 }
 #mfab-blur-overlay.open{
   opacity:1;
@@ -3591,6 +3587,8 @@ img {
 </style>
 </head>
 <body>
+<!-- MFAB BLUR OVERLAY — fica logo no início do body para garantir presença no DOM -->
+<div id="mfab-blur-overlay" onclick="mfabClose()"></div>
 <!-- noise grain filter -->
 <svg style="position:fixed;width:0;height:0;pointer-events:none;z-index:-1" aria-hidden="true">
   <filter id="grain">
@@ -15006,7 +15004,6 @@ document.addEventListener('touchstart', e => {
   </div>
 </div>
 
-<div id="mfab-blur-overlay" onclick="mfabClose()"></div>
 <!-- PHOTO LIGHTBOX -->
 <div id="photo-lightbox" onclick="closePhotoLightbox()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out">
   <div style="position:relative;max-width:92vw;max-height:92vh;display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
