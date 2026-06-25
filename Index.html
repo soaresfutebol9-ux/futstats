@@ -62,6 +62,19 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
+
+/* ── MFAB BLUR ── */
+body.mfab-open .ah,
+body.mfab-open .ac,
+body.mfab-open .bn {
+  filter: blur(5px);
+  transition: filter .25s ease;
+  pointer-events: none;
+}
+.ah, .ac, .bn {
+  transition: filter .25s ease;
+}
+
 html,body{
   font-family:'DM Sans',sans-serif;
   background:var(--bg);color:var(--tx);
@@ -10536,23 +10549,21 @@ function mfabToggle(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
-  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   const open = items.classList.toggle('open');
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
-  if(overlay) overlay.classList.toggle('open', open);
+  document.body.classList.toggle('mfab-open', open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
-  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   items.classList.remove('open');
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
-  if(overlay) overlay.classList.remove('open');
+  document.body.classList.remove('mfab-open');
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
