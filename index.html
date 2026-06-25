@@ -11729,6 +11729,13 @@ const CONQUISTAS = [
   { id:'seq_hexa',      cat:'🎩 Sequencial de Gols', nome:'Hexa-trick',   desc:'6 gols na mesma partida', icon:'💫', tipo:'seq_gols', val:6 },
   { id:'seq_hepta',     cat:'🎩 Sequencial de Gols', nome:'Hepta-trick',  desc:'7 gols na mesma partida', icon:'🌪️', tipo:'seq_gols', val:7 },
   { id:'seq_maradona',  cat:'🎩 Sequencial de Gols', nome:'Modo Maradona',desc:'8 ou mais gols na mesma partida', icon:'🤯', tipo:'seq_gols', val:8 },
+  // ── SEQUENCIAL DE ASSISTÊNCIAS (por partida) ─────────────────
+  { id:'seq_assist_3', cat:'🎪 Sequencial de Assistências', nome:'Garçom de Luxo',   desc:'3 assistências na mesma partida', icon:'🍾', tipo:'seq_assist', val:3 },
+  { id:'seq_assist_4', cat:'🎪 Sequencial de Assistências', nome:'Maestro',          desc:'4 assistências na mesma partida', icon:'🎼', tipo:'seq_assist', val:4 },
+  { id:'seq_assist_5', cat:'🎪 Sequencial de Assistências', nome:'Condutor',         desc:'5 assistências na mesma partida', icon:'🧭', tipo:'seq_assist', val:5 },
+  { id:'seq_assist_6', cat:'🎪 Sequencial de Assistências', nome:'Visionário',       desc:'6 assistências na mesma partida', icon:'🔭', tipo:'seq_assist', val:6 },
+  { id:'seq_assist_7', cat:'🎪 Sequencial de Assistências', nome:'Dono do Jogo',     desc:'7 assistências na mesma partida', icon:'🎮', tipo:'seq_assist', val:7 },
+  { id:'seq_assist_8', cat:'🎪 Sequencial de Assistências', nome:'Modo Xavi',        desc:'8 ou mais assistências na mesma partida', icon:'🧠', tipo:'seq_assist', val:8 },
   // ── PÊNALTI SEQUENCIAL ──────────────────────────────────────
   { id:'pen_seq_3',  cat:'🥅 Pênalti Sequencial', nome:'Calibrado',      desc:'3 pênaltis consecutivos convertidos',  icon:'🎯', tipo:'pen_seq', val:3  },
   { id:'pen_seq_5',  cat:'🥅 Pênalti Sequencial', nome:'Frieza Clínica', desc:'5 pênaltis consecutivos convertidos',  icon:'🧊', tipo:'pen_seq', val:5  },
@@ -11973,6 +11980,15 @@ function calcConquistas(uid, gd){
       count = partidasValidas.filter(x => (x.gols||0) >= cq.val).length;
       achieved = count > 0;
       progress = Math.min(melhorPartidaValida, cq.val);
+    } else if(cq.tipo==='seq_assist'){
+      // Conquista criada em 26/05/2026 — só conta partidas a partir dessa data
+      const SEQ_ASSIST_INICIO = '2026-05-26';
+      const partidasValidasAssist = todasPartidas.filter(x => (x.date||'') >= SEQ_ASSIST_INICIO);
+      const melhorAssistPartida = Math.max(0, ...partidasValidasAssist.map(x => x.assist||0));
+      // Cascata: uma partida com 5 assistências desbloqueia todos os patamares abaixo também
+      count = partidasValidasAssist.filter(x => (x.assist||0) >= cq.val).length;
+      achieved = count > 0;
+      progress = Math.min(melhorAssistPartida, cq.val);
     } else if(cq.tipo==='pen_seq'){
       // sequência máxima de partidas com 100% de pênaltis convertidos
       count = Math.floor(penSeqMax / cq.val); // quantas vezes atingiu o threshold
@@ -12096,6 +12112,9 @@ const XP_CONQUISTAS = {
   // 🎩 Sequencial de Gols — muito difícil
   seq_hattrick: 150, seq_poker: 250, seq_manita: 380,
   seq_hexa: 540, seq_hepta: 730, seq_maradona: 950,
+  // 🎪 Sequencial de Assistências — muito difícil
+  seq_assist_3: 150, seq_assist_4: 250, seq_assist_5: 380,
+  seq_assist_6: 540, seq_assist_7: 730, seq_assist_8: 950,
   // 🥅 Pênalti Sequencial — muito difícil
   pen_seq_3: 150, pen_seq_5: 280, pen_seq_7: 460, pen_seq_10: 700,
   // 🥅 Aproveitamento de Pênaltis no Ano — difícil
@@ -12119,7 +12138,7 @@ const XP_DESAFIO_DERROTA  = 15;
 // Conquistas cujo tipo pode se repetir pagam metade na 2ª vez em diante
 const TIPOS_REPETIVEIS = new Set([
   'gols_mes','assist_mes','ga_mes','ouro_consec','prata_consec',
-  'ultimo_consec','seq_gols','pen_seq','pen_ano'
+  'ultimo_consec','seq_gols','seq_assist','pen_seq','pen_ano'
 ]);
 
 // ── Níveis: XP necessário para alcançar cada nível ─────────────
