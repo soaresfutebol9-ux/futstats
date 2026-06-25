@@ -2033,7 +2033,7 @@ select option{background:var(--bg3)}
 
 /* ── MULTI-FAB ── */
 .mfab-wrap{
-  position:fixed;bottom:90px;right:16px;z-index:500;
+  position:fixed;bottom:90px;right:16px;z-index:999;
   display:none;flex-direction:column-reverse;align-items:flex-end;gap:10px;
 }
 body.duelo-fab-visible .mfab-wrap,
@@ -2094,14 +2094,20 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 
 /* ── MFAB BLUR OVERLAY ── */
 #mfab-blur-overlay{
-  display:none;
-  position:fixed;inset:0;z-index:499;
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  background:rgba(0,0,0,.35);
-  transition:opacity .25s;
+  position:fixed;inset:0;z-index:498;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  background:rgba(0,0,0,.4);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .3s ease, visibility .3s ease;
+  pointer-events:none;
 }
-#mfab-blur-overlay.open{ display:block; }
+#mfab-blur-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:all;
+}
 
 /* ══ MODAL HISTÓRICO DE CONFRONTOS ══ */
 #modal-historico-confrontos{
