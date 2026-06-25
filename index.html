@@ -2686,15 +2686,6 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:linear-gradient(135deg,rgba(255,215,0,.1) 0%,var(--bg3) 100%);
   box-shadow:0 0 20px rgba(255,215,0,.12);
 }
-.cq-card.desbloqueada.nova{
-  border-color:rgba(255,215,0,.8);
-  box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4);
-  animation:cqNovaPulse 1.8s ease-in-out 3;
-}
-@keyframes cqNovaPulse{
-  0%,100%{box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4)}
-  50%{box-shadow:0 0 48px rgba(255,215,0,.65),0 0 0 2px rgba(255,215,0,.7)}
-}
 .cq-card.bloqueada{
   opacity:.5;filter:grayscale(.6);
 }
@@ -2704,13 +2695,6 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .cq-card.bloqueada .cq-card-nome{color:var(--tx3)}
 .cq-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:#403f3f;letter-spacing:.03em;line-height:1.3}
 .cq-card-data{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.6);margin-top:2px}
-.cq-nova-tag{
-  position:absolute;top:6px;right:6px;
-  background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);
-  border-radius:99px;padding:1px 6px;
-  font-family:'DM Mono',monospace;font-size:9px;font-weight:700;
-  color:#FFD700;letter-spacing:.06em;text-transform:uppercase;
-}
 .cq-stack-badge{
   position:absolute;top:6px;left:6px;
   min-width:20px;height:20px;border-radius:99px;
@@ -6003,10 +5987,6 @@ async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pe
     } catch(e){ console.warn('[CQ] erro ao salvar conquistas:', e); }
   }
 
-  // Atualiza badge FAB
-  const badge = document.getElementById('conquistas-fab-badge');
-  if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
-
   // Toast visual de conquista
   window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
 
@@ -7237,32 +7217,10 @@ function enterApp(){
       if((novas && novas.length > 0) || (cqResult?.updates && Object.keys(cqResult.updates).length > 0)){
         await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
       }
-      if(!(novas && novas.length > 0)){
-        // Verifica se há não vistas para mostrar badge
-        _checkBadgeConquistas();
-      }
     }
     // Grava craque da semana passada automaticamente
     if(window._salvarCraqueSemana) window._salvarCraqueSemana();
   }, 1500);
-}
-async function _checkBadgeConquistas(){
-  if(!currentUser||!gd) return;
-  try {
-    const snap=await getDoc(doc(db,'users',currentUser.uid));
-    if(!snap.exists()) return;
-    const data=snap.data();
-    const _gid=groupId||'';
-    const desbAll=data.conquistasDesbloqueadas||{};
-    const desb=(desbAll[_gid] && typeof desbAll[_gid]==='object' && !desbAll[_gid].ts) ? desbAll[_gid] : {};
-    const vistasAll=data.conquistasVistas||{};
-    const vistas=Array.isArray(vistasAll)?[]:(vistasAll[_gid]||[]);
-    const naoVistas=Object.keys(desb).filter(id=>!vistas.includes(id));
-    if(naoVistas.length>0){
-      const badge=$('conquistas-fab-badge');
-      if(badge){ badge.textContent=naoVistas.length; badge.style.display='flex'; }
-    }
-  }catch(e){}
 }
 
 window.leaveGroup=async()=>{
@@ -12100,8 +12058,8 @@ function calcConquistas(uid, gd){
       achieved = count > 0;
       progress = Math.min(assistTotal, cq.val);
     } else if(cq.tipo==='seq_gols'){
-      // Conquista criada em 20/05/2026 — só conta partidas a partir dessa data
-      const SEQ_GOLS_INICIO = '2026-05-20';
+      // Conquista criada em 26/05/2026 — só conta partidas a partir dessa data
+      const SEQ_GOLS_INICIO = '2026-05-26';
       const partidasValidas = todasPartidas.filter(x => (x.date||'') >= SEQ_GOLS_INICIO);
       const melhorPartidaValida = Math.max(0, ...partidasValidas.map(x => x.gols||0));
       // Limiar mínimo: uma partida com 5 gols conta tanto para "5+" quanto para "3+" e "4+",
@@ -12146,7 +12104,7 @@ window._checkConquistas = async function(db, currentUser, gd){
   const conquistasAchieved = Object.entries(calc).filter(([,v])=>v&&v.achieved).map(([k])=>k);
   const newlyUnlocked = [];
 
-  // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
+  // Lê estado atual do Firestore (campo conquistasDesbloqueadas)
   let userSnap;
   try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ console.error('[CQ] erro getDoc:',e); return []; }
   const userData = userSnap.exists() ? userSnap.data() : {};
@@ -12156,10 +12114,6 @@ window._checkConquistas = async function(db, currentUser, gd){
   const jaDesbloqueadas = (jaDesbloqueadasAll[_gid] && typeof jaDesbloqueadasAll[_gid] === 'object' && !jaDesbloqueadasAll[_gid].ts)
     ? jaDesbloqueadasAll[_gid]
     : {};
-  const jaVistasAll = userData.conquistasVistas || {};
-  const jaVistas = Array.isArray(jaVistasAll)
-    ? [] // formato antigo ignorado por grupo
-    : (jaVistasAll[_gid] || []);
 
   const updates = {};
   const novasIds = [];
@@ -12710,8 +12664,6 @@ window.abrirConquistas = function(uid){
     requestAnimationFrame(()=>{ modal.style.opacity='1'; });
   });
   _renderConquistasModal(_cqUid);
-  // Marca como vistas
-  _marcarConquistasVistas(_cqUid);
 };
 
 window.fecharConquistas = function(){
@@ -12744,28 +12696,19 @@ async function _renderConquistasModal(uid){
 
   const calc = _calcConquistas(uid, gd);
 
-  // Conquistas já desbloqueadas salvas no Firestore (para saber datas e novas)
+  // Conquistas já desbloqueadas salvas no Firestore (para saber datas e contador ×N)
   let jaDesbloqueadas = {};
-  let jaVistas = [];
   try {
-    const snap = await window._db_getDoc(document._firestoreDoc(uid));
+    const snap = await window._db_getDoc(window._db_doc('users', uid));
     if(snap && snap.exists()){
       const _gid2 = window._groupId || '';
       const _desbAll = snap.data().conquistasDesbloqueadas || {};
       jaDesbloqueadas = (_desbAll[_gid2] && typeof _desbAll[_gid2]==='object' && !_desbAll[_gid2].ts) ? _desbAll[_gid2] : {};
-      const _vistasAll = snap.data().conquistasVistas || {};
-      jaVistas = Array.isArray(_vistasAll) ? [] : (_vistasAll[_gid2] || []);
     }
   } catch(e){}
 
   const totalDesb = Object.values(calc).filter(v=>v.achieved).length;
   const totalAll  = CONQUISTAS.length;
-  const novas = Object.keys(calc).filter(id=>{
-    if(!calc[id].achieved) return false;
-    // "Nova!" aparece só na primeira vez que a conquista é desbloqueada.
-    // Repetições subsequentes (×2, ×3, ×4...) não voltam a marcar como nova.
-    return !jaVistas.includes(id);
-  });
 
   // Agrupa por categoria
   const cats = {};
@@ -12796,7 +12739,6 @@ async function _renderConquistasModal(uid){
       <div class="cq-grid">`;
     cqs.forEach(cq=>{
       const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val, count:0};
-      const isNova = r.achieved && novas.includes(cq.id);
       // Tipos de conquista que são marcos únicos — não faz sentido mostrar ×N
       const tipoUnico = ['ouro_acum','ultimo_acum','gols_total'].includes(cq.tipo);
       const stackCount = r.achieved ? (r.count > 0 ? r.count : 1) : 0;
@@ -12808,8 +12750,7 @@ async function _renderConquistasModal(uid){
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
 
       if(r.achieved){
-        html += `<div class="cq-card desbloqueada${isNova?' nova':''}" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
-          ${isNova?'<div class="cq-nova-tag">nova!</div>':''}
+        html += `<div class="cq-card desbloqueada" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
           ${(!tipoUnico && stackCount > 1) ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
@@ -12893,22 +12834,6 @@ window.abrirDetalheCQ = async function(cqId){
 
   body.innerHTML = html;
 };
-async function _marcarConquistasVistas(uid){
-  try {
-    const calc = _calcConquistas(uid, window._gd);
-    const ids = Object.keys(calc).filter(id=>calc[id].achieved);
-    if(!ids.length) return;
-    const _gid3 = window._groupId || '';
-    const updates = {};
-    updates[`conquistasVistas.${_gid3}`] = ids;
-    ids.forEach(id=>{
-      updates[`conquistasDesbloqueadas.${_gid3}.${id}.count`] = calc[id].count || 1;
-    });
-    await window._db_updateDoc_safe(uid, updates);
-    const badge = document.getElementById('conquistas-fab-badge');
-    if(badge) badge.style.display='none';
-  } catch(e){}
-}
 
 // ── Toast de nova conquista ────────────────────────────────────
 // A fila interna foi substituída pelo orquestrador central (_toastEnqueueCentral).
@@ -12978,9 +12903,6 @@ function _mostrarUmToast(cq, cb){
       }
     });
   });
-
-  const badge = document.getElementById('conquistas-fab-badge');
-  if(badge) badge.style.display='flex';
 
   setTimeout(()=>{
     if(window._cqCountInterval) clearInterval(window._cqCountInterval);
