@@ -1504,6 +1504,42 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .pen-bar-track2{height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;flex:1;margin-top:6px}
 .pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ── MAPA DE PÊNALTIS ── */
+#pen-mapa-modal{display:none;position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.72);align-items:flex-end;justify-content:center}
+#pen-mapa-modal.open{display:flex;animation:modalBgIn .22s ease forwards}
+.pen-mapa-inner{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:1.2rem 1rem 2rem;box-shadow:0 -8px 40px rgba(0,0,0,.5)}
+.pen-mapa-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:.3rem;color:var(--tx)}
+.pen-mapa-sub{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:1rem;font-family:'DM Mono',monospace}
+.pen-mapa-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:1rem;scrollbar-width:none}
+.pen-mapa-filter::-webkit-scrollbar{display:none}
+.pen-mapa-chip{padding:5px 13px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.pen-mapa-chip.active{border-color:var(--g);background:rgba(77,255,176,.15);color:var(--g)}
+.pen-gol-wrap{position:relative;width:100%;max-width:400px;margin:0 auto 1rem}
+.pen-gol-canvas{width:100%;display:block;cursor:crosshair;border-radius:12px}
+.pen-mapa-legend{display:flex;gap:18px;justify-content:center;margin-bottom:.8rem}
+.pen-mapa-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace}
+.pen-mapa-legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.pen-mapa-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:14px}
+.pen-mapa-stats{display:flex;gap:10px;justify-content:center;margin-bottom:1rem}
+.pen-mapa-stat{background:var(--bg3);border-radius:12px;padding:10px 18px;text-align:center;flex:1;max-width:100px}
+.pen-mapa-stat-val{font-family:'ClassyVogue',sans-serif;font-size:24px}
+.pen-mapa-stat-lbl{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px}
+
+/* Modal de marcação de pênalti (após salvar partida) */
+#pen-marcar-modal{display:none;position:fixed;inset:0;z-index:3300;background:rgba(0,0,0,.82);align-items:center;justify-content:center}
+#pen-marcar-modal.open{display:flex;animation:modalBgIn .22s ease forwards}
+.pen-marcar-inner{background:var(--bg2);border-radius:22px;width:calc(100% - 2rem);max-width:440px;padding:1.4rem 1rem 1.4rem;box-shadow:0 8px 48px rgba(0,0,0,.6);position:relative}
+.pen-marcar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-align:center;margin-bottom:.2rem;color:var(--tx)}
+.pen-marcar-sub{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:.8rem;font-family:'DM Mono',monospace}
+.pen-marcar-indicator{display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:.8rem;font-size:13px;color:var(--tx2);font-family:'DM Mono',monospace}
+.pen-marcar-dot{width:10px;height:10px;border-radius:50%;background:var(--bo2);flex-shrink:0;transition:background .2s}
+.pen-marcar-dot.ok{background:#4caf50}
+.pen-marcar-dot.err{background:#e53935}
+.pen-marcar-actions{display:flex;gap:10px;margin-top:1rem}
+.pen-marcar-btn{flex:1;padding:13px;border-radius:13px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pen-marcar-btn.skip{background:var(--bg3);color:var(--tx2)}
+.pen-marcar-btn.save{background:var(--grad-green);color:#07090d}
 /* ── RANKING GERAL BANNER ── */
 .geral-banner{
   background:#56B4E9;
@@ -7244,6 +7280,10 @@ window.addMatch=async()=>{
     if(!already){if(!gd.members)gd.members=[];gd.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});}
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
+    // Se teve pênaltis, abre modal de marcação após o modal de partida salva fechar
+    if(pb>0){
+      setTimeout(()=>{ openPenMarcar(novaPartida, pb, pk); }, 5200);
+    }
     // Publica no feed
     (async()=>{
       const partes=[];
@@ -7970,6 +8010,7 @@ function renderRanking(){
       <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">🗓 Mês atual</div>
       <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">📅 Ano atual</div>
       ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">🗂 Selecionar ano</div>`:''}
+      <div class="pen-subtab" onclick="openPenMapa()" style="border:1.5px solid rgba(77,255,176,.4);color:var(--g)">🗺 Mapa</div>
     </div>${anoPickerHTML}`;
 
     if(!activeData.length){
@@ -14000,6 +14041,365 @@ document.addEventListener('touchstart', e => {
   });
 })();
 </script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   SISTEMA DE MAPA DE PÊNALTIS
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  /* ── Dimensões do gol (relativas ao canvas) ──────────── */
+  // Canvas: 400×240. Gol ocupa faixa central, área clicável é maior (inclui fora do gol)
+  const GW=400,GH=240; // canvas virtual size
+  const GOAL = { x:60, y:50, w:280, h:120 }; // gol dentro do canvas
+  const CLICK_PAD = 36; // px extra ao redor do gol para registrar chutes para fora
+
+  /* ── Cores ─────────────────────────────────────────── */
+  const C_OK  = '#4caf50';
+  const C_ERR = '#e53935';
+  const C_OK_FILL  = 'rgba(76,175,80,.75)';
+  const C_ERR_FILL = 'rgba(229,57,53,.75)';
+  const C_STROKE   = 'rgba(255,255,255,.9)';
+
+  /* ── Estado do modal de marcação ────────────────────── */
+  let _marcarPartida=null; // partida à qual estamos associando
+  let _marcarTotal=0;      // total de cobranças a marcar
+  let _marcarOk=0;         // quantas convertidas
+  let _marcarIdx=0;        // cobrança atual (0-based)
+  let _marcarResultados=[]; // [{x,y,ok}] já confirmados
+  let _marcarPendente=null; // {x,y,ok} — atual aguardando confirmação
+  let _marcarResult=null;  // true/false selecionado pelo usuário
+  let _marcarPos=null;     // {x,y} clicado pelo usuário
+
+  /* ── Desenha o gol no canvas ────────────────────────── */
+  function drawGoal(ctx, W, H, pts, highlightIdx){
+    ctx.clearRect(0,0,W,H);
+    const sx=W/GW, sy=H/GH;
+    const gx=GOAL.x*sx, gy=GOAL.y*sy, gw=GOAL.w*sx, gh=GOAL.h*sy;
+
+    // Fundo campo
+    ctx.fillStyle='#2d5a1b';
+    ctx.fillRect(0,0,W,H);
+
+    // Grade da trave
+    const cols=6,rows=3;
+    ctx.strokeStyle='rgba(255,255,255,.1)';
+    ctx.lineWidth=.5;
+    for(let c=0;c<=cols;c++){const x=gx+c*(gw/cols);ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+gh);ctx.stroke();}
+    for(let r=0;r<=rows;r++){const y=gy+r*(gh/rows);ctx.beginPath();ctx.moveTo(gx,y);ctx.lineTo(gx+gw,y);ctx.stroke();}
+
+    // Moldura do gol
+    ctx.strokeStyle='rgba(255,255,255,.92)';
+    ctx.lineWidth=3*Math.min(sx,sy);
+    ctx.strokeRect(gx,gy,gw,gh);
+
+    // Linha do chão
+    ctx.strokeStyle='rgba(255,255,255,.5)';
+    ctx.lineWidth=2*sy;
+    ctx.beginPath();ctx.moveTo(gx-20*sx,gy+gh);ctx.lineTo(gx+gw+20*sx,gy+gh);ctx.stroke();
+
+    // Pontos
+    if(pts && pts.length){
+      pts.forEach((p,i)=>{
+        const px=p.x*sx, py=p.y*sy;
+        const isHigh = highlightIdx===i;
+        ctx.beginPath();
+        ctx.arc(px,py,isHigh?10*Math.min(sx,sy):7*Math.min(sx,sy),0,Math.PI*2);
+        ctx.fillStyle=p.ok?C_OK_FILL:C_ERR_FILL;
+        ctx.fill();
+        ctx.strokeStyle=isHigh?'#fff':C_STROKE;
+        ctx.lineWidth=isHigh?2.5:1.5;
+        ctx.stroke();
+      });
+    }
+  }
+
+  /* ── Converte clique do canvas para coords virtuais ─── */
+  function canvasToVirtual(canvas, clientX, clientY){
+    const rect=canvas.getBoundingClientRect();
+    const cx=(clientX-rect.left)/rect.width*GW;
+    const cy=(clientY-rect.top)/rect.height*GH;
+    return {x:Math.round(cx), y:Math.round(cy)};
+  }
+
+  /* ── Verifica se ponto está na área clicável ─────────── */
+  function inClickArea(x,y){
+    const pad=CLICK_PAD;
+    return x>=(GOAL.x-pad) && x<=(GOAL.x+GOAL.w+pad) && y>=(GOAL.y-pad) && y<=(GOAL.y+GOAL.h+pad);
+  }
+
+  /* ═══ MODAL DE MARCAÇÃO ═══════════════════════════════ */
+  window.openPenMarcar = function(partida, total, ok){
+    _marcarPartida = partida;
+    _marcarTotal   = total;
+    _marcarOk      = ok;
+    _marcarIdx     = 0;
+    _marcarResultados = [];
+    _marcarPendente = null;
+    _marcarResult   = null;
+    _marcarPos      = null;
+
+    // Monta "resultado" esperado: ok convertidos + (total-ok) errados, embaralhados
+    // Não vamos forçar: usuário define resultado ao clicar ✅/❌
+    _renderMarcar();
+    document.getElementById('pen-marcar-modal').classList.add('open');
+    requestAnimationFrame(()=>_setupMarcarCanvas());
+  };
+
+  function _renderMarcar(){
+    const sub = document.getElementById('pen-marcar-sub');
+    const ind  = document.getElementById('pen-marcar-indicator');
+    const btn  = document.getElementById('pen-marcar-confirmar');
+    if(sub) sub.textContent = `Cobrança ${_marcarIdx+1} de ${_marcarTotal} — Toque no gol onde você bateu`;
+
+    // Indicador de pontos já marcados
+    if(ind){
+      ind.innerHTML = Array.from({length:_marcarTotal}).map((_,i)=>{
+        const r = _marcarResultados[i];
+        const cls = r===undefined?'':r.ok?'ok':'err';
+        return `<div class="pen-marcar-dot ${cls}"></div>`;
+      }).join('');
+    }
+
+    // Botão confirmar: desabilita até ter pos E resultado
+    if(btn){
+      const canConfirm = _marcarPos!==null && _marcarResult!==null;
+      btn.disabled = !canConfirm;
+      btn.style.opacity = canConfirm?'1':'.4';
+    }
+
+    // Atualiza visuais dos botões de resultado
+    const btnOk  = document.getElementById('pen-btn-ok');
+    const btnErr = document.getElementById('pen-btn-err');
+    if(btnOk)  btnOk.style.borderWidth  = (_marcarResult===true)  ? '3px':'2px';
+    if(btnErr) btnErr.style.borderWidth = (_marcarResult===false) ? '3px':'2px';
+    if(btnOk)  btnOk.style.background   = (_marcarResult===true)  ? 'rgba(76,175,80,.28)':'rgba(76,175,80,.12)';
+    if(btnErr) btnErr.style.background  = (_marcarResult===false) ? 'rgba(229,57,53,.28)':'rgba(229,57,53,.12)';
+  }
+
+  function _setupMarcarCanvas(){
+    const canvas = document.getElementById('pen-marcar-canvas');
+    if(!canvas) return;
+    canvas.width  = GW;
+    canvas.height = GH;
+    const ctx = canvas.getContext('2d');
+
+    // Desenha estado atual (pontos já marcados + pendente)
+    function redraw(){
+      const pts = [
+        ..._marcarResultados,
+        ...(_marcarPendente ? [_marcarPendente] : [])
+      ];
+      drawGoal(ctx, GW, GH, pts, _marcarResultados.length);
+    }
+    redraw();
+
+    // Remove listeners antigos
+    canvas._penHandler && canvas.removeEventListener('click',canvas._penHandler);
+    canvas._penHandler = function(e){
+      e.preventDefault();
+      const touch = e.touches?.[0] || e;
+      const pos = canvasToVirtual(canvas, touch.clientX||e.clientX, touch.clientY||e.clientY);
+      if(!inClickArea(pos.x,pos.y)) return;
+      _marcarPos = pos;
+      _marcarPendente = {x:pos.x, y:pos.y, ok: _marcarResult !== null ? _marcarResult : true};
+      _renderMarcar();
+      redraw();
+    };
+    canvas.addEventListener('click', canvas._penHandler);
+    canvas.addEventListener('touchend', canvas._penHandler, {passive:false});
+  }
+
+  window.setPenResult = function(ok){
+    _marcarResult = ok;
+    if(_marcarPos) _marcarPendente = {x:_marcarPos.x, y:_marcarPos.y, ok};
+    _renderMarcar();
+    // Redesenha canvas
+    const canvas = document.getElementById('pen-marcar-canvas');
+    if(canvas){
+      const ctx=canvas.getContext('2d');
+      const pts=[..._marcarResultados,...(_marcarPendente?[_marcarPendente]:[])];
+      drawGoal(ctx,GW,GH,pts,_marcarResultados.length);
+    }
+  };
+
+  window.confirmarPenAtual = function(){
+    if(_marcarPos===null||_marcarResult===null) return;
+    _marcarResultados.push({x:_marcarPos.x, y:_marcarPos.y, ok:_marcarResult});
+    _marcarIdx++;
+    _marcarPos=null; _marcarResult=null; _marcarPendente=null;
+
+    if(_marcarIdx>=_marcarTotal){
+      // Todos marcados: salvar
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+      document.getElementById('pen-marcar-modal').classList.remove('open');
+      return;
+    }
+    _renderMarcar();
+    requestAnimationFrame(()=>_setupMarcarCanvas());
+  };
+
+  window.skipPenMarcar = function(){
+    document.getElementById('pen-marcar-modal').classList.remove('open');
+    // Salva o que já foi marcado até agora (pode ser parcial)
+    if(_marcarResultados.length>0 && _marcarPartida){
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+    }
+  };
+
+  /* ── Salva penMap no Firestore ────────────────────────── */
+  async function _salvarPenMap(partida, pontos){
+    try{
+      // Encontra o match no array gd.matches pelo ts
+      if(!gd||!gd.matches) return;
+      const idx = gd.matches.findIndex(m=>m.uid===partida.uid&&m.ts===partida.ts);
+      if(idx<0) return;
+      const matches = [...gd.matches];
+      matches[idx] = {...matches[idx], penMap: pontos};
+      await updateDoc(doc(db,'groups',groupId),{matches});
+      gd.matches = matches;
+    }catch(e){ console.warn('penMap save error',e); }
+  }
+
+  /* ═══ MODAL DO MAPA PÚBLICO ════════════════════════════ */
+  let _mapaFiltroUid = 'all'; // 'all' ou uid
+
+  window.openPenMapa = function(){
+    _mapaFiltroUid = 'all';
+    _renderMapa();
+    document.getElementById('pen-mapa-modal').classList.add('open');
+  };
+
+  window.closePenMapa = function(){
+    document.getElementById('pen-mapa-modal').classList.remove('open');
+  };
+
+  window.setPenMapaFiltro = function(uid){
+    _mapaFiltroUid = uid;
+    _renderMapa();
+  };
+
+  function _getPontos(){
+    if(!gd||!gd.matches) return [];
+    return gd.matches.flatMap(m=>{
+      if(!m.penMap||!m.penMap.length) return [];
+      const player = (gd.members||[]).find(mb=>mb.uid===m.uid);
+      return m.penMap.map(p=>({...p, uid:m.uid, name:m.player||player?.name||'?', date:m.date}));
+    });
+  }
+
+  function _renderMapa(){
+    const todos = _getPontos();
+    const filtrado = _mapaFiltroUid==='all' ? todos : todos.filter(p=>p.uid===_mapaFiltroUid);
+
+    // Jogadores únicos com pontos
+    const jogadores = [];
+    const seenUids = new Set();
+    todos.forEach(p=>{if(!seenUids.has(p.uid)){seenUids.add(p.uid);jogadores.push({uid:p.uid,name:p.name});}});
+
+    // Filtros
+    const filterEl = document.getElementById('pen-mapa-filter');
+    if(filterEl){
+      filterEl.innerHTML = `<button class="pen-mapa-chip${_mapaFiltroUid==='all'?' active':''}" onclick="setPenMapaFiltro('all')">Todos</button>` +
+        jogadores.map(j=>`<button class="pen-mapa-chip${_mapaFiltroUid===j.uid?' active':''}" onclick="setPenMapaFiltro('${j.uid}')">${j.name.split(' ')[0]}</button>`).join('');
+    }
+
+    // Stats
+    const totalPts = filtrado.length;
+    const okPts    = filtrado.filter(p=>p.ok).length;
+    const errPts   = totalPts-okPts;
+    const statsEl = document.getElementById('pen-mapa-stats');
+    if(statsEl){
+      statsEl.innerHTML = totalPts===0?'':
+        `<div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#4caf50">${okPts}</div><div class="pen-mapa-stat-lbl">✅ Gols</div></div>
+         <div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#e53935">${errPts}</div><div class="pen-mapa-stat-lbl">❌ Errados</div></div>
+         <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
+    }
+
+    const emptyEl = document.getElementById('pen-mapa-empty');
+    const canvas  = document.getElementById('pen-mapa-canvas');
+    if(!canvas) return;
+
+    if(totalPts===0){
+      if(emptyEl) emptyEl.style.display='';
+      canvas.style.display='none';
+      return;
+    }
+    if(emptyEl) emptyEl.style.display='none';
+    canvas.style.display='';
+    canvas.width=GW; canvas.height=GH;
+    const ctx=canvas.getContext('2d');
+    drawGoal(ctx, GW, GH, filtrado);
+
+    // Sub-título
+    const subEl=document.getElementById('pen-mapa-sub-txt');
+    if(subEl){
+      if(_mapaFiltroUid==='all') subEl.textContent=`${totalPts} cobrança${totalPts!==1?'s':''} de ${jogadores.length} jogador${jogadores.length!==1?'es':''}`;
+      else{const j=jogadores.find(x=>x.uid===_mapaFiltroUid);subEl.textContent=`${j?.name||'?'} · ${totalPts} cobrança${totalPts!==1?'s':''}`;};
+    }
+  }
+
+  /* ═══ ADMIN: editar penMap de qualquer jogador ═════════ */
+  // Abre o mapa com botão de edição — aparece somente para admin
+  window.openPenMapaAdmin = function(uid, ts){
+    if(!window._isAdmin || !_isAdmin()) return;
+    // Encontra o match
+    const m = (gd?.matches||[]).find(x=>x.uid===uid&&x.ts===ts);
+    if(!m) return;
+    // Remove o penMap e reabre modal de marcação em nome do jogador
+    if(!confirm(`Reeditar cobranças de ${m.player||m.uid}?`)) return;
+    openPenMarcar(m, m.penBat||0, m.penOk||0);
+  };
+
+})();
+</script>
+
+<!-- MODAL MAPA DE PÊNALTIS -->
+<div id="pen-mapa-modal">
+  <div class="pen-mapa-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div></div>
+      <div class="pen-mapa-title">🗺 Mapa de Pênaltis</div>
+      <button onclick="closePenMapa()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
+    </div>
+    <div class="pen-mapa-sub" id="pen-mapa-sub-txt">Todos os jogadores · todas as cobranças</div>
+    <div class="pen-mapa-legend">
+      <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
+      <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
+    </div>
+    <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
+    <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
+    <div class="pen-gol-wrap">
+      <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
+    </div>
+    <div id="pen-mapa-empty" class="pen-mapa-empty" style="display:none">Nenhuma cobrança mapeada ainda.</div>
+  </div>
+</div>
+
+<!-- MODAL MARCAR PÊNALTI NO GOL -->
+<div id="pen-marcar-modal">
+  <div class="pen-marcar-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem">
+      <div></div>
+      <div class="pen-marcar-title">🎯 Marcar pênalti</div>
+      <button onclick="skipPenMarcar()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
+    </div>
+    <div class="pen-marcar-sub" id="pen-marcar-sub">Cobrança 1 de 1 — Toque no gol onde você bateu</div>
+    <div class="pen-marcar-indicator" id="pen-marcar-indicator"></div>
+    <div class="pen-gol-wrap">
+      <canvas id="pen-marcar-canvas" class="pen-gol-canvas"></canvas>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:.6rem">
+      <button onclick="setPenResult(true)" id="pen-btn-ok" style="flex:1;padding:11px;border-radius:12px;border:2px solid #4caf50;background:rgba(76,175,80,.12);color:#4caf50;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">✅ Convertido</button>
+      <button onclick="setPenResult(false)" id="pen-btn-err" style="flex:1;padding:11px;border-radius:12px;border:2px solid #e53935;background:rgba(229,57,53,.12);color:#e53935;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">❌ Errado</button>
+    </div>
+    <div class="pen-marcar-actions">
+      <button class="pen-marcar-btn skip" onclick="skipPenMarcar()">Pular</button>
+      <button class="pen-marcar-btn save" onclick="confirmarPenAtual()" id="pen-marcar-confirmar" disabled style="opacity:.4">Confirmar →</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
