@@ -63,17 +63,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 
-/* ── MFAB BLUR ── */
-body.mfab-open .ah,
-body.mfab-open .ac,
-body.mfab-open .bn {
-  filter: blur(5px);
-  transition: filter .25s ease;
-  pointer-events: none;
-}
-.ah, .ac, .bn {
-  transition: filter .25s ease;
-}
+/* (blur agora é feito via #mfab-blur-overlay com backdrop-filter) */
 
 html,body{
   font-family:'DM Sans',sans-serif;
@@ -2108,10 +2098,12 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 /* ── MFAB BLUR OVERLAY ── */
 #mfab-blur-overlay{
   position:fixed;inset:0;z-index:490;
-  background:rgba(0,0,0,.5);
+  background:rgba(245,247,252,.35);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   opacity:0;
   visibility:hidden;
-  transition:opacity .3s ease, visibility .3s ease;
+  transition:opacity .25s ease, visibility .25s ease, backdrop-filter .25s ease;
   pointer-events:none;
 }
 #mfab-blur-overlay.open{
@@ -10549,21 +10541,25 @@ function mfabToggle(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
+  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   const open = items.classList.toggle('open');
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
   document.body.classList.toggle('mfab-open', open);
+  if(overlay) overlay.classList.toggle('open', open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
+  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   items.classList.remove('open');
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
   document.body.classList.remove('mfab-open');
+  if(overlay) overlay.classList.remove('open');
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
