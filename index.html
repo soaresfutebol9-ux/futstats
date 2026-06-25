@@ -1506,9 +1506,9 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 
 /* ── MAPA DE PÊNALTIS ── */
-#pen-mapa-modal{display:none;position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.72);align-items:flex-end;justify-content:center}
+#pen-mapa-modal{display:none;position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.72);align-items:flex-start;justify-content:center;padding-top:5vh;overflow-y:auto}
 #pen-mapa-modal.open{display:flex;animation:modalBgIn .22s ease forwards}
-.pen-mapa-inner{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:1.2rem 1rem 2rem;box-shadow:0 -8px 40px rgba(0,0,0,.5)}
+.pen-mapa-inner{background:var(--bg2);border-radius:24px;width:calc(100% - 3rem);max-width:440px;max-height:88vh;overflow-y:auto;padding:1.2rem 1rem 1.6rem;box-shadow:0 8px 40px rgba(0,0,0,.5)}
 .pen-mapa-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:.3rem;color:var(--tx)}
 .pen-mapa-sub{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:1rem;font-family:'DM Mono',monospace}
 .pen-mapa-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:1rem;scrollbar-width:none}
@@ -1516,6 +1516,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-mapa-chip{padding:5px 13px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .pen-mapa-chip.active{border-color:var(--g);background:rgba(77,255,176,.15);color:var(--g)}
 .pen-gol-wrap{position:relative;width:100%;max-width:400px;margin:0 auto 1rem}
+.pen-gol-wrap.mapa-sm{max-width:300px}
 .pen-gol-canvas{width:100%;display:block;cursor:crosshair;border-radius:12px}
 .pen-mapa-legend{display:flex;gap:18px;justify-content:center;margin-bottom:.8rem}
 .pen-mapa-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace}
@@ -14414,7 +14415,7 @@ document.addEventListener('touchstart', e => {
     </div>
     <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
     <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
-    <div class="pen-gol-wrap">
+    <div class="pen-gol-wrap mapa-sm">
       <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
     </div>
     <div id="pen-mapa-empty" class="pen-mapa-empty" style="display:none">Nenhuma cobrança mapeada ainda.</div>
