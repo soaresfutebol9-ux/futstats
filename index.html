@@ -8957,13 +8957,12 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   const nLen=mb.name.length;
   nomeEl.style.fontSize=nLen>22?'12px':nLen>18?'14px':nLen>13?'15px':'17px';
 
-  // Botão Desafiar — só aparece se for outro jogador e nenhum dos dois estiver em desafio
+  // Botão Desafiar — só aparece se for outro jogador e ELE não estiver em desafio ativo
   const desafiarBtn=document.getElementById('mp-desafiar-btn');
   if(desafiarBtn){
     const isMe = uid === currentUser?.uid;
-    const euAtivo = (gd.desafios||[]).some(d=>d.status==='ativo'&&(d.uidA===currentUser?.uid||d.uidB===currentUser?.uid));
     const eleAtivo = (gd.desafios||[]).some(d=>d.status==='ativo'&&(d.uidA===uid||d.uidB===uid));
-    if(!isMe && !euAtivo && !eleAtivo){
+    if(!isMe && !eleAtivo){
       desafiarBtn.style.display='block';
       desafiarBtn.title='Desafiar ' + mb.name;
     } else {
