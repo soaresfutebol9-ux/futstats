@@ -2083,14 +2083,13 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   display:flex;align-items:center;justify-content:center;
   font-size:20px;line-height:1;
   overflow:hidden;
-  -webkit-mask-image:-webkit-radial-gradient(white,black);
-  transition:transform .2s cubic-bezier(.34,1.2,.64,1),filter .2s;
+  transition:transform .2s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
   flex-shrink:0;
 }
 .mfab-item:active{transform:scale(.88);}
 .mfab-item-confrontos{
   background:linear-gradient(135deg,#38bdf8 0%,#0284c7 100%);
-  filter:drop-shadow(0 4px 8px rgba(56,189,248,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  box-shadow:0 4px 12px rgba(56,189,248,.55),0 2px 6px rgba(0,0,0,.4);
   color:#fff;
 }
 
@@ -2248,17 +2247,17 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .hc-summary-box.tie .hc-summary-val{color:var(--tx2);}
 .mfab-item-conquistas{
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
-  filter:drop-shadow(0 4px 8px rgba(255,180,0,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  box-shadow:0 4px 12px rgba(255,180,0,.55),0 2px 6px rgba(0,0,0,.4);
   color:#07090d;
 }
 .mfab-item-carta{
   background:linear-gradient(135deg,#6ee7f7 0%,#2563eb 100%);
-  filter:drop-shadow(0 4px 8px rgba(110,231,247,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  box-shadow:0 4px 12px rgba(110,231,247,.55),0 2px 6px rgba(0,0,0,.4);
   color:#fff;
 }
 .mfab-item-calendario{
   background:linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%);
-  filter:drop-shadow(0 4px 8px rgba(167,139,250,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  box-shadow:0 4px 12px rgba(167,139,250,.55),0 2px 6px rgba(0,0,0,.4);
   color:#fff;
 }
 
