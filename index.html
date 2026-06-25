@@ -14048,6 +14048,12 @@ document.addEventListener('touchstart', e => {
    ═══════════════════════════════════════════════════════ */
 (function(){
   'use strict';
+  // Helpers para acessar estado do app principal
+  function _gd(){ return window._gdRef || null; }
+  function _db(){ return (typeof getFirestore === 'function') ? getFirestore() : null; }
+  function _groupId(){ return window.groupId || null; }
+  function _updateDoc(ref, data){ return (typeof updateDoc === 'function') ? updateDoc(ref, data) : Promise.reject('updateDoc indisponível'); }
+  function _doc(db, col, id){ return (typeof doc === 'function') ? doc(db, col, id) : null; }
 
   /* ── Dimensões do gol (relativas ao canvas) ──────────── */
   // Canvas: 400×240. Gol ocupa faixa central, área clicável é maior (inclui fora do gol)
@@ -14182,8 +14188,12 @@ document.addEventListener('touchstart', e => {
   function _setupMarcarCanvas(){
     const canvas = document.getElementById('pen-marcar-canvas');
     if(!canvas) return;
-    canvas.width  = GW;
-    canvas.height = GH;
+    // Usa largura CSS real para resolução interna correta no mobile
+    const cssW = canvas.offsetWidth || GW;
+    const cssH = Math.round(cssW * GH / GW);
+    canvas.width  = cssW;
+    canvas.height = cssH;
+    const CW = cssW, CH = cssH;
     const ctx = canvas.getContext('2d');
 
     function redraw(){
@@ -14191,14 +14201,19 @@ document.addEventListener('touchstart', e => {
         ..._marcarResultados,
         ...(_marcarPendente ? [_marcarPendente] : [])
       ];
-      drawGoal(ctx, GW, GH, pts, _marcarResultados.length);
+      // Escala os pontos (salvos em coords GW×GH) para o tamanho real do canvas
+      const scaled = pts.map(p=>({...p, x:p.x*CW/GW, y:p.y*CH/GH}));
+      drawGoal(ctx, CW, CH, scaled, _marcarResultados.length);
     }
     redraw();
 
     function handleXY(clientX, clientY){
       const pos = canvasToVirtual(canvas, clientX, clientY);
-      _marcarPos = pos;
-      _marcarPendente = {x:pos.x, y:pos.y, ok: _marcarResult !== null ? _marcarResult : true};
+      // Normaliza para coords GW×GH independente do tamanho real do canvas
+      const normX = Math.round(pos.x * GW / CW);
+      const normY = Math.round(pos.y * GH / CH);
+      _marcarPos = {x:normX, y:normY};
+      _marcarPendente = {x:normX, y:normY, ok: _marcarResult !== null ? _marcarResult : true};
       _renderMarcar();
       redraw();
     }
@@ -14257,13 +14272,13 @@ document.addEventListener('touchstart', e => {
   /* ── Salva penMap no Firestore ────────────────────────── */
   async function _salvarPenMap(partida, pontos){
     try{
-      // Encontra o match no array gd.matches pelo ts
-      if(!gd||!gd.matches) return;
+      const gd=_gd(); const db=_db(); const groupId=_groupId();
+      if(!gd||!gd.matches||!db||!groupId) return;
       const idx = gd.matches.findIndex(m=>m.uid===partida.uid&&m.ts===partida.ts);
       if(idx<0) return;
       const matches = [...gd.matches];
       matches[idx] = {...matches[idx], penMap: pontos};
-      await updateDoc(doc(db,'groups',groupId),{matches});
+      await _updateDoc(_doc(db,'groups',groupId),{matches});
       gd.matches = matches;
     }catch(e){ console.warn('penMap save error',e); }
   }
@@ -14273,8 +14288,10 @@ document.addEventListener('touchstart', e => {
 
   window.openPenMapa = function(){
     _mapaFiltroUid = 'all';
-    _renderMapa();
+    // Renderiza texto/filtros antes de abrir; canvas depois (precisa do modal visível)
+    _renderMapaSemCanvas();
     document.getElementById('pen-mapa-modal').classList.add('open');
+    setTimeout(()=>_renderMapaCanvas(), 80);
   };
 
   window.closePenMapa = function(){
@@ -14283,11 +14300,12 @@ document.addEventListener('touchstart', e => {
 
   window.setPenMapaFiltro = function(uid){
     _mapaFiltroUid = uid;
-    _renderMapa();
+    _renderMapaSemCanvas();
+    _renderMapaCanvas();
   };
 
   function _getPontos(){
-    if(!gd||!gd.matches) return [];
+    const gd=_gd(); if(!gd||!gd.matches) return [];
     return gd.matches.flatMap(m=>{
       if(!m.penMap||!m.penMap.length) return [];
       const player = (gd.members||[]).find(mb=>mb.uid===m.uid);
@@ -14295,14 +14313,17 @@ document.addEventListener('touchstart', e => {
     });
   }
 
-  function _renderMapa(){
+  function _getMapaData(){
     const todos = _getPontos();
     const filtrado = _mapaFiltroUid==='all' ? todos : todos.filter(p=>p.uid===_mapaFiltroUid);
-
-    // Jogadores únicos com pontos
     const jogadores = [];
     const seenUids = new Set();
     todos.forEach(p=>{if(!seenUids.has(p.uid)){seenUids.add(p.uid);jogadores.push({uid:p.uid,name:p.name});}});
+    return {todos, filtrado, jogadores};
+  }
+
+  function _renderMapaSemCanvas(){
+    const {todos, filtrado, jogadores} = _getMapaData();
 
     // Filtros
     const filterEl = document.getElementById('pen-mapa-filter');
@@ -14323,6 +14344,17 @@ document.addEventListener('touchstart', e => {
          <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
     }
 
+    // Sub-título
+    const subEl=document.getElementById('pen-mapa-sub-txt');
+    if(subEl){
+      if(_mapaFiltroUid==='all') subEl.textContent=`${totalPts} cobrança${totalPts!==1?'s':''} de ${jogadores.length} jogador${jogadores.length!==1?'es':''}`;
+      else{const j=jogadores.find(x=>x.uid===_mapaFiltroUid);subEl.textContent=`${j?.name||'?'} · ${totalPts} cobrança${totalPts!==1?'s':''}`;};
+    }
+  }
+
+  function _renderMapaCanvas(){
+    const {filtrado} = _getMapaData();
+    const totalPts = filtrado.length;
     const emptyEl = document.getElementById('pen-mapa-empty');
     const canvas  = document.getElementById('pen-mapa-canvas');
     if(!canvas) return;
@@ -14334,23 +14366,22 @@ document.addEventListener('touchstart', e => {
     }
     if(emptyEl) emptyEl.style.display='none';
     canvas.style.display='';
-    canvas.width=GW; canvas.height=GH;
+    // Usa largura CSS real do canvas para setar resolução interna
+    const cssW = canvas.offsetWidth || GW;
+    const cssH = Math.round(cssW * GH / GW);
+    canvas.width  = cssW;
+    canvas.height = cssH;
     const ctx=canvas.getContext('2d');
-    drawGoal(ctx, GW, GH, filtrado);
-
-    // Sub-título
-    const subEl=document.getElementById('pen-mapa-sub-txt');
-    if(subEl){
-      if(_mapaFiltroUid==='all') subEl.textContent=`${totalPts} cobrança${totalPts!==1?'s':''} de ${jogadores.length} jogador${jogadores.length!==1?'es':''}`;
-      else{const j=jogadores.find(x=>x.uid===_mapaFiltroUid);subEl.textContent=`${j?.name||'?'} · ${totalPts} cobrança${totalPts!==1?'s':''}`;};
-    }
+    drawGoal(ctx, cssW, cssH, filtrado);
   }
+
+  function _renderMapa(){ _renderMapaSemCanvas(); _renderMapaCanvas(); }
 
   /* ═══ ADMIN: editar penMap de qualquer jogador ═════════ */
   // Abre o mapa com botão de edição — aparece somente para admin
   window.openPenMapaAdmin = function(uid, ts){
     if(!window._isAdmin || !_isAdmin()) return;
-    // Encontra o match
+    const gd=_gd();
     const m = (gd?.matches||[]).find(x=>x.uid===uid&&x.ts===ts);
     if(!m) return;
     // Remove o penMap e reabre modal de marcação em nome do jogador
