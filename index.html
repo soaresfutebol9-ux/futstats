@@ -13453,6 +13453,31 @@ function _cartaFallbackDownload(card){
   letter-spacing:.06em;
 }
 
+/* ── AGRUPAMENTO POR MÊS NO HISTÓRICO ── */
+.craque-hist-month-group{margin-bottom:10px;}
+.craque-hist-month-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;border-radius:10px;cursor:pointer;
+  background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);
+  user-select:none;transition:background .15s;
+}
+.craque-hist-month-header:hover{background:rgba(0,0,0,.1);}
+.craque-hist-month-label{
+  font-family:'VarsityTeam',serif;font-size:13px;color:#000;letter-spacing:.04em;
+}
+.craque-hist-month-meta{
+  font-family:'DM Mono',monospace;font-size:10px;color:#858585;
+}
+.craque-hist-month-arrow{
+  font-size:12px;color:#858585;transition:transform .2s;
+}
+.craque-hist-month-arrow.open{transform:rotate(90deg);}
+.craque-hist-month-body{
+  margin-top:6px;overflow:hidden;
+  max-height:0;transition:max-height .25s ease;
+}
+.craque-hist-month-body.open{max-height:9999px;}
+
 /* ── MODO LITE ────────────────────────────────────────────────────────────── */
 /* Desativa apenas animações decorativas — não afeta transitions de visibilidade */
 body.lite-mode .podium-item,
@@ -13625,7 +13650,7 @@ function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
     }
   });
   return Object.values(byPlayer)
-    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
+    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 5) - (p.penErr * 5) }))
     .sort((a, b) => b.score !== a.score ? b.score - a.score : b.gols - a.gols);
 }
 
@@ -13733,35 +13758,70 @@ function _renderCraqueModalContent(){
     if(!hist.length){
       body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O histórico é gravado automaticamente<br>ao final de cada semana.</div>';
     } else {
-      // Conta quantas vezes cada jogador foi craque
+      // Conta quantas vezes cada jogador foi craque (total geral)
       const contagem = {};
       hist.forEach(c => {
         const k = c.uid || c.name;
         contagem[k] = (contagem[k] || 0) + 1;
       });
 
-      body.innerHTML = hist.map((c, i) => {
-        const isMe = c.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
-        const av = typeof avatarHTML === 'function'
-          ? avatarHTML(c.name, 36, c.uid)
-          : `<div class="av av0">${(c.name||'?')[0].toUpperCase()}</div>`;
-        const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
-        const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
-        const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
-        const vezes  = contagem[c.uid || c.name];
-        const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
-        return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
-          <div class="craque-hist-crown">${i === 0 ? '🥇' : '👑'}</div>
-          <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
-          <div class="craque-hist-info">
-            <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
-            <div class="craque-hist-periodo">${c.label}</div>
-            <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+      // Agrupa por mês da SEGUNDA-FEIRA (início da semana)
+      const meses = {};
+      const mesesOrdem = [];
+      const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      hist.forEach(c => {
+        // Usa weekStart (segunda-feira) para determinar o mês
+        const ws = c.weekStart || c.key || '';
+        const d = ws ? new Date(ws + 'T00:00:00') : null;
+        const mesKey = d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` : 'sem-data';
+        const mesLabel = d ? `${MESES_PT[d.getMonth()]} ${d.getFullYear()}` : 'Sem data';
+        if(!meses[mesKey]){
+          meses[mesKey] = { label: mesLabel, items: [] };
+          mesesOrdem.push(mesKey);
+        }
+        meses[mesKey].items.push(c);
+      });
+
+      // Renderiza grupos colapsáveis — o mês mais recente começa aberto
+      body.innerHTML = mesesOrdem.map((mesKey, mIdx) => {
+        const grupo = meses[mesKey];
+        const isFirst = mIdx === 0;
+        const nSemanas = grupo.items.length;
+        const metaLabel = `${nSemanas} semana${nSemanas > 1 ? 's' : ''}`;
+        const itemsHTML = grupo.items.map((c, i) => {
+          const isMe = c.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+          const av = typeof avatarHTML === 'function'
+            ? avatarHTML(c.name, 36, c.uid)
+            : `<div class="av av0">${(c.name||'?')[0].toUpperCase()}</div>`;
+          const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
+          const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
+          const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
+          const vezes  = contagem[c.uid || c.name];
+          const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
+          return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
+            <div class="craque-hist-crown">👑</div>
+            <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+            <div class="craque-hist-info">
+              <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+              <div class="craque-hist-periodo">${c.label}</div>
+              <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+            </div>
+            <div>
+              <div class="craque-hist-score">${c.score}</div>
+              <div class="craque-hist-score-lbl">pts</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        return `<div class="craque-hist-month-group">
+          <div class="craque-hist-month-header" onclick="_toggleCraqueMes(this)">
+            <div>
+              <div class="craque-hist-month-label">📅 ${grupo.label}</div>
+              <div class="craque-hist-month-meta">${metaLabel}</div>
+            </div>
+            <span class="craque-hist-month-arrow${isFirst ? ' open' : ''}">▶</span>
           </div>
-          <div>
-            <div class="craque-hist-score">${c.score}</div>
-            <div class="craque-hist-score-lbl">pts</div>
-          </div>
+          <div class="craque-hist-month-body${isFirst ? ' open' : ''}">${itemsHTML}</div>
         </div>`;
       }).join('');
     }
@@ -13797,6 +13857,14 @@ window.fecharCraqueSemana = function(){
   if(!modal) return;
   modal.classList.remove('open');
   document.body.style.overflow = '';
+};
+
+window._toggleCraqueMes = function(header){
+  const arrow = header.querySelector('.craque-hist-month-arrow');
+  const body  = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
 };
 
 // Fecha com ESC
