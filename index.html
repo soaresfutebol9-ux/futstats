@@ -1622,6 +1622,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .hist-mes-card:hover{border-color:var(--bo2)}
 .hist-mes-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
 .hist-mes-nome{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.hist-mes-nome .hist-mes-ano{font-size:0.78em;font-weight:700;}
 .hist-mes-badge{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);background:var(--bg3);border:1px solid var(--bo);border-radius:6px;padding:4px 10px}
 .hist-mes-players{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:.85rem}
 .hist-mes-player{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--bo);border-radius:10px;padding:6px 12px}
@@ -1907,10 +1908,18 @@ select option{background:var(--bg3)}
 /* ── Versão slim (1 linha) ── */
 .desafio-slim{
   border-radius:10px;padding:7px 10px;margin-bottom:6px;
-  background:rgba(255,90,122,.04);
-  border:1.5px solid rgba(255,90,122,.4);
+  background:rgba(150,160,180,.05);
+  border:1.5px solid rgba(150,160,180,.35);
   display:flex;align-items:center;gap:5px;
   position:relative;overflow:hidden;
+}
+.desafio-slim.is-winner{
+  background:rgba(77,255,176,.05);
+  border-color:rgba(77,255,176,.5);
+}
+.desafio-slim.is-loser{
+  background:rgba(255,90,122,.05);
+  border-color:rgba(255,90,122,.5);
 }
 .desafio-slim-name{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 0;min-width:0;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:4px;}
 .desafio-slim-name.right{text-align:left;justify-content:flex-start;}
@@ -4483,6 +4492,10 @@ function _redrawAllPizzas(){
 
 function getMesKey(date){const d=date||new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
 function getMesLabel(key){const[y,m]=key.split('-');const ms=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];return`${ms[parseInt(m)-1]} ${y}`}
+// Versão com mês e ano em spans separados, com tamanho de fonte ajustado
+// para compensar o fato de a fonte 'Syne' desenhar os dígitos em escala
+// visualmente maior que as letras minúsculas (deixava o ano "saltando").
+function getMesLabelHTML(key){const[y,m]=key.split('-');const ms=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];return`${ms[parseInt(m)-1]} <span class="hist-mes-ano">${y}</span>`}
 function mesAtual(){return getMesKey()}
 function fd(d){if(!d)return'';return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
 function avC(name){let h=0;for(let c of(name||'?'))h=(h*31+c.charCodeAt(0))&0xffff;return'av'+(h%6)}
@@ -6832,7 +6845,15 @@ function _dcCardHTML(challenge, perspectiveUid){
   const crownB = winnerUID===challenge.uidB ? '<span class=\"desafio-slim-crown\">👑</span>' : '';
   const cancelBtn = (!ended && (challenge.uidA === currentUser?.uid || challenge.uidB === currentUser?.uid))
     ? '<button onclick=\"_dcCancelar(\\x27' + challenge.id + '\\x27)\" class=\"desafio-slim-cancel\">cancelar</button>' : '';
-  return '<div class=\"desafio-slim\">'
+  // Cor da borda relativa ao "dono" do perfil sendo visualizado (perspectiveUid):
+  // verde se ele venceu, vermelha se ele perdeu, cinza se empate/sem vencedor ainda.
+  let perspectiveClass = '';
+  if(winnerUID && perspectiveUid && (perspectiveUid===challenge.uidA || perspectiveUid===challenge.uidB)){
+    perspectiveClass = winnerUID===perspectiveUid ? ' is-winner' : ' is-loser';
+  } else if(winnerUID){
+    perspectiveClass = ' is-winner'; // sem perspectiva definida (ex: tela do criador do desafio): mantém verde neutro
+  }
+  return '<div class=\"desafio-slim' + perspectiveClass + '\">'
     + '<span class=\"desafio-slim-name\">' + mbA.name + crownA + '</span>'
     + '<span class=\"desafio-slim-score\">' + scoreA + '</span>'
     + '<span class=\"desafio-slim-x\">×</span>'
@@ -8405,7 +8426,7 @@ function renderHistTab(){
         const h=hist[k];const allMatches=h.matches||[];
         return`<div class="hist-mes-card">
           <div class="hist-mes-top">
-            <div class="hist-mes-nome">${getMesLabel(k)}</div>
+            <div class="hist-mes-nome">${getMesLabelHTML(k)}</div>
             <div class="hist-mes-badge">${allMatches.length} partida${allMatches.length!==1?'s':''}</div>
           </div>
           <div class="hist-mes-actions">
@@ -8418,7 +8439,7 @@ function renderHistTab(){
       mesVigenteNoAno?`<div class="hist-mes-card" style="border-color:rgba(77,255,176,.3);position:relative;overflow:hidden">
         <div style="text-align:center;margin-bottom:6px"><span style="display:inline-block;background:var(--g);color:#0a0a0a;font-size:9px;font-family:'DM Mono',monospace;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.08em">ATUAL</span></div>
         <div class="hist-mes-top">
-          <div class="hist-mes-nome">${getMesLabel(mesVigente)}</div>
+          <div class="hist-mes-nome">${getMesLabelHTML(mesVigente)}</div>
           <div class="hist-mes-badge">${(gd.matches||[]).length} partida${(gd.matches||[]).length!==1?'s':''}</div>
         </div>
         <div class="hist-mes-actions">
@@ -13928,9 +13949,9 @@ function _renderCraqueModalContent(){
               <div class="craque-hist-month-label">📅 ${grupo.label}</div>
               <div class="craque-hist-month-meta">${metaLabel}</div>
             </div>
-            <span class="craque-hist-month-arrow${isFirst ? ' open' : ''}">▶</span>
+            <span class="craque-hist-month-arrow">▶</span>
           </div>
-          <div class="craque-hist-month-body${isFirst ? ' open' : ''}">${itemsHTML}</div>
+          <div class="craque-hist-month-body">${itemsHTML}</div>
         </div>`;
       }).join('');
     }
@@ -13972,6 +13993,13 @@ window._toggleCraqueMes = function(header){
   const arrow = header.querySelector('.craque-hist-month-arrow');
   const body  = header.nextElementSibling;
   const isOpen = body.classList.contains('open');
+  // Accordion: fecha todos os outros meses antes de aplicar o novo estado
+  document.querySelectorAll('.craque-hist-month-body.open').forEach(b => {
+    if(b !== body) b.classList.remove('open');
+  });
+  document.querySelectorAll('.craque-hist-month-arrow.open').forEach(a => {
+    if(a !== arrow) a.classList.remove('open');
+  });
   body.classList.toggle('open', !isOpen);
   arrow.classList.toggle('open', !isOpen);
 };
