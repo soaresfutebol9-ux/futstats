@@ -13603,10 +13603,11 @@ function _cartaFallbackDownload(card){
 }
 .craque-hist-month-arrow.open{transform:rotate(90deg);}
 .craque-hist-month-body{
-  margin-top:6px;overflow:hidden;
-  max-height:0;transition:max-height .25s ease;
+  margin-top:0;overflow:hidden;
+  max-height:0;opacity:0;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1),opacity .22s ease,margin-top .32s cubic-bezier(.4,0,.2,1);
 }
-.craque-hist-month-body.open{max-height:9999px;}
+.craque-hist-month-body.open{opacity:1;margin-top:6px;}
 
 /* ── MODO LITE ────────────────────────────────────────────────────────────── */
 /* Desativa apenas animações decorativas — não afeta transitions de visibilidade */
@@ -13993,15 +13994,37 @@ window._toggleCraqueMes = function(header){
   const arrow = header.querySelector('.craque-hist-month-arrow');
   const body  = header.nextElementSibling;
   const isOpen = body.classList.contains('open');
-  // Accordion: fecha todos os outros meses antes de aplicar o novo estado
+
+  // Fecha de forma fluida qualquer outro mês que esteja aberto (accordion)
   document.querySelectorAll('.craque-hist-month-body.open').forEach(b => {
-    if(b !== body) b.classList.remove('open');
+    if(b === body) return;
+    const otherHeader = b.previousElementSibling; // .craque-hist-month-header correspondente
+    const otherArrow = otherHeader?.querySelector('.craque-hist-month-arrow');
+    b.style.maxHeight = b.scrollHeight + 'px'; // fixa a altura atual antes de animar para 0
+    requestAnimationFrame(() => { b.style.maxHeight = '0px'; });
+    b.classList.remove('open');
+    if(otherArrow) otherArrow.classList.remove('open');
   });
-  document.querySelectorAll('.craque-hist-month-arrow.open').forEach(a => {
-    if(a !== arrow) a.classList.remove('open');
-  });
-  body.classList.toggle('open', !isOpen);
-  arrow.classList.toggle('open', !isOpen);
+
+  if(isOpen){
+    // Fechando o mês clicado: parte da altura real até 0
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  } else {
+    // Abrindo: define a altura real do conteúdo como destino da animação
+    body.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    arrow.classList.add('open');
+    // Após a transição, libera o limite para não cortar conteúdo dinâmico futuro
+    body.addEventListener('transitionend', function _onEnd(e){
+      if(e.propertyName === 'max-height' && body.classList.contains('open')){
+        body.style.maxHeight = 'none';
+      }
+      body.removeEventListener('transitionend', _onEnd);
+    });
+  }
 };
 
 // Fecha com ESC
