@@ -10557,6 +10557,8 @@ function mfabClose(){
 // Fecha o menu ao clicar fora
 document.addEventListener('click', e=>{
   const wrap = document.getElementById('mfab-wrap');
+  const modal = document.getElementById('modal-historico-confrontos');
+  if(modal && modal.classList.contains('open')) return;
   if(wrap && !wrap.contains(e.target)){
     mfabClose();
   }
@@ -16255,17 +16257,19 @@ window._cfgRemoverMembro = async function() {
   let _hcFiltroAno = '__todos__';     // '2024' ou '__todos__'
 
   window.abrirHistoricoConfrontos = function(){
-    const modal = document.getElementById('modal-historico-confrontos');
-    if(!modal) return;
-    _hcFiltroJogador = '__todos__';
-    _hcFiltroAno = '__todos__';
-    modal.classList.add('open');
-    if(!gd){
-      document.getElementById('hc-body').innerHTML='<div class="hc-empty">Carregue um grupo para ver os confrontos.</div>';
-      return;
-    }
-    _hcBuildFilters();
-    _hcRender();
+    setTimeout(function(){
+      const modal = document.getElementById('modal-historico-confrontos');
+      if(!modal) return;
+      _hcFiltroJogador = '__todos__';
+      _hcFiltroAno = '__todos__';
+      modal.classList.add('open');
+      if(!gd){
+        document.getElementById('hc-body').innerHTML='<div class="hc-empty">Carregue um grupo para ver os confrontos.</div>';
+        return;
+      }
+      _hcBuildFilters();
+      _hcRender();
+    }, 50);
   };
 
   window.fecharHistoricoConfrontos = function(){
