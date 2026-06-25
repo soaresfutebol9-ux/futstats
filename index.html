@@ -3562,7 +3562,6 @@ body::before{
         <div class="ft" onclick="setRank('geral',this)">Geral</div>
         <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
-        <button id="rank-share-btn" onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
       <div id="rl-wrap"><div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div></div>
 
@@ -4212,8 +4211,6 @@ body::before{
 <div class="ov" id="pvermes">
   <div class="pan" style="position:relative">
     <button onclick="closeP('pvermes')" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='#FF5A7A';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,90,122,.15)';this.style.color='#FF5A7A'">×</button>
-    <!-- Botão compartilhar histórico do mês -->
-    <button id="pvermes-share-btn" onclick="shareMonthRanking()" title="Compartilhar ranking do mês" style="position:absolute;top:12px;right:52px;width:30px;height:30px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;z-index:2;padding:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="18" height="18" style="display:block"></button>
     <div id="pvermes-content"></div>
     <button class="bg2btn" onclick="closeP('pvermes')" style="margin-top:10px">Fechar</button>
   </div>
@@ -7845,7 +7842,6 @@ function renderRanking(){
     }
   }
   const mbs=gd.members||[];
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(rankStat==='recordes'||rankStat==='pen')?'none':'flex';
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
   const geralWrap=document.getElementById('geral-banner-wrap');
@@ -8082,7 +8078,6 @@ window.setRank=(s,el)=>{
   _rankAtivo=s;
   document.querySelectorAll('.ft').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(s==='recordes'||s==='pen')?'none':'flex';
   showRankingSkeleton();
 
   setTimeout(()=>{
@@ -9894,7 +9889,6 @@ window.irParaRankingGA=()=>{
         <div class="mp-header-actions">
           <button id="mp-desafiar-btn" onclick="_mpDesafiarClick()" title="Desafiar este jogador" style="display:none;background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:8px;padding:5px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">⚔️</button>
           <button id="mp-adm-partidas-btn" title="Gerenciar partidas (ADM)" style="display:none;align-items:center;justify-content:center;background:#0a0e1a;border:none;color:#fff;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;cursor:pointer;transition:opacity .15s;flex-shrink:0">+</button>
-          <button onclick="sharePlayerProfile()" title="Compartilhar perfil" style="width:28px;height:28px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0;flex-shrink:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="15" height="15" style="display:block"></button>
           <div class="mp-close" onclick="closePlayerProfile()">×</div>
         </div>
       </div>
@@ -10140,7 +10134,6 @@ window.irParaRankingGA=()=>{
       <div class="duelo-title" style="display:flex;align-items:center;white-space:nowrap">⚔️ Modo Duelo</div>
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="abrirCriarDesafio()" title="Criar desafio com prazo" style="background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:10px;padding:6px 12px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">+ Desafiar</button>
-        <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
         <div class="duelo-close" onclick="closeDuelo()">×</div>
       </div>
     </div>
@@ -11128,29 +11121,10 @@ document.addEventListener('click', e=>{
   let _lastCardData = null;
   let _lastCardType = null;
 
-  window.shareRanking = async function () {
-    const data = buildRankingData();
-    if (!data || !data.players.length) {
-      alert('Nenhum dado de ranking disponível para compartilhar.');
-      return;
-    }
-    _lastCardData = data;
-    _lastCardType = 'ranking';
-    const canvas = openShareModal();
-    await drawRankingCard(canvas, data);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareRanking = function () {};
 
-  window.shareDuelo = async function () {
-    const data = buildDueloData();
-    if (!data) {
-      alert('Selecione dois jogadores no modo duelo antes de compartilhar.');
-      return;
-    }
-    _lastCardData = data;
-    _lastCardType = 'duelo';
-    const canvas = openShareModal();
-    await drawDueloCard(canvas, data);
-  };
+  window.shareDuelo = function () {};
 
   // ── CARD: RANKING DE MÊS HISTÓRICO ─────────────────────────
   function buildMonthRankingData(key, isVigente) {
@@ -11446,31 +11420,11 @@ document.addEventListener('click', e=>{
     ctx.fillText(footLabel.toUpperCase(), W / 2, H - 16);
   }
 
-  // ── COMPARTILHAR RANKING DO MÊS ──────────────────────────────
-  window.shareMonthRanking = async function () {
-    const key = window._pvermes_key;
-    const isVigente = window._pvermes_isVigente;
-    const data = buildMonthRankingData(key, isVigente);
-    if (!data || !data.players.length) { alert('Nenhum dado disponível.'); return; }
-    _lastCardData = data;
-    _lastCardType = 'monthranking';
-    const canvas = openShareModal();
-    await drawRankingCard(canvas, data);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareMonthRanking = function () {};
 
-  // ── COMPARTILHAR RECORDES ────────────────────────────────────
-  window.shareRecord = async function(tipo) {
-    const data = window._buildRecordData ? window._buildRecordData() : null;
-    if (!data) { alert('Nenhum dado disponível.'); return; }
-    const list = tipo === 'gols' ? data.golsTop : data.assistTop;
-    if (!list || !list.length) { alert('Nenhum recorde registrado ainda.'); return; }
-
-    const recData = { tipo, list, groupName: (window._gd && window._gd.name) || 'Grupo' };
-    _lastCardData = recData;
-    _lastCardType = 'record';
-    const canvas = openShareModal();
-    await drawRecordCard(canvas, recData);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareRecord = function() {};
 
   async function drawRecordCard(canvas, data) {
     const W = CARD_W, H = CARD_H;
@@ -11676,58 +11630,10 @@ document.addEventListener('click', e=>{
     setTimeout(() => { el.style.display = 'none'; }, 260);
   }
 
-  window.sharePlayerProfile = async function () {
-    const uid = window._mpUid;
-    if (!uid) { alert('Abra o perfil de um jogador primeiro.'); return; }
+  // Recurso de compartilhamento removido.
+  window.sharePlayerProfile = function () {};
 
-    // Descobre temporadas disponíveis
-    const testData = buildPlayerProfileData(uid, '__all__');
-    if (!testData) { alert('Sem dados para compartilhar.'); return; }
-    const anos = testData.anosDisponiveis || [];
-
-    _createSeasonPickerModal();
-    const modal = document.getElementById('season-picker-modal');
-    const opts = document.getElementById('sp-options');
-
-    // Monta opções dinamicamente
-    let optHTML = '';
-    anos.forEach(a => {
-      optHTML += `<button class="sp-opt" onclick="window._doSharePlayerSeason('${uid}','${a}')">
-        <div class="sp-opt-icon">📅</div>
-        <div>Temporada ${a}</div>
-      </button>`;
-    });
-    if (anos.length > 1) {
-      optHTML += `<button class="sp-opt sp-opt-all" onclick="window._doSharePlayerSeason('${uid}','__all__')">
-        <div class="sp-opt-icon">🌐</div>
-        <div>Geral — todas as temporadas</div>
-      </button>`;
-    }
-    if (!optHTML) {
-      // Sem histórico, compartilha direto como geral
-      const data = buildPlayerProfileData(uid, '__all__');
-      _lastCardData = data;
-      _lastCardType = 'player';
-      const canvas = openShareModal();
-      await drawPlayerCard(canvas, data);
-      return;
-    }
-    opts.innerHTML = optHTML;
-
-    modal.style.display = 'flex';
-    if(document.body.classList.contains('lite-mode')){modal.classList.add('show');}else{requestAnimationFrame(()=>modal.classList.add('show'));}
-  };
-
-  window._doSharePlayerSeason = async function(uid, season) {
-    _closeSeasonPicker();
-    await new Promise(r => setTimeout(r, 260)); // aguarda fechar picker
-    const data = buildPlayerProfileData(uid, season);
-    if (!data) { alert('Sem dados para compartilhar.'); return; }
-    _lastCardData = data;
-    _lastCardType = 'player';
-    const canvas = openShareModal();
-    await drawPlayerCard(canvas, data);
-  };
+  window._doSharePlayerSeason = function() {};
 
   // ── FIM COMPARTILHAMENTO ────────────────────────────────────
 
