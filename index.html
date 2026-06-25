@@ -2163,7 +2163,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:rgba(0,0,0,.78);
   padding:16px;
 }
-#modal-carta.open{ display:flex; }
+#modal-carta.open{ display:flex; animation:modalBgIn .25s ease forwards; }
 .carta-inner{
   background:transparent;
   display:flex;flex-direction:column;align-items:center;
@@ -13393,8 +13393,21 @@ window.fecharCartaJogador = function(){
   // Apenas limpa o pendente sem reverter — o tema salvo persiste no localStorage
   _cartaTemaPendente = null;
   const modal=document.getElementById('modal-carta');
-  if(modal) modal.classList.remove('open');
-  document.body.style.overflow='';
+  if(!modal || !modal.classList.contains('open')) return; // já fechado ou fechando
+  const inner=document.getElementById('carta-inner');
+  modal.style.transition='opacity .22s ease';
+  modal.style.opacity='0';
+  if(inner){
+    inner.style.transition='transform .2s cubic-bezier(.4,0,1,1),opacity .2s ease';
+    inner.style.transform='translateY(24px) scale(.97)';
+    inner.style.opacity='0';
+  }
+  setTimeout(()=>{
+    modal.classList.remove('open');
+    modal.style.cssText='';
+    if(inner) inner.style.cssText='';
+    document.body.style.overflow='';
+  },220);
 };
 
 /* Fecha ao apertar Escape */
