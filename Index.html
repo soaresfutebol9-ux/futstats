@@ -2033,7 +2033,7 @@ select option{background:var(--bg3)}
 
 /* ── MULTI-FAB ── */
 .mfab-wrap{
-  position:fixed;bottom:90px;right:16px;z-index:999;
+  position:fixed;bottom:90px;right:16px;z-index:9999;
   display:none;flex-direction:column-reverse;align-items:flex-end;gap:10px;
 }
 body.duelo-fab-visible .mfab-wrap,
@@ -2092,21 +2092,10 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   color:#fff;
 }
 
-/* ── MFAB BLUR ── */
-body.mfab-open #sa{
-  filter:blur(4px);
-  transition:filter .3s ease;
-  pointer-events:none;
-}
-#sa{
-  transition:filter .3s ease;
-}
 /* ── MFAB BLUR OVERLAY ── */
 #mfab-blur-overlay{
-  position:fixed;inset:0;z-index:498;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  background:rgba(0,0,0,.4);
+  position:fixed;inset:0;z-index:490;
+  background:rgba(0,0,0,.5);
   opacity:0;
   visibility:hidden;
   transition:opacity .3s ease, visibility .3s ease;
@@ -10343,7 +10332,6 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MULTI-FAB (Duelo + Conquistas) ══ -->
-<div id="mfab-blur-overlay" onclick="mfabClose()"></div>
 <div class="mfab-wrap" id="mfab-wrap">
   <!-- Itens expandíveis -->
   <div class="mfab-items" id="mfab-items">
@@ -10554,7 +10542,6 @@ function mfabToggle(){
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
   if(overlay) overlay.classList.toggle('open', open);
-  document.body.classList.toggle('mfab-open', open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
@@ -10566,7 +10553,6 @@ function mfabClose(){
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
   if(overlay) overlay.classList.remove('open');
-  document.body.classList.remove('mfab-open');
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
@@ -15000,6 +14986,7 @@ document.addEventListener('touchstart', e => {
   </div>
 </div>
 
+<div id="mfab-blur-overlay" onclick="mfabClose()"></div>
 </body>
 </html>
 <!-- PHOTO LIGHTBOX -->
