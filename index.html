@@ -5149,7 +5149,7 @@ function renderPerfilPanelStats(){
       <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">⚽ Últimas partidas</div>
       <div class="mr-list-fade"><div class="mr-list">${myMatches.map(m=>{
         const pl=[];if(m.gols>0)pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);if(m.assist>0)pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);if((m.penBat||0)>0)pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat}</span>`);
-        return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit(${m._gi});closeP('pperfil')">✏️</button><button class="ma-btn del" onclick="deleteMatchAndRefresh(${m._gi})">🗑</button></div></div>`;
+        return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(_isAdmin()&&(m.penBat||0)>0)?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="openEdit(${m._gi});closeP('pperfil')">✏️</button><button class="ma-btn del" onclick="deleteMatchAndRefresh(${m._gi})">🗑</button></div></div>`;
       }).join('')}</div></div>
       ${myMatches.length>3?`<button class="mr-expand-btn" onclick="openModalPartidas()" style="margin-top:8px"><svg viewBox='0 0 24 24' style='width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2'><polyline points='15 3 21 3 21 9'/><polyline points='9 21 3 21 3 15'/><line x1='21' y1='3' x2='14' y2='10'/><line x1='3' y1='21' x2='10' y2='14'/></svg> Ver todas (${myMatches.length})</button>`:''}
     </div>`;
@@ -8287,7 +8287,7 @@ function renderPerfil(){
     <div class="card"><div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">${avatarHTML(myProfile.displayName,50,currentUser.uid)}<div><div style="font-family:'Freshman',sans-serif;font-size:17px;font-weight:normal;letter-spacing:.5px">${myProfile.displayName}</div><div style="font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace">${gd.name} · ${getMesLabel(gd.mesAtivo||mesAtual())}</div></div></div>
     <div class="sg"><div class="sb"><div class="sbl">Gols</div><div class="sbv">${s.gols}</div><div class="sba">${s.n?(s.gols/s.n).toFixed(1):'—'}/jogo</div></div><div class="sb"><div class="sbl">Assist.</div><div class="sbv">${s.assist}</div><div class="sba">${s.n?(s.assist/s.n).toFixed(1):'—'}/jogo</div></div><div class="sb"><div class="sbl">G+A</div><div class="sbv">${s.gols+s.assist}</div><div class="sba">${s.n?((s.gols+s.assist)/s.n).toFixed(1):'—'}/jogo</div></div></div></div>
     ${s.penBat>0?`<div class="card"><div class="cl">Pênaltis</div><div class="pizza-wrap"><canvas id="${pizzaId}" class="pizza-canvas" width="96" height="96"></canvas><div class="pizza-legend"><div class="pizza-item"><div class="pizza-dot" style="background:#6FCF97"></div><span style="color:var(--tx2)">Convertidos:</span><strong style="color:#6FCF97;font-family:'ClassyVogue',sans-serif;font-size:20px"> ${s.penOk}</strong></div><div class="pizza-item"><div class="pizza-dot" style="background:#EB5757"></div><span style="color:var(--tx2)">Perdidos:</span><strong style="color:#EB5757;font-family:'ClassyVogue',sans-serif;font-size:20px"> ${s.penBat-s.penOk}</strong></div><div class="pizza-item"><div class="pizza-dot" style="background:#F2C94C"></div><span style="color:var(--tx2)">Aproveit.:</span><strong style="color:var(--am);font-family:'ClassyVogue',sans-serif;font-size:18px"> ${pct}%</strong></div></div></div></div>`:''}
-    <div class="card"><div class="cl">Últimas partidas</div>${(()=>{if(myMatches.length===0)return'<div class="empty" style="padding:1rem 0">Nenhuma partida ainda.</div>';const rows=myMatches.map(m=>{const pl=[];if(m.gols>0)pl.push('<span class="pi pg">⚽ '+m.gols+'</span>');if(m.assist>0)pl.push('<span class="pi pb2">👟 '+m.assist+'</span>');if((m.penBat||0)>0)pl.push('<span class="pi pa">'+(m.penOk||0)+'/'+m.penBat+' pen</span>');return'<div class="mr"><div class="md">'+fd(m.date)+'</div><div style="flex:1"><div class="mt2">'+m.name+'</div><div class="mp">'+(pl.join('')||'<span class="pi pp">sem stats</span>')+'</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit('+m._gi+')">✏️</button><button class="ma-btn del" onclick="deleteMatch('+m._gi+')">🗑</button></div></div>';}).join('');const btn=myMatches.length>3?'<button class="mr-expand-btn" onclick="openModalPartidas()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Ver todas ('+myMatches.length+')</button>':'';return'<div class="mr-list-fade"><div class="mr-list">'+rows+'</div></div>'+btn;})()} </div>`;
+    <div class="card"><div class="cl">Últimas partidas</div>${(()=>{if(myMatches.length===0)return'<div class="empty" style="padding:1rem 0">Nenhuma partida ainda.</div>';const rows=myMatches.map(m=>{const pl=[];if(m.gols>0)pl.push('<span class="pi pg">⚽ '+m.gols+'</span>');if(m.assist>0)pl.push('<span class="pi pb2">👟 '+m.assist+'</span>');if((m.penBat||0)>0)pl.push('<span class="pi pa">'+(m.penOk||0)+'/'+m.penBat+' pen</span>');return'<div class="mr"><div class="md">'+fd(m.date)+'</div><div style="flex:1"><div class="mt2">'+m.name+'</div><div class="mp">'+(pl.join('')||'<span class="pi pp">sem stats</span>')+'</div></div><div class="ma-actions">'+((_isAdmin()&&(m.penBat||0)>0)?'<button class="ma-btn" onclick="openPenMarcarAdmin('+m._gi+')" title="Marcar pênaltis">🎯</button>':'')+'<button class="ma-btn" onclick="openEdit('+m._gi+')">✏️</button><button class="ma-btn del" onclick="deleteMatch('+m._gi+')">🗑</button></div></div>';}).join('');const btn=myMatches.length>3?'<button class="mr-expand-btn" onclick="openModalPartidas()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Ver todas ('+myMatches.length+')</button>':'';return'<div class="mr-list-fade"><div class="mr-list">'+rows+'</div></div>'+btn;})()} </div>`;
   if(s.penBat>0)requestAnimationFrame(()=>drawPizza(pizzaId,s.penOk,s.penBat));
 }
 
@@ -9029,7 +9029,7 @@ window.openModalPartidas=()=>{
     if(m.gols>0)pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);
     if(m.assist>0)pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);
     if((m.penBat||0)>0)pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
-    return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit(${m._gi});closeModalPartidas()">✏️</button><button class="ma-btn del" onclick="deleteMatchModal(${m._gi})">🗑</button></div></div>`;
+    return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(_isAdmin()&&(m.penBat||0)>0)?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="openEdit(${m._gi});closeModalPartidas()">✏️</button><button class="ma-btn del" onclick="deleteMatchModal(${m._gi})">🗑</button></div></div>`;
   }).join('');
   const modal=$('modal-partidas');
   modal.style.display='flex';
@@ -9140,7 +9140,7 @@ function _renderAdmPartidasModal(){
     if(m.gols>0) pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);
     if(m.assist>0) pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);
     if((m.penBat||0)>0) pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
-    return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
+    return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(m.penBat||0)>0?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
   }).join('');
 
   const modal = $('modal-partidas');
@@ -14152,15 +14152,25 @@ document.addEventListener('touchstart', e => {
   }
 
   /* ═══ MODAL DE MARCAÇÃO ═══════════════════════════════ */
-  window.openPenMarcar = function(partida, total, ok){
+  window.openPenMarcar = function(partida, total, ok, pontosExistentes){
     _marcarPartida = partida;
     _marcarTotal   = total;
     _marcarOk      = ok;
-    _marcarIdx     = 0;
-    _marcarResultados = [];
+    // Retomada: se já existem pontos marcados (penMap parcial), começa a partir deles
+    _marcarResultados = (pontosExistentes && pontosExistentes.length)
+      ? pontosExistentes.map(p=>({x:p.x, y:p.y, ok:p.ok}))
+      : [];
+    _marcarIdx     = _marcarResultados.length;
     _marcarPendente = null;
     _marcarResult   = null;
     _marcarPos      = null;
+
+    // Caso não haja cobranças pendentes (já estava completo), nada a marcar — apenas garante que está salvo
+    if(_marcarIdx >= _marcarTotal){
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+      alert('Essa partida já tem todas as cobranças de pênalti mapeadas.');
+      return;
+    }
 
     // Monta "resultado" esperado: ok convertidos + (total-ok) errados, embaralhados
     // Não vamos forçar: usuário define resultado ao clicar ✅/❌
@@ -14627,16 +14637,26 @@ document.addEventListener('touchstart', e => {
 
   function _renderMapa(){ _renderMapaSemCanvas(); _renderMapaCanvas(); }
 
-  /* ═══ ADMIN: editar penMap de qualquer jogador ═════════ */
-  // Abre o mapa com botão de edição — aparece somente para admin
-  window.openPenMapaAdmin = function(uid, ts){
-    if(!window._isAdmin || !_isAdmin()) return;
+  /* ═══ ADMIN: reabrir/retomar marcação de pênaltis de qualquer partida ═══
+     Usada pelo botão 🎯 nos cards de partida — visível somente para o ADM.
+     gi = índice da partida no array gd.matches (mesmo "_gi" usado por openEdit/deleteMatch). */
+  window.openPenMarcarAdmin = function(gi){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin) return;
     const gd=_gd();
-    const m = (gd?.matches||[]).find(x=>x.uid===uid&&x.ts===ts);
-    if(!m) return;
-    // Remove o penMap e reabre modal de marcação em nome do jogador
-    if(!confirm(`Reeditar cobranças de ${m.player||m.uid}?`)) return;
-    openPenMarcar(m, m.penBat||0, m.penOk||0);
+    const m = (gd?.matches||[])[gi];
+    if(!m || !(m.penBat>0)) return;
+    openPenMarcar(m, m.penBat||0, m.penOk||0, m.penMap||[]);
+  };
+
+  // Mantido por compatibilidade, caso algo ainda chame pelo nome antigo (uid+ts)
+  window.openPenMapaAdmin = function(uid, ts){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin) return;
+    const gd=_gd();
+    const gi = (gd?.matches||[]).findIndex(x=>x.uid===uid&&x.ts===ts);
+    if(gi<0) return;
+    openPenMarcarAdmin(gi);
   };
 
 })();
