@@ -1080,7 +1080,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 /* ── RANKING ── */
 .rank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-.rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem;align-items:stretch;}
+.rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:24px;margin-bottom:1.25rem;align-items:stretch;}
 
 .podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center;overflow:hidden}
 .podium-item.p1{background:linear-gradient(160deg,#f5f0a0 0%,#e8df2c 15%,#b8a800 30%,#e8df2c 45%,#a09000 58%,#e8df2c 70%,#c0b400 82%,#f5f0a0 100%);border-color:#b8a800;box-shadow:0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset}
@@ -1107,7 +1107,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .podium-crown{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .p1 .podium-av{position:relative;}
 .p1 .podium-av-crown{
-  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  position:absolute;top:-26px;left:50%;transform:translateX(-50%);
   font-size:22px;line-height:1;
   filter:drop-shadow(0 0 10px rgba(255,215,0,.85));
   animation:craque-crown-bounce 2.4s ease-in-out infinite;
@@ -7897,7 +7897,7 @@ function renderRanking(){
     const podiumOrderG=[1,0,2];const podiumClsG=['p2','p1','p3'];const podiumCrownG=['🥈','🥇','🥉'];
     let podiumGeralHTML='';
     if(top3g.length>=2){
-      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumClsG[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}"><div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}${isMe?`<div class="av-you-ring">${avatarHTML(p.name,46,p.uid)}</div>`:avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.gols+p.assist}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
+      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumClsG[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}<div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,46,p.uid)}</div>`:avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.gols+p.assist}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
@@ -8079,7 +8079,7 @@ function renderRanking(){
   const podiumOrder=[1,0,2];const podiumCls=['p2','p1','p3'];const podiumCrown=['🥈','🥇','🥉'];const podiumSizes=[46,46,46];
   let podiumHTML='';
   if(top3.length>=2){
-    podiumHTML=`<div class="rank-podium">${podiumOrder.map((pi,vi)=>{const p=top3[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumCls[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}"><div class="podium-crown">${podiumCrown[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}${isMe?`<div class="av-you-ring">${avatarHTML(p.name,podiumSizes[vi],p.uid)}</div>`:avatarHTML(p.name,podiumSizes[vi],p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.val}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
+    podiumHTML=`<div class="rank-podium">${podiumOrder.map((pi,vi)=>{const p=top3[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumCls[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}<div class="podium-crown">${podiumCrown[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,podiumSizes[vi],p.uid)}</div>`:avatarHTML(p.name,podiumSizes[vi],p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.val}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
