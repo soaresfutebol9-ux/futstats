@@ -2072,11 +2072,9 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 .mfab-item-label{
   background:rgba(14,18,30,.88);border:1px solid rgba(255,255,255,.13);
-  
   border-radius:20px;padding:5px 13px;
   font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
   color:#fff;white-space:nowrap;
-  box-shadow:0 2px 10px rgba(0,0,0,.45);
 }
 .mfab-item{
   width:44px;height:44px;border-radius:50%;
@@ -2093,6 +2091,17 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   box-shadow:0 4px 12px rgba(56,189,248,.55),0 2px 6px rgba(0,0,0,.4);
   color:#fff;
 }
+
+/* ── MFAB BLUR OVERLAY ── */
+#mfab-blur-overlay{
+  display:none;
+  position:fixed;inset:0;z-index:499;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.35);
+  transition:opacity .25s;
+}
+#mfab-blur-overlay.open{ display:block; }
 
 /* ══ MODAL HISTÓRICO DE CONFRONTOS ══ */
 #modal-historico-confrontos{
@@ -10319,6 +10328,7 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MULTI-FAB (Duelo + Conquistas) ══ -->
+<div id="mfab-blur-overlay" onclick="mfabClose()"></div>
 <div class="mfab-wrap" id="mfab-wrap">
   <!-- Itens expandíveis -->
   <div class="mfab-items" id="mfab-items">
@@ -10523,19 +10533,23 @@ function mfabToggle(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
+  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   const open = items.classList.toggle('open');
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
+  if(overlay) overlay.classList.toggle('open', open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
+  const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
   items.classList.remove('open');
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
+  if(overlay) overlay.classList.remove('open');
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
