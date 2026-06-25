@@ -779,7 +779,7 @@ html.is-touch .auth-ball{animation:none}
 }
 
 /* Ranking list switch — sem blur */
-#rl-wrap{overflow:hidden;position:relative;}
+#rl-wrap{overflow:visible;position:relative;}
 #rl{will-change:transform,opacity;}
 @keyframes rl-slide-in-right {
   0%  {transform:translateX(100%);opacity:0}
@@ -1082,7 +1082,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
 .rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:30px;margin-bottom:1.25rem;align-items:stretch;}
 
-.podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center;overflow:hidden}
+.podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center;overflow:visible}
 .podium-item.p1{background:linear-gradient(160deg,#f5f0a0 0%,#e8df2c 15%,#b8a800 30%,#e8df2c 45%,#a09000 58%,#e8df2c 70%,#c0b400 82%,#f5f0a0 100%);border-color:#b8a800;box-shadow:0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset}
 .podium-item.p2{background:linear-gradient(160deg,#f0f0f0 0%,#d8d8d8 12%,#a0a8b0 25%,#e8e8e8 38%,#9098a0 50%,#c8c8c8 62%,#f0f0f0 72%,#b0b8c0 82%,#d8d8d8 92%,#f4f4f4 100%);border-color:#888888;box-shadow:0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.5) inset}
 .podium-item.p3{background:linear-gradient(160deg,#e8d0a8 0%,#bf9658 14%,#8a6020 28%,#d4aa70 42%,#7a5010 55%,#bf9658 68%,#a07840 78%,#6a4008 88%,#e0c090 100%);border-color:#8a6020;box-shadow:0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset}
