@@ -14102,22 +14102,23 @@ document.addEventListener('touchstart', e => {
     ctx.fillStyle='#2d5a1b';
     ctx.fillRect(0,0,W,H);
 
-    // Grade da trave
+    // Grade da rede (mais sutil que as traves)
     const cols=6,rows=3;
-    ctx.strokeStyle='rgba(255,255,255,.1)';
-    ctx.lineWidth=.5;
+    ctx.strokeStyle='rgba(255,255,255,.16)';
+    ctx.lineWidth=.75;
     for(let c=0;c<=cols;c++){const x=gx+c*(gw/cols);ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+gh);ctx.stroke();}
     for(let r=0;r<=rows;r++){const y=gy+r*(gh/rows);ctx.beginPath();ctx.moveTo(gx,y);ctx.lineTo(gx+gw,y);ctx.stroke();}
 
-    // Moldura do gol
-    ctx.strokeStyle='rgba(255,255,255,.92)';
-    ctx.lineWidth=3*Math.min(sx,sy);
-    ctx.strokeRect(gx,gy,gw,gh);
-
-    // Linha do chão
-    ctx.strokeStyle='rgba(255,255,255,.5)';
-    ctx.lineWidth=2*sy;
-    ctx.beginPath();ctx.moveTo(gx-20*sx,gy+gh);ctx.lineTo(gx+gw+20*sx,gy+gh);ctx.stroke();
+    // Moldura do gol (sem linha de base — só travessão + duas traves laterais)
+    ctx.strokeStyle='rgba(255,255,255,.95)';
+    ctx.lineWidth=7*Math.min(sx,sy);
+    ctx.lineCap='square';
+    ctx.beginPath();
+    ctx.moveTo(gx,gy+gh);      // pé da trave esquerda
+    ctx.lineTo(gx,gy);         // sobe até o travessão
+    ctx.lineTo(gx+gw,gy);      // travessão
+    ctx.lineTo(gx+gw,gy+gh);   // desce trave direita
+    ctx.stroke();
 
     // Pontos
     if(pts && pts.length){
