@@ -14362,6 +14362,9 @@ document.addEventListener('touchstart', e => {
     const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
     if(!isAdmin){ bar.style.display='none'; bar.innerHTML=''; return; }
 
+    // Sem jogador específico selecionado ("Todos") e fora do modo edição: não mostra nada
+    if(!_editMode && _mapaFiltroUid==='all'){ bar.style.display='none'; bar.innerHTML=''; return; }
+
     bar.style.display='flex';
     bar.style.justifyContent='center';
     bar.style.marginBottom='.8rem';
@@ -14374,11 +14377,7 @@ document.addEventListener('touchstart', e => {
         </div>
         <div style="width:100%;text-align:center;font-size:10.5px;color:var(--tx3);margin-top:6px;font-family:'DM Mono',monospace">Arraste para mover · toque para trocar resultado · ✕ para excluir</div>`;
     } else {
-      const podeEditar = _mapaFiltroUid!=='all';
-      bar.innerHTML = `<button onclick="startEditPenMapa()" ${podeEditar?'':'disabled'} style="padding:8px 18px;border-radius:10px;border:1.5px solid ${podeEditar?'var(--g)':'var(--bo2)'};background:${podeEditar?'rgba(77,255,176,.12)':'var(--bg3)'};color:${podeEditar?'var(--g)':'var(--tx3)'};font-weight:700;font-size:12px;cursor:${podeEditar?'pointer':'not-allowed'};font-family:'DM Sans',sans-serif;opacity:${podeEditar?'1':'.6'}">✏️ Editar mapa</button>`;
-      if(!podeEditar){
-        bar.innerHTML += `<div style="width:100%;text-align:center;font-size:10.5px;color:var(--tx3);margin-top:6px;font-family:'DM Mono',monospace">Selecione um jogador para editar seu mapa</div>`;
-      }
+      bar.innerHTML = `<button onclick="startEditPenMapa()" style="padding:8px 18px;border-radius:10px;border:1.5px solid var(--g);background:rgba(77,255,176,.12);color:var(--g);font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">✏️ Editar mapa</button>`;
     }
   }
 
