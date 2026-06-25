@@ -7386,7 +7386,7 @@ async function checkMesViradaWith(gid,cur){
   if(cur.mesAtivo!==ma){
     const mesEncerrado = cur.mesAtivo;
     if(!cur.historico)cur.historico={};
-    cur.historico[mesEncerrado]={matches:[...(cur.matches||[])],members:[...(cur.members||[])]};
+    cur.historico[mesEncerrado]={matches:[...(cur.matches||[])],members:[...(cur.members||[])],desafios:[...(cur.desafios||[])]};
     cur.matches=[];cur.mesAtivo=ma;
     await setDoc(doc(db,'groups',gid),cur);
     // Publica no feed sobre encerramento do mês
@@ -16276,8 +16276,21 @@ window._cfgRemoverMembro = async function() {
     document.getElementById('modal-historico-confrontos')?.classList.remove('open');
   };
 
+  function _hcGetTodosDesafios(){
+    const atual = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+    const doHistorico = [];
+    Object.values(gd.historico||{}).forEach(h => {
+      (h.desafios||[]).forEach(d => {
+        if(d.status === 'ativo' || d.status === 'encerrado') doHistorico.push(d);
+      });
+    });
+    const vistos = new Set(atual.map(d => d.id));
+    doHistorico.forEach(d => { if(!vistos.has(d.id)) atual.push(d); });
+    return atual;
+  }
+
   function _hcBuildFilters(){
-    const desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+    const desafios = _hcGetTodosDesafios();
 
     // ── Filtro por jogador ──
     const playerWrap = document.getElementById('hc-player-filter');
@@ -16349,7 +16362,7 @@ window._cfgRemoverMembro = async function() {
     if(!body) return;
 
     const myUid = currentUser?.uid;
-    let desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+    let desafios = _hcGetTodosDesafios();
 
     // Filtro por jogador
     if(_hcFiltroJogador !== '__todos__'){
