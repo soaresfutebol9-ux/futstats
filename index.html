@@ -2088,10 +2088,164 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   flex-shrink:0;
 }
 .mfab-item:active{transform:scale(.88);}
-.mfab-item-duelo{
-  background:linear-gradient(135deg,#FF5A7A 0%,#c01040 100%);
-  filter:drop-shadow(0 4px 8px rgba(255,90,122,.6)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+.mfab-item-confrontos{
+  background:linear-gradient(135deg,#38bdf8 0%,#0284c7 100%);
+  filter:drop-shadow(0 4px 8px rgba(56,189,248,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  color:#fff;
 }
+
+/* ══ MODAL HISTÓRICO DE CONFRONTOS ══ */
+#modal-historico-confrontos{
+  display:none;position:fixed;inset:0;z-index:3200;
+  background:rgba(0,0,0,.8);
+  align-items:center;justify-content:center;
+  padding:16px;
+}
+#modal-historico-confrontos.open{display:flex;animation:modalBgIn .22s ease forwards;}
+.hc-inner{
+  background:var(--bg2);
+  border-radius:22px;
+  width:100%;max-width:520px;
+  max-height:90vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 48px rgba(0,0,0,.65),0 0 0 1px rgba(56,189,248,.15);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+.hc-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.2rem .85rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(56,189,248,.08) 0%,transparent 70%);
+}
+.hc-title{
+  font-family:'VarsityTeam',serif;font-size:17px;font-weight:bold;letter-spacing:.4px;
+  background:linear-gradient(135deg,#38bdf8 0%,#7dd3fc 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hc-close{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--bo2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;
+  transition:all .15s;
+}
+.hc-close:hover{background:var(--re);color:#fff;border-color:transparent;}
+.hc-filters{
+  padding:.75rem 1.1rem .6rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;display:flex;flex-direction:column;gap:8px;
+}
+/* Filtro de jogador */
+.hc-player-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hc-player-filter::-webkit-scrollbar{display:none;}
+.hc-player-chip{
+  padding:7px 13px;border-radius:99px;
+  border:1.5px solid var(--bo2);background:var(--bg3);
+  color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .18s;
+}
+.hc-player-chip.active{
+  border-color:#38bdf8;background:rgba(56,189,248,.15);color:#38bdf8;
+}
+/* Filtro de ano */
+.hc-year-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hc-year-filter::-webkit-scrollbar{display:none;}
+.hc-year-chip{
+  padding:5px 11px;border-radius:99px;
+  border:1.5px solid var(--bo2);background:var(--bg3);
+  color:var(--tx3);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .15s;
+}
+.hc-year-chip.active{
+  border-color:#38bdf8;background:rgba(56,189,248,.12);color:#38bdf8;
+}
+/* Body scrollável */
+.hc-body{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:.9rem 1.1rem 1.5rem;flex:1;
+}
+.hc-body::-webkit-scrollbar{width:3px;}
+.hc-body::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px;}
+/* Grupo de ano */
+.hc-year-group{margin-bottom:1.25rem;}
+.hc-year-label{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx3);
+  margin-bottom:.65rem;padding:0 2px;
+  display:flex;align-items:center;gap:6px;
+}
+.hc-year-label::after{content:'';flex:1;height:1px;background:var(--bo);}
+/* Card de confronto — cinza neutro (geral) */
+.hc-match{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:12px;
+  background:var(--bg3);border:1.5px solid var(--bo2);
+  margin-bottom:6px;position:relative;overflow:hidden;
+  transition:border-color .15s;
+}
+/* Quando filtrado por jogador: verde = ganhou, vermelho = perdeu */
+.hc-match.is-winner{
+  background:rgba(0,201,122,.06);border-color:rgba(0,201,122,.4);
+}
+.hc-match.is-loser{
+  background:rgba(224,32,80,.05);border-color:rgba(224,32,80,.35);
+}
+.hc-match.is-tie{
+  background:var(--bg3);border-color:var(--bo2);
+}
+.hc-name-left,.hc-name-right{
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:1 1 0;min-width:0;
+}
+.hc-name-right{text-align:right;}
+.hc-match.is-winner .hc-name-self{color:#009a5c;}
+.hc-match.is-loser .hc-name-self{color:#e02050;}
+.hc-scores{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.hc-score{
+  font-family:'DM Mono',monospace;font-size:15px;font-weight:700;
+  min-width:22px;text-align:center;color:var(--tx);
+}
+.hc-score.winner-score{color:#009a5c;}
+.hc-score.loser-score{color:#e02050;opacity:.75;}
+.hc-x{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);}
+.hc-tipo{
+  font-family:'DM Mono',monospace;font-size:8px;
+  background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);
+  border-radius:5px;padding:2px 6px;color:#38bdf8;
+  white-space:nowrap;flex-shrink:0;
+}
+.hc-empty{
+  text-align:center;padding:2.5rem 1rem;
+  color:var(--tx3);font-family:'DM Mono',monospace;
+  font-size:12px;letter-spacing:.04em;
+}
+.hc-count-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);
+  border-radius:99px;padding:4px 12px;
+  font-family:'DM Mono',monospace;font-size:11px;color:#38bdf8;
+  margin-bottom:.85rem;
+}
+/* Sumário quando filtrado por jogador */
+.hc-summary{
+  display:flex;gap:8px;margin-bottom:.9rem;
+}
+.hc-summary-box{
+  flex:1;border-radius:12px;padding:10px;text-align:center;
+  background:var(--bg3);border:1px solid var(--bo);
+}
+.hc-summary-val{font-family:'ClassyVogue',sans-serif;font-size:22px;line-height:1;}
+.hc-summary-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px;}
+.hc-summary-box.win .hc-summary-val{color:#009a5c;}
+.hc-summary-box.lose .hc-summary-val{color:#e02050;}
+.hc-summary-box.tie .hc-summary-val{color:var(--tx2);}
 .mfab-item-conquistas{
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
   filter:drop-shadow(0 4px 8px rgba(255,180,0,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
@@ -8961,17 +9115,7 @@ function _buildPlayerProfile(uid){
     ?'<div class="empty">Nenhum dado registrado.</div>'
     :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
-  // ── Desafios do jogador ──
-  const desafiosDoJogador = (gd.desafios||[]).filter(d =>
-    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado')
-  ).slice(-4).reverse();
-  if(desafiosDoJogador.length){
-    const desafioSection = document.createElement('div');
-    desafioSection.style.cssText='margin-top:12px;';
-    desafioSection.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>⚔️</span> Desafios diretos</div>'
-      + desafiosDoJogador.map(d => _dcCardHTML(d, uid)).join('');
-    document.getElementById('mp-body').appendChild(desafioSection);
-  }
+  // (confrontos diretos movidos para o FAB "Histórico de Confrontos")
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -10203,6 +10347,12 @@ window.irParaRankingGA=()=>{
       </button>
     </div>
     <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Histórico de Confrontos</span>
+      <button class="mfab-item mfab-item-confrontos" onclick="mfabClose();abrirHistoricoConfrontos()" title="Histórico de Confrontos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </button>
+    </div>
+    <div class="mfab-item-wrap">
       <span class="mfab-item-label">Modo Duelo</span>
       <button class="mfab-item mfab-item-duelo" onclick="mfabClose();openDuelo()" title="Modo Duelo">⚔️</button>
     </div>
@@ -10212,6 +10362,25 @@ window.irParaRankingGA=()=>{
     <span id="mfab-main-icon">＋</span>
     <div class="mfab-main-badge" id="mfab-main-badge"></div>
   </button>
+</div>
+
+<!-- ══ MODAL HISTÓRICO DE CONFRONTOS ══ -->
+<div id="modal-historico-confrontos" onclick="if(event.target===this)fecharHistoricoConfrontos()">
+  <div class="hc-inner">
+    <div class="hc-header">
+      <div class="hc-title">⚔️ Histórico de Confrontos</div>
+      <button class="hc-close" onclick="fecharHistoricoConfrontos()">×</button>
+    </div>
+    <div class="hc-filters">
+      <!-- Filtro por jogador -->
+      <div class="hc-player-filter" id="hc-player-filter"></div>
+      <!-- Filtro por ano -->
+      <div class="hc-year-filter" id="hc-year-filter"></div>
+    </div>
+    <div class="hc-body" id="hc-body">
+      <div class="hc-empty">Carregando confrontos...</div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MODAL CALENDÁRIO ══ -->
@@ -16075,6 +16244,207 @@ window._cfgRemoverMembro = async function() {
     document.getElementById('cal-popup').classList.add('open');
     // Scroll suave para o popup
     setTimeout(()=>{ document.getElementById('cal-popup').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
+  }
+})();
+
+// ══════════════════════════════════════════════════════
+//  HISTÓRICO DE CONFRONTOS — FAB
+// ══════════════════════════════════════════════════════
+(function(){
+  let _hcFiltroJogador = '__todos__'; // uid ou '__todos__'
+  let _hcFiltroAno = '__todos__';     // '2024' ou '__todos__'
+
+  window.abrirHistoricoConfrontos = function(){
+    const modal = document.getElementById('modal-historico-confrontos');
+    if(!modal || !gd) return;
+    _hcFiltroJogador = '__todos__';
+    _hcFiltroAno = '__todos__';
+    _hcBuildFilters();
+    _hcRender();
+    modal.classList.add('open');
+  };
+
+  window.fecharHistoricoConfrontos = function(){
+    document.getElementById('modal-historico-confrontos')?.classList.remove('open');
+  };
+
+  function _hcBuildFilters(){
+    const desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+
+    // ── Filtro por jogador ──
+    const playerWrap = document.getElementById('hc-player-filter');
+    if(!playerWrap) return;
+
+    // Coletar UIDs/nomes únicos que participaram de confrontos
+    const memberMap = {};
+    (gd.members||[]).forEach(m => { if(m.uid) memberMap[m.uid] = m.name; });
+
+    const uidsVisiveis = new Set();
+    desafios.forEach(d => {
+      if(d.uidA) uidsVisiveis.add(d.uidA);
+      if(d.uidB) uidsVisiveis.add(d.uidB);
+    });
+
+    const playerChips = [{ uid: '__todos__', name: 'Geral' }];
+    uidsVisiveis.forEach(uid => {
+      playerChips.push({ uid, name: memberMap[uid] || uid.slice(0,6) });
+    });
+
+    playerWrap.innerHTML = playerChips.map(p =>
+      `<button class="hc-player-chip${_hcFiltroJogador===p.uid?' active':''}" onclick="window._hcSetJogador('${p.uid}')">${p.name}</button>`
+    ).join('');
+
+    // ── Filtro por ano ──
+    const yearWrap = document.getElementById('hc-year-filter');
+    if(!yearWrap) return;
+
+    const anos = new Set();
+    desafios.forEach(d => {
+      const ts = d.criadoEm || d.ts || 0;
+      if(ts) anos.add(new String(new Date(ts).getFullYear()).toString());
+      // também tenta extrair do campo data se existir
+      if(d.dataFim) anos.add(d.dataFim.slice(0,4));
+    });
+    const anosOrdenados = ['__todos__', ...Array.from(anos).sort((a,b)=>b-a)];
+
+    yearWrap.innerHTML = anosOrdenados.map(a =>
+      `<button class="hc-year-chip${_hcFiltroAno===a?' active':''}" onclick="window._hcSetAno('${a}')">${a==='__todos__'?'Todos os anos':a}</button>`
+    ).join('');
+  }
+
+  window._hcSetJogador = function(uid){
+    _hcFiltroJogador = uid;
+    _hcBuildFilters();
+    _hcRender();
+  };
+
+  window._hcSetAno = function(ano){
+    _hcFiltroAno = ano;
+    _hcBuildFilters();
+    _hcRender();
+  };
+
+  function _hcGetNome(uid){
+    const m = (gd.members||[]).find(x => x.uid === uid);
+    return m ? m.name : (uid||'?').slice(0,8);
+  }
+
+  function _hcGetAnoDesafio(d){
+    const ts = d.criadoEm || d.ts || 0;
+    if(ts) return String(new Date(ts).getFullYear());
+    if(d.dataFim) return d.dataFim.slice(0,4);
+    return '—';
+  }
+
+  function _hcRender(){
+    const body = document.getElementById('hc-body');
+    if(!body) return;
+
+    const myUid = currentUser?.uid;
+    let desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+
+    // Filtro por jogador
+    if(_hcFiltroJogador !== '__todos__'){
+      desafios = desafios.filter(d => d.uidA === _hcFiltroJogador || d.uidB === _hcFiltroJogador);
+    }
+
+    // Filtro por ano
+    if(_hcFiltroAno !== '__todos__'){
+      desafios = desafios.filter(d => _hcGetAnoDesafio(d) === _hcFiltroAno);
+    }
+
+    if(!desafios.length){
+      body.innerHTML = '<div class="hc-empty">Nenhum confronto encontrado.</div>';
+      return;
+    }
+
+    // Agrupar por ano
+    const porAno = {};
+    desafios.forEach(d => {
+      const ano = _hcGetAnoDesafio(d);
+      if(!porAno[ano]) porAno[ano] = [];
+      porAno[ano].push(d);
+    });
+
+    // Modo: filtrado por jogador específico → mostra resumo + cores
+    const filtrando = _hcFiltroJogador !== '__todos__';
+    const fuid = _hcFiltroJogador;
+
+    let html = '';
+
+    // Sumário quando filtrado por jogador
+    if(filtrando){
+      let vit=0, der=0, emp=0;
+      desafios.forEach(d => {
+        const isA = d.uidA === fuid;
+        const scoreA = d.scoreA||0, scoreB = d.scoreB||0;
+        const meu = isA ? scoreA : scoreB;
+        const opp = isA ? scoreB : scoreA;
+        if(meu > opp) vit++;
+        else if(meu < opp) der++;
+        else emp++;
+      });
+      html += `<div class="hc-summary">
+        <div class="hc-summary-box win"><div class="hc-summary-val">${vit}</div><div class="hc-summary-lbl">Vitórias</div></div>
+        <div class="hc-summary-box lose"><div class="hc-summary-val">${der}</div><div class="hc-summary-lbl">Derrotas</div></div>
+        <div class="hc-summary-box tie"><div class="hc-summary-val">${emp}</div><div class="hc-summary-lbl">Empates</div></div>
+      </div>`;
+    }
+
+    html += `<div class="hc-count-badge">⚔️ ${desafios.length} confronto${desafios.length!==1?'s':''}</div>`;
+
+    // Renderizar por ano (mais recente primeiro)
+    const anosOrdenados = Object.keys(porAno).sort((a,b)=>b-a);
+    anosOrdenados.forEach(ano => {
+      const lista = porAno[ano].slice().reverse(); // mais recente primeiro dentro do ano
+      html += `<div class="hc-year-group">
+        <div class="hc-year-label">${ano}</div>`;
+
+      lista.forEach(d => {
+        const nomeA = _hcGetNome(d.uidA);
+        const nomeB = _hcGetNome(d.uidB);
+        const sA = d.scoreA||0, sB = d.scoreB||0;
+
+        // Determinar classes de cor
+        let matchCls = '';
+        let scoreACls = '', scoreBCls = '';
+        if(filtrando){
+          const isA = d.uidA === fuid;
+          const meu = isA ? sA : sB;
+          const opp = isA ? sB : sA;
+          if(meu > opp){ matchCls='is-winner'; }
+          else if(meu < opp){ matchCls='is-loser'; }
+          else matchCls='is-tie';
+          // scores
+          if(sA > sB){ scoreACls='winner-score'; scoreBCls='loser-score'; }
+          else if(sB > sA){ scoreBCls='winner-score'; scoreACls='loser-score'; }
+        }
+
+        // Tipo / status
+        const tipo = d.tipo || 'Gols';
+        const enc = d.status==='encerrado';
+        const statusLabel = enc ? 'Encerrado' : 'Em curso';
+
+        // Nomes (destaca jogador filtrado)
+        const nameACls = (filtrando && d.uidA===fuid) ? 'hc-name-left hc-name-self' : 'hc-name-left';
+        const nameBCls = (filtrando && d.uidB===fuid) ? 'hc-name-right hc-name-self' : 'hc-name-right';
+
+        html += `<div class="hc-match ${matchCls}">
+          <div class="${nameACls}">${nomeA}</div>
+          <div class="hc-scores">
+            <span class="hc-score ${scoreACls}">${sA}</span>
+            <span class="hc-x">×</span>
+            <span class="hc-score ${scoreBCls}">${sB}</span>
+          </div>
+          <div class="${nameBCls}">${nomeB}</div>
+          <span class="hc-tipo">${tipo}</span>
+        </div>`;
+      });
+
+      html += `</div>`; // fim hc-year-group
+    });
+
+    body.innerHTML = html;
   }
 })();
 </script>
