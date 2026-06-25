@@ -5983,7 +5983,15 @@ async function _publishFeed(tipo, texto){
 
 // ── Processa conquistas novas: notif pessoal no sino + feed do grupo ──────────
 async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pendingUid){
-  if(!novas || novas.length === 0) return;
+  // Mesmo sem conquistas "novas" para o toast, pode haver updates de contador
+  // (repetições) pendentes que precisam ser salvos no Firestore.
+  if((!novas || novas.length === 0)){
+    if(pendingUpdates && pendingUid && Object.keys(pendingUpdates).length > 0){
+      try { await window._db_updateDoc(window._db_doc('users', pendingUid), pendingUpdates); }
+      catch(e){ console.warn('[CQ] erro ao salvar conquistas:', e); }
+    }
+    return;
+  }
   const uid = currentUser.uid;
   const now = Date.now();
 
@@ -7226,9 +7234,10 @@ function enterApp(){
       const cqResult = await window._checkConquistas(db, currentUser, gd);
       const novas = cqResult?.novas || cqResult || [];
       window._checkLevelUp && window._checkLevelUp(_gdAntesLoad, gd);
-      if(novas && novas.length > 0){
+      if((novas && novas.length > 0) || (cqResult?.updates && Object.keys(cqResult.updates).length > 0)){
         await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
-      } else {
+      }
+      if(!(novas && novas.length > 0)){
         // Verifica se há não vistas para mostrar badge
         _checkBadgeConquistas();
       }
@@ -7268,11 +7277,17 @@ window.addMatch=async()=>{
   const date=$('fdate').value;if(!date)return showErr('aerr','Selecione a data.');
   const name=$('fname').value.trim()||'Pelada',gols=parseInt($('fgols').value)||0,assist=parseInt($('fassist').value)||0,pb=parseInt($('fpb').value)||0,pk=Math.min(parseInt($('fpk').value)||0,pb);
   try{
-    const snap=await getDoc(doc(db,'groups',groupId));const cur=snap.data();if(!cur.matches)cur.matches=[];
-    cur.matches.push({player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()});
-    const already=(cur.members||[]).some(m=>m.uid===currentUser.uid);
-    if(!already)cur.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
-    await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+    const novaPartida={player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()};
+    // Usa o estado local (gd), já mantido em sincronia pelo onSnapshot,
+    // em vez de baixar o documento inteiro do grupo de novo (getDoc).
+    const already=((gd&&gd.members)||[]).some(m=>m.uid===currentUser.uid);
+    const updates={matches:arrayUnion(novaPartida)};
+    if(!already)updates.members=arrayUnion({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
+    // updateDoc só envia o incremento, sem reler/regravar o documento inteiro — bem mais rápido em grupos com muito histórico.
+    await updateDoc(doc(db,'groups',groupId),updates);
+    // Atualiza o estado local imediatamente (o onSnapshot também vai confirmar em seguida).
+    if(!gd.matches)gd.matches=[];gd.matches.push(novaPartida);
+    if(!already){if(!gd.members)gd.members=[];gd.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});}
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
     // Publica no feed
@@ -7314,7 +7329,7 @@ window.addMatch=async()=>{
         const novas=cqResult?.novas||cqResult||[];
         // Verifica level up (partida + possíveis conquistas novas)
         window._checkLevelUp && window._checkLevelUp(gdAntes, gd);
-        if(novas&&novas.length>0){
+        if((novas&&novas.length>0) || (cqResult?.updates && Object.keys(cqResult.updates).length>0)){
           await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
         }
       }
@@ -8142,8 +8157,8 @@ function buildRecordData(){
     return playerField||'?';
   }
 
-  const playerBestGols={};
-  const playerBestAssist={};
+  const allGolsEntries=[];
+  const allAssistEntries=[];
 
   function processMatches(matches,mesKey){
     const byPlayer={};
@@ -8156,26 +8171,24 @@ function buildRecordData(){
       byPlayer[key].gols+=(m.gols||0);
       byPlayer[key].assist+=(m.assist||0);
     });
+    const label=getMesLabel(mesKey);
     Object.values(byPlayer).forEach(p=>{
-      const pkey=p.uid||p.name;
-      const label=getMesLabel(mesKey);
-      if(!playerBestGols[pkey]||p.gols>playerBestGols[pkey].val)
-        playerBestGols[pkey]={...p,val:p.gols,mesKey,mesLabel:label};
-      if(!playerBestAssist[pkey]||p.assist>playerBestAssist[pkey].val)
-        playerBestAssist[pkey]={...p,val:p.assist,mesKey,mesLabel:label};
+      // Cada combinação jogador+mês entra como um registro independente,
+      // permitindo que o mesmo jogador apareça mais de uma vez no top 3
+      // (ex.: 1º e 2º lugar com dois meses diferentes dele).
+      if(p.gols>0) allGolsEntries.push({...p,val:p.gols,mesKey,mesLabel:label});
+      if(p.assist>0) allAssistEntries.push({...p,val:p.assist,mesKey,mesLabel:label});
     });
   }
 
   allKeys.forEach(k=>{ processMatches((hist[k].matches||[]),k); });
   processMatches(gd.matches||[],vigenteKey);
 
-  const golsTop=Object.values(playerBestGols)
-    .filter(p=>p.val>0)
+  const golsTop=allGolsEntries
     .sort((a,b)=>b.val-a.val)
     .slice(0,3)
     .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
-  const assistTop=Object.values(playerBestAssist)
-    .filter(p=>p.val>0)
+  const assistTop=allAssistEntries
     .sort((a,b)=>b.val-a.val)
     .slice(0,3)
     .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
@@ -12091,9 +12104,9 @@ function calcConquistas(uid, gd){
       const SEQ_GOLS_INICIO = '2026-05-27';
       const partidasValidas = todasPartidas.filter(x => (x.date||'') >= SEQ_GOLS_INICIO);
       const melhorPartidaValida = Math.max(0, ...partidasValidas.map(x => x.gols||0));
-      const limSup = cq.val === 8 ? Infinity : (cq.val + 1);
-      count = partidasValidas.filter(x => (x.gols||0) >= cq.val && (cq.val===8 || (x.gols||0) < limSup)).length;
-      if(cq.val === 8) count = partidasValidas.filter(x => (x.gols||0) >= 8).length;
+      // Limiar mínimo: uma partida com 5 gols conta tanto para "5+" quanto para "3+" e "4+",
+      // desbloqueando em cascata todos os patamares alcançados (não só o mais alto).
+      count = partidasValidas.filter(x => (x.gols||0) >= cq.val).length;
       achieved = count > 0;
       progress = Math.min(melhorPartidaValida, cq.val);
     } else if(cq.tipo==='pen_seq'){
@@ -12158,16 +12171,16 @@ window._checkConquistas = async function(db, currentUser, gd){
     const savedCount = savedEntry ? (savedEntry.count || 1) : 0;
     const newCount   = r.count || 1;
     if(savedCount === 0){
-      // Primeira vez desbloqueando neste grupo
+      // Primeira vez desbloqueando neste grupo — dispara toast normalmente.
       updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push(cq);
     } else if(newCount > savedCount){
-      // Conquistou de novo (count aumentou) neste grupo
+      // Repetiu a conquista (count aumentou): atualiza o contador salvo
+      // (para o badge ×N no modal continuar correto), mas NÃO dispara
+      // toast nem conta como "nova" de novo — já foi desbloqueada antes.
       const prevTs = savedEntry.ts && savedEntry.ts.seconds ? savedEntry.ts.seconds*1000 : (savedEntry.ts || Date.now());
       updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: prevTs, tsLast: Date.now(), count: newCount };
-      novasIds.push(cq.id);
-      newlyUnlocked.push({...cq, _stackCount: newCount});
     }
   });
 
@@ -12749,10 +12762,9 @@ async function _renderConquistasModal(uid){
   const totalAll  = CONQUISTAS.length;
   const novas = Object.keys(calc).filter(id=>{
     if(!calc[id].achieved) return false;
-    if(!jaVistas.includes(id)) return true;
-    const saved = jaDesbloqueadas[id];
-    if(!saved) return false;
-    return (calc[id].count || 1) > (saved.count || 1);
+    // "Nova!" aparece só na primeira vez que a conquista é desbloqueada.
+    // Repetições subsequentes (×2, ×3, ×4...) não voltam a marcar como nova.
+    return !jaVistas.includes(id);
   });
 
   // Agrupa por categoria
@@ -13850,7 +13862,7 @@ function _renderCraqueModalContent(){
           : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
         const gChip  = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
         const aChip  = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
-        const pkChip = p.penOk  > 0 ? `<span class="craque-rank-chip" style="color:#4dffb0">🟢 ${p.penOk}PK</span>` : '';
+        const pkChip = p.penOk  > 0 ? `<span class="craque-rank-chip">🟢 ${p.penOk}PK</span>` : '';
         const zeroLabel = (!gChip && !aChip && !pkChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
         return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
           <div class="craque-rank-pos ${pClass}">${posLabel}</div>
