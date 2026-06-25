@@ -7880,7 +7880,7 @@ function renderRanking(){
         const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';
         const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
         const valStyle=pos<=3?darkMetal:'color:var(--tx)';
-        return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
+        return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" data-uid="${p.uid||''}" data-pos="${pos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
           <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div>
           <div class="ri-info">
