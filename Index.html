@@ -1080,7 +1080,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 /* ── RANKING ── */
 .rank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-.rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem;align-items:stretch;}
+.rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:30px;margin-bottom:1.25rem;align-items:stretch;}
 
 .podium-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px 14px;border-radius:16px;border:1px solid var(--bo);background:var(--bg2);position:relative;text-align:center;overflow:hidden}
 .podium-item.p1{background:linear-gradient(160deg,#f5f0a0 0%,#e8df2c 15%,#b8a800 30%,#e8df2c 45%,#a09000 58%,#e8df2c 70%,#c0b400 82%,#f5f0a0 100%);border-color:#b8a800;box-shadow:0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset}
@@ -1107,7 +1107,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .podium-crown{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .p1 .podium-av{position:relative;}
 .p1 .podium-av-crown{
-  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  position:absolute;top:-26px;left:50%;transform:translateX(-50%);
   font-size:22px;line-height:1;
   filter:drop-shadow(0 0 10px rgba(255,215,0,.85));
   animation:craque-crown-bounce 2.4s ease-in-out infinite;
@@ -1228,6 +1228,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .ri.ri-me{border-color:rgba(77,255,176,.35);background:#e0dedc;box-shadow:0 0 0 1px rgba(77,255,176,.35),var(--glow-card)}
 .rp{font-family:'DM Mono',monospace;font-size:16px;color:var(--tx3);text-align:center;line-height:1}
 .ri-info{min-width:0;display:flex;flex-direction:column;gap:3px}
+.ri.ri-rest .ri-info{margin-left:8px}
 .ri-name{font-weight:normal;font-size:17px;font-family:'Freshman',sans-serif;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
 .ri-sub{font-size:15px;color:var(--tx2);font-family:'ClassyVogue',sans-serif;white-space:nowrap}
 .ri-sub strong{color:var(--tx)}
@@ -1346,21 +1347,21 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   background:linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)!important;
   box-shadow:0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset!important}
 
-.rec-card-gold .rec-name{color:#4a3a00}
+.rec-card-gold .rec-name{color:#000000}
 .rec-card-gold .rec-meta{color:#6a5800}
 .rec-card-gold .rec-val-lbl{color:#7a6800}
 .rec-card-silver{
   border-color:#888888!important;
   background:linear-gradient(135deg,#ffffff 0%,#e8e8e8 15%,#b0b0b0 28%,#f0f0f0 42%,#909090 55%,#d8d8d8 68%,#ffffff 80%,#a0a0a0 90%,#e8e8e8 100%)!important;
   box-shadow:0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset!important}
-.rec-card-silver .rec-name{color:#222222}
+.rec-card-silver .rec-name{color:#000000}
 .rec-card-silver .rec-meta{color:#444444}
 .rec-card-silver .rec-val-lbl{color:#555555}
 .rec-card-bronze{
   border-color:#8a6020!important;
   background:linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)!important;
   box-shadow:0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset!important}
-.rec-card-bronze .rec-name{color:#3a1a00}
+.rec-card-bronze .rec-name{color:#000000}
 .rec-card-bronze .rec-meta{color:#5a3000}
 .rec-card-bronze .rec-val-lbl{color:#6a3800}
 .rec-medal{font-size:26px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));line-height:1}
@@ -1462,7 +1463,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 /* ── SUB-TABS PÊNALTIS ── */
 .pen-subtabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;border:1px solid var(--bo)}
-.pen-subtab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.pen-subtab{flex:1;padding:9px 3px;text-align:center;font-size:11.5px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pen-subtab.active{background:linear-gradient(135deg,rgba(255,90,122,.85) 0%,rgba(200,30,70,.9) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700}
 
 /* ── CARD PÊNALTI GRANDE (estilo G+A) ── */
@@ -1504,6 +1505,38 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .pen-bar-track2{height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;flex:1;margin-top:6px}
 .pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ── MAPA DE PÊNALTIS (renderizado inline na própria aba) ── */
+.pen-mapa-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:1rem;scrollbar-width:none}
+.pen-mapa-filter::-webkit-scrollbar{display:none}
+.pen-mapa-chip{padding:5px 13px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.pen-mapa-chip.active{border-color:var(--g);background:rgba(77,255,176,.15);color:var(--g)}
+.pen-gol-wrap{position:relative;width:100%;max-width:400px;margin:0 auto 1rem}
+.pen-gol-wrap.mapa-sm{max-width:300px}
+.pen-gol-canvas{width:100%;display:block;cursor:crosshair;border-radius:12px}
+.pen-mapa-legend{display:flex;gap:18px;justify-content:center;margin-bottom:.8rem}
+.pen-mapa-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace}
+.pen-mapa-legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.pen-mapa-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:14px}
+.pen-mapa-stats{display:flex;gap:10px;justify-content:center;margin-bottom:1rem}
+.pen-mapa-stat{background:var(--bg3);border-radius:12px;padding:10px 18px;text-align:center;flex:1;max-width:100px}
+.pen-mapa-stat-val{font-family:'ClassyVogue',sans-serif;font-size:24px}
+.pen-mapa-stat-lbl{font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:2px}
+
+/* Modal de marcação de pênalti (após salvar partida) */
+#pen-marcar-modal{display:none;position:fixed;inset:0;z-index:3300;background:rgba(0,0,0,.82);align-items:center;justify-content:center}
+#pen-marcar-modal.open{display:flex;animation:modalBgIn .22s ease forwards}
+.pen-marcar-inner{background:var(--bg2);border-radius:22px;width:calc(100% - 2rem);max-width:440px;padding:1.4rem 1rem 1.4rem;box-shadow:0 8px 48px rgba(0,0,0,.6);position:relative}
+.pen-marcar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-align:center;margin-bottom:.2rem;color:var(--tx)}
+.pen-marcar-sub{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:.8rem;font-family:'DM Mono',monospace}
+.pen-marcar-indicator{display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:.8rem;font-size:13px;color:var(--tx2);font-family:'DM Mono',monospace}
+.pen-marcar-dot{width:10px;height:10px;border-radius:50%;background:var(--bo2);flex-shrink:0;transition:background .2s}
+.pen-marcar-dot.ok{background:#4caf50}
+.pen-marcar-dot.err{background:#e53935}
+.pen-marcar-actions{display:flex;gap:10px;margin-top:1rem}
+.pen-marcar-btn{flex:1;padding:13px;border-radius:13px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pen-marcar-btn.skip{background:var(--bg3);color:var(--tx2)}
+.pen-marcar-btn.save{background:var(--grad-green);color:#07090d}
 /* ── RANKING GERAL BANNER ── */
 .geral-banner{
   background:#56B4E9;
@@ -1589,7 +1622,8 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 .hist-mes-card:hover{border-color:var(--bo2)}
 .hist-mes-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
-.hist-mes-nome{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.hist-mes-nome{font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;letter-spacing:-.2px}
+.hist-mes-nome .hist-mes-ano{font-size:1em;font-weight:800;}
 .hist-mes-badge{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);background:var(--bg3);border:1px solid var(--bo);border-radius:6px;padding:4px 10px}
 .hist-mes-players{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:.85rem}
 .hist-mes-player{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--bo);border-radius:10px;padding:6px 12px}
@@ -1851,13 +1885,12 @@ select option{background:var(--bg3)}
 .desafio-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem 1.1rem 1.4rem;flex:1;}
 /* Live challenge card shown in profiles/ranking */
 .desafio-card{
-  border-radius:16px;padding:14px 16px;margin-bottom:12px;
-  background:linear-gradient(135deg,rgba(255,90,122,.13) 0%,rgba(255,180,0,.07) 100%);
+  border-radius:10px;padding:8px 12px;margin-bottom:6px;
+  background:rgba(255,255,255,.02);
   border:1.5px solid rgba(255,90,122,.4);
-  box-shadow:0 0 24px rgba(255,90,122,.12);
+  display:flex;align-items:center;gap:8px;
   position:relative;overflow:hidden;
 }
-.desafio-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);pointer-events:none;}
 .desafio-card-title{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,100,130,.9);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .desafio-card-title::before{content:'⚔️';font-size:11px;}
 .desafio-live-dot{width:6px;height:6px;border-radius:50%;background:#FF5A7A;box-shadow:0 0 6px #FF5A7A;animation:feed-pulse 1.8s ease-in-out infinite;flex-shrink:0;}
@@ -1873,6 +1906,32 @@ select option{background:var(--bg3)}
 .desafio-tipo-badge{font-family:'DM Mono',monospace;font-size:10px;background:rgba(255,90,122,.18);border:1px solid rgba(255,90,122,.3);border-radius:6px;padding:3px 8px;color:rgba(255,150,160,.9);}
 .desafio-countdown{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);letter-spacing:.04em;}
 .desafio-countdown.urgent{color:#FF5A7A;animation:feed-pulse 1.5s ease-in-out infinite;}
+/* ── Versão slim (1 linha) ── */
+.desafio-slim{
+  border-radius:10px;padding:7px 10px;margin-bottom:6px;
+  background:rgba(150,160,180,.05);
+  border:1.5px solid rgba(150,160,180,.35);
+  display:flex;align-items:center;gap:5px;
+  position:relative;overflow:hidden;
+}
+.desafio-slim.is-winner{
+  background:rgba(77,255,176,.05);
+  border-color:rgba(77,255,176,.5);
+}
+.desafio-slim.is-loser{
+  background:rgba(255,90,122,.05);
+  border-color:rgba(255,90,122,.5);
+}
+.desafio-slim-name{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 0;min-width:0;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:4px;}
+.desafio-slim-name.right{text-align:left;justify-content:flex-start;}
+.desafio-slim-score{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--tx);flex-shrink:0;min-width:24px;text-align:center;letter-spacing:.02em;}
+.desafio-slim-x{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);flex-shrink:0;}
+.desafio-slim-meta{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.desafio-slim-badge{font-family:'DM Mono',monospace;font-size:8px;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.28);border-radius:5px;padding:2px 5px;color:rgba(255,150,160,.9);white-space:nowrap;}
+.desafio-slim-status{font-family:'DM Mono',monospace;font-size:8px;color:var(--tx3);white-space:nowrap;min-width:38px;text-align:right;}
+.desafio-slim-status.urgent{color:#FF5A7A;animation:feed-pulse 1.5s ease-in-out infinite;}
+.desafio-slim-crown{font-size:11px;flex-shrink:0;}
+.desafio-slim-cancel{font-family:'DM Mono',monospace;font-size:8px;background:none;border:1px solid rgba(255,90,122,.3);color:rgba(255,90,122,.7);border-radius:6px;padding:2px 5px;cursor:pointer;flex-shrink:0;}
 /* Winner badge in profile */
 .desafio-winner-badge{
   display:inline-flex;align-items:center;gap:5px;
@@ -2029,10 +2088,164 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   flex-shrink:0;
 }
 .mfab-item:active{transform:scale(.88);}
-.mfab-item-duelo{
-  background:linear-gradient(135deg,#FF5A7A 0%,#c01040 100%);
-  filter:drop-shadow(0 4px 8px rgba(255,90,122,.6)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+.mfab-item-confrontos{
+  background:linear-gradient(135deg,#38bdf8 0%,#0284c7 100%);
+  filter:drop-shadow(0 4px 8px rgba(56,189,248,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
+  color:#fff;
 }
+
+/* ══ MODAL HISTÓRICO DE CONFRONTOS ══ */
+#modal-historico-confrontos{
+  display:none;position:fixed;inset:0;z-index:3200;
+  background:rgba(0,0,0,.8);
+  align-items:center;justify-content:center;
+  padding:16px;
+}
+#modal-historico-confrontos.open{display:flex;animation:modalBgIn .22s ease forwards;}
+.hc-inner{
+  background:var(--bg2);
+  border-radius:22px;
+  width:100%;max-width:520px;
+  max-height:90vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 48px rgba(0,0,0,.65),0 0 0 1px rgba(56,189,248,.15);
+  animation:modalIn .28s cubic-bezier(.32,1,.6,1) forwards;
+  overflow:hidden;
+}
+.hc-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.2rem .85rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(56,189,248,.08) 0%,transparent 70%);
+}
+.hc-title{
+  font-family:'VarsityTeam',serif;font-size:17px;font-weight:bold;letter-spacing:.4px;
+  background:linear-gradient(135deg,#38bdf8 0%,#7dd3fc 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hc-close{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--bo2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--tx2);font-size:18px;line-height:1;
+  transition:all .15s;
+}
+.hc-close:hover{background:var(--re);color:#fff;border-color:transparent;}
+.hc-filters{
+  padding:.75rem 1.1rem .6rem;
+  border-bottom:1px solid var(--bo);
+  flex-shrink:0;display:flex;flex-direction:column;gap:8px;
+}
+/* Filtro de jogador */
+.hc-player-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hc-player-filter::-webkit-scrollbar{display:none;}
+.hc-player-chip{
+  padding:7px 13px;border-radius:99px;
+  border:1.5px solid var(--bo2);background:var(--bg3);
+  color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .18s;
+}
+.hc-player-chip.active{
+  border-color:#38bdf8;background:rgba(56,189,248,.15);color:#38bdf8;
+}
+/* Filtro de ano */
+.hc-year-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hc-year-filter::-webkit-scrollbar{display:none;}
+.hc-year-chip{
+  padding:5px 11px;border-radius:99px;
+  border:1.5px solid var(--bo2);background:var(--bg3);
+  color:var(--tx3);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .15s;
+}
+.hc-year-chip.active{
+  border-color:#38bdf8;background:rgba(56,189,248,.12);color:#38bdf8;
+}
+/* Body scrollável */
+.hc-body{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:.9rem 1.1rem 1.5rem;flex:1;
+}
+.hc-body::-webkit-scrollbar{width:3px;}
+.hc-body::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px;}
+/* Grupo de ano */
+.hc-year-group{margin-bottom:1.25rem;}
+.hc-year-label{
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx3);
+  margin-bottom:.65rem;padding:0 2px;
+  display:flex;align-items:center;gap:6px;
+}
+.hc-year-label::after{content:'';flex:1;height:1px;background:var(--bo);}
+/* Card de confronto — cinza neutro (geral) */
+.hc-match{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:12px;
+  background:var(--bg3);border:1.5px solid var(--bo2);
+  margin-bottom:6px;position:relative;overflow:hidden;
+  transition:border-color .15s;
+}
+/* Quando filtrado por jogador: verde = ganhou, vermelho = perdeu */
+.hc-match.is-winner{
+  background:rgba(0,201,122,.06);border-color:rgba(0,201,122,.4);
+}
+.hc-match.is-loser{
+  background:rgba(224,32,80,.05);border-color:rgba(224,32,80,.35);
+}
+.hc-match.is-tie{
+  background:var(--bg3);border-color:var(--bo2);
+}
+.hc-name-left,.hc-name-right{
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:1 1 0;min-width:0;
+}
+.hc-name-right{text-align:right;}
+.hc-match.is-winner .hc-name-self{color:#009a5c;}
+.hc-match.is-loser .hc-name-self{color:#e02050;}
+.hc-scores{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.hc-score{
+  font-family:'DM Mono',monospace;font-size:15px;font-weight:700;
+  min-width:22px;text-align:center;color:var(--tx);
+}
+.hc-score.winner-score{color:#009a5c;}
+.hc-score.loser-score{color:#e02050;opacity:.75;}
+.hc-x{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);}
+.hc-tipo{
+  font-family:'DM Mono',monospace;font-size:8px;
+  background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);
+  border-radius:5px;padding:2px 6px;color:#38bdf8;
+  white-space:nowrap;flex-shrink:0;
+}
+.hc-empty{
+  text-align:center;padding:2.5rem 1rem;
+  color:var(--tx3);font-family:'DM Mono',monospace;
+  font-size:12px;letter-spacing:.04em;
+}
+.hc-count-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);
+  border-radius:99px;padding:4px 12px;
+  font-family:'DM Mono',monospace;font-size:11px;color:#38bdf8;
+  margin-bottom:.85rem;
+}
+/* Sumário quando filtrado por jogador */
+.hc-summary{
+  display:flex;gap:8px;margin-bottom:.9rem;
+}
+.hc-summary-box{
+  flex:1;border-radius:12px;padding:10px;text-align:center;
+  background:var(--bg3);border:1px solid var(--bo);
+}
+.hc-summary-val{font-family:'ClassyVogue',sans-serif;font-size:22px;line-height:1;}
+.hc-summary-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px;}
+.hc-summary-box.win .hc-summary-val{color:#009a5c;}
+.hc-summary-box.lose .hc-summary-val{color:#e02050;}
+.hc-summary-box.tie .hc-summary-val{color:var(--tx2);}
 .mfab-item-conquistas{
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
   filter:drop-shadow(0 4px 8px rgba(255,180,0,.55)) drop-shadow(0 2px 4px rgba(0,0,0,.4));
@@ -2131,7 +2344,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:rgba(0,0,0,.78);
   padding:16px;
 }
-#modal-carta.open{ display:flex; }
+#modal-carta.open{ display:flex; animation:modalBgIn .25s ease forwards; }
 .carta-inner{
   background:transparent;
   display:flex;flex-direction:column;align-items:center;
@@ -2686,15 +2899,6 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:linear-gradient(135deg,rgba(255,215,0,.1) 0%,var(--bg3) 100%);
   box-shadow:0 0 20px rgba(255,215,0,.12);
 }
-.cq-card.desbloqueada.nova{
-  border-color:rgba(255,215,0,.8);
-  box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4);
-  animation:cqNovaPulse 1.8s ease-in-out 3;
-}
-@keyframes cqNovaPulse{
-  0%,100%{box-shadow:0 0 28px rgba(255,215,0,.35),0 0 0 1px rgba(255,215,0,.4)}
-  50%{box-shadow:0 0 48px rgba(255,215,0,.65),0 0 0 2px rgba(255,215,0,.7)}
-}
 .cq-card.bloqueada{
   opacity:.5;filter:grayscale(.6);
 }
@@ -2704,13 +2908,6 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .cq-card.bloqueada .cq-card-nome{color:var(--tx3)}
 .cq-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:#403f3f;letter-spacing:.03em;line-height:1.3}
 .cq-card-data{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,215,0,.6);margin-top:2px}
-.cq-nova-tag{
-  position:absolute;top:6px;right:6px;
-  background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);
-  border-radius:99px;padding:1px 6px;
-  font-family:'DM Mono',monospace;font-size:9px;font-weight:700;
-  color:#FFD700;letter-spacing:.06em;text-transform:uppercase;
-}
 .cq-stack-badge{
   position:absolute;top:6px;left:6px;
   min-width:20px;height:20px;border-radius:99px;
@@ -3578,7 +3775,6 @@ body::before{
         <div class="ft" onclick="setRank('geral',this)">Geral</div>
         <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
-        <button id="rank-share-btn" onclick="shareRanking()" title="Compartilhar" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
       </div>
       <div id="rl-wrap"><div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div></div>
 
@@ -4228,8 +4424,6 @@ body::before{
 <div class="ov" id="pvermes">
   <div class="pan" style="position:relative">
     <button onclick="closeP('pvermes')" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.35);color:#FF5A7A;font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:2" onmouseover="this.style.background='#FF5A7A';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,90,122,.15)';this.style.color='#FF5A7A'">×</button>
-    <!-- Botão compartilhar histórico do mês -->
-    <button id="pvermes-share-btn" onclick="shareMonthRanking()" title="Compartilhar ranking do mês" style="position:absolute;top:12px;right:52px;width:30px;height:30px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;z-index:2;padding:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="18" height="18" style="display:block"></button>
     <div id="pvermes-content"></div>
     <button class="bg2btn" onclick="closeP('pvermes')" style="margin-top:10px">Fechar</button>
   </div>
@@ -4453,6 +4647,10 @@ function _redrawAllPizzas(){
 
 function getMesKey(date){const d=date||new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
 function getMesLabel(key){const[y,m]=key.split('-');const ms=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];return`${ms[parseInt(m)-1]} ${y}`}
+// Versão com mês e ano em spans separados, com tamanho de fonte ajustado
+// para compensar o fato de a fonte 'Syne' desenhar os dígitos em escala
+// visualmente maior que as letras minúsculas (deixava o ano "saltando").
+function getMesLabelHTML(key){const[y,m]=key.split('-');const ms=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];return`${ms[parseInt(m)-1]} <span class="hist-mes-ano">${y}</span>`}
 function mesAtual(){return getMesKey()}
 function fd(d){if(!d)return'';return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
 function avC(name){let h=0;for(let c of(name||'?'))h=(h*31+c.charCodeAt(0))&0xffff;return'av'+(h%6)}
@@ -4932,9 +5130,8 @@ window.avatarHTML=avatarHTML;
       _active = true;
       if(navigator.vibrate) navigator.vibrate(35);
       _showPopup(card);
-      // Esconde após 2.5s automaticamente
+      // Popup fica visível até o usuário retirar o dedo
       clearTimeout(_hideTimer);
-      _hideTimer = setTimeout(_hidePopup, 2500);
     }, LP_MS);
   }
 
@@ -4943,7 +5140,7 @@ window.avatarHTML=avatarHTML;
     _timer = null;
     if(_active){
       _active = false;
-      // Deixa o popup visível até o auto-hide, mas permite fechar
+      _hidePopup();
     }
   }
 
@@ -5132,7 +5329,7 @@ function renderPerfilPanelStats(){
       <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">⚽ Últimas partidas</div>
       <div class="mr-list-fade"><div class="mr-list">${myMatches.map(m=>{
         const pl=[];if(m.gols>0)pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);if(m.assist>0)pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);if((m.penBat||0)>0)pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat}</span>`);
-        return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit(${m._gi});closeP('pperfil')">✏️</button><button class="ma-btn del" onclick="deleteMatchAndRefresh(${m._gi})">🗑</button></div></div>`;
+        return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(_isAdmin()&&(m.penBat||0)>0)?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="openEdit(${m._gi});closeP('pperfil')">✏️</button><button class="ma-btn del" onclick="deleteMatchAndRefresh(${m._gi})">🗑</button></div></div>`;
       }).join('')}</div></div>
       ${myMatches.length>3?`<button class="mr-expand-btn" onclick="openModalPartidas()" style="margin-top:8px"><svg viewBox='0 0 24 24' style='width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2'><polyline points='15 3 21 3 21 9'/><polyline points='9 21 3 21 3 15'/><line x1='21' y1='3' x2='14' y2='10'/><line x1='3' y1='21' x2='10' y2='14'/></svg> Ver todas (${myMatches.length})</button>`:''}
     </div>`;
@@ -5657,8 +5854,16 @@ window._apagarNotif = async function(id){
     const cur  = snap.data();
     if(cur.notifs&&cur.notifs[currentUser.uid]){
       cur.notifs[currentUser.uid] = cur.notifs[currentUser.uid].filter(n=>n.id!==id);
+      // Lembretes de ciclo do questionário (id no formato 'survey_ciclo_<ciclo>') têm
+      // disparo automático recorrente. Ao apagar, registra esse ciclo como "dispensado"
+      // para esse usuário, para que não volte a ser recriado até o próximo semestre.
+      if(id.startsWith('survey_ciclo_')){
+        cur.surveyCicloDispensado = cur.surveyCicloDispensado || {};
+        cur.surveyCicloDispensado[currentUser.uid] = id;
+      }
       await setDoc(doc(db,'groups',groupId),cur);
       gd = cur;
+      window._gd = cur;
       _renderNotifPanel();
       _updateNotifBadge();
     }
@@ -5983,7 +6188,15 @@ async function _publishFeed(tipo, texto){
 
 // ── Processa conquistas novas: notif pessoal no sino + feed do grupo ──────────
 async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pendingUid){
-  if(!novas || novas.length === 0) return;
+  // Mesmo sem conquistas "novas" para o toast, pode haver updates de contador
+  // (repetições) pendentes que precisam ser salvos no Firestore.
+  if((!novas || novas.length === 0)){
+    if(pendingUpdates && pendingUid && Object.keys(pendingUpdates).length > 0){
+      try { await window._db_updateDoc(window._db_doc('users', pendingUid), pendingUpdates); }
+      catch(e){ console.warn('[CQ] erro ao salvar conquistas:', e); }
+    }
+    return;
+  }
   const uid = currentUser.uid;
   const now = Date.now();
 
@@ -5994,10 +6207,6 @@ async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pe
       await window._db_updateDoc(window._db_doc('users', pendingUid), pendingUpdates);
     } catch(e){ console.warn('[CQ] erro ao salvar conquistas:', e); }
   }
-
-  // Atualiza badge FAB
-  const badge = document.getElementById('conquistas-fab-badge');
-  if(badge){ badge.textContent = novas.length; badge.style.display = 'flex'; }
 
   // Toast visual de conquista
   window._mostrarToastConquistas && window._mostrarToastConquistas(novas);
@@ -6788,19 +6997,35 @@ function _dcCardHTML(challenge, perspectiveUid){
       +'</div>';
   }
 
-  // Card de desafio ATIVO / ENCERRADO
+  // Card de desafio ATIVO / ENCERRADO — versão slim (1 linha)
   const scoreA = _dcGetScore(challenge.uidA, challenge);
   const scoreB = _dcGetScore(challenge.uidB, challenge);
   const time   = _dcTimeLeft(challenge.endTs);
   const ended  = time.ended || challenge.status === 'encerrado';
-  const clsA = scoreA > scoreB ? 'winning' : scoreA < scoreB ? 'losing' : 'tied';
-  const clsB = scoreB > scoreA ? 'winning' : scoreB < scoreA ? 'losing' : 'tied';
   let winnerUID = null;
   if(ended){ if(scoreA > scoreB) winnerUID = challenge.uidA; else if(scoreB > scoreA) winnerUID = challenge.uidB; }
-  const winnerBadge = winnerUID ? '<div style="text-align:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,215,0,.2)"><span class=\"desafio-winner-badge\">\ud83d\udc51 '+(winnerUID===challenge.uidA?mbA.name:mbB.name)+' venceu!</span></div>' : '';
+  const crownA = winnerUID===challenge.uidA ? '<span class=\"desafio-slim-crown\">👑</span>' : '';
+  const crownB = winnerUID===challenge.uidB ? '<span class=\"desafio-slim-crown\">👑</span>' : '';
   const cancelBtn = (!ended && (challenge.uidA === currentUser?.uid || challenge.uidB === currentUser?.uid))
-    ? '<button onclick=\"_dcCancelar(\\x27' + challenge.id + '\\x27)\" style=\"margin-top:8px;font-size:10px;font-family:\'DM Mono\',monospace;background:none;border:1px solid rgba(255,90,122,.3);color:rgba(255,90,122,.7);border-radius:8px;padding:4px 10px;cursor:pointer;float:right\">cancelar</button>' : '';
-  return '<div class=\"desafio-card\"><div class=\"desafio-card-title\"><div class=\"desafio-live-dot\"'+(ended?' style=\"background:#888;box-shadow:none;animation:none\"':'')+' ></div>Desafio direto'+(ended?' \u00b7 Encerrado':'')+cancelBtn+'</div><div class=\"desafio-players-row\"><div class=\"desafio-player-col\">' + avatarHTML(mbA.name,38,mbA.uid) + '<div class=\"desafio-player-name\">' + mbA.name + '</div><div class=\"desafio-player-score '+clsA+'\">' + scoreA + '</div></div><div class=\"desafio-vs-divider\">VS</div><div class=\"desafio-player-col\">' + avatarHTML(mbB.name,38,mbB.uid) + '<div class=\"desafio-player-name\">' + mbB.name + '</div><div class=\"desafio-player-score '+clsB+'\">' + scoreB + '</div></div></div><div class=\"desafio-meta-row\"><span class=\"desafio-tipo-badge\">' + tipoLabel + '</span><span class=\"desafio-countdown'+(time.urgent && !ended?' urgent':'')+'\">' + (ended?'Encerrado':time.label) + '</span></div>' + winnerBadge + '</div>';
+    ? '<button onclick=\"_dcCancelar(\\x27' + challenge.id + '\\x27)\" class=\"desafio-slim-cancel\">cancelar</button>' : '';
+  // Cor da borda relativa ao "dono" do perfil sendo visualizado (perspectiveUid):
+  // verde se ele venceu, vermelha se ele perdeu, cinza se empate/sem vencedor ainda.
+  let perspectiveClass = '';
+  if(winnerUID && perspectiveUid && (perspectiveUid===challenge.uidA || perspectiveUid===challenge.uidB)){
+    perspectiveClass = winnerUID===perspectiveUid ? ' is-winner' : ' is-loser';
+  } else if(winnerUID){
+    perspectiveClass = ' is-winner'; // sem perspectiva definida (ex: tela do criador do desafio): mantém verde neutro
+  }
+  return '<div class=\"desafio-slim' + perspectiveClass + '\">'
+    + '<span class=\"desafio-slim-name\">' + mbA.name + crownA + '</span>'
+    + '<span class=\"desafio-slim-score\">' + scoreA + '</span>'
+    + '<span class=\"desafio-slim-x\">×</span>'
+    + '<span class=\"desafio-slim-score\">' + scoreB + '</span>'
+    + '<span class=\"desafio-slim-name right\">' + crownB + mbB.name + '</span>'
+    + '<span class=\"desafio-slim-meta\"><span class=\"desafio-slim-badge\">' + tipoLabel + '</span>'
+    + '<span class=\"desafio-slim-status' + (time.urgent && !ended?' urgent':'') + '\">' + (ended?'Encerrado':time.label) + '</span>'
+    + cancelBtn + '</span>'
+    + '</div>';
 }
 
 window._dcRenderInProfile = function(uid, containerEl){
@@ -7226,34 +7451,13 @@ function enterApp(){
       const cqResult = await window._checkConquistas(db, currentUser, gd);
       const novas = cqResult?.novas || cqResult || [];
       window._checkLevelUp && window._checkLevelUp(_gdAntesLoad, gd);
-      if(novas && novas.length > 0){
+      if((novas && novas.length > 0) || (cqResult?.updates && Object.keys(cqResult.updates).length > 0)){
         await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
-      } else {
-        // Verifica se há não vistas para mostrar badge
-        _checkBadgeConquistas();
       }
     }
     // Grava craque da semana passada automaticamente
     if(window._salvarCraqueSemana) window._salvarCraqueSemana();
   }, 1500);
-}
-async function _checkBadgeConquistas(){
-  if(!currentUser||!gd) return;
-  try {
-    const snap=await getDoc(doc(db,'users',currentUser.uid));
-    if(!snap.exists()) return;
-    const data=snap.data();
-    const _gid=groupId||'';
-    const desbAll=data.conquistasDesbloqueadas||{};
-    const desb=(desbAll[_gid] && typeof desbAll[_gid]==='object' && !desbAll[_gid].ts) ? desbAll[_gid] : {};
-    const vistasAll=data.conquistasVistas||{};
-    const vistas=Array.isArray(vistasAll)?[]:(vistasAll[_gid]||[]);
-    const naoVistas=Object.keys(desb).filter(id=>!vistas.includes(id));
-    if(naoVistas.length>0){
-      const badge=$('conquistas-fab-badge');
-      if(badge){ badge.textContent=naoVistas.length; badge.style.display='flex'; }
-    }
-  }catch(e){}
 }
 
 window.leaveGroup=async()=>{
@@ -7268,13 +7472,23 @@ window.addMatch=async()=>{
   const date=$('fdate').value;if(!date)return showErr('aerr','Selecione a data.');
   const name=$('fname').value.trim()||'Pelada',gols=parseInt($('fgols').value)||0,assist=parseInt($('fassist').value)||0,pb=parseInt($('fpb').value)||0,pk=Math.min(parseInt($('fpk').value)||0,pb);
   try{
-    const snap=await getDoc(doc(db,'groups',groupId));const cur=snap.data();if(!cur.matches)cur.matches=[];
-    cur.matches.push({player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()});
-    const already=(cur.members||[]).some(m=>m.uid===currentUser.uid);
-    if(!already)cur.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
-    await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+    const novaPartida={player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()};
+    // Usa o estado local (gd), já mantido em sincronia pelo onSnapshot,
+    // em vez de baixar o documento inteiro do grupo de novo (getDoc).
+    const already=((gd&&gd.members)||[]).some(m=>m.uid===currentUser.uid);
+    const updates={matches:arrayUnion(novaPartida)};
+    if(!already)updates.members=arrayUnion({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
+    // updateDoc só envia o incremento, sem reler/regravar o documento inteiro — bem mais rápido em grupos com muito histórico.
+    await updateDoc(doc(db,'groups',groupId),updates);
+    // Atualiza o estado local imediatamente (o onSnapshot também vai confirmar em seguida).
+    if(!gd.matches)gd.matches=[];gd.matches.push(novaPartida);
+    if(!already){if(!gd.members)gd.members=[];gd.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});}
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
+    // Se teve pênaltis, abre modal de marcação após o modal de partida salva fechar
+    if(pb>0){
+      setTimeout(()=>{ openPenMarcar(novaPartida, pb, pk); }, 5200);
+    }
     // Publica no feed
     (async()=>{
       const partes=[];
@@ -7314,7 +7528,7 @@ window.addMatch=async()=>{
         const novas=cqResult?.novas||cqResult||[];
         // Verifica level up (partida + possíveis conquistas novas)
         window._checkLevelUp && window._checkLevelUp(gdAntes, gd);
-        if(novas&&novas.length>0){
+        if((novas&&novas.length>0) || (cqResult?.updates && Object.keys(cqResult.updates).length>0)){
           await _processarNovasConquistas(novas, true, cqResult?.updates, cqResult?.uid);
         }
       }
@@ -7328,6 +7542,20 @@ window.saveEdit=async()=>{
   m.date=$('edate').value;m.name=$('ename').value.trim()||'Pelada';m.gols=parseInt($('egols').value)||0;m.assist=parseInt($('eassist').value)||0;m.penBat=parseInt($('epb').value)||0;m.penOk=Math.min(parseInt($('epk').value)||0,m.penBat);
   await setDoc(doc(db,'groups',groupId),cur);gd=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
   if(typeof window._admEditCallback==='function'){const cb=window._admEditCallback;window._admEditCallback=null;cb();}
+};
+window.savePenMap=async(partida, pontos)=>{
+  // Exposta para o script do mapa — tem acesso direto ao db, doc, updateDoc do escopo principal
+  try{
+    if(!gd||!gd.matches||!groupId) return false;
+    let idx = gd.matches.findIndex(m=>m.uid===partida.uid && m.ts===partida.ts);
+    if(idx<0) idx = gd.matches.findIndex(m=>m.uid===partida.uid && Math.abs((m.ts||0)-(partida.ts||0))<5000);
+    if(idx<0) return false;
+    const matches = gd.matches.map((m,i)=> i===idx ? {...m, penMap: pontos} : m);
+    await updateDoc(doc(db,'groups',groupId), {matches});
+    gd.matches = matches;
+    window._gdRef = gd;
+    return true;
+  }catch(e){ console.warn('savePenMap error',e); return false; }
 };
 window.deleteMatch=async gi=>{
   if(!confirm('Deletar essa partida?'))return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return;
@@ -7406,6 +7634,7 @@ function drawPizzaPen(canvasId,ok,bat){
 }
 
 window.setPenSubTab=sub=>{
+  if(window._penSubTab==='mapa' && sub!=='mapa' && typeof window._mapaConfirmLeave==='function' && !window._mapaConfirmLeave()) return;
   window._penSubTab=sub;
   if(sub!=='ano') window._penAnoSel=null; // limpa seleção ao trocar de aba
   const rl=$('rl');
@@ -7872,7 +8101,6 @@ function renderRanking(){
     }
   }
   const mbs=gd.members||[];
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(rankStat==='recordes'||rankStat==='pen')?'none':'flex';
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
   const geralWrap=document.getElementById('geral-banner-wrap');
@@ -7897,7 +8125,7 @@ function renderRanking(){
     const podiumOrderG=[1,0,2];const podiumClsG=['p2','p1','p3'];const podiumCrownG=['🥈','🥇','🥉'];
     let podiumGeralHTML='';
     if(top3g.length>=2){
-      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumClsG[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}"><div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}${isMe?`<div class="av-you-ring">${avatarHTML(p.name,46,p.uid)}</div>`:avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.gols+p.assist}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
+      podiumGeralHTML=`<div class="rank-podium">${podiumOrderG.map((pi,vi)=>{const p=top3g[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumClsG[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}<div class="podium-crown">${podiumCrownG[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,46,p.uid)}</div>`:avatarHTML(p.name,46,p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.gols+p.assist}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
     }
     const listGeralItems=top3g.length>=2?restg:geralData;const geralOffset=top3g.length>=2?3:0;
     $('rl').innerHTML=`
@@ -7906,14 +8134,14 @@ function renderRanking(){
       <div class="rank-list">${listGeralItems.map((p,i)=>{
         const isMe=p.uid===currentUser?.uid;
         const pos=i+1+geralOffset;
-        const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';
+        const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'#000000';
         const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#f0f0f0 0%,#d0d0d0 12%,#707070 25%,#e8e8e8 38%,#505050 50%,#c0c0c0 62%,#f0f0f0 72%,#686868 82%,#d8d8d8 92%,#f4f4f4 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'';
         const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'var(--bo)';
         const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';
         const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
         const valStyle=pos<=3?darkMetal:'color:var(--tx)';
-        return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
-          <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div>
+        return`<div class="ri${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':' ri-rest'}" data-uid="${p.uid||''}" data-pos="${pos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}">
+          <div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos+'°'}</div>
           <div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div>
           <div class="ri-info">
             <div class="ri-name">${p.name}${p.uid===_getAdminUid()?_admBadgeHTML():''}</div>
@@ -7999,10 +8227,29 @@ function renderRanking(){
 
     // ── Sub-abas HTML ──
     const subTabsHTML=`<div class="pen-subtabs">
-      <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">🗓 Mês atual</div>
-      <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">📅 Ano atual</div>
-      ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">🗂 Selecionar ano</div>`:''}
+      <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">Mês atual</div>
+      <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">Ano atual</div>
+      ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">Selecionar ano</div>`:''}
+      <div class="pen-subtab${window._penSubTab==='mapa'?' active':''}" onclick="setPenSubTab('mapa')">Mapa</div>
     </div>${anoPickerHTML}`;
+
+    // ── Aba "Mapa": renderizada inline no próprio painel, sem modal ──
+    if(window._penSubTab==='mapa'){
+      $('rl').innerHTML=subTabsHTML+`
+        <div class="pen-mapa-legend">
+          <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
+          <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
+        </div>
+        <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
+        <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
+        <div id="pen-mapa-edit-bar" style="display:none"></div>
+        <div class="pen-gol-wrap mapa-sm">
+          <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
+        </div>
+        <div id="pen-mapa-empty" class="pen-mapa-empty" style="display:none">Nenhuma cobrança mapeada ainda.</div>`;
+      if(typeof window.renderPenMapaPanel==='function') window.renderPenMapaPanel();
+      return;
+    }
 
     if(!activeData.length){
       $('rl').innerHTML=subTabsHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+( window._penAnoSel||'')}.</div></div>`;
@@ -8079,11 +8326,11 @@ function renderRanking(){
   const podiumOrder=[1,0,2];const podiumCls=['p2','p1','p3'];const podiumCrown=['🥈','🥇','🥉'];const podiumSizes=[46,46,46];
   let podiumHTML='';
   if(top3.length>=2){
-    podiumHTML=`<div class="rank-podium">${podiumOrder.map((pi,vi)=>{const p=top3[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumCls[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}"><div class="podium-crown">${podiumCrown[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}${isMe?`<div class="av-you-ring">${avatarHTML(p.name,podiumSizes[vi],p.uid)}</div>`:avatarHTML(p.name,podiumSizes[vi],p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.val}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
+    podiumHTML=`<div class="rank-podium">${podiumOrder.map((pi,vi)=>{const p=top3[pi];if(!p)return'<div></div>';const isMe=p.uid===currentUser?.uid;const podiumPos=[2,1,3][vi];return`<div class="podium-item ${podiumCls[vi]}" data-uid="${p.uid||''}" data-pos="${podiumPos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}">${podiumPos===1?'<span class="podium-av-crown">👑</span>':''}<div class="podium-crown">${podiumCrown[vi]}</div><div class="podium-av" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,podiumSizes[vi],p.uid)}</div>`:avatarHTML(p.name,podiumSizes[vi],p.uid)}</div><div class="podium-name">${p.name}</div>${getApelido(p.uid)?`<div class="podium-apelido">${getApelido(p.uid)}</div>`:''}<div class="podium-val ri-count" data-val="${p.val}">0</div><div class="podium-stat">G+A</div></div>`;}).join('')}</div>`;
   }
   const listItems=top3.length>=2?rest:ranked;const offset=top3.length>=2?3:0;
 
-  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'var(--tx3)';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#f0f0f0 0%,#d0d0d0 12%,#707070 25%,#e8e8e8 38%,#505050 50%,#c0c0c0 62%,#f0f0f0 72%,#686868 82%,#d8d8d8 92%,#f4f4f4 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':''}" data-uid="${p.uid||''}" data-pos="${pos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}</div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
+  $('rl').innerHTML=`${renderCraqueRodada()}${renderMvpBanner()}${podiumHTML}<div class="rank-list">${listItems.map((p,i)=>{const isMe=p.uid===currentUser?.uid;const pos=i+1+offset;const posColor=pos===1?'#F2C94C':pos===2?'#bdbdbd':pos===3?'#a0785a':'#000000';const podiumBg=pos===1?'linear-gradient(135deg,#f5f0a0 0%,#e8df2c 18%,#b8a800 35%,#e8df2c 50%,#a09000 65%,#e8df2c 78%,#f5f0a0 100%)':pos===2?'linear-gradient(135deg,#f0f0f0 0%,#d0d0d0 12%,#707070 25%,#e8e8e8 38%,#505050 50%,#c0c0c0 62%,#f0f0f0 72%,#686868 82%,#d8d8d8 92%,#f4f4f4 100%)':pos===3?'linear-gradient(135deg,#e8d0a8 0%,#bf9658 16%,#8a6020 30%,#d4aa70 45%,#7a5010 58%,#bf9658 72%,#a07840 82%,#e0c090 100%)':'#ffeeeb';const podiumBorder=pos===1?'#b8a800':pos===2?'#888888':pos===3?'#8a6020':'#e0c8c0';const podiumShadow=pos===1?'0 4px 28px rgba(184,168,0,.55),0 0 0 1px rgba(248,240,100,.25) inset':pos===2?'0 4px 22px rgba(100,100,100,.5),0 0 0 1px rgba(255,255,255,.4) inset':pos===3?'0 4px 22px rgba(138,96,32,.55),0 0 0 1px rgba(232,200,150,.25) inset':'var(--glow-card)';const darkMetal='background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';const valStyle=pos<=3?darkMetal:'color:var(--tx)';return`<div class="ri ri-anim${isMe?' ri-me':''}${pos===1?' ri-gold':pos===2?' ri-silver':pos===3?' ri-bronze':' ri-rest'}" data-uid="${p.uid||''}" data-pos="${pos}" data-gols="${p.gols||0}" data-assist="${p.assist||0}" data-penbat="${p.penBat||0}" data-penok="${p.penOk||0}" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="position:relative;animation-delay:${i*60}ms;${pos<=3?`background:${podiumBg};border-color:${podiumBorder};box-shadow:${podiumShadow};`:''}"><div class="rp" style="color:${posColor}">${pos<=3?['🥇','🥈','🥉'][pos-1]:pos+'°'}</div><div onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${isMe?`<div class="av-you-ring">${avatarHTML(p.name,50,p.uid)}</div>`:avatarHTML(p.name,50,p.uid)}</div><div class="ri-info"><div class="ri-name">${p.name}</div>${getApelido(p.uid)?`<div class="ri-apelido">${getApelido(p.uid)}</div>`:''}</div><div class="ri-val"><div class="ri-val-num ri-count" data-val="${p.val}" style="${valStyle}">0</div><div class="ri-val-lbl">G+A</div></div></div>`;}).join('')}</div>`;
 
   // Animar podium com delay escalonado
   document.querySelectorAll('.podium-item').forEach((el,i)=>{el.style.animationDelay=i*80+'ms';});
@@ -8109,7 +8356,6 @@ window.setRank=(s,el)=>{
   _rankAtivo=s;
   document.querySelectorAll('.ft').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const rsb=$('rank-share-btn');if(rsb)rsb.style.display=(s==='recordes'||s==='pen')?'none':'flex';
   showRankingSkeleton();
 
   setTimeout(()=>{
@@ -8142,8 +8388,8 @@ function buildRecordData(){
     return playerField||'?';
   }
 
-  const playerBestGols={};
-  const playerBestAssist={};
+  const allGolsEntries=[];
+  const allAssistEntries=[];
 
   function processMatches(matches,mesKey){
     const byPlayer={};
@@ -8156,26 +8402,24 @@ function buildRecordData(){
       byPlayer[key].gols+=(m.gols||0);
       byPlayer[key].assist+=(m.assist||0);
     });
+    const label=getMesLabel(mesKey);
     Object.values(byPlayer).forEach(p=>{
-      const pkey=p.uid||p.name;
-      const label=getMesLabel(mesKey);
-      if(!playerBestGols[pkey]||p.gols>playerBestGols[pkey].val)
-        playerBestGols[pkey]={...p,val:p.gols,mesKey,mesLabel:label};
-      if(!playerBestAssist[pkey]||p.assist>playerBestAssist[pkey].val)
-        playerBestAssist[pkey]={...p,val:p.assist,mesKey,mesLabel:label};
+      // Cada combinação jogador+mês entra como um registro independente,
+      // permitindo que o mesmo jogador apareça mais de uma vez no top 3
+      // (ex.: 1º e 2º lugar com dois meses diferentes dele).
+      if(p.gols>0) allGolsEntries.push({...p,val:p.gols,mesKey,mesLabel:label});
+      if(p.assist>0) allAssistEntries.push({...p,val:p.assist,mesKey,mesLabel:label});
     });
   }
 
   allKeys.forEach(k=>{ processMatches((hist[k].matches||[]),k); });
   processMatches(gd.matches||[],vigenteKey);
 
-  const golsTop=Object.values(playerBestGols)
-    .filter(p=>p.val>0)
+  const golsTop=allGolsEntries
     .sort((a,b)=>b.val-a.val)
     .slice(0,3)
     .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
-  const assistTop=Object.values(playerBestAssist)
-    .filter(p=>p.val>0)
+  const assistTop=allAssistEntries
     .sort((a,b)=>b.val-a.val)
     .slice(0,3)
     .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
@@ -8266,7 +8510,7 @@ function renderPerfil(){
     <div class="card"><div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">${avatarHTML(myProfile.displayName,50,currentUser.uid)}<div><div style="font-family:'Freshman',sans-serif;font-size:17px;font-weight:normal;letter-spacing:.5px">${myProfile.displayName}</div><div style="font-size:12px;color:var(--tx2);font-family:'DM Mono',monospace">${gd.name} · ${getMesLabel(gd.mesAtivo||mesAtual())}</div></div></div>
     <div class="sg"><div class="sb"><div class="sbl">Gols</div><div class="sbv">${s.gols}</div><div class="sba">${s.n?(s.gols/s.n).toFixed(1):'—'}/jogo</div></div><div class="sb"><div class="sbl">Assist.</div><div class="sbv">${s.assist}</div><div class="sba">${s.n?(s.assist/s.n).toFixed(1):'—'}/jogo</div></div><div class="sb"><div class="sbl">G+A</div><div class="sbv">${s.gols+s.assist}</div><div class="sba">${s.n?((s.gols+s.assist)/s.n).toFixed(1):'—'}/jogo</div></div></div></div>
     ${s.penBat>0?`<div class="card"><div class="cl">Pênaltis</div><div class="pizza-wrap"><canvas id="${pizzaId}" class="pizza-canvas" width="96" height="96"></canvas><div class="pizza-legend"><div class="pizza-item"><div class="pizza-dot" style="background:#6FCF97"></div><span style="color:var(--tx2)">Convertidos:</span><strong style="color:#6FCF97;font-family:'ClassyVogue',sans-serif;font-size:20px"> ${s.penOk}</strong></div><div class="pizza-item"><div class="pizza-dot" style="background:#EB5757"></div><span style="color:var(--tx2)">Perdidos:</span><strong style="color:#EB5757;font-family:'ClassyVogue',sans-serif;font-size:20px"> ${s.penBat-s.penOk}</strong></div><div class="pizza-item"><div class="pizza-dot" style="background:#F2C94C"></div><span style="color:var(--tx2)">Aproveit.:</span><strong style="color:var(--am);font-family:'ClassyVogue',sans-serif;font-size:18px"> ${pct}%</strong></div></div></div></div>`:''}
-    <div class="card"><div class="cl">Últimas partidas</div>${(()=>{if(myMatches.length===0)return'<div class="empty" style="padding:1rem 0">Nenhuma partida ainda.</div>';const rows=myMatches.map(m=>{const pl=[];if(m.gols>0)pl.push('<span class="pi pg">⚽ '+m.gols+'</span>');if(m.assist>0)pl.push('<span class="pi pb2">👟 '+m.assist+'</span>');if((m.penBat||0)>0)pl.push('<span class="pi pa">'+(m.penOk||0)+'/'+m.penBat+' pen</span>');return'<div class="mr"><div class="md">'+fd(m.date)+'</div><div style="flex:1"><div class="mt2">'+m.name+'</div><div class="mp">'+(pl.join('')||'<span class="pi pp">sem stats</span>')+'</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit('+m._gi+')">✏️</button><button class="ma-btn del" onclick="deleteMatch('+m._gi+')">🗑</button></div></div>';}).join('');const btn=myMatches.length>3?'<button class="mr-expand-btn" onclick="openModalPartidas()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Ver todas ('+myMatches.length+')</button>':'';return'<div class="mr-list-fade"><div class="mr-list">'+rows+'</div></div>'+btn;})()} </div>`;
+    <div class="card"><div class="cl">Últimas partidas</div>${(()=>{if(myMatches.length===0)return'<div class="empty" style="padding:1rem 0">Nenhuma partida ainda.</div>';const rows=myMatches.map(m=>{const pl=[];if(m.gols>0)pl.push('<span class="pi pg">⚽ '+m.gols+'</span>');if(m.assist>0)pl.push('<span class="pi pb2">👟 '+m.assist+'</span>');if((m.penBat||0)>0)pl.push('<span class="pi pa">'+(m.penOk||0)+'/'+m.penBat+' pen</span>');return'<div class="mr"><div class="md">'+fd(m.date)+'</div><div style="flex:1"><div class="mt2">'+m.name+'</div><div class="mp">'+(pl.join('')||'<span class="pi pp">sem stats</span>')+'</div></div><div class="ma-actions">'+((_isAdmin()&&(m.penBat||0)>0)?'<button class="ma-btn" onclick="openPenMarcarAdmin('+m._gi+')" title="Marcar pênaltis">🎯</button>':'')+'<button class="ma-btn" onclick="openEdit('+m._gi+')">✏️</button><button class="ma-btn del" onclick="deleteMatch('+m._gi+')">🗑</button></div></div>';}).join('');const btn=myMatches.length>3?'<button class="mr-expand-btn" onclick="openModalPartidas()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Ver todas ('+myMatches.length+')</button>':'';return'<div class="mr-list-fade"><div class="mr-list">'+rows+'</div></div>'+btn;})()} </div>`;
   if(s.penBat>0)requestAnimationFrame(()=>drawPizza(pizzaId,s.penOk,s.penBat));
 }
 
@@ -8345,7 +8589,7 @@ function renderHistTab(){
         const h=hist[k];const allMatches=h.matches||[];
         return`<div class="hist-mes-card">
           <div class="hist-mes-top">
-            <div class="hist-mes-nome">${getMesLabel(k)}</div>
+            <div class="hist-mes-nome">${getMesLabelHTML(k)}</div>
             <div class="hist-mes-badge">${allMatches.length} partida${allMatches.length!==1?'s':''}</div>
           </div>
           <div class="hist-mes-actions">
@@ -8358,7 +8602,7 @@ function renderHistTab(){
       mesVigenteNoAno?`<div class="hist-mes-card" style="border-color:rgba(77,255,176,.3);position:relative;overflow:hidden">
         <div style="text-align:center;margin-bottom:6px"><span style="display:inline-block;background:var(--g);color:#0a0a0a;font-size:9px;font-family:'DM Mono',monospace;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.08em">ATUAL</span></div>
         <div class="hist-mes-top">
-          <div class="hist-mes-nome">${getMesLabel(mesVigente)}</div>
+          <div class="hist-mes-nome">${getMesLabelHTML(mesVigente)}</div>
           <div class="hist-mes-badge">${(gd.matches||[]).length} partida${(gd.matches||[]).length!==1?'s':''}</div>
         </div>
         <div class="hist-mes-actions">
@@ -8871,17 +9115,7 @@ function _buildPlayerProfile(uid){
     ?'<div class="empty">Nenhum dado registrado.</div>'
     :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
 
-  // ── Desafios do jogador ──
-  const desafiosDoJogador = (gd.desafios||[]).filter(d =>
-    (d.uidA === uid || d.uidB === uid) && (d.status === 'ativo' || d.status === 'encerrado')
-  ).slice(-4).reverse();
-  if(desafiosDoJogador.length){
-    const desafioSection = document.createElement('div');
-    desafioSection.style.cssText='margin-top:12px;';
-    desafioSection.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:#494a48;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span>⚔️</span> Desafios diretos</div>'
-      + desafiosDoJogador.map(d => _dcCardHTML(d, uid)).join('');
-    document.getElementById('mp-body').appendChild(desafioSection);
-  }
+  // (confrontos diretos movidos para o FAB "Histórico de Confrontos")
 }
 
 window.openPlayerProfile=(uid,avElOrEvent)=>{
@@ -8922,13 +9156,15 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   const nLen=mb.name.length;
   nomeEl.style.fontSize=nLen>22?'12px':nLen>18?'14px':nLen>13?'15px':'17px';
 
-  // Botão Desafiar — só aparece se for outro jogador e nenhum dos dois estiver em desafio
+  // Botão Desafiar — só aparece se for outro jogador e ELE não estiver em desafio ativo
+  // Antes de checar, garante que desafios já vencidos (endTs no passado) sejam
+  // marcados como 'encerrado' mesmo que nenhum dos participantes tenha aberto o app ainda.
+  if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar();
   const desafiarBtn=document.getElementById('mp-desafiar-btn');
   if(desafiarBtn){
     const isMe = uid === currentUser?.uid;
-    const euAtivo = (gd.desafios||[]).some(d=>d.status==='ativo'&&(d.uidA===currentUser?.uid||d.uidB===currentUser?.uid));
     const eleAtivo = (gd.desafios||[]).some(d=>d.status==='ativo'&&(d.uidA===uid||d.uidB===uid));
-    if(!isMe && !euAtivo && !eleAtivo){
+    if(!isMe && !eleAtivo){
       desafiarBtn.style.display='block';
       desafiarBtn.title='Desafiar ' + mb.name;
     } else {
@@ -9008,7 +9244,7 @@ window.openModalPartidas=()=>{
     if(m.gols>0)pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);
     if(m.assist>0)pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);
     if((m.penBat||0)>0)pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
-    return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="openEdit(${m._gi});closeModalPartidas()">✏️</button><button class="ma-btn del" onclick="deleteMatchModal(${m._gi})">🗑</button></div></div>`;
+    return`<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(_isAdmin()&&(m.penBat||0)>0)?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="openEdit(${m._gi});closeModalPartidas()">✏️</button><button class="ma-btn del" onclick="deleteMatchModal(${m._gi})">🗑</button></div></div>`;
   }).join('');
   const modal=$('modal-partidas');
   modal.style.display='flex';
@@ -9119,7 +9355,7 @@ function _renderAdmPartidasModal(){
     if(m.gols>0) pl.push(`<span class="pi pg">⚽ ${m.gols}</span>`);
     if(m.assist>0) pl.push(`<span class="pi pb2">👟 ${m.assist}</span>`);
     if((m.penBat||0)>0) pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
-    return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions"><button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
+    return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(m.penBat||0)>0?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
   }).join('');
 
   const modal = $('modal-partidas');
@@ -9923,7 +10159,6 @@ window.irParaRankingGA=()=>{
         <div class="mp-header-actions">
           <button id="mp-desafiar-btn" onclick="_mpDesafiarClick()" title="Desafiar este jogador" style="display:none;background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:8px;padding:5px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">⚔️</button>
           <button id="mp-adm-partidas-btn" title="Gerenciar partidas (ADM)" style="display:none;align-items:center;justify-content:center;background:#0a0e1a;border:none;color:#fff;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;cursor:pointer;transition:opacity .15s;flex-shrink:0">+</button>
-          <button onclick="sharePlayerProfile()" title="Compartilhar perfil" style="width:28px;height:28px;border-radius:50%;background:rgba(77,255,176,.1);border:1px solid rgba(77,255,176,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0;flex-shrink:0" onmouseover="this.style.background='rgba(77,255,176,.25)'" onmouseout="this.style.background='rgba(77,255,176,.1)'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="15" height="15" style="display:block"></button>
           <div class="mp-close" onclick="closePlayerProfile()">×</div>
         </div>
       </div>
@@ -10112,6 +10347,12 @@ window.irParaRankingGA=()=>{
       </button>
     </div>
     <div class="mfab-item-wrap">
+      <span class="mfab-item-label">Histórico de Confrontos</span>
+      <button class="mfab-item mfab-item-confrontos" onclick="mfabClose();abrirHistoricoConfrontos()" title="Histórico de Confrontos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </button>
+    </div>
+    <div class="mfab-item-wrap">
       <span class="mfab-item-label">Modo Duelo</span>
       <button class="mfab-item mfab-item-duelo" onclick="mfabClose();openDuelo()" title="Modo Duelo">⚔️</button>
     </div>
@@ -10121,6 +10362,25 @@ window.irParaRankingGA=()=>{
     <span id="mfab-main-icon">＋</span>
     <div class="mfab-main-badge" id="mfab-main-badge"></div>
   </button>
+</div>
+
+<!-- ══ MODAL HISTÓRICO DE CONFRONTOS ══ -->
+<div id="modal-historico-confrontos" onclick="if(event.target===this)fecharHistoricoConfrontos()">
+  <div class="hc-inner">
+    <div class="hc-header">
+      <div class="hc-title">⚔️ Histórico de Confrontos</div>
+      <button class="hc-close" onclick="fecharHistoricoConfrontos()">×</button>
+    </div>
+    <div class="hc-filters">
+      <!-- Filtro por jogador -->
+      <div class="hc-player-filter" id="hc-player-filter"></div>
+      <!-- Filtro por ano -->
+      <div class="hc-year-filter" id="hc-year-filter"></div>
+    </div>
+    <div class="hc-body" id="hc-body">
+      <div class="hc-empty">Carregando confrontos...</div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MODAL CALENDÁRIO ══ -->
@@ -10169,7 +10429,6 @@ window.irParaRankingGA=()=>{
       <div class="duelo-title" style="display:flex;align-items:center;white-space:nowrap">⚔️ Modo Duelo</div>
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="abrirCriarDesafio()" title="Criar desafio com prazo" style="background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:10px;padding:6px 12px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">+ Desafiar</button>
-        <button onclick="shareDuelo()" title="Compartilhar duelo" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;opacity:.85;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"><img src="https://raw.githubusercontent.com/soaresfutebol9-ux/futstats/main/compartilhar.png" width="26" height="26" style="display:block"></button>
         <div class="duelo-close" onclick="closeDuelo()">×</div>
       </div>
     </div>
@@ -11157,29 +11416,10 @@ document.addEventListener('click', e=>{
   let _lastCardData = null;
   let _lastCardType = null;
 
-  window.shareRanking = async function () {
-    const data = buildRankingData();
-    if (!data || !data.players.length) {
-      alert('Nenhum dado de ranking disponível para compartilhar.');
-      return;
-    }
-    _lastCardData = data;
-    _lastCardType = 'ranking';
-    const canvas = openShareModal();
-    await drawRankingCard(canvas, data);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareRanking = function () {};
 
-  window.shareDuelo = async function () {
-    const data = buildDueloData();
-    if (!data) {
-      alert('Selecione dois jogadores no modo duelo antes de compartilhar.');
-      return;
-    }
-    _lastCardData = data;
-    _lastCardType = 'duelo';
-    const canvas = openShareModal();
-    await drawDueloCard(canvas, data);
-  };
+  window.shareDuelo = function () {};
 
   // ── CARD: RANKING DE MÊS HISTÓRICO ─────────────────────────
   function buildMonthRankingData(key, isVigente) {
@@ -11475,31 +11715,11 @@ document.addEventListener('click', e=>{
     ctx.fillText(footLabel.toUpperCase(), W / 2, H - 16);
   }
 
-  // ── COMPARTILHAR RANKING DO MÊS ──────────────────────────────
-  window.shareMonthRanking = async function () {
-    const key = window._pvermes_key;
-    const isVigente = window._pvermes_isVigente;
-    const data = buildMonthRankingData(key, isVigente);
-    if (!data || !data.players.length) { alert('Nenhum dado disponível.'); return; }
-    _lastCardData = data;
-    _lastCardType = 'monthranking';
-    const canvas = openShareModal();
-    await drawRankingCard(canvas, data);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareMonthRanking = function () {};
 
-  // ── COMPARTILHAR RECORDES ────────────────────────────────────
-  window.shareRecord = async function(tipo) {
-    const data = window._buildRecordData ? window._buildRecordData() : null;
-    if (!data) { alert('Nenhum dado disponível.'); return; }
-    const list = tipo === 'gols' ? data.golsTop : data.assistTop;
-    if (!list || !list.length) { alert('Nenhum recorde registrado ainda.'); return; }
-
-    const recData = { tipo, list, groupName: (window._gd && window._gd.name) || 'Grupo' };
-    _lastCardData = recData;
-    _lastCardType = 'record';
-    const canvas = openShareModal();
-    await drawRecordCard(canvas, recData);
-  };
+  // Recurso de compartilhamento removido.
+  window.shareRecord = function() {};
 
   async function drawRecordCard(canvas, data) {
     const W = CARD_W, H = CARD_H;
@@ -11705,58 +11925,10 @@ document.addEventListener('click', e=>{
     setTimeout(() => { el.style.display = 'none'; }, 260);
   }
 
-  window.sharePlayerProfile = async function () {
-    const uid = window._mpUid;
-    if (!uid) { alert('Abra o perfil de um jogador primeiro.'); return; }
+  // Recurso de compartilhamento removido.
+  window.sharePlayerProfile = function () {};
 
-    // Descobre temporadas disponíveis
-    const testData = buildPlayerProfileData(uid, '__all__');
-    if (!testData) { alert('Sem dados para compartilhar.'); return; }
-    const anos = testData.anosDisponiveis || [];
-
-    _createSeasonPickerModal();
-    const modal = document.getElementById('season-picker-modal');
-    const opts = document.getElementById('sp-options');
-
-    // Monta opções dinamicamente
-    let optHTML = '';
-    anos.forEach(a => {
-      optHTML += `<button class="sp-opt" onclick="window._doSharePlayerSeason('${uid}','${a}')">
-        <div class="sp-opt-icon">📅</div>
-        <div>Temporada ${a}</div>
-      </button>`;
-    });
-    if (anos.length > 1) {
-      optHTML += `<button class="sp-opt sp-opt-all" onclick="window._doSharePlayerSeason('${uid}','__all__')">
-        <div class="sp-opt-icon">🌐</div>
-        <div>Geral — todas as temporadas</div>
-      </button>`;
-    }
-    if (!optHTML) {
-      // Sem histórico, compartilha direto como geral
-      const data = buildPlayerProfileData(uid, '__all__');
-      _lastCardData = data;
-      _lastCardType = 'player';
-      const canvas = openShareModal();
-      await drawPlayerCard(canvas, data);
-      return;
-    }
-    opts.innerHTML = optHTML;
-
-    modal.style.display = 'flex';
-    if(document.body.classList.contains('lite-mode')){modal.classList.add('show');}else{requestAnimationFrame(()=>modal.classList.add('show'));}
-  };
-
-  window._doSharePlayerSeason = async function(uid, season) {
-    _closeSeasonPicker();
-    await new Promise(r => setTimeout(r, 260)); // aguarda fechar picker
-    const data = buildPlayerProfileData(uid, season);
-    if (!data) { alert('Sem dados para compartilhar.'); return; }
-    _lastCardData = data;
-    _lastCardType = 'player';
-    const canvas = openShareModal();
-    await drawPlayerCard(canvas, data);
-  };
+  window._doSharePlayerSeason = function() {};
 
   // ── FIM COMPARTILHAMENTO ────────────────────────────────────
 
@@ -11852,6 +12024,13 @@ const CONQUISTAS = [
   { id:'seq_hexa',      cat:'🎩 Sequencial de Gols', nome:'Hexa-trick',   desc:'6 gols na mesma partida', icon:'💫', tipo:'seq_gols', val:6 },
   { id:'seq_hepta',     cat:'🎩 Sequencial de Gols', nome:'Hepta-trick',  desc:'7 gols na mesma partida', icon:'🌪️', tipo:'seq_gols', val:7 },
   { id:'seq_maradona',  cat:'🎩 Sequencial de Gols', nome:'Modo Maradona',desc:'8 ou mais gols na mesma partida', icon:'🤯', tipo:'seq_gols', val:8 },
+  // ── SEQUENCIAL DE ASSISTÊNCIAS (por partida) ─────────────────
+  { id:'seq_assist_3', cat:'🎪 Sequencial de Assistências', nome:'Garçom de Luxo',   desc:'3 assistências na mesma partida', icon:'🍾', tipo:'seq_assist', val:3 },
+  { id:'seq_assist_4', cat:'🎪 Sequencial de Assistências', nome:'Maestro',          desc:'4 assistências na mesma partida', icon:'🎼', tipo:'seq_assist', val:4 },
+  { id:'seq_assist_5', cat:'🎪 Sequencial de Assistências', nome:'Condutor',         desc:'5 assistências na mesma partida', icon:'🧭', tipo:'seq_assist', val:5 },
+  { id:'seq_assist_6', cat:'🎪 Sequencial de Assistências', nome:'Visionário',       desc:'6 assistências na mesma partida', icon:'🔭', tipo:'seq_assist', val:6 },
+  { id:'seq_assist_7', cat:'🎪 Sequencial de Assistências', nome:'Dono do Jogo',     desc:'7 assistências na mesma partida', icon:'🎮', tipo:'seq_assist', val:7 },
+  { id:'seq_assist_8', cat:'🎪 Sequencial de Assistências', nome:'Modo Xavi',        desc:'8 ou mais assistências na mesma partida', icon:'🧠', tipo:'seq_assist', val:8 },
   // ── PÊNALTI SEQUENCIAL ──────────────────────────────────────
   { id:'pen_seq_3',  cat:'🥅 Pênalti Sequencial', nome:'Calibrado',      desc:'3 pênaltis consecutivos convertidos',  icon:'🎯', tipo:'pen_seq', val:3  },
   { id:'pen_seq_5',  cat:'🥅 Pênalti Sequencial', nome:'Frieza Clínica', desc:'5 pênaltis consecutivos convertidos',  icon:'🧊', tipo:'pen_seq', val:5  },
@@ -12087,15 +12266,24 @@ function calcConquistas(uid, gd){
       achieved = count > 0;
       progress = Math.min(assistTotal, cq.val);
     } else if(cq.tipo==='seq_gols'){
-      // Conquista criada em 20/05/2026 — só conta partidas a partir dessa data
-      const SEQ_GOLS_INICIO = '2026-05-27';
+      // Conquista criada em 26/05/2026 — só conta partidas a partir dessa data
+      const SEQ_GOLS_INICIO = '2026-05-26';
       const partidasValidas = todasPartidas.filter(x => (x.date||'') >= SEQ_GOLS_INICIO);
       const melhorPartidaValida = Math.max(0, ...partidasValidas.map(x => x.gols||0));
-      const limSup = cq.val === 8 ? Infinity : (cq.val + 1);
-      count = partidasValidas.filter(x => (x.gols||0) >= cq.val && (cq.val===8 || (x.gols||0) < limSup)).length;
-      if(cq.val === 8) count = partidasValidas.filter(x => (x.gols||0) >= 8).length;
+      // Limiar mínimo: uma partida com 5 gols conta tanto para "5+" quanto para "3+" e "4+",
+      // desbloqueando em cascata todos os patamares alcançados (não só o mais alto).
+      count = partidasValidas.filter(x => (x.gols||0) >= cq.val).length;
       achieved = count > 0;
       progress = Math.min(melhorPartidaValida, cq.val);
+    } else if(cq.tipo==='seq_assist'){
+      // Conquista criada em 26/05/2026 — só conta partidas a partir dessa data
+      const SEQ_ASSIST_INICIO = '2026-05-26';
+      const partidasValidasAssist = todasPartidas.filter(x => (x.date||'') >= SEQ_ASSIST_INICIO);
+      const melhorAssistPartida = Math.max(0, ...partidasValidasAssist.map(x => x.assist||0));
+      // Cascata: uma partida com 5 assistências desbloqueia todos os patamares abaixo também
+      count = partidasValidasAssist.filter(x => (x.assist||0) >= cq.val).length;
+      achieved = count > 0;
+      progress = Math.min(melhorAssistPartida, cq.val);
     } else if(cq.tipo==='pen_seq'){
       // sequência máxima de partidas com 100% de pênaltis convertidos
       count = Math.floor(penSeqMax / cq.val); // quantas vezes atingiu o threshold
@@ -12133,7 +12321,7 @@ window._checkConquistas = async function(db, currentUser, gd){
   const conquistasAchieved = Object.entries(calc).filter(([,v])=>v&&v.achieved).map(([k])=>k);
   const newlyUnlocked = [];
 
-  // Lê estado atual do Firestore (campo conquistasVistas e conquistasDesbloqueadas)
+  // Lê estado atual do Firestore (campo conquistasDesbloqueadas)
   let userSnap;
   try { userSnap = await window._db_getDoc(window._db_doc('users',uid)); } catch(e){ console.error('[CQ] erro getDoc:',e); return []; }
   const userData = userSnap.exists() ? userSnap.data() : {};
@@ -12143,10 +12331,6 @@ window._checkConquistas = async function(db, currentUser, gd){
   const jaDesbloqueadas = (jaDesbloqueadasAll[_gid] && typeof jaDesbloqueadasAll[_gid] === 'object' && !jaDesbloqueadasAll[_gid].ts)
     ? jaDesbloqueadasAll[_gid]
     : {};
-  const jaVistasAll = userData.conquistasVistas || {};
-  const jaVistas = Array.isArray(jaVistasAll)
-    ? [] // formato antigo ignorado por grupo
-    : (jaVistasAll[_gid] || []);
 
   const updates = {};
   const novasIds = [];
@@ -12158,16 +12342,16 @@ window._checkConquistas = async function(db, currentUser, gd){
     const savedCount = savedEntry ? (savedEntry.count || 1) : 0;
     const newCount   = r.count || 1;
     if(savedCount === 0){
-      // Primeira vez desbloqueando neste grupo
+      // Primeira vez desbloqueando neste grupo — dispara toast normalmente.
       updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: Date.now(), count: newCount };
       novasIds.push(cq.id);
       newlyUnlocked.push(cq);
     } else if(newCount > savedCount){
-      // Conquistou de novo (count aumentou) neste grupo
+      // Repetiu a conquista (count aumentou): atualiza o contador salvo
+      // (para o badge ×N no modal continuar correto), mas NÃO dispara
+      // toast nem conta como "nova" de novo — já foi desbloqueada antes.
       const prevTs = savedEntry.ts && savedEntry.ts.seconds ? savedEntry.ts.seconds*1000 : (savedEntry.ts || Date.now());
       updates[`conquistasDesbloqueadas.${_gid}.${cq.id}`] = { ts: prevTs, tsLast: Date.now(), count: newCount };
-      novasIds.push(cq.id);
-      newlyUnlocked.push({...cq, _stackCount: newCount});
     }
   });
 
@@ -12223,6 +12407,9 @@ const XP_CONQUISTAS = {
   // 🎩 Sequencial de Gols — muito difícil
   seq_hattrick: 150, seq_poker: 250, seq_manita: 380,
   seq_hexa: 540, seq_hepta: 730, seq_maradona: 950,
+  // 🎪 Sequencial de Assistências — muito difícil
+  seq_assist_3: 150, seq_assist_4: 250, seq_assist_5: 380,
+  seq_assist_6: 540, seq_assist_7: 730, seq_assist_8: 950,
   // 🥅 Pênalti Sequencial — muito difícil
   pen_seq_3: 150, pen_seq_5: 280, pen_seq_7: 460, pen_seq_10: 700,
   // 🥅 Aproveitamento de Pênaltis no Ano — difícil
@@ -12246,7 +12433,7 @@ const XP_DESAFIO_DERROTA  = 15;
 // Conquistas cujo tipo pode se repetir pagam metade na 2ª vez em diante
 const TIPOS_REPETIVEIS = new Set([
   'gols_mes','assist_mes','ga_mes','ouro_consec','prata_consec',
-  'ultimo_consec','seq_gols','pen_seq','pen_ano'
+  'ultimo_consec','seq_gols','seq_assist','pen_seq','pen_ano'
 ]);
 
 // ── Níveis: XP necessário para alcançar cada nível ─────────────
@@ -12697,8 +12884,6 @@ window.abrirConquistas = function(uid){
     requestAnimationFrame(()=>{ modal.style.opacity='1'; });
   });
   _renderConquistasModal(_cqUid);
-  // Marca como vistas
-  _marcarConquistasVistas(_cqUid);
 };
 
 window.fecharConquistas = function(){
@@ -12731,29 +12916,19 @@ async function _renderConquistasModal(uid){
 
   const calc = _calcConquistas(uid, gd);
 
-  // Conquistas já desbloqueadas salvas no Firestore (para saber datas e novas)
+  // Conquistas já desbloqueadas salvas no Firestore (para saber datas e contador ×N)
   let jaDesbloqueadas = {};
-  let jaVistas = [];
   try {
-    const snap = await window._db_getDoc(document._firestoreDoc(uid));
+    const snap = await window._db_getDoc(window._db_doc('users', uid));
     if(snap && snap.exists()){
       const _gid2 = window._groupId || '';
       const _desbAll = snap.data().conquistasDesbloqueadas || {};
       jaDesbloqueadas = (_desbAll[_gid2] && typeof _desbAll[_gid2]==='object' && !_desbAll[_gid2].ts) ? _desbAll[_gid2] : {};
-      const _vistasAll = snap.data().conquistasVistas || {};
-      jaVistas = Array.isArray(_vistasAll) ? [] : (_vistasAll[_gid2] || []);
     }
   } catch(e){}
 
   const totalDesb = Object.values(calc).filter(v=>v.achieved).length;
   const totalAll  = CONQUISTAS.length;
-  const novas = Object.keys(calc).filter(id=>{
-    if(!calc[id].achieved) return false;
-    if(!jaVistas.includes(id)) return true;
-    const saved = jaDesbloqueadas[id];
-    if(!saved) return false;
-    return (calc[id].count || 1) > (saved.count || 1);
-  });
 
   // Agrupa por categoria
   const cats = {};
@@ -12784,7 +12959,6 @@ async function _renderConquistasModal(uid){
       <div class="cq-grid">`;
     cqs.forEach(cq=>{
       const r = calc[cq.id] || {achieved:false, progress:0, max:cq.val, count:0};
-      const isNova = r.achieved && novas.includes(cq.id);
       // Tipos de conquista que são marcos únicos — não faz sentido mostrar ×N
       const tipoUnico = ['ouro_acum','ultimo_acum','gols_total'].includes(cq.tipo);
       const stackCount = r.achieved ? (r.count > 0 ? r.count : 1) : 0;
@@ -12796,8 +12970,7 @@ async function _renderConquistasModal(uid){
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
 
       if(r.achieved){
-        html += `<div class="cq-card desbloqueada${isNova?' nova':''}" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
-          ${isNova?'<div class="cq-nova-tag">nova!</div>':''}
+        html += `<div class="cq-card desbloqueada" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
           ${(!tipoUnico && stackCount > 1) ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
@@ -12881,22 +13054,6 @@ window.abrirDetalheCQ = async function(cqId){
 
   body.innerHTML = html;
 };
-async function _marcarConquistasVistas(uid){
-  try {
-    const calc = _calcConquistas(uid, window._gd);
-    const ids = Object.keys(calc).filter(id=>calc[id].achieved);
-    if(!ids.length) return;
-    const _gid3 = window._groupId || '';
-    const updates = {};
-    updates[`conquistasVistas.${_gid3}`] = ids;
-    ids.forEach(id=>{
-      updates[`conquistasDesbloqueadas.${_gid3}.${id}.count`] = calc[id].count || 1;
-    });
-    await window._db_updateDoc_safe(uid, updates);
-    const badge = document.getElementById('conquistas-fab-badge');
-    if(badge) badge.style.display='none';
-  } catch(e){}
-}
 
 // ── Toast de nova conquista ────────────────────────────────────
 // A fila interna foi substituída pelo orquestrador central (_toastEnqueueCentral).
@@ -12966,9 +13123,6 @@ function _mostrarUmToast(cq, cb){
       }
     });
   });
-
-  const badge = document.getElementById('conquistas-fab-badge');
-  if(badge) badge.style.display='flex';
 
   setTimeout(()=>{
     if(window._cqCountInterval) clearInterval(window._cqCountInterval);
@@ -13465,8 +13619,21 @@ window.fecharCartaJogador = function(){
   // Apenas limpa o pendente sem reverter — o tema salvo persiste no localStorage
   _cartaTemaPendente = null;
   const modal=document.getElementById('modal-carta');
-  if(modal) modal.classList.remove('open');
-  document.body.style.overflow='';
+  if(!modal || !modal.classList.contains('open')) return; // já fechado ou fechando
+  const inner=document.getElementById('carta-inner');
+  modal.style.transition='opacity .22s ease';
+  modal.style.opacity='0';
+  if(inner){
+    inner.style.transition='transform .2s cubic-bezier(.4,0,1,1),opacity .2s ease';
+    inner.style.transform='translateY(24px) scale(.97)';
+    inner.style.opacity='0';
+  }
+  setTimeout(()=>{
+    modal.classList.remove('open');
+    modal.style.cssText='';
+    if(inner) inner.style.cssText='';
+    document.body.style.overflow='';
+  },220);
 };
 
 /* Fecha ao apertar Escape */
@@ -13593,6 +13760,32 @@ function _cartaFallbackDownload(card){
   font-family:'DM Mono',monospace;font-size:11px;color:#000;
   letter-spacing:.06em;
 }
+
+/* ── AGRUPAMENTO POR MÊS NO HISTÓRICO ── */
+.craque-hist-month-group{margin-bottom:10px;}
+.craque-hist-month-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;border-radius:10px;cursor:pointer;
+  background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.1);
+  user-select:none;transition:background .15s;
+}
+.craque-hist-month-header:hover{background:rgba(0,0,0,.1);}
+.craque-hist-month-label{
+  font-family:'VarsityTeam',serif;font-size:13px;color:#000;letter-spacing:.04em;
+}
+.craque-hist-month-meta{
+  font-family:'DM Mono',monospace;font-size:10px;color:#858585;
+}
+.craque-hist-month-arrow{
+  font-size:12px;color:#858585;transition:transform .2s;
+}
+.craque-hist-month-arrow.open{transform:rotate(90deg);}
+.craque-hist-month-body{
+  margin-top:0;overflow:hidden;
+  max-height:0;opacity:0;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1),opacity .22s ease,margin-top .32s cubic-bezier(.4,0,.2,1);
+}
+.craque-hist-month-body.open{opacity:1;margin-top:6px;}
 
 /* ── MODO LITE ────────────────────────────────────────────────────────────── */
 /* Desativa apenas animações decorativas — não afeta transitions de visibilidade */
@@ -13766,7 +13959,7 @@ function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
     }
   });
   return Object.values(byPlayer)
-    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3) }))
+    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 5) - (p.penErr * 5) }))
     .sort((a, b) => b.score !== a.score ? b.score - a.score : b.gols - a.gols);
 }
 
@@ -13850,7 +14043,7 @@ function _renderCraqueModalContent(){
           : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
         const gChip  = p.gols   > 0 ? `<span class="craque-rank-chip">⚽ ${p.gols}G</span>` : '';
         const aChip  = p.assist > 0 ? `<span class="craque-rank-chip">👟 ${p.assist}A</span>` : '';
-        const pkChip = p.penOk  > 0 ? `<span class="craque-rank-chip" style="color:#4dffb0">🟢 ${p.penOk}PK</span>` : '';
+        const pkChip = p.penOk  > 0 ? `<span class="craque-rank-chip">🟢 ${p.penOk}PK</span>` : '';
         const zeroLabel = (!gChip && !aChip && !pkChip) ? `<span class="craque-rank-chip" style="opacity:.45">— sem partidas</span>` : '';
         return `<div class="craque-rank-row${isTop ? ' is-top' : ''}" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
           <div class="craque-rank-pos ${pClass}">${posLabel}</div>
@@ -13874,35 +14067,70 @@ function _renderCraqueModalContent(){
     if(!hist.length){
       body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O histórico é gravado automaticamente<br>ao final de cada semana.</div>';
     } else {
-      // Conta quantas vezes cada jogador foi craque
+      // Conta quantas vezes cada jogador foi craque (total geral)
       const contagem = {};
       hist.forEach(c => {
         const k = c.uid || c.name;
         contagem[k] = (contagem[k] || 0) + 1;
       });
 
-      body.innerHTML = hist.map((c, i) => {
-        const isMe = c.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
-        const av = typeof avatarHTML === 'function'
-          ? avatarHTML(c.name, 36, c.uid)
-          : `<div class="av av0">${(c.name||'?')[0].toUpperCase()}</div>`;
-        const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
-        const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
-        const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
-        const vezes  = contagem[c.uid || c.name];
-        const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
-        return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
-          <div class="craque-hist-crown">${i === 0 ? '🥇' : '👑'}</div>
-          <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
-          <div class="craque-hist-info">
-            <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
-            <div class="craque-hist-periodo">${c.label}</div>
-            <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+      // Agrupa por mês da SEGUNDA-FEIRA (início da semana)
+      const meses = {};
+      const mesesOrdem = [];
+      const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      hist.forEach(c => {
+        // Usa weekStart (segunda-feira) para determinar o mês
+        const ws = c.weekStart || c.key || '';
+        const d = ws ? new Date(ws + 'T00:00:00') : null;
+        const mesKey = d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` : 'sem-data';
+        const mesLabel = d ? `${MESES_PT[d.getMonth()]} ${d.getFullYear()}` : 'Sem data';
+        if(!meses[mesKey]){
+          meses[mesKey] = { label: mesLabel, items: [] };
+          mesesOrdem.push(mesKey);
+        }
+        meses[mesKey].items.push(c);
+      });
+
+      // Renderiza grupos colapsáveis — o mês mais recente começa aberto
+      body.innerHTML = mesesOrdem.map((mesKey, mIdx) => {
+        const grupo = meses[mesKey];
+        const isFirst = mIdx === 0;
+        const nSemanas = grupo.items.length;
+        const metaLabel = `${nSemanas} semana${nSemanas > 1 ? 's' : ''}`;
+        const itemsHTML = grupo.items.map((c, i) => {
+          const isMe = c.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+          const av = typeof avatarHTML === 'function'
+            ? avatarHTML(c.name, 36, c.uid)
+            : `<div class="av av0">${(c.name||'?')[0].toUpperCase()}</div>`;
+          const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
+          const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
+          const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
+          const vezes  = contagem[c.uid || c.name];
+          const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
+          return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
+            <div class="craque-hist-crown">👑</div>
+            <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+            <div class="craque-hist-info">
+              <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+              <div class="craque-hist-periodo">${c.label}</div>
+              <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+            </div>
+            <div>
+              <div class="craque-hist-score">${c.score}</div>
+              <div class="craque-hist-score-lbl">pts</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        return `<div class="craque-hist-month-group">
+          <div class="craque-hist-month-header" onclick="_toggleCraqueMes(this)">
+            <div>
+              <div class="craque-hist-month-label">📅 ${grupo.label}</div>
+              <div class="craque-hist-month-meta">${metaLabel}</div>
+            </div>
+            <span class="craque-hist-month-arrow">▶</span>
           </div>
-          <div>
-            <div class="craque-hist-score">${c.score}</div>
-            <div class="craque-hist-score-lbl">pts</div>
-          </div>
+          <div class="craque-hist-month-body">${itemsHTML}</div>
         </div>`;
       }).join('');
     }
@@ -13938,6 +14166,43 @@ window.fecharCraqueSemana = function(){
   if(!modal) return;
   modal.classList.remove('open');
   document.body.style.overflow = '';
+};
+
+window._toggleCraqueMes = function(header){
+  const arrow = header.querySelector('.craque-hist-month-arrow');
+  const body  = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+
+  // Fecha de forma fluida qualquer outro mês que esteja aberto (accordion)
+  document.querySelectorAll('.craque-hist-month-body.open').forEach(b => {
+    if(b === body) return;
+    const otherHeader = b.previousElementSibling; // .craque-hist-month-header correspondente
+    const otherArrow = otherHeader?.querySelector('.craque-hist-month-arrow');
+    b.style.maxHeight = b.scrollHeight + 'px'; // fixa a altura atual antes de animar para 0
+    requestAnimationFrame(() => { b.style.maxHeight = '0px'; });
+    b.classList.remove('open');
+    if(otherArrow) otherArrow.classList.remove('open');
+  });
+
+  if(isOpen){
+    // Fechando o mês clicado: parte da altura real até 0
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+    body.classList.remove('open');
+    arrow.classList.remove('open');
+  } else {
+    // Abrindo: define a altura real do conteúdo como destino da animação
+    body.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    arrow.classList.add('open');
+    // Após a transição, libera o limite para não cortar conteúdo dinâmico futuro
+    body.addEventListener('transitionend', function _onEnd(e){
+      if(e.propertyName === 'max-height' && body.classList.contains('open')){
+        body.style.maxHeight = 'none';
+      }
+      body.removeEventListener('transitionend', _onEnd);
+    });
+  }
 };
 
 // Fecha com ESC
@@ -14074,6 +14339,633 @@ document.addEventListener('touchstart', e => {
   });
 })();
 </script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   SISTEMA DE MAPA DE PÊNALTIS
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  // Helpers para acessar estado do app principal
+  function _gd(){ return window._gdRef || null; }
+  function _db(){ return (typeof getFirestore === 'function') ? getFirestore() : null; }
+  function _groupId(){ return window.groupId || null; }
+  function _updateDoc(ref, data){ return (typeof updateDoc === 'function') ? updateDoc(ref, data) : Promise.reject('updateDoc indisponível'); }
+  function _doc(db, col, id){ return (typeof doc === 'function') ? doc(db, col, id) : null; }
+
+  /* ── Dimensões do gol (relativas ao canvas) ──────────── */
+  // Canvas: 400×240. Gol ocupa faixa central, área clicável é maior (inclui fora do gol)
+  const GW=400,GH=240; // canvas virtual size
+  const GOAL = { x:60, y:50, w:280, h:120 }; // gol dentro do canvas
+  const CLICK_PAD = 36; // px extra ao redor do gol para registrar chutes para fora
+
+  /* ── Cores ─────────────────────────────────────────── */
+  const C_OK  = '#4caf50';
+  const C_ERR = '#e53935';
+  const C_OK_FILL  = 'rgba(76,175,80,.75)';
+  const C_ERR_FILL = 'rgba(229,57,53,.75)';
+  const C_STROKE   = 'rgba(255,255,255,.9)';
+
+  /* ── Estado do modal de marcação ────────────────────── */
+  let _marcarPartida=null; // partida à qual estamos associando
+  let _marcarTotal=0;      // total de cobranças a marcar
+  let _marcarOk=0;         // quantas convertidas
+  let _marcarIdx=0;        // cobrança atual (0-based)
+  let _marcarResultados=[]; // [{x,y,ok}] já confirmados
+  let _marcarPendente=null; // {x,y,ok} — atual aguardando confirmação
+  let _marcarResult=null;  // true/false selecionado pelo usuário
+  let _marcarPos=null;     // {x,y} clicado pelo usuário
+
+  /* ── Desenha o gol no canvas ────────────────────────── */
+  function drawGoal(ctx, W, H, pts, highlightIdx){
+    ctx.clearRect(0,0,W,H);
+    const sx=W/GW, sy=H/GH;
+    const gx=GOAL.x*sx, gy=GOAL.y*sy, gw=GOAL.w*sx, gh=GOAL.h*sy;
+
+    // Fundo campo
+    ctx.fillStyle='#2d5a1b';
+    ctx.fillRect(0,0,W,H);
+
+    // Grade da rede (mais sutil que as traves)
+    const cols=6,rows=3;
+    ctx.strokeStyle='rgba(255,255,255,.16)';
+    ctx.lineWidth=.75;
+    for(let c=0;c<=cols;c++){const x=gx+c*(gw/cols);ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy+gh);ctx.stroke();}
+    for(let r=0;r<=rows;r++){const y=gy+r*(gh/rows);ctx.beginPath();ctx.moveTo(gx,y);ctx.lineTo(gx+gw,y);ctx.stroke();}
+
+    // Moldura do gol (sem linha de base — só travessão + duas traves laterais)
+    ctx.strokeStyle='rgba(255,255,255,.95)';
+    ctx.lineWidth=7*Math.min(sx,sy);
+    ctx.lineCap='square';
+    ctx.beginPath();
+    ctx.moveTo(gx,gy+gh);      // pé da trave esquerda
+    ctx.lineTo(gx,gy);         // sobe até o travessão
+    ctx.lineTo(gx+gw,gy);      // travessão
+    ctx.lineTo(gx+gw,gy+gh);   // desce trave direita
+    ctx.stroke();
+
+    // Pontos
+    if(pts && pts.length){
+      pts.forEach((p,i)=>{
+        const px=p.x*sx, py=p.y*sy;
+        const isHigh = highlightIdx===i;
+        ctx.beginPath();
+        ctx.arc(px,py,isHigh?10*Math.min(sx,sy):7*Math.min(sx,sy),0,Math.PI*2);
+        ctx.fillStyle=p.ok?C_OK_FILL:C_ERR_FILL;
+        ctx.fill();
+        ctx.strokeStyle=isHigh?'#fff':C_STROKE;
+        ctx.lineWidth=isHigh?2.5:1.5;
+        ctx.stroke();
+      });
+    }
+  }
+
+  /* ── Converte clique do canvas para coords virtuais ─── */
+  function canvasToVirtual(canvas, clientX, clientY){
+    const rect=canvas.getBoundingClientRect();
+    const cx=(clientX-rect.left)/rect.width*GW;
+    const cy=(clientY-rect.top)/rect.height*GH;
+    return {x:Math.round(cx), y:Math.round(cy)};
+  }
+
+  /* ── Verifica se ponto está na área clicável ─────────── */
+  function inClickArea(x,y){
+    const pad=CLICK_PAD;
+    return x>=(GOAL.x-pad) && x<=(GOAL.x+GOAL.w+pad) && y>=(GOAL.y-pad) && y<=(GOAL.y+GOAL.h+pad);
+  }
+
+  /* ═══ MODAL DE MARCAÇÃO ═══════════════════════════════ */
+  window.openPenMarcar = function(partida, total, ok, pontosExistentes){
+    _marcarPartida = partida;
+    _marcarTotal   = total;
+    _marcarOk      = ok;
+    // Retomada: se já existem pontos marcados (penMap parcial), começa a partir deles
+    _marcarResultados = (pontosExistentes && pontosExistentes.length)
+      ? pontosExistentes.map(p=>({x:p.x, y:p.y, ok:p.ok}))
+      : [];
+    _marcarIdx     = _marcarResultados.length;
+    _marcarPendente = null;
+    _marcarResult   = null;
+    _marcarPos      = null;
+
+    // Caso não haja cobranças pendentes (já estava completo), nada a marcar — apenas garante que está salvo
+    if(_marcarIdx >= _marcarTotal){
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+      alert('Essa partida já tem todas as cobranças de pênalti mapeadas.');
+      return;
+    }
+
+    // Monta "resultado" esperado: ok convertidos + (total-ok) errados, embaralhados
+    // Não vamos forçar: usuário define resultado ao clicar ✅/❌
+    _renderMarcar();
+    document.getElementById('pen-marcar-modal').classList.add('open');
+    // Aguarda o modal estar visível antes de configurar o canvas
+    setTimeout(()=>_setupMarcarCanvas(), 80);
+  };
+
+  function _renderMarcar(){
+    const sub = document.getElementById('pen-marcar-sub');
+    const ind  = document.getElementById('pen-marcar-indicator');
+    const btn  = document.getElementById('pen-marcar-confirmar');
+    if(sub) sub.textContent = `Cobrança ${_marcarIdx+1} de ${_marcarTotal} — Toque no gol onde você bateu`;
+
+    // Indicador de pontos já marcados
+    if(ind){
+      ind.innerHTML = Array.from({length:_marcarTotal}).map((_,i)=>{
+        const r = _marcarResultados[i];
+        const cls = r===undefined?'':r.ok?'ok':'err';
+        return `<div class="pen-marcar-dot ${cls}"></div>`;
+      }).join('');
+    }
+
+    // Botão confirmar: desabilita até ter pos E resultado
+    if(btn){
+      const canConfirm = _marcarPos!==null && _marcarResult!==null;
+      btn.disabled = !canConfirm;
+      btn.style.opacity = canConfirm?'1':'.4';
+    }
+
+    // Atualiza visuais dos botões de resultado
+    const btnOk  = document.getElementById('pen-btn-ok');
+    const btnErr = document.getElementById('pen-btn-err');
+    if(btnOk)  btnOk.style.borderWidth  = (_marcarResult===true)  ? '3px':'2px';
+    if(btnErr) btnErr.style.borderWidth = (_marcarResult===false) ? '3px':'2px';
+    if(btnOk)  btnOk.style.background   = (_marcarResult===true)  ? 'rgba(76,175,80,.28)':'rgba(76,175,80,.12)';
+    if(btnErr) btnErr.style.background  = (_marcarResult===false) ? 'rgba(229,57,53,.28)':'rgba(229,57,53,.12)';
+  }
+
+  function _setupMarcarCanvas(){
+    const canvas = document.getElementById('pen-marcar-canvas');
+    if(!canvas) return;
+    // Usa largura CSS real para resolução interna correta no mobile
+    const cssW = canvas.offsetWidth || GW;
+    const cssH = Math.round(cssW * GH / GW);
+    canvas.width  = cssW;
+    canvas.height = cssH;
+    const CW = cssW, CH = cssH;
+    const ctx = canvas.getContext('2d');
+
+    function redraw(){
+      const pts = [
+        ..._marcarResultados,
+        ...(_marcarPendente ? [_marcarPendente] : [])
+      ];
+      // Escala os pontos (salvos em coords GW×GH) para o tamanho real do canvas
+      const scaled = pts.map(p=>({...p, x:p.x*CW/GW, y:p.y*CH/GH}));
+      drawGoal(ctx, CW, CH, scaled, _marcarResultados.length);
+    }
+    redraw();
+
+    function handleXY(clientX, clientY){
+      const pos = canvasToVirtual(canvas, clientX, clientY);
+      // Normaliza para coords GW×GH independente do tamanho real do canvas
+      const normX = Math.round(pos.x * GW / CW);
+      const normY = Math.round(pos.y * GH / CH);
+      _marcarPos = {x:normX, y:normY};
+      _marcarPendente = {x:normX, y:normY, ok: _marcarResult !== null ? _marcarResult : true};
+      _renderMarcar();
+      redraw();
+    }
+
+    // Remove listeners antigos
+    if(canvas._penClickH) canvas.removeEventListener('click', canvas._penClickH);
+    if(canvas._penTouchH) canvas.removeEventListener('touchend', canvas._penTouchH);
+
+    canvas._penClickH = function(e){ e.preventDefault(); handleXY(e.clientX, e.clientY); };
+    canvas._penTouchH = function(e){
+      e.preventDefault();
+      const t = e.changedTouches && e.changedTouches[0];
+      if(t) handleXY(t.clientX, t.clientY);
+    };
+    canvas.addEventListener('click', canvas._penClickH);
+    canvas.addEventListener('touchend', canvas._penTouchH, {passive:false});
+  }
+
+  window.setPenResult = function(ok){
+    _marcarResult = ok;
+    if(_marcarPos) _marcarPendente = {x:_marcarPos.x, y:_marcarPos.y, ok};
+    _renderMarcar();
+    // Redesenha canvas
+    const canvas = document.getElementById('pen-marcar-canvas');
+    if(canvas){
+      const ctx=canvas.getContext('2d');
+      const pts=[..._marcarResultados,...(_marcarPendente?[_marcarPendente]:[])];
+      drawGoal(ctx,GW,GH,pts,_marcarResultados.length);
+    }
+  };
+
+  window.confirmarPenAtual = function(){
+    if(_marcarPos===null||_marcarResult===null) return;
+    _marcarResultados.push({x:_marcarPos.x, y:_marcarPos.y, ok:_marcarResult});
+    _marcarIdx++;
+    _marcarPos=null; _marcarResult=null; _marcarPendente=null;
+
+    if(_marcarIdx>=_marcarTotal){
+      // Todos marcados: salvar
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+      document.getElementById('pen-marcar-modal').classList.remove('open');
+      return;
+    }
+    _renderMarcar();
+    setTimeout(()=>_setupMarcarCanvas(), 40);
+  };
+
+  window.skipPenMarcar = function(){
+    document.getElementById('pen-marcar-modal').classList.remove('open');
+    // Salva o que já foi marcado até agora (pode ser parcial)
+    if(_marcarResultados.length>0 && _marcarPartida){
+      _salvarPenMap(_marcarPartida, _marcarResultados);
+    }
+  };
+
+  /* ── Salva penMap no Firestore ────────────────────────── */
+  async function _salvarPenMap(partida, pontos){
+    // Usa window.savePenMap exposto pelo script principal (tem acesso nativo ao db/doc/updateDoc)
+    if(typeof window.savePenMap === 'function'){
+      const ok = await window.savePenMap(partida, pontos);
+      if(!ok) console.warn('penMap: partida nao encontrada, ts=', partida.ts);
+      return;
+    }
+    console.warn('penMap: window.savePenMap nao disponivel');
+  }
+
+  /* ═══ MODAL DO MAPA PÚBLICO ════════════════════════════ */
+  let _mapaFiltroUid = 'all'; // 'all' ou uid
+  let _editMode = false;       // true quando ADM está editando o mapa do jogador filtrado
+  let _editPontos = null;      // cópia local dos pontos em edição (apenas do jogador filtrado)
+  let _editSelIdx = null;      // índice (em _editPontos) do ponto selecionado/arrastando
+  let _editDragging = false;
+  let _editDirty = false;      // se há alterações não salvas
+
+  window.renderPenMapaPanel = function(){
+    _mapaFiltroUid = 'all';
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
+    // Renderiza texto/filtros antes do canvas (canvas depende do elemento já estar no DOM e visível)
+    _renderMapaSemCanvas();
+    setTimeout(()=>_renderMapaCanvas(), 80);
+  };
+
+  // Chamado antes de sair da aba "Mapa" (troca de sub-aba). Retorna false para cancelar a troca.
+  window._mapaConfirmLeave = function(){
+    if(_editDirty && !confirm('Você tem alterações não salvas no mapa. Sair mesmo assim?')) return false;
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
+    return true;
+  };
+
+  window.setPenMapaFiltro = function(uid){
+    if(_editMode && _editDirty && !confirm('Trocar de jogador vai descartar as alterações não salvas. Continuar?')) return;
+    _mapaFiltroUid = uid;
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
+    _renderMapaSemCanvas();
+    _renderMapaCanvas();
+  };
+
+  function _getPontos(){
+    const gd=_gd(); if(!gd||!gd.matches) return [];
+    return gd.matches.flatMap(m=>{
+      if(!m.penMap||!m.penMap.length) return [];
+      const player = (gd.members||[]).find(mb=>mb.uid===m.uid);
+      return m.penMap.map((p,i)=>({...p, uid:m.uid, name:m.player||player?.name||'?', date:m.date, _ts:m.ts, _idx:i}));
+    });
+  }
+
+  function _getMapaData(){
+    const todos = _getPontos();
+    const filtrado = _mapaFiltroUid==='all' ? todos : todos.filter(p=>p.uid===_mapaFiltroUid);
+    const jogadores = [];
+    const seenUids = new Set();
+    todos.forEach(p=>{if(!seenUids.has(p.uid)){seenUids.add(p.uid);jogadores.push({uid:p.uid,name:p.name});}});
+    return {todos, filtrado, jogadores};
+  }
+
+  /* ── Botão "Editar" (somente ADM) ─────────────────────── */
+  function _renderEditBar(){
+    const bar = document.getElementById('pen-mapa-edit-bar');
+    if(!bar) return;
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin){ bar.style.display='none'; bar.innerHTML=''; return; }
+
+    // Sem jogador específico selecionado ("Todos") e fora do modo edição: não mostra nada
+    if(!_editMode && _mapaFiltroUid==='all'){ bar.style.display='none'; bar.innerHTML=''; return; }
+
+    bar.style.display='flex';
+    bar.style.justifyContent='center';
+    bar.style.marginBottom='.8rem';
+
+    if(_editMode){
+      bar.innerHTML = `
+        <div style="display:flex;gap:8px;width:100%">
+          <button onclick="cancelEditPenMapa()" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Cancelar</button>
+          <button onclick="saveEditPenMapa()" style="flex:1;padding:9px;border-radius:10px;border:none;background:#4caf50;color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">💾 Salvar alterações</button>
+        </div>
+        <div style="width:100%;text-align:center;font-size:10.5px;color:var(--tx3);margin-top:6px;font-family:'DM Mono',monospace">Arraste para mover · toque para trocar resultado · ✕ para excluir</div>`;
+    } else {
+      bar.innerHTML = `<button onclick="startEditPenMapa()" style="padding:8px 18px;border-radius:10px;border:1.5px solid var(--g);background:rgba(77,255,176,.12);color:var(--g);font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">✏️ Editar mapa</button>`;
+    }
+  }
+
+  window.startEditPenMapa = function(){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin || _mapaFiltroUid==='all') return;
+    const {filtrado} = _getMapaData();
+    // Cópia local profunda dos pontos do jogador filtrado, preservando referência à partida (_ts/_idx)
+    _editPontos = filtrado.map(p=>({...p}));
+    _editMode = true;
+    _editSelIdx = null;
+    _editDirty = false;
+    _renderEditBar();
+    _renderMapaCanvas();
+  };
+
+  window.cancelEditPenMapa = function(){
+    if(_editDirty && !confirm('Descartar alterações não salvas?')) return;
+    _editMode = false;
+    _editPontos = null;
+    _editSelIdx = null;
+    _editDirty = false;
+    _renderEditBar();
+    _renderMapaCanvas();
+  };
+
+  window.saveEditPenMapa = async function(){
+    if(!_editMode || !_editPontos) return;
+    const gd=_gd();
+    if(!gd||!gd.matches) return;
+    // Agrupa os pontos editados por partida de origem (_ts), preservando _idx original
+    const porPartida = new Map(); // ts -> array de pontos (ou null nos índices excluídos)
+    _editPontos.forEach(p=>{
+      if(!porPartida.has(p._ts)) porPartida.set(p._ts, []);
+      porPartida.get(p._ts).push(p);
+    });
+
+    let okTudo = true;
+    for(const [ts, pontosDaPartida] of porPartida.entries()){
+      const m = gd.matches.find(mm=>mm.uid===_mapaFiltroUid && mm.ts===ts);
+      if(!m) { okTudo=false; continue; }
+      // Reconstrói o penMap completo dessa partida: começa do array original e aplica updates/remoções
+      const novoPenMap = (m.penMap||[]).map((orig,i)=>{
+        const editado = pontosDaPartida.find(p=>p._idx===i);
+        if(editado === undefined) return null; // ponto foi excluído
+        return {x: editado.x, y: editado.y, ok: editado.ok};
+      }).filter(p=>p!==null);
+      const ok = await window.savePenMap({uid:_mapaFiltroUid, ts}, novoPenMap);
+      if(!ok) okTudo=false;
+    }
+
+    if(okTudo){
+      _editMode=false; _editPontos=null; _editSelIdx=null; _editDirty=false;
+      _renderEditBar();
+      _renderMapaSemCanvas();
+      _renderMapaCanvas();
+    } else {
+      alert('Não foi possível salvar todas as alterações. Tente novamente.');
+    }
+  };
+
+  function _renderMapaSemCanvas(){
+    const {todos, filtrado, jogadores} = _getMapaData();
+
+    // Filtros
+    const filterEl = document.getElementById('pen-mapa-filter');
+    if(filterEl){
+      filterEl.innerHTML = `<button class="pen-mapa-chip${_mapaFiltroUid==='all'?' active':''}" onclick="setPenMapaFiltro('all')">Todos</button>` +
+        jogadores.map(j=>`<button class="pen-mapa-chip${_mapaFiltroUid===j.uid?' active':''}" onclick="setPenMapaFiltro('${j.uid}')">${j.name.split(' ')[0]}</button>`).join('');
+    }
+
+    // Stats
+    const totalPts = filtrado.length;
+    const okPts    = filtrado.filter(p=>p.ok).length;
+    const errPts   = totalPts-okPts;
+    const statsEl = document.getElementById('pen-mapa-stats');
+    if(statsEl){
+      statsEl.innerHTML = totalPts===0?'':
+        `<div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#4caf50">${okPts}</div><div class="pen-mapa-stat-lbl">✅ Gols</div></div>
+         <div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#e53935">${errPts}</div><div class="pen-mapa-stat-lbl">❌ Errados</div></div>
+         <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
+    }
+
+    _renderEditBar();
+  }
+
+  /* ── Coordenadas do canvas do mapa (para detectar cliques nos pontos em modo edição) ── */
+  let _mapaCanvasGeom = null; // {cssW, cssH, scaleX, scaleY}
+
+  function _renderMapaCanvas(){
+    const {filtrado} = _getMapaData();
+    const pontos = _editMode ? _editPontos : filtrado;
+    const totalPts = pontos.length;
+    const emptyEl = document.getElementById('pen-mapa-empty');
+    const canvas  = document.getElementById('pen-mapa-canvas');
+    if(!canvas) return;
+
+    if(totalPts===0){
+      if(emptyEl) emptyEl.style.display='';
+      canvas.style.display='none';
+      return;
+    }
+    if(emptyEl) emptyEl.style.display='none';
+    canvas.style.display='';
+    // Usa largura CSS real do canvas para setar resolução interna
+    const cssW = canvas.offsetWidth || GW;
+    const cssH = Math.round(cssW * GH / GW);
+    canvas.width  = cssW;
+    canvas.height = cssH;
+    _mapaCanvasGeom = {cssW, cssH};
+    const ctx=canvas.getContext('2d');
+
+    if(_editMode){
+      _drawEditableGoal(ctx, cssW, cssH);
+      _setupMapaEditHandlers(canvas);
+      canvas.style.cursor='grab';
+    } else {
+      drawGoal(ctx, cssW, cssH, pontos);
+      canvas.style.cursor='default';
+      // Remove handlers de edição se existirem
+      if(canvas._mapaDownH) canvas.removeEventListener('mousedown', canvas._mapaDownH);
+      if(canvas._mapaMoveH) canvas.removeEventListener('mousemove', canvas._mapaMoveH);
+      if(canvas._mapaUpH) canvas.removeEventListener('mouseup', canvas._mapaUpH);
+      if(canvas._mapaTouchStartH) canvas.removeEventListener('touchstart', canvas._mapaTouchStartH);
+      if(canvas._mapaTouchMoveH) canvas.removeEventListener('touchmove', canvas._mapaTouchMoveH);
+      if(canvas._mapaTouchEndH) canvas.removeEventListener('touchend', canvas._mapaTouchEndH);
+    }
+  }
+
+  /* ── Desenha o gol em modo edição, com destaque + "x" de exclusão no ponto selecionado ── */
+  function _drawEditableGoal(ctx, W, H){
+    drawGoal(ctx, W, H, _editPontos, _editSelIdx);
+    if(_editSelIdx===null || !_editPontos[_editSelIdx]) return;
+    const sx=W/GW, sy=H/GH;
+    const p = _editPontos[_editSelIdx];
+    const px=p.x*sx, py=p.y*sy;
+    const r=10*Math.min(sx,sy);
+    // Botão de exclusão: pequeno círculo com "x" acima-direita do ponto selecionado
+    const exX = px + r*1.5, exY = py - r*1.5;
+    ctx.beginPath();
+    ctx.arc(exX, exY, 9, 0, Math.PI*2);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(exX-3.5, exY-3.5); ctx.lineTo(exX+3.5, exY+3.5);
+    ctx.moveTo(exX+3.5, exY-3.5); ctx.lineTo(exX-3.5, exY+3.5);
+    ctx.stroke();
+    // Guarda posição do botão de exclusão para detecção de clique
+    canvasDelBtn = {x:exX, y:exY, r:12};
+  }
+  let canvasDelBtn = null;
+
+  function _hitTestPonto(vx, vy){
+    // Retorna índice do ponto em _editPontos mais próximo do clique, dentro de um raio de tolerância
+    if(!_editPontos) return null;
+    const TOL = 18; // tolerância em coords virtuais (GW×GH)
+    let best=null, bestDist=Infinity;
+    _editPontos.forEach((p,i)=>{
+      const d = Math.hypot(p.x-vx, p.y-vy);
+      if(d<TOL && d<bestDist){ bestDist=d; best=i; }
+    });
+    return best;
+  }
+
+  function _setupMapaEditHandlers(canvas){
+    // Remove handlers antigos antes de religar (evita duplicação)
+    if(canvas._mapaDownH) canvas.removeEventListener('mousedown', canvas._mapaDownH);
+    if(canvas._mapaMoveH) canvas.removeEventListener('mousemove', canvas._mapaMoveH);
+    if(canvas._mapaUpH) canvas.removeEventListener('mouseup', canvas._mapaUpH);
+    if(canvas._mapaTouchStartH) canvas.removeEventListener('touchstart', canvas._mapaTouchStartH);
+    if(canvas._mapaTouchMoveH) canvas.removeEventListener('touchmove', canvas._mapaTouchMoveH);
+    if(canvas._mapaTouchEndH) canvas.removeEventListener('touchend', canvas._mapaTouchEndH);
+
+    let moved = false;
+    let startVX=0, startVY=0;
+
+    function redraw(){
+      const ctx = canvas.getContext('2d');
+      _drawEditableGoal(ctx, canvas.width, canvas.height);
+    }
+
+    function virtualFromEvent(clientX, clientY){
+      return canvasToVirtual(canvas, clientX, clientY);
+    }
+
+    function checkDelClick(clientX, clientY){
+      if(!canvasDelBtn) return false;
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width/rect.width, sy=canvas.height/rect.height;
+      const cx = (clientX-rect.left)*sx, cy=(clientY-rect.top)*sy;
+      const d = Math.hypot(cx-canvasDelBtn.x, cy-canvasDelBtn.y);
+      return d <= canvasDelBtn.r;
+    }
+
+    function onDown(clientX, clientY){
+      if(checkDelClick(clientX, clientY)){
+        if(_editSelIdx!==null){
+          _editPontos.splice(_editSelIdx,1);
+          _editSelIdx=null;
+          _editDirty=true;
+          redraw();
+        }
+        return;
+      }
+      const v = virtualFromEvent(clientX, clientY);
+      startVX=v.x; startVY=v.y; moved=false;
+      const idx = _hitTestPonto(v.x, v.y);
+      _editSelIdx = idx;
+      _editDragging = idx!==null;
+      redraw();
+    }
+
+    function onMove(clientX, clientY){
+      if(!_editDragging || _editSelIdx===null) return;
+      const v = virtualFromEvent(clientX, clientY);
+      if(Math.hypot(v.x-startVX, v.y-startVY) > 2) moved = true;
+      // Restringe ao raio clicável do gol (mesma área usada na marcação original)
+      let nx = Math.max(GOAL.x-CLICK_PAD, Math.min(GOAL.x+GOAL.w+CLICK_PAD, v.x));
+      let ny = Math.max(GOAL.y-CLICK_PAD, Math.min(GOAL.y+GOAL.h+CLICK_PAD, v.y));
+      _editPontos[_editSelIdx].x = nx;
+      _editPontos[_editSelIdx].y = ny;
+      _editDirty = true;
+      redraw();
+    }
+
+    function onUp(){
+      if(_editDragging && _editSelIdx!==null && !moved){
+        // Foi um toque/clique sem arrastar -> alterna resultado (ok/erro)
+        _editPontos[_editSelIdx].ok = !_editPontos[_editSelIdx].ok;
+        _editDirty = true;
+        redraw();
+      }
+      _editDragging = false;
+      moved = false;
+    }
+
+    canvas._mapaDownH = function(e){ e.preventDefault(); onDown(e.clientX, e.clientY); };
+    canvas._mapaMoveH = function(e){ if(_editDragging){ e.preventDefault(); onMove(e.clientX, e.clientY); } };
+    canvas._mapaUpH   = function(e){ onUp(); };
+    canvas._mapaTouchStartH = function(e){ e.preventDefault(); const t=e.touches[0]; if(t) onDown(t.clientX, t.clientY); };
+    canvas._mapaTouchMoveH  = function(e){ if(_editDragging){ e.preventDefault(); const t=e.touches[0]; if(t) onMove(t.clientX, t.clientY); } };
+    canvas._mapaTouchEndH   = function(e){ e.preventDefault(); onUp(); };
+
+    canvas.addEventListener('mousedown', canvas._mapaDownH);
+    canvas.addEventListener('mousemove', canvas._mapaMoveH);
+    canvas.addEventListener('mouseup', canvas._mapaUpH);
+    canvas.addEventListener('touchstart', canvas._mapaTouchStartH, {passive:false});
+    canvas.addEventListener('touchmove', canvas._mapaTouchMoveH, {passive:false});
+    canvas.addEventListener('touchend', canvas._mapaTouchEndH, {passive:false});
+  }
+
+  function _renderMapa(){ _renderMapaSemCanvas(); _renderMapaCanvas(); }
+
+  /* ═══ ADMIN: reabrir/retomar marcação de pênaltis de qualquer partida ═══
+     Usada pelo botão 🎯 nos cards de partida — visível somente para o ADM.
+     gi = índice da partida no array gd.matches (mesmo "_gi" usado por openEdit/deleteMatch). */
+  window.openPenMarcarAdmin = function(gi){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin) return;
+    const gd=_gd();
+    const m = (gd?.matches||[])[gi];
+    if(!m || !(m.penBat>0)) return;
+    openPenMarcar(m, m.penBat||0, m.penOk||0, m.penMap||[]);
+  };
+
+  // Mantido por compatibilidade, caso algo ainda chame pelo nome antigo (uid+ts)
+  window.openPenMapaAdmin = function(uid, ts){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin) return;
+    const gd=_gd();
+    const gi = (gd?.matches||[]).findIndex(x=>x.uid===uid&&x.ts===ts);
+    if(gi<0) return;
+    openPenMarcarAdmin(gi);
+  };
+
+})();
+</script>
+
+<div id="pen-marcar-modal">
+  <div class="pen-marcar-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem">
+      <div></div>
+      <div class="pen-marcar-title">🎯 Marcar pênalti</div>
+      <button onclick="skipPenMarcar()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
+    </div>
+    <div class="pen-marcar-sub" id="pen-marcar-sub">Cobrança 1 de 1 — Toque no gol onde você bateu</div>
+    <div class="pen-marcar-indicator" id="pen-marcar-indicator"></div>
+    <div class="pen-gol-wrap">
+      <canvas id="pen-marcar-canvas" class="pen-gol-canvas"></canvas>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:.6rem">
+      <button onclick="setPenResult(true)" id="pen-btn-ok" style="flex:1;padding:11px;border-radius:12px;border:2px solid #4caf50;background:rgba(76,175,80,.12);color:#4caf50;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">✅ Convertido</button>
+      <button onclick="setPenResult(false)" id="pen-btn-err" style="flex:1;padding:11px;border-radius:12px;border:2px solid #e53935;background:rgba(229,57,53,.12);color:#e53935;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">❌ Errado</button>
+    </div>
+    <div class="pen-marcar-actions">
+      <button class="pen-marcar-btn skip" onclick="skipPenMarcar()">Pular</button>
+      <button class="pen-marcar-btn save" onclick="confirmarPenAtual()" id="pen-marcar-confirmar" disabled style="opacity:.4">Confirmar →</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
@@ -14985,6 +15877,10 @@ window.abrirCartaJogador = function(uidParam){
     // Chave de deduplicação única por ciclo semestral (ex: "survey_ciclo_S1/2025")
     const chaveDedup = 'survey_ciclo_' + ciclo;
 
+    // Se o usuário já dispensou (apagou) o lembrete deste mesmo ciclo, não recria
+    // até que o ciclo mude (próximo semestre gera uma chaveDedup diferente).
+    if(gd.surveyCicloDispensado && gd.surveyCicloDispensado[uid] === chaveDedup) return;
+
     // Verificação rápida no cache local antes de ir ao servidor
     if((gd.notifs?.[uid]||[]).some(n => n.id === chaveDedup)) return;
 
@@ -14992,6 +15888,9 @@ window.abrirCartaJogador = function(uidParam){
       const snap = await window._db_getDoc(window._db_doc('groups', groupId));
       if(!snap.exists()) return;
       const cur = snap.data();
+
+      // Revalida a dispensa com os dados mais recentes do servidor
+      if(cur.surveyCicloDispensado && cur.surveyCicloDispensado[uid] === chaveDedup) return;
 
       cur.notifs        = cur.notifs      || {};
       cur.notifs[uid]   = cur.notifs[uid] || [];
@@ -15345,6 +16244,211 @@ window._cfgRemoverMembro = async function() {
     document.getElementById('cal-popup').classList.add('open');
     // Scroll suave para o popup
     setTimeout(()=>{ document.getElementById('cal-popup').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
+  }
+})();
+
+// ══════════════════════════════════════════════════════
+//  HISTÓRICO DE CONFRONTOS — FAB
+// ══════════════════════════════════════════════════════
+(function(){
+  let _hcFiltroJogador = '__todos__'; // uid ou '__todos__'
+  let _hcFiltroAno = '__todos__';     // '2024' ou '__todos__'
+
+  window.abrirHistoricoConfrontos = function(){
+    const modal = document.getElementById('modal-historico-confrontos');
+    if(!modal) return;
+    _hcFiltroJogador = '__todos__';
+    _hcFiltroAno = '__todos__';
+    modal.classList.add('open');
+    if(!gd){
+      document.getElementById('hc-body').innerHTML='<div class="hc-empty">Carregue um grupo para ver os confrontos.</div>';
+      return;
+    }
+    _hcBuildFilters();
+    _hcRender();
+  };
+
+  window.fecharHistoricoConfrontos = function(){
+    document.getElementById('modal-historico-confrontos')?.classList.remove('open');
+  };
+
+  function _hcBuildFilters(){
+    const desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+
+    // ── Filtro por jogador ──
+    const playerWrap = document.getElementById('hc-player-filter');
+    if(!playerWrap) return;
+
+    // Coletar UIDs/nomes únicos que participaram de confrontos
+    const memberMap = {};
+    (gd.members||[]).forEach(m => { if(m.uid) memberMap[m.uid] = m.name; });
+
+    const uidsVisiveis = new Set();
+    desafios.forEach(d => {
+      if(d.uidA) uidsVisiveis.add(d.uidA);
+      if(d.uidB) uidsVisiveis.add(d.uidB);
+    });
+
+    const playerChips = [{ uid: '__todos__', name: 'Geral' }];
+    uidsVisiveis.forEach(uid => {
+      playerChips.push({ uid, name: memberMap[uid] || uid.slice(0,6) });
+    });
+
+    playerWrap.innerHTML = playerChips.map(p =>
+      `<button class="hc-player-chip${_hcFiltroJogador===p.uid?' active':''}" onclick="window._hcSetJogador('${p.uid}')">${p.name}</button>`
+    ).join('');
+
+    // ── Filtro por ano ──
+    const yearWrap = document.getElementById('hc-year-filter');
+    if(!yearWrap) return;
+
+    const anos = new Set();
+    desafios.forEach(d => {
+      const ts = d.criadoEm || d.ts || 0;
+      if(ts) anos.add(new String(new Date(ts).getFullYear()).toString());
+      // também tenta extrair do campo data se existir
+      if(d.dataFim) anos.add(d.dataFim.slice(0,4));
+    });
+    const anosOrdenados = ['__todos__', ...Array.from(anos).sort((a,b)=>b-a)];
+
+    yearWrap.innerHTML = anosOrdenados.map(a =>
+      `<button class="hc-year-chip${_hcFiltroAno===a?' active':''}" onclick="window._hcSetAno('${a}')">${a==='__todos__'?'Todos os anos':a}</button>`
+    ).join('');
+  }
+
+  window._hcSetJogador = function(uid){
+    _hcFiltroJogador = uid;
+    _hcBuildFilters();
+    _hcRender();
+  };
+
+  window._hcSetAno = function(ano){
+    _hcFiltroAno = ano;
+    _hcBuildFilters();
+    _hcRender();
+  };
+
+  function _hcGetNome(uid){
+    const m = (gd.members||[]).find(x => x.uid === uid);
+    return m ? m.name : (uid||'?').slice(0,8);
+  }
+
+  function _hcGetAnoDesafio(d){
+    const ts = d.criadoEm || d.ts || 0;
+    if(ts) return String(new Date(ts).getFullYear());
+    if(d.dataFim) return d.dataFim.slice(0,4);
+    return '—';
+  }
+
+  function _hcRender(){
+    const body = document.getElementById('hc-body');
+    if(!body) return;
+
+    const myUid = currentUser?.uid;
+    let desafios = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
+
+    // Filtro por jogador
+    if(_hcFiltroJogador !== '__todos__'){
+      desafios = desafios.filter(d => d.uidA === _hcFiltroJogador || d.uidB === _hcFiltroJogador);
+    }
+
+    // Filtro por ano
+    if(_hcFiltroAno !== '__todos__'){
+      desafios = desafios.filter(d => _hcGetAnoDesafio(d) === _hcFiltroAno);
+    }
+
+    if(!desafios.length){
+      body.innerHTML = '<div class="hc-empty">Nenhum confronto encontrado.</div>';
+      return;
+    }
+
+    // Agrupar por ano
+    const porAno = {};
+    desafios.forEach(d => {
+      const ano = _hcGetAnoDesafio(d);
+      if(!porAno[ano]) porAno[ano] = [];
+      porAno[ano].push(d);
+    });
+
+    // Modo: filtrado por jogador específico → mostra resumo + cores
+    const filtrando = _hcFiltroJogador !== '__todos__';
+    const fuid = _hcFiltroJogador;
+
+    let html = '';
+
+    // Sumário quando filtrado por jogador
+    if(filtrando){
+      let vit=0, der=0, emp=0;
+      desafios.forEach(d => {
+        const isA = d.uidA === fuid;
+        const scoreA = d.scoreA||0, scoreB = d.scoreB||0;
+        const meu = isA ? scoreA : scoreB;
+        const opp = isA ? scoreB : scoreA;
+        if(meu > opp) vit++;
+        else if(meu < opp) der++;
+        else emp++;
+      });
+      html += `<div class="hc-summary">
+        <div class="hc-summary-box win"><div class="hc-summary-val">${vit}</div><div class="hc-summary-lbl">Vitórias</div></div>
+        <div class="hc-summary-box lose"><div class="hc-summary-val">${der}</div><div class="hc-summary-lbl">Derrotas</div></div>
+        <div class="hc-summary-box tie"><div class="hc-summary-val">${emp}</div><div class="hc-summary-lbl">Empates</div></div>
+      </div>`;
+    }
+
+    html += `<div class="hc-count-badge">⚔️ ${desafios.length} confronto${desafios.length!==1?'s':''}</div>`;
+
+    // Renderizar por ano (mais recente primeiro)
+    const anosOrdenados = Object.keys(porAno).sort((a,b)=>b-a);
+    anosOrdenados.forEach(ano => {
+      const lista = porAno[ano].slice().reverse(); // mais recente primeiro dentro do ano
+      html += `<div class="hc-year-group">
+        <div class="hc-year-label">${ano}</div>`;
+
+      lista.forEach(d => {
+        const nomeA = _hcGetNome(d.uidA);
+        const nomeB = _hcGetNome(d.uidB);
+        const sA = d.scoreA||0, sB = d.scoreB||0;
+
+        // Determinar classes de cor
+        let matchCls = '';
+        let scoreACls = '', scoreBCls = '';
+        if(filtrando){
+          const isA = d.uidA === fuid;
+          const meu = isA ? sA : sB;
+          const opp = isA ? sB : sA;
+          if(meu > opp){ matchCls='is-winner'; }
+          else if(meu < opp){ matchCls='is-loser'; }
+          else matchCls='is-tie';
+          // scores
+          if(sA > sB){ scoreACls='winner-score'; scoreBCls='loser-score'; }
+          else if(sB > sA){ scoreBCls='winner-score'; scoreACls='loser-score'; }
+        }
+
+        // Tipo / status
+        const tipo = d.tipo || 'Gols';
+        const enc = d.status==='encerrado';
+        const statusLabel = enc ? 'Encerrado' : 'Em curso';
+
+        // Nomes (destaca jogador filtrado)
+        const nameACls = (filtrando && d.uidA===fuid) ? 'hc-name-left hc-name-self' : 'hc-name-left';
+        const nameBCls = (filtrando && d.uidB===fuid) ? 'hc-name-right hc-name-self' : 'hc-name-right';
+
+        html += `<div class="hc-match ${matchCls}">
+          <div class="${nameACls}">${nomeA}</div>
+          <div class="hc-scores">
+            <span class="hc-score ${scoreACls}">${sA}</span>
+            <span class="hc-x">×</span>
+            <span class="hc-score ${scoreBCls}">${sB}</span>
+          </div>
+          <div class="${nameBCls}">${nomeB}</div>
+          <span class="hc-tipo">${tipo}</span>
+        </div>`;
+      });
+
+      html += `</div>`; // fim hc-year-group
+    });
+
+    body.innerHTML = html;
   }
 })();
 </script>
