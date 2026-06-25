@@ -7338,6 +7338,20 @@ window.saveEdit=async()=>{
   await setDoc(doc(db,'groups',groupId),cur);gd=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
   if(typeof window._admEditCallback==='function'){const cb=window._admEditCallback;window._admEditCallback=null;cb();}
 };
+window.savePenMap=async(partida, pontos)=>{
+  // Exposta para o script do mapa — tem acesso direto ao db, doc, updateDoc do escopo principal
+  try{
+    if(!gd||!gd.matches||!groupId) return false;
+    let idx = gd.matches.findIndex(m=>m.uid===partida.uid && m.ts===partida.ts);
+    if(idx<0) idx = gd.matches.findIndex(m=>m.uid===partida.uid && Math.abs((m.ts||0)-(partida.ts||0))<5000);
+    if(idx<0) return false;
+    const matches = gd.matches.map((m,i)=> i===idx ? {...m, penMap: pontos} : m);
+    await updateDoc(doc(db,'groups',groupId), {matches});
+    gd.matches = matches;
+    window._gdRef = gd;
+    return true;
+  }catch(e){ console.warn('savePenMap error',e); return false; }
+};
 window.deleteMatch=async gi=>{
   if(!confirm('Deletar essa partida?'))return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return;
   const cur=snap.data();cur.matches.splice(gi,1);await setDoc(doc(db,'groups',groupId),cur);gd=cur;
@@ -14271,16 +14285,13 @@ document.addEventListener('touchstart', e => {
 
   /* ── Salva penMap no Firestore ────────────────────────── */
   async function _salvarPenMap(partida, pontos){
-    try{
-      const gd=_gd(); const db=_db(); const groupId=_groupId();
-      if(!gd||!gd.matches||!db||!groupId) return;
-      const idx = gd.matches.findIndex(m=>m.uid===partida.uid&&m.ts===partida.ts);
-      if(idx<0) return;
-      const matches = [...gd.matches];
-      matches[idx] = {...matches[idx], penMap: pontos};
-      await _updateDoc(_doc(db,'groups',groupId),{matches});
-      gd.matches = matches;
-    }catch(e){ console.warn('penMap save error',e); }
+    // Usa window.savePenMap exposto pelo script principal (tem acesso nativo ao db/doc/updateDoc)
+    if(typeof window.savePenMap === 'function'){
+      const ok = await window.savePenMap(partida, pontos);
+      if(!ok) console.warn('penMap: partida nao encontrada, ts=', partida.ts);
+      return;
+    }
+    console.warn('penMap: window.savePenMap nao disponivel');
   }
 
   /* ═══ MODAL DO MAPA PÚBLICO ════════════════════════════ */
