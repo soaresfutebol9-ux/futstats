@@ -2092,6 +2092,15 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   color:#fff;
 }
 
+/* ── MFAB BLUR ── */
+body.mfab-open #sa{
+  filter:blur(4px);
+  transition:filter .3s ease;
+  pointer-events:none;
+}
+#sa{
+  transition:filter .3s ease;
+}
 /* ── MFAB BLUR OVERLAY ── */
 #mfab-blur-overlay{
   position:fixed;inset:0;z-index:498;
@@ -10545,6 +10554,7 @@ function mfabToggle(){
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
   if(overlay) overlay.classList.toggle('open', open);
+  document.body.classList.toggle('mfab-open', open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
@@ -10556,6 +10566,7 @@ function mfabClose(){
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
   if(overlay) overlay.classList.remove('open');
+  document.body.classList.remove('mfab-open');
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
