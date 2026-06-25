@@ -14298,9 +14298,15 @@ document.addEventListener('touchstart', e => {
 
   /* ═══ MODAL DO MAPA PÚBLICO ════════════════════════════ */
   let _mapaFiltroUid = 'all'; // 'all' ou uid
+  let _editMode = false;       // true quando ADM está editando o mapa do jogador filtrado
+  let _editPontos = null;      // cópia local dos pontos em edição (apenas do jogador filtrado)
+  let _editSelIdx = null;      // índice (em _editPontos) do ponto selecionado/arrastando
+  let _editDragging = false;
+  let _editDirty = false;      // se há alterações não salvas
 
   window.openPenMapa = function(){
     _mapaFiltroUid = 'all';
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
     // Renderiza texto/filtros antes de abrir; canvas depois (precisa do modal visível)
     _renderMapaSemCanvas();
     document.getElementById('pen-mapa-modal').classList.add('open');
@@ -14308,11 +14314,15 @@ document.addEventListener('touchstart', e => {
   };
 
   window.closePenMapa = function(){
+    if(_editDirty && !confirm('Você tem alterações não salvas no mapa. Fechar mesmo assim?')) return;
+    _editMode=false; _editPontos=null; _editSelIdx=null; _editDirty=false;
     document.getElementById('pen-mapa-modal').classList.remove('open');
   };
 
   window.setPenMapaFiltro = function(uid){
+    if(_editMode && _editDirty && !confirm('Trocar de jogador vai descartar as alterações não salvas. Continuar?')) return;
     _mapaFiltroUid = uid;
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
     _renderMapaSemCanvas();
     _renderMapaCanvas();
   };
@@ -14322,7 +14332,7 @@ document.addEventListener('touchstart', e => {
     return gd.matches.flatMap(m=>{
       if(!m.penMap||!m.penMap.length) return [];
       const player = (gd.members||[]).find(mb=>mb.uid===m.uid);
-      return m.penMap.map(p=>({...p, uid:m.uid, name:m.player||player?.name||'?', date:m.date}));
+      return m.penMap.map((p,i)=>({...p, uid:m.uid, name:m.player||player?.name||'?', date:m.date, _ts:m.ts, _idx:i}));
     });
   }
 
@@ -14334,6 +14344,91 @@ document.addEventListener('touchstart', e => {
     todos.forEach(p=>{if(!seenUids.has(p.uid)){seenUids.add(p.uid);jogadores.push({uid:p.uid,name:p.name});}});
     return {todos, filtrado, jogadores};
   }
+
+  /* ── Botão "Editar" (somente ADM) ─────────────────────── */
+  function _renderEditBar(){
+    const bar = document.getElementById('pen-mapa-edit-bar');
+    if(!bar) return;
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin){ bar.style.display='none'; bar.innerHTML=''; return; }
+
+    bar.style.display='flex';
+    bar.style.justifyContent='center';
+    bar.style.marginBottom='.8rem';
+
+    if(_editMode){
+      bar.innerHTML = `
+        <div style="display:flex;gap:8px;width:100%">
+          <button onclick="cancelEditPenMapa()" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Cancelar</button>
+          <button onclick="saveEditPenMapa()" style="flex:1;padding:9px;border-radius:10px;border:none;background:#4caf50;color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">💾 Salvar alterações</button>
+        </div>
+        <div style="width:100%;text-align:center;font-size:10.5px;color:var(--tx3);margin-top:6px;font-family:'DM Mono',monospace">Arraste para mover · toque para trocar resultado · ✕ para excluir</div>`;
+    } else {
+      const podeEditar = _mapaFiltroUid!=='all';
+      bar.innerHTML = `<button onclick="startEditPenMapa()" ${podeEditar?'':'disabled'} style="padding:8px 18px;border-radius:10px;border:1.5px solid ${podeEditar?'var(--g)':'var(--bo2)'};background:${podeEditar?'rgba(77,255,176,.12)':'var(--bg3)'};color:${podeEditar?'var(--g)':'var(--tx3)'};font-weight:700;font-size:12px;cursor:${podeEditar?'pointer':'not-allowed'};font-family:'DM Sans',sans-serif;opacity:${podeEditar?'1':'.6'}">✏️ Editar mapa</button>`;
+      if(!podeEditar){
+        bar.innerHTML += `<div style="width:100%;text-align:center;font-size:10.5px;color:var(--tx3);margin-top:6px;font-family:'DM Mono',monospace">Selecione um jogador para editar seu mapa</div>`;
+      }
+    }
+  }
+
+  window.startEditPenMapa = function(){
+    const isAdmin = (typeof window._isAdmin === 'function') ? window._isAdmin() : (typeof _isAdmin==='function' && _isAdmin());
+    if(!isAdmin || _mapaFiltroUid==='all') return;
+    const {filtrado} = _getMapaData();
+    // Cópia local profunda dos pontos do jogador filtrado, preservando referência à partida (_ts/_idx)
+    _editPontos = filtrado.map(p=>({...p}));
+    _editMode = true;
+    _editSelIdx = null;
+    _editDirty = false;
+    _renderEditBar();
+    _renderMapaCanvas();
+  };
+
+  window.cancelEditPenMapa = function(){
+    if(_editDirty && !confirm('Descartar alterações não salvas?')) return;
+    _editMode = false;
+    _editPontos = null;
+    _editSelIdx = null;
+    _editDirty = false;
+    _renderEditBar();
+    _renderMapaCanvas();
+  };
+
+  window.saveEditPenMapa = async function(){
+    if(!_editMode || !_editPontos) return;
+    const gd=_gd();
+    if(!gd||!gd.matches) return;
+    // Agrupa os pontos editados por partida de origem (_ts), preservando _idx original
+    const porPartida = new Map(); // ts -> array de pontos (ou null nos índices excluídos)
+    _editPontos.forEach(p=>{
+      if(!porPartida.has(p._ts)) porPartida.set(p._ts, []);
+      porPartida.get(p._ts).push(p);
+    });
+
+    let okTudo = true;
+    for(const [ts, pontosDaPartida] of porPartida.entries()){
+      const m = gd.matches.find(mm=>mm.uid===_mapaFiltroUid && mm.ts===ts);
+      if(!m) { okTudo=false; continue; }
+      // Reconstrói o penMap completo dessa partida: começa do array original e aplica updates/remoções
+      const novoPenMap = (m.penMap||[]).map((orig,i)=>{
+        const editado = pontosDaPartida.find(p=>p._idx===i);
+        if(editado === undefined) return null; // ponto foi excluído
+        return {x: editado.x, y: editado.y, ok: editado.ok};
+      }).filter(p=>p!==null);
+      const ok = await window.savePenMap({uid:_mapaFiltroUid, ts}, novoPenMap);
+      if(!ok) okTudo=false;
+    }
+
+    if(okTudo){
+      _editMode=false; _editPontos=null; _editSelIdx=null; _editDirty=false;
+      _renderEditBar();
+      _renderMapaSemCanvas();
+      _renderMapaCanvas();
+    } else {
+      alert('Não foi possível salvar todas as alterações. Tente novamente.');
+    }
+  };
 
   function _renderMapaSemCanvas(){
     const {todos, filtrado, jogadores} = _getMapaData();
@@ -14357,12 +14452,16 @@ document.addEventListener('touchstart', e => {
          <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
     }
 
-
+    _renderEditBar();
   }
+
+  /* ── Coordenadas do canvas do mapa (para detectar cliques nos pontos em modo edição) ── */
+  let _mapaCanvasGeom = null; // {cssW, cssH, scaleX, scaleY}
 
   function _renderMapaCanvas(){
     const {filtrado} = _getMapaData();
-    const totalPts = filtrado.length;
+    const pontos = _editMode ? _editPontos : filtrado;
+    const totalPts = pontos.length;
     const emptyEl = document.getElementById('pen-mapa-empty');
     const canvas  = document.getElementById('pen-mapa-canvas');
     if(!canvas) return;
@@ -14379,8 +14478,151 @@ document.addEventListener('touchstart', e => {
     const cssH = Math.round(cssW * GH / GW);
     canvas.width  = cssW;
     canvas.height = cssH;
+    _mapaCanvasGeom = {cssW, cssH};
     const ctx=canvas.getContext('2d');
-    drawGoal(ctx, cssW, cssH, filtrado);
+
+    if(_editMode){
+      _drawEditableGoal(ctx, cssW, cssH);
+      _setupMapaEditHandlers(canvas);
+      canvas.style.cursor='grab';
+    } else {
+      drawGoal(ctx, cssW, cssH, pontos);
+      canvas.style.cursor='default';
+      // Remove handlers de edição se existirem
+      if(canvas._mapaDownH) canvas.removeEventListener('mousedown', canvas._mapaDownH);
+      if(canvas._mapaMoveH) canvas.removeEventListener('mousemove', canvas._mapaMoveH);
+      if(canvas._mapaUpH) canvas.removeEventListener('mouseup', canvas._mapaUpH);
+      if(canvas._mapaTouchStartH) canvas.removeEventListener('touchstart', canvas._mapaTouchStartH);
+      if(canvas._mapaTouchMoveH) canvas.removeEventListener('touchmove', canvas._mapaTouchMoveH);
+      if(canvas._mapaTouchEndH) canvas.removeEventListener('touchend', canvas._mapaTouchEndH);
+    }
+  }
+
+  /* ── Desenha o gol em modo edição, com destaque + "x" de exclusão no ponto selecionado ── */
+  function _drawEditableGoal(ctx, W, H){
+    drawGoal(ctx, W, H, _editPontos, _editSelIdx);
+    if(_editSelIdx===null || !_editPontos[_editSelIdx]) return;
+    const sx=W/GW, sy=H/GH;
+    const p = _editPontos[_editSelIdx];
+    const px=p.x*sx, py=p.y*sy;
+    const r=10*Math.min(sx,sy);
+    // Botão de exclusão: pequeno círculo com "x" acima-direita do ponto selecionado
+    const exX = px + r*1.5, exY = py - r*1.5;
+    ctx.beginPath();
+    ctx.arc(exX, exY, 9, 0, Math.PI*2);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(exX-3.5, exY-3.5); ctx.lineTo(exX+3.5, exY+3.5);
+    ctx.moveTo(exX+3.5, exY-3.5); ctx.lineTo(exX-3.5, exY+3.5);
+    ctx.stroke();
+    // Guarda posição do botão de exclusão para detecção de clique
+    canvasDelBtn = {x:exX, y:exY, r:12};
+  }
+  let canvasDelBtn = null;
+
+  function _hitTestPonto(vx, vy){
+    // Retorna índice do ponto em _editPontos mais próximo do clique, dentro de um raio de tolerância
+    if(!_editPontos) return null;
+    const TOL = 18; // tolerância em coords virtuais (GW×GH)
+    let best=null, bestDist=Infinity;
+    _editPontos.forEach((p,i)=>{
+      const d = Math.hypot(p.x-vx, p.y-vy);
+      if(d<TOL && d<bestDist){ bestDist=d; best=i; }
+    });
+    return best;
+  }
+
+  function _setupMapaEditHandlers(canvas){
+    // Remove handlers antigos antes de religar (evita duplicação)
+    if(canvas._mapaDownH) canvas.removeEventListener('mousedown', canvas._mapaDownH);
+    if(canvas._mapaMoveH) canvas.removeEventListener('mousemove', canvas._mapaMoveH);
+    if(canvas._mapaUpH) canvas.removeEventListener('mouseup', canvas._mapaUpH);
+    if(canvas._mapaTouchStartH) canvas.removeEventListener('touchstart', canvas._mapaTouchStartH);
+    if(canvas._mapaTouchMoveH) canvas.removeEventListener('touchmove', canvas._mapaTouchMoveH);
+    if(canvas._mapaTouchEndH) canvas.removeEventListener('touchend', canvas._mapaTouchEndH);
+
+    let moved = false;
+    let startVX=0, startVY=0;
+
+    function redraw(){
+      const ctx = canvas.getContext('2d');
+      _drawEditableGoal(ctx, canvas.width, canvas.height);
+    }
+
+    function virtualFromEvent(clientX, clientY){
+      return canvasToVirtual(canvas, clientX, clientY);
+    }
+
+    function checkDelClick(clientX, clientY){
+      if(!canvasDelBtn) return false;
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width/rect.width, sy=canvas.height/rect.height;
+      const cx = (clientX-rect.left)*sx, cy=(clientY-rect.top)*sy;
+      const d = Math.hypot(cx-canvasDelBtn.x, cy-canvasDelBtn.y);
+      return d <= canvasDelBtn.r;
+    }
+
+    function onDown(clientX, clientY){
+      if(checkDelClick(clientX, clientY)){
+        if(_editSelIdx!==null){
+          _editPontos.splice(_editSelIdx,1);
+          _editSelIdx=null;
+          _editDirty=true;
+          redraw();
+        }
+        return;
+      }
+      const v = virtualFromEvent(clientX, clientY);
+      startVX=v.x; startVY=v.y; moved=false;
+      const idx = _hitTestPonto(v.x, v.y);
+      _editSelIdx = idx;
+      _editDragging = idx!==null;
+      redraw();
+    }
+
+    function onMove(clientX, clientY){
+      if(!_editDragging || _editSelIdx===null) return;
+      const v = virtualFromEvent(clientX, clientY);
+      if(Math.hypot(v.x-startVX, v.y-startVY) > 2) moved = true;
+      // Restringe ao raio clicável do gol (mesma área usada na marcação original)
+      let nx = Math.max(GOAL.x-CLICK_PAD, Math.min(GOAL.x+GOAL.w+CLICK_PAD, v.x));
+      let ny = Math.max(GOAL.y-CLICK_PAD, Math.min(GOAL.y+GOAL.h+CLICK_PAD, v.y));
+      _editPontos[_editSelIdx].x = nx;
+      _editPontos[_editSelIdx].y = ny;
+      _editDirty = true;
+      redraw();
+    }
+
+    function onUp(){
+      if(_editDragging && _editSelIdx!==null && !moved){
+        // Foi um toque/clique sem arrastar -> alterna resultado (ok/erro)
+        _editPontos[_editSelIdx].ok = !_editPontos[_editSelIdx].ok;
+        _editDirty = true;
+        redraw();
+      }
+      _editDragging = false;
+      moved = false;
+    }
+
+    canvas._mapaDownH = function(e){ e.preventDefault(); onDown(e.clientX, e.clientY); };
+    canvas._mapaMoveH = function(e){ if(_editDragging){ e.preventDefault(); onMove(e.clientX, e.clientY); } };
+    canvas._mapaUpH   = function(e){ onUp(); };
+    canvas._mapaTouchStartH = function(e){ e.preventDefault(); const t=e.touches[0]; if(t) onDown(t.clientX, t.clientY); };
+    canvas._mapaTouchMoveH  = function(e){ if(_editDragging){ e.preventDefault(); const t=e.touches[0]; if(t) onMove(t.clientX, t.clientY); } };
+    canvas._mapaTouchEndH   = function(e){ e.preventDefault(); onUp(); };
+
+    canvas.addEventListener('mousedown', canvas._mapaDownH);
+    canvas.addEventListener('mousemove', canvas._mapaMoveH);
+    canvas.addEventListener('mouseup', canvas._mapaUpH);
+    canvas.addEventListener('touchstart', canvas._mapaTouchStartH, {passive:false});
+    canvas.addEventListener('touchmove', canvas._mapaTouchMoveH, {passive:false});
+    canvas.addEventListener('touchend', canvas._mapaTouchEndH, {passive:false});
   }
 
   function _renderMapa(){ _renderMapaSemCanvas(); _renderMapaCanvas(); }
@@ -14404,7 +14646,7 @@ document.addEventListener('touchstart', e => {
 <div id="pen-mapa-modal">
   <div class="pen-mapa-inner">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-      <div></div>
+      <div style="width:22px"></div>
       <div class="pen-mapa-title">MAPA DE PÊNALTIS</div>
       <button onclick="closePenMapa()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
     </div>
@@ -14415,6 +14657,7 @@ document.addEventListener('touchstart', e => {
     </div>
     <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
     <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
+    <div id="pen-mapa-edit-bar" style="display:none"></div>
     <div class="pen-gol-wrap mapa-sm">
       <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
     </div>
