@@ -4913,9 +4913,8 @@ window.avatarHTML=avatarHTML;
       _active = true;
       if(navigator.vibrate) navigator.vibrate(35);
       _showPopup(card);
-      // Esconde após 2.5s automaticamente
+      // Popup fica visível até o usuário retirar o dedo
       clearTimeout(_hideTimer);
-      _hideTimer = setTimeout(_hidePopup, 2500);
     }, LP_MS);
   }
 
@@ -4924,7 +4923,7 @@ window.avatarHTML=avatarHTML;
     _timer = null;
     if(_active){
       _active = false;
-      // Deixa o popup visível até o auto-hide, mas permite fechar
+      _hidePopup();
     }
   }
 
