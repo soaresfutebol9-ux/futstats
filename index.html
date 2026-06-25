@@ -8958,6 +8958,9 @@ window.openPlayerProfile=(uid,avElOrEvent)=>{
   nomeEl.style.fontSize=nLen>22?'12px':nLen>18?'14px':nLen>13?'15px':'17px';
 
   // Botão Desafiar — só aparece se for outro jogador e ELE não estiver em desafio ativo
+  // Antes de checar, garante que desafios já vencidos (endTs no passado) sejam
+  // marcados como 'encerrado' mesmo que nenhum dos participantes tenha aberto o app ainda.
+  if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar();
   const desafiarBtn=document.getElementById('mp-desafiar-btn');
   if(desafiarBtn){
     const isMe = uid === currentUser?.uid;
