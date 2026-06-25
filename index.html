@@ -14144,7 +14144,8 @@ document.addEventListener('touchstart', e => {
     // Não vamos forçar: usuário define resultado ao clicar ✅/❌
     _renderMarcar();
     document.getElementById('pen-marcar-modal').classList.add('open');
-    requestAnimationFrame(()=>_setupMarcarCanvas());
+    // Aguarda o modal estar visível antes de configurar o canvas
+    setTimeout(()=>_setupMarcarCanvas(), 80);
   };
 
   function _renderMarcar(){
@@ -14185,7 +14186,6 @@ document.addEventListener('touchstart', e => {
     canvas.height = GH;
     const ctx = canvas.getContext('2d');
 
-    // Desenha estado atual (pontos já marcados + pendente)
     function redraw(){
       const pts = [
         ..._marcarResultados,
@@ -14195,20 +14195,26 @@ document.addEventListener('touchstart', e => {
     }
     redraw();
 
-    // Remove listeners antigos
-    canvas._penHandler && canvas.removeEventListener('click',canvas._penHandler);
-    canvas._penHandler = function(e){
-      e.preventDefault();
-      const touch = e.touches?.[0] || e;
-      const pos = canvasToVirtual(canvas, touch.clientX||e.clientX, touch.clientY||e.clientY);
-      if(!inClickArea(pos.x,pos.y)) return;
+    function handleXY(clientX, clientY){
+      const pos = canvasToVirtual(canvas, clientX, clientY);
       _marcarPos = pos;
       _marcarPendente = {x:pos.x, y:pos.y, ok: _marcarResult !== null ? _marcarResult : true};
       _renderMarcar();
       redraw();
+    }
+
+    // Remove listeners antigos
+    if(canvas._penClickH) canvas.removeEventListener('click', canvas._penClickH);
+    if(canvas._penTouchH) canvas.removeEventListener('touchend', canvas._penTouchH);
+
+    canvas._penClickH = function(e){ e.preventDefault(); handleXY(e.clientX, e.clientY); };
+    canvas._penTouchH = function(e){
+      e.preventDefault();
+      const t = e.changedTouches && e.changedTouches[0];
+      if(t) handleXY(t.clientX, t.clientY);
     };
-    canvas.addEventListener('click', canvas._penHandler);
-    canvas.addEventListener('touchend', canvas._penHandler, {passive:false});
+    canvas.addEventListener('click', canvas._penClickH);
+    canvas.addEventListener('touchend', canvas._penTouchH, {passive:false});
   }
 
   window.setPenResult = function(ok){
@@ -14237,7 +14243,7 @@ document.addEventListener('touchstart', e => {
       return;
     }
     _renderMarcar();
-    requestAnimationFrame(()=>_setupMarcarCanvas());
+    setTimeout(()=>_setupMarcarCanvas(), 40);
   };
 
   window.skipPenMarcar = function(){
