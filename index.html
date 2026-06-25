@@ -14355,12 +14355,7 @@ document.addEventListener('touchstart', e => {
          <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
     }
 
-    // Sub-título
-    const subEl=document.getElementById('pen-mapa-sub-txt');
-    if(subEl){
-      if(_mapaFiltroUid==='all') subEl.textContent=`${totalPts} cobrança${totalPts!==1?'s':''} de ${jogadores.length} jogador${jogadores.length!==1?'es':''}`;
-      else{const j=jogadores.find(x=>x.uid===_mapaFiltroUid);subEl.textContent=`${j?.name||'?'} · ${totalPts} cobrança${totalPts!==1?'s':''}`;};
-    }
+
   }
 
   function _renderMapaCanvas(){
@@ -14408,10 +14403,10 @@ document.addEventListener('touchstart', e => {
   <div class="pen-mapa-inner">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
       <div></div>
-      <div class="pen-mapa-title">🗺 Mapa de Pênaltis</div>
+      <div class="pen-mapa-title">MAPA DE PÊNALTIS</div>
       <button onclick="closePenMapa()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
     </div>
-    <div class="pen-mapa-sub" id="pen-mapa-sub-txt">Todos os jogadores · todas as cobranças</div>
+
     <div class="pen-mapa-legend">
       <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
       <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
