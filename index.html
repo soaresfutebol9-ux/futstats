@@ -1462,7 +1462,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 
 /* ── SUB-TABS PÊNALTIS ── */
 .pen-subtabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;border:1px solid var(--bo)}
-.pen-subtab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.pen-subtab{flex:1;padding:9px 3px;text-align:center;font-size:11.5px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pen-subtab.active{background:linear-gradient(135deg,rgba(255,90,122,.85) 0%,rgba(200,30,70,.9) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700}
 
 /* ── CARD PÊNALTI GRANDE (estilo G+A) ── */
@@ -1505,12 +1505,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-bar-track2{height:8px;border-radius:99px;background:var(--bg3);overflow:hidden;flex:1;margin-top:6px}
 .pen-bar-fill2{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 
-/* ── MAPA DE PÊNALTIS ── */
-#pen-mapa-modal{display:none;position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.72);align-items:flex-start;justify-content:center;padding-top:5vh;overflow-y:auto}
-#pen-mapa-modal.open{display:flex;animation:modalBgIn .22s ease forwards}
-.pen-mapa-inner{background:var(--bg2);border-radius:24px;width:calc(100% - 3rem);max-width:440px;max-height:88vh;overflow-y:auto;padding:1.2rem 1rem 1.6rem;box-shadow:0 8px 40px rgba(0,0,0,.5)}
-.pen-mapa-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:.3rem;color:var(--tx)}
-.pen-mapa-sub{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:1rem;font-family:'DM Mono',monospace}
+/* ── MAPA DE PÊNALTIS (renderizado inline na própria aba) ── */
 .pen-mapa-filter{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:1rem;scrollbar-width:none}
 .pen-mapa-filter::-webkit-scrollbar{display:none}
 .pen-mapa-chip{padding:5px 13px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
@@ -7430,6 +7425,7 @@ function drawPizzaPen(canvasId,ok,bat){
 }
 
 window.setPenSubTab=sub=>{
+  if(window._penSubTab==='mapa' && sub!=='mapa' && typeof window._mapaConfirmLeave==='function' && !window._mapaConfirmLeave()) return;
   window._penSubTab=sub;
   if(sub!=='ano') window._penAnoSel=null; // limpa seleção ao trocar de aba
   const rl=$('rl');
@@ -8022,11 +8018,29 @@ function renderRanking(){
 
     // ── Sub-abas HTML ──
     const subTabsHTML=`<div class="pen-subtabs">
-      <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">🗓 Mês atual</div>
-      <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">📅 Ano atual</div>
-      ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">🗂 Selecionar ano</div>`:''}
-      <div class="pen-subtab" onclick="openPenMapa()" style="border:1.5px solid rgba(77,255,176,.4);color:var(--g)">🗺 Mapa</div>
+      <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">Mês atual</div>
+      <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">Ano atual</div>
+      ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">Selecionar ano</div>`:''}
+      <div class="pen-subtab${window._penSubTab==='mapa'?' active':''}" onclick="setPenSubTab('mapa')">Mapa</div>
     </div>${anoPickerHTML}`;
+
+    // ── Aba "Mapa": renderizada inline no próprio painel, sem modal ──
+    if(window._penSubTab==='mapa'){
+      $('rl').innerHTML=subTabsHTML+`
+        <div class="pen-mapa-legend">
+          <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
+          <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
+        </div>
+        <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
+        <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
+        <div id="pen-mapa-edit-bar" style="display:none"></div>
+        <div class="pen-gol-wrap mapa-sm">
+          <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
+        </div>
+        <div id="pen-mapa-empty" class="pen-mapa-empty" style="display:none">Nenhuma cobrança mapeada ainda.</div>`;
+      if(typeof window.renderPenMapaPanel==='function') window.renderPenMapaPanel();
+      return;
+    }
 
     if(!activeData.length){
       $('rl').innerHTML=subTabsHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+( window._penAnoSel||'')}.</div></div>`;
@@ -14314,19 +14328,19 @@ document.addEventListener('touchstart', e => {
   let _editDragging = false;
   let _editDirty = false;      // se há alterações não salvas
 
-  window.openPenMapa = function(){
+  window.renderPenMapaPanel = function(){
     _mapaFiltroUid = 'all';
     _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
-    // Renderiza texto/filtros antes de abrir; canvas depois (precisa do modal visível)
+    // Renderiza texto/filtros antes do canvas (canvas depende do elemento já estar no DOM e visível)
     _renderMapaSemCanvas();
-    document.getElementById('pen-mapa-modal').classList.add('open');
     setTimeout(()=>_renderMapaCanvas(), 80);
   };
 
-  window.closePenMapa = function(){
-    if(_editDirty && !confirm('Você tem alterações não salvas no mapa. Fechar mesmo assim?')) return;
-    _editMode=false; _editPontos=null; _editSelIdx=null; _editDirty=false;
-    document.getElementById('pen-mapa-modal').classList.remove('open');
+  // Chamado antes de sair da aba "Mapa" (troca de sub-aba). Retorna false para cancelar a troca.
+  window._mapaConfirmLeave = function(){
+    if(_editDirty && !confirm('Você tem alterações não salvas no mapa. Sair mesmo assim?')) return false;
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
+    return true;
   };
 
   window.setPenMapaFiltro = function(uid){
@@ -14661,30 +14675,6 @@ document.addEventListener('touchstart', e => {
 })();
 </script>
 
-<!-- MODAL MAPA DE PÊNALTIS -->
-<div id="pen-mapa-modal">
-  <div class="pen-mapa-inner">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-      <div style="width:22px"></div>
-      <div class="pen-mapa-title">MAPA DE PÊNALTIS</div>
-      <button onclick="closePenMapa()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
-    </div>
-
-    <div class="pen-mapa-legend">
-      <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
-      <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
-    </div>
-    <div class="pen-mapa-stats" id="pen-mapa-stats"></div>
-    <div class="pen-mapa-filter" id="pen-mapa-filter"></div>
-    <div id="pen-mapa-edit-bar" style="display:none"></div>
-    <div class="pen-gol-wrap mapa-sm">
-      <canvas id="pen-mapa-canvas" class="pen-gol-canvas" style="cursor:default"></canvas>
-    </div>
-    <div id="pen-mapa-empty" class="pen-mapa-empty" style="display:none">Nenhuma cobrança mapeada ainda.</div>
-  </div>
-</div>
-
-<!-- MODAL MARCAR PÊNALTI NO GOL -->
 <div id="pen-marcar-modal">
   <div class="pen-marcar-inner">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem">
