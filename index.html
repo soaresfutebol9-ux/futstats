@@ -5699,8 +5699,16 @@ window._apagarNotif = async function(id){
     const cur  = snap.data();
     if(cur.notifs&&cur.notifs[currentUser.uid]){
       cur.notifs[currentUser.uid] = cur.notifs[currentUser.uid].filter(n=>n.id!==id);
+      // Lembretes de ciclo do questionário (id no formato 'survey_ciclo_<ciclo>') têm
+      // disparo automático recorrente. Ao apagar, registra esse ciclo como "dispensado"
+      // para esse usuário, para que não volte a ser recriado até o próximo semestre.
+      if(id.startsWith('survey_ciclo_')){
+        cur.surveyCicloDispensado = cur.surveyCicloDispensado || {};
+        cur.surveyCicloDispensado[currentUser.uid] = id;
+      }
       await setDoc(doc(db,'groups',groupId),cur);
       gd = cur;
+      window._gd = cur;
       _renderNotifPanel();
       _updateNotifBadge();
     }
@@ -15699,6 +15707,10 @@ window.abrirCartaJogador = function(uidParam){
     // Chave de deduplicação única por ciclo semestral (ex: "survey_ciclo_S1/2025")
     const chaveDedup = 'survey_ciclo_' + ciclo;
 
+    // Se o usuário já dispensou (apagou) o lembrete deste mesmo ciclo, não recria
+    // até que o ciclo mude (próximo semestre gera uma chaveDedup diferente).
+    if(gd.surveyCicloDispensado && gd.surveyCicloDispensado[uid] === chaveDedup) return;
+
     // Verificação rápida no cache local antes de ir ao servidor
     if((gd.notifs?.[uid]||[]).some(n => n.id === chaveDedup)) return;
 
@@ -15706,6 +15718,9 @@ window.abrirCartaJogador = function(uidParam){
       const snap = await window._db_getDoc(window._db_doc('groups', groupId));
       if(!snap.exists()) return;
       const cur = snap.data();
+
+      // Revalida a dispensa com os dados mais recentes do servidor
+      if(cur.surveyCicloDispensado && cur.surveyCicloDispensado[uid] === chaveDedup) return;
 
       cur.notifs        = cur.notifs      || {};
       cur.notifs[uid]   = cur.notifs[uid] || [];
