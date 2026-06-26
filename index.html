@@ -534,7 +534,7 @@ html.is-touch .auth-ball{animation:none}
 .sg-actions{display:flex;flex-direction:column;gap:.6rem;}
 .sg-skeleton{height:66px;border-radius:14px;background:var(--c1);border:1px solid var(--bo);animation:sk-pulse 1.4s ease-in-out infinite;}
 
-#sa{background:var(--bg);height:calc(var(--vh,1vh)*100);height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#sa{background:var(--bg);height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
 #sa::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
     radial-gradient(ellipse 55% 40% at 15% 0%,rgba(77,255,176,.07) 0%,transparent 65%),
@@ -1285,7 +1285,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   text-transform:uppercase;margin-top:3px;opacity:.7;
 }
 
-.tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:0;z-index:50;background:var(--bg,#f5f7fc);padding-top:4px;padding-bottom:4px;margin-top:-4px}
 .tr-filter::-webkit-scrollbar{display:none}
 .ft{
   padding:10px 16px;border-radius:99px;font-size:14px;cursor:pointer;
@@ -3303,12 +3303,10 @@ html, body {
   }
 }
 
-/* ── REMOVE DUPLA BARRA DE ROLAGEM NO iOS ──
-   Restrito a iOS: no Chrome/Android, --vh é recalculado via 'resize' quando a barra de
-   endereço recolhe/expande durante o scroll, o que fazia a altura de #sa oscilar e a
-   tab bar de filtros parecer desaparecer. 100dvh já resolve o caso iOS sem JS. */
+/* ── iOS: usa dvh fixo para evitar dupla barra de rolagem ──
+   Android Chrome: usa 100dvh diretamente (sem --vh, pois o resize
+   da address bar causa oscilação de altura e some com a tab bar). */
 html.os-ios #sa {
-  height: calc(var(--vh, 1vh) * 100);
   height: 100dvh;
 }
 
