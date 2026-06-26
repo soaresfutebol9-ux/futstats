@@ -9048,7 +9048,7 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
     return '<div style="text-align:center;padding:40px;color:#494a48;font-family:DM Mono,monospace">Dados insuficientes para o gráfico.</div>';
   }
 
-  const W=1000, H=320, PL=46, PR=24, PT=24, PB=42;
+  const W=1000, H=320, PL=46, PR=24, PT=24, PB=54;
   const iW=W-PL-PR, iH=H-PT-PB;
   const maxV=Math.max(...vals,1);
   const minV=Math.min(...vals,0);
@@ -9082,9 +9082,17 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
     return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="#ebebeb" stroke-width="2"/>`;
   }).join('');
 
+  const mesesAbrev=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const xLabels=months.map((m,i)=>{
-    const lbl=m.label;
-    return`<text x="${xOf(i).toFixed(1)}" y="${(H-12).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>14?'10':'12'}" fill="${m.current?corClaro:'#494a48'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
+    const lbl=mesesAbrev[parseInt(m.key.split('-')[1])-1];
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-26).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>14?'10':'12'}" fill="${m.current?corClaro:'#494a48'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
+  }).join('');
+
+  // Régua de anos: mostra o ano apenas no primeiro mês e sempre que ele muda,
+  // como uma marcação separada abaixo dos nomes dos meses.
+  const anoLabels=months.map((m,i)=>{
+    if(i>0 && months[i-1].ano===m.ano) return '';
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-10).toFixed(1)}" text-anchor="start" font-family="DM Mono,monospace" font-size="10" fill="#6b6c69" font-weight="700" letter-spacing="0.5">${m.ano}</text>`;
   }).join('');
 
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
@@ -9099,6 +9107,7 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
   ${segments}
   ${dots}
   ${xLabels}
+  ${anoLabels}
 </svg>`;
 }
 
