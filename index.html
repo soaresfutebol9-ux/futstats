@@ -8563,10 +8563,11 @@ function renderRanking(){
 }
 const _rankOrder={ga:0,geral:1,recordes:2,pen:3,performance:4};
 let _perfUid=null; // uid do jogador exibido na aba Performance do Ranking
+let _perfAno='__all__'; // temporada selecionada na aba Performance ('__all__' = Geral)
 let _rankAtivo='ga';
 window.setRank=(s,el)=>{
   if(s===_rankAtivo) return;
-  if(s==='performance') _perfUid=null; // sempre reabre mostrando o próprio jogador logado
+  if(s==='performance'){_perfUid=null;_perfAno='__all__';} // sempre reabre mostrando o próprio jogador, temporada Geral
   const rl=$('rl');
   const isLite = document.body.classList.contains('lite-mode');
   const dir = (_rankOrder[s]??0) > (_rankOrder[_rankAtivo]??0) ? 'left' : 'right';
@@ -8895,13 +8896,32 @@ window._buildRecordData = buildRecordData;
 // `decimals` controla a formatação (0 para totais inteiros, 1 para médias).
 function _buildPerfChart(months,valueFn,opts){
   const {titulo,cor,corClaro,gradId,decimals=0,emptyMsg}=opts;
-  if(months.length<2){
+  const fmt=v=>decimals?v.toFixed(decimals):Math.round(v);
+
+  // Sem nenhum mês qualificado (ex.: corte "por jogo" ainda não atingido, ou
+  // temporada selecionada não tem dados) ──
+  if(months.length===0){
     return `<div style="background:#dedede;border:1.5px solid ${cor};border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
   <div style="font-size:10px;color:${corClaro};font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">${titulo}</div>
-  <div style="text-align:center;padding:1rem .5rem;color:#494a48;font-size:12px;font-family:'DM Mono',monospace">${emptyMsg||'Ainda não há meses suficientes para exibir a evolução.'}</div>
+  <div style="text-align:center;padding:1rem .5rem;color:#494a48;font-size:12px;font-family:'DM Mono',monospace">${emptyMsg||'Nenhum mês com dados nesta temporada.'}</div>
 </div>`;
   }
-  const fmt=v=>decimals?v.toFixed(decimals):Math.round(v);
+
+  // Exatamente 1 mês qualificado: ainda não há 2 pontos para traçar uma linha
+  // de evolução, mas o dado do mês já existe e deve ser exibido normalmente ──
+  if(months.length===1){
+    const m=months[0];
+    const v=valueFn(m);
+    return `<div style="background:#dedede;border:1.5px solid ${cor};border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+  <div style="font-size:10px;color:${corClaro};font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">${titulo}</div>
+  <div style="text-align:center;padding:.25rem .5rem .5rem">
+    <div style="font-family:'ClassyVogue',sans-serif;font-size:36px;color:#000000;line-height:1">${fmt(v)}</div>
+    <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;margin-top:6px">${m.label} · primeiro mês registrado</div>
+  </div>
+</div>`;
+  }
+
+  // 2+ meses: gráfico de linha completo (verde=subiu, vermelho=caiu, cinza=estável) ──
   const W=320,H=110,PL=36,PR=10,PT=12,PB=28;
   const iW=W-PL-PR,iH=H-PT-PB;
   const vals=months.map(valueFn);
@@ -8982,17 +9002,35 @@ function renderPerformanceTab(){
   const mb=mbs.find(m=>m.uid===_perfUid);
   if(!mb){$('rl').innerHTML='<div class="empty">Jogador não encontrado.</div>';return;}
 
-  const allMonths=_buildAllMonths(_perfUid,mb);
-  // Gráficos "por jogo" só valem a partir de jun/2026 (mesmo corte usado no recorde G+A/Jogo)
-  const mesesPorJogo=allMonths.filter(m=>m.key>=REC_GA_POR_JOGO_INICIO&&m.jogos>0);
-  const msgCorte='Estatística por jogo válida a partir de Jun/2026.';
+  const allMonthsCompletos=_buildAllMonths(_perfUid,mb);
 
-  const seletor=`<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+  // ── Temporadas disponíveis (mesmo critério usado no perfil do jogador: a partir de 2025) ──
+  const anosSet=new Set(allMonthsCompletos.map(m=>m.ano));
+  const anos=[...anosSet].filter(a=>parseInt(a)>=2025).sort();
+  if(!['__all__',...anos].includes(_perfAno)) _perfAno='__all__';
+  const isAllAno=(_perfAno==='__all__');
+
+  // Aplica o filtro de temporada antes de extrair os dados de cada gráfico
+  const allMonths=isAllAno?allMonthsCompletos:allMonthsCompletos.filter(m=>m.ano===_perfAno);
+
+  // Gráficos "por jogo" só valem a partir de 01/06/2026 (mesmo corte usado no recorde G+A/Jogo)
+  const mesesPorJogo=allMonths.filter(m=>m.key>=REC_GA_POR_JOGO_INICIO&&m.jogos>0);
+  const msgCorte='Estatística por jogo válida a partir de 01/06/2026.';
+
+  const seletorJogador=`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
     <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">👤 Jogador:</span>
     <select onchange="_perfSelecionarJogador(this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center">
       ${mbs.map(m=>`<option value="${m.uid}" ${m.uid===_perfUid?'selected':''}>${m.name}</option>`).join('')}
     </select>
   </div>`;
+
+  const seletorTemporada=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Temporada:</span>
+    <select onchange="_perfSelecionarTemporada(this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center">
+      ${anos.map(a=>`<option value="${a}" ${a===_perfAno&&!isAllAno?'selected':''}>${a}</option>`).join('')}
+      <option value="__all__" ${isAllAno?'selected':''}>Geral</option>
+    </select>
+  </div>`:'';
 
   const chartGA=_buildPerfChart(allMonths,m=>m.g+m.a,{titulo:'📈 Evolução G+A mensal',cor:'#40c960',corClaro:'#1a5c2a',gradId:'perfGradGA'});
   const chartGols=_buildPerfChart(allMonths,m=>m.g,{titulo:'⚽ Evolução de gols mensal',cor:'#2a9cc9',corClaro:'#1b5c78',gradId:'perfGradGols'});
@@ -9001,10 +9039,11 @@ function renderPerformanceTab(){
   const chartAssistJogo=_buildPerfChart(mesesPorJogo,m=>m.a/m.jogos,{titulo:'👟 Assistências por jogo (mensal)',cor:'#9b6fd9',corClaro:'#5a3a8a',gradId:'perfGradAssistJogo',decimals:1,emptyMsg:msgCorte});
   const chartGAJogo=_buildPerfChart(mesesPorJogo,m=>(m.g+m.a)/m.jogos,{titulo:'📊 G+A por jogo (mensal)',cor:'#40c960',corClaro:'#1a5c2a',gradId:'perfGradGAJogo',decimals:1,emptyMsg:msgCorte});
 
-  $('rl').innerHTML=`<div style="padding-bottom:.5rem">${seletor}${chartGA}${chartGols}${chartAssist}${chartGolsJogo}${chartAssistJogo}${chartGAJogo}</div>`;
+  $('rl').innerHTML=`<div style="padding-bottom:.5rem">${seletorJogador}${seletorTemporada}${chartGA}${chartGols}${chartAssist}${chartGolsJogo}${chartAssistJogo}${chartGAJogo}</div>`;
 }
 
 window._perfSelecionarJogador=(uid)=>{ _perfUid=uid; renderPerformanceTab(); };
+window._perfSelecionarTemporada=(ano)=>{ _perfAno=ano; renderPerformanceTab(); };
 
 function renderPerfil(){
   if(!gd)return;const s=getSt(currentUser.uid,null,true);const pct=s.penBat>0?Math.round(s.penOk/s.penBat*100):null;
