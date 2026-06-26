@@ -6974,12 +6974,55 @@ function _dcTimeLeft(endTs){
   return { label: m+'min', urgent: true, ended: false };
 }
 
+function _dcStatValor(x, tipo){
+  if(tipo === 'gols')   return x.gols||0;
+  if(tipo === 'assist') return x.assist||0;
+  return (x.gols||0)+(x.assist||0);
+}
+
+// Soma o stat relevante (gols/assist/G+A) de um jogador dentro da janela de
+// tempo do desafio. IMPORTANTE: as partidas do mês corrente vivem em
+// gd.matches, mas ao virar o mês elas são arquivadas em gd.historico[mes] e
+// gd.matches é zerado (ver checkMesViradaWith). Um desafio pode atravessar
+// essa virada, então é preciso somar as duas fontes — senão o placar de
+// desafios mais antigos volta a 0 depois que o mês deles é arquivado.
 function _dcGetScore(uid, challenge){
-  if(!gd || !uid) return 0;
-  const src = (gd.matches||[]).filter(x => x.uid === uid && x.ts >= challenge.startTs && x.ts <= challenge.endTs);
-  if(challenge.tipo === 'gols')   return src.reduce((s,x) => s+(x.gols||0), 0);
-  if(challenge.tipo === 'assist') return src.reduce((s,x) => s+(x.assist||0), 0);
-  return src.reduce((s,x) => s+(x.gols||0)+(x.assist||0), 0);
+  if(!gd || !uid || challenge.startTs==null || challenge.endTs==null) return 0;
+  const noPeriodo = x => x.uid === uid && x.ts >= challenge.startTs && x.ts <= challenge.endTs;
+  let total = (gd.matches||[]).filter(noPeriodo)
+    .reduce((s,x) => s + _dcStatValor(x, challenge.tipo), 0);
+  Object.values(gd.historico||{}).forEach(h => {
+    total += (h.matches||[]).filter(noPeriodo)
+      .reduce((s,x) => s + _dcStatValor(x, challenge.tipo), 0);
+  });
+  return total;
+}
+
+// Placar final "congelado" de um desafio. Desafios encerrados devem ter
+// scoreA/scoreB persistidos (gravados em _dcCheckEncerrar no momento em que
+// o desafio termina) — isso evita que o placar dependa para sempre de onde
+// as partidas estão guardadas. Registros antigos, criados antes dessa
+// correção, não têm esses campos: para eles, recalculamos a partir do
+// histórico de partidas e corrigimos o registro automaticamente (gravação
+// única, em lote) para que da próxima vez o placar venha direto.
+let _dcCorrecaoPendente = false;
+function _dcAgendarCorrecaoPlacar(){
+  if(_dcCorrecaoPendente || !groupId || !gd) return;
+  _dcCorrecaoPendente = true;
+  setTimeout(()=>{
+    _dcCorrecaoPendente = false;
+    setDoc(doc(db,'groups',groupId), gd).catch(()=>{});
+  }, 800);
+}
+function _dcFinalScore(d){
+  if(typeof d.scoreA === 'number' && typeof d.scoreB === 'number') return [d.scoreA, d.scoreB];
+  const sA = _dcGetScore(d.uidA, d);
+  const sB = _dcGetScore(d.uidB, d);
+  if(d.status === 'encerrado'){
+    d.scoreA = sA; d.scoreB = sB;
+    _dcAgendarCorrecaoPlacar();
+  }
+  return [sA, sB];
 }
 
 function _dcGetForUid(uid){
@@ -7027,10 +7070,14 @@ function _dcCardHTML(challenge, perspectiveUid){
   }
 
   // Card de desafio ATIVO / ENCERRADO — versão slim (1 linha)
-  const scoreA = _dcGetScore(challenge.uidA, challenge);
-  const scoreB = _dcGetScore(challenge.uidB, challenge);
   const time   = _dcTimeLeft(challenge.endTs);
   const ended  = time.ended || challenge.status === 'encerrado';
+  // Desafios encerrados usam o placar final congelado (persistido em
+  // _dcCheckEncerrar, ou corrigido automaticamente se for um registro
+  // antigo). Desafios ainda ativos têm o placar recalculado a cada render.
+  const [scoreA, scoreB] = ended
+    ? _dcFinalScore(challenge)
+    : [_dcGetScore(challenge.uidA, challenge), _dcGetScore(challenge.uidB, challenge)];
   let winnerUID = null;
   if(ended){ if(scoreA > scoreB) winnerUID = challenge.uidA; else if(scoreB > scoreA) winnerUID = challenge.uidB; }
   const crownA = winnerUID===challenge.uidA ? '<span class=\"desafio-slim-crown\">👑</span>' : '';
@@ -7063,6 +7110,11 @@ window._dcRenderInProfile = function(uid, containerEl){
   if(!desafios.length){ containerEl.innerHTML = ''; return; }
   containerEl.innerHTML = desafios.map(d => _dcCardHTML(d, uid)).join('');
 };
+
+// Expostos para o <script> (não-module) do modal "Histórico de Confrontos",
+// que não tem acesso direto às variáveis/funções deste módulo.
+window._dcGetScore = _dcGetScore;
+window._dcFinalScore = _dcFinalScore;
 
 window.abrirCriarDesafio = function(preSelectUid){
   _dc = { rivalUid: preSelectUid || null, tipo: 'gols' };
@@ -7239,9 +7291,12 @@ function _dcCheckEncerrar(){
   (gd.desafios||[]).forEach(d=>{
     if(d.status==='ativo'&&now>d.endTs){
       d.status='encerrado'; changed=true;
-      // Calcula placar final
+      // Calcula placar final e CONGELA no registro (scoreA/scoreB), para
+      // que o resultado não dependa de onde as partidas estarão guardadas
+      // no futuro (gd.matches do mês corrente é zerado a cada virada de mês).
       const sA=_dcGetScore(d.uidA,d);
       const sB=_dcGetScore(d.uidB,d);
+      d.scoreA=sA; d.scoreB=sB;
       const winnerUid = sA>sB ? d.uidA : sB>sA ? d.uidB : null;
       const loserUid  = sA>sB ? d.uidB : sB>sA ? d.uidA : null;
       const tipoLabel = d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
@@ -16394,6 +16449,16 @@ window._cfgRemoverMembro = async function() {
     return '—';
   }
 
+  // Placar real de um confronto. d.scoreA/d.scoreB nem sempre existem no
+  // registro (desafios antigos não tinham o placar congelado na época em
+  // que terminaram), então usamos window._dcFinalScore — que recalcula a
+  // partir do histórico de partidas quando necessário e corrige o registro
+  // automaticamente — em vez de ler os campos crus, que ficavam sempre 0.
+  function _hcScoreDe(d){
+    if(typeof window._dcFinalScore === 'function') return window._dcFinalScore(d);
+    return [d.scoreA||0, d.scoreB||0];
+  }
+
   function _hcRender(){
     const body = document.getElementById('hc-body');
     if(!body) return;
@@ -16435,7 +16500,7 @@ window._cfgRemoverMembro = async function() {
       let vit=0, der=0, emp=0;
       desafios.forEach(d => {
         const isA = d.uidA === fuid;
-        const scoreA = d.scoreA||0, scoreB = d.scoreB||0;
+        const [scoreA, scoreB] = _hcScoreDe(d);
         const meu = isA ? scoreA : scoreB;
         const opp = isA ? scoreB : scoreA;
         if(meu > opp) vit++;
@@ -16461,7 +16526,7 @@ window._cfgRemoverMembro = async function() {
       lista.forEach(d => {
         const nomeA = _hcGetNome(d.uidA);
         const nomeB = _hcGetNome(d.uidB);
-        const sA = d.scoreA||0, sB = d.scoreB||0;
+        const [sA, sB] = _hcScoreDe(d);
 
         // Determinar classes de cor
         let matchCls = '';
