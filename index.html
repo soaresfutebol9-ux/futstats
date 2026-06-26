@@ -8416,11 +8416,16 @@ function renderRanking(){
     }
 
     if(!activeData.length){
-      $('rl').innerHTML=subTabsHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+( window._penAnoSel||'')}.</div></div>`;
+      $('rl').innerHTML=subTabsHTML+((window._penSubTab==='ano'&&anoSel)?`<div style="display:flex;align-items:center;gap:8px;padding:2px 1rem 10px"><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--tx)">${anoSel}</span><span style="font-size:12px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-weight:500">· estatísticas do ano</span></div>`:'')+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+(window._penAnoSel||'')}.</div></div>`;
       return;
     }
 
-    $('rl').innerHTML=subTabsHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
+    // Label do ano selecionado (visível apenas na aba 'ano')
+    const anoLabelHTML=(window._penSubTab==='ano'&&anoSel)
+      ?`<div style="display:flex;align-items:center;gap:8px;padding:2px 1rem 10px"><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--tx)">${anoSel}</span><span style="font-size:12px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-weight:500">· estatísticas do ano</span></div>`
+      :'';
+
+    $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
       const isMe=p.uid===currentUser?.uid;
       const cor=penColor(p.pct);
       const isPodium=i<3;
