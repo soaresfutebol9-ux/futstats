@@ -1283,7 +1283,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   text-transform:uppercase;margin-top:3px;opacity:.7;
 }
 
-.tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;will-change:transform}
 .tr-filter::-webkit-scrollbar{display:none}
 .ft{
   padding:10px 16px;border-radius:99px;font-size:14px;cursor:pointer;
@@ -1299,6 +1299,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   transform:skewX(-20deg);
   animation:ft-shine 5s ease-in-out infinite;
   pointer-events:none;
+  will-change:transform,opacity;
 }
 @keyframes ft-shine{
   0%,100%{left:-80%;opacity:0}
