@@ -1040,14 +1040,14 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   letter-spacing:1px;
   font-style:normal;
   line-height:1.1;
-  text-shadow:0 2px 14px rgba(0,0,0,.5);
+  text-shadow:0 2px 3px rgba(0,0,0,.45);
 }
 .mes-vigente-titulo{
   color:#ffffff;
   background:none;
   -webkit-background-clip:unset;
   background-clip:unset;
-  text-shadow:0 2px 10px rgba(0,0,0,.4);
+  text-shadow:0 2px 3px rgba(0,0,0,.4);
   filter:none;
 }
 .mes-vigente-icon{font-size:28px;opacity:.75;line-height:1}
@@ -1283,15 +1283,15 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   text-transform:uppercase;margin-top:3px;opacity:.7;
 }
 
-.tr-filter{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;will-change:transform}
-.tr-filter::-webkit-scrollbar{display:none}
+.tr-filter{display:flex;gap:4px;flex-wrap:nowrap;margin-bottom:1.1rem;will-change:transform}
 .ft{
-  padding:10px 16px;border-radius:99px;font-size:14px;cursor:pointer;
-  border:1px solid #b8b6b4;flex-shrink:0;white-space:nowrap;
+  padding:9px 4px;border-radius:99px;font-size:clamp(10px,3.1vw,14px);cursor:pointer;
+  border:1px solid #b8b6b4;flex:1 1 0;min-width:0;white-space:nowrap;
   background:linear-gradient(170deg,#f5f4f2 0%,#e2e0de 45%,#ececea 55%,#d8d6d4 100%);
   color:#1a1a1a;transition:all .18s;font-family:'DM Sans',sans-serif;font-weight:700;
+  text-align:center;overflow:hidden;text-overflow:ellipsis;
   box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -1px 0 rgba(0,0,0,.1) inset,0 2px 6px rgba(0,0,0,.12);
-  position:relative;overflow:hidden;
+  position:relative;
 }
 .ft::after{
   content:'';position:absolute;top:0;left:-80%;width:40%;height:100%;
@@ -1781,20 +1781,20 @@ select option{background:var(--bg3)}
 
 /* ── MODAL GRÁFICO EXPANDIDO ── */
 #modal-evol-chart{
-  display:none;position:fixed;inset:0;z-index:4500;
-  background:rgba(0,0,0,.92);
+  display:none;position:fixed;inset:0;z-index:10500;
+  background:rgba(20,22,20,.55);
   align-items:center;justify-content:center;
   
 }
 #modal-evol-chart.open{display:flex;animation:modalBgIn .22s ease forwards;}
 #evol-chart-inner{
-  background:#141720;
-  border:1px solid rgba(64,201,96,.3);
+  background:#dedede;
+  border:1.5px solid #40c960;
   border-radius:20px;
   width:96vw;max-width:960px;
   max-height:92vh;
   display:flex;flex-direction:column;
-  box-shadow:0 12px 60px rgba(0,0,0,.9),0 0 0 1px rgba(64,201,96,.12),0 0 80px rgba(64,201,96,.05);
+  box-shadow:0 12px 60px rgba(0,0,0,.35),0 0 0 1px rgba(64,201,96,.15);
   animation:modalIn .25s cubic-bezier(.32,1,.6,1) forwards;
   overflow:hidden;
 }
@@ -1832,9 +1832,9 @@ select option{background:var(--bg3)}
 #evol-chart-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px 12px;
-  border-bottom:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(0,0,0,.1);
   flex-shrink:0;
-  background:linear-gradient(135deg,rgba(64,201,96,.1) 0%,rgba(64,201,96,.02) 60%,transparent 100%);
+  background:linear-gradient(135deg,rgba(64,201,96,.14) 0%,rgba(64,201,96,.03) 60%,transparent 100%);
 }
 #evol-chart-body{
   overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -1843,52 +1843,52 @@ select option{background:var(--bg3)}
 /* Botão tela cheia */
 #evol-fullscreen-btn{
   width:30px;height:30px;border-radius:8px;
-  background:rgba(64,201,96,.12);
-  border:1px solid rgba(64,201,96,.35);
-  color:#40c960;font-size:14px;cursor:pointer;
+  background:rgba(64,201,96,.14);
+  border:1px solid rgba(64,201,96,.4);
+  color:#1a5c2a;font-size:14px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all .15s;flex-shrink:0;margin-left:8px;
 }
-#evol-fullscreen-btn:hover{ background:rgba(64,201,96,.25); }
+#evol-fullscreen-btn:hover{ background:rgba(64,201,96,.28); }
 /* Stats resumo no topo do modal */
 .evol-summary-bar{
   display:flex;gap:10px;flex-wrap:wrap;
   padding:12px 20px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  background:rgba(0,0,0,.2);
+  border-bottom:1px solid rgba(0,0,0,.08);
+  background:rgba(0,0,0,.04);
   flex-shrink:0;
 }
 .evol-stat-pill{
   display:flex;flex-direction:column;align-items:center;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.5);
+  border:1px solid rgba(0,0,0,.1);
   border-radius:10px;
   padding:6px 14px;
   min-width:60px;
   flex:1;
 }
 .evol-stat-pill-val{
-  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#fff;line-height:1.1;
+  font-family:'ClassyVogue',sans-serif;font-size:20px;color:#1a1a1a;line-height:1.1;
 }
 .evol-stat-pill-lbl{
   font-family:'DM Mono',monospace;font-size:8px;
-  color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;
+  color:#494a48;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;
 }
-.evol-stat-pill.green .evol-stat-pill-val{ color:#40c960; }
-.evol-stat-pill.red .evol-stat-pill-val{ color:#FF5A7A; }
-.evol-stat-pill.gold .evol-stat-pill-val{ color:#FFD166; }
+.evol-stat-pill.green .evol-stat-pill-val{ color:#1a5c2a; }
+.evol-stat-pill.red .evol-stat-pill-val{ color:#cc2222; }
+.evol-stat-pill.gold .evol-stat-pill-val{ color:#a5780a; }
 .evol-tooltip{
   position:absolute;
-  background:rgba(20,24,36,.97);
-  border:1px solid rgba(64,201,96,.4);
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(64,201,96,.45);
   border-radius:10px;
   padding:8px 12px;
   font-family:'DM Mono',monospace;
   font-size:12px;
-  color:#fff;
+  color:#1a1a1a;
   pointer-events:none;
   white-space:nowrap;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
   z-index:10;
   transform:translate(-50%,-110%);
   transition:opacity .1s;
@@ -3302,8 +3302,8 @@ html, body {
 }
 
 .ft {
-  padding: 9px 13px;
-  font-size: clamp(12px, 3.5vw, 14px);
+  padding: 9px 4px;
+  font-size: clamp(10px, 3.1vw, 14px);
 }
 
 /* ── CONTEÚDO: largura máxima fluida ── */
@@ -7957,6 +7957,17 @@ function renderMvpBanner(){
 // GRÁFICO EXPANDIDO — tela cheia horizontal
 // ══════════════════════════════════════════
 
+// Esconde o multi-FAB (botão flutuante "+") enquanto o gráfico expandido
+// estiver aberto, já que ele tem z-index alto e fica sobreposto ao modal.
+function _esconderFabDuranteModal(){
+  const fab = document.querySelector('.mfab-wrap');
+  if(fab) fab.style.display='none';
+}
+function _restaurarFabAposModal(){
+  const fab = document.querySelector('.mfab-wrap');
+  if(fab) fab.style.display='';
+}
+
 window.fecharEvolChart = function(){
   const m = document.getElementById('modal-evol-chart');
   const inner = document.getElementById('evol-chart-inner');
@@ -7971,6 +7982,7 @@ window.fecharEvolChart = function(){
   if(sb) sb.style.display='none';
   _perfChartExpandedData = null;
   _liberarOrientacao();
+  _restaurarFabAposModal();
   setTimeout(()=>{ m.style.display='none'; }, 280);
 };
 
@@ -7981,8 +7993,9 @@ window.abrirEvolChart = function(uid){
   const m = document.getElementById('modal-evol-chart');
   const body = document.getElementById('evol-chart-body');
   const trendEl = document.getElementById('evol-chart-trend');
-  body.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);font-family:DM Mono,monospace">Carregando...</div>';
+  body.innerHTML = '<div style="text-align:center;padding:40px;color:#494a48;font-family:DM Mono,monospace">Carregando...</div>';
   m.style.display = 'flex';
+  _esconderFabDuranteModal();
   requestAnimationFrame(()=>{ m.classList.add('open'); _renderEvolChartExpanded(uid, body, trendEl, '__all__'); });
 };
 window._evolFiltrarAno = function(ano){
@@ -7994,7 +8007,7 @@ window._evolFiltrarAno = function(ano){
 
 function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   const mb = (gd.members||[]).find(m=>m.uid===uid);
-  if(!mb){ body.innerHTML='<div style="color:#fff;padding:20px">Membro não encontrado.</div>'; return; }
+  if(!mb){ body.innerHTML='<div style="color:#1a1a1a;padding:20px">Membro não encontrado.</div>'; return; }
 
   // Coleta todos os meses (histórico + ativo)
   const mesAtivoCur = gd.mesAtivo || mesAtual();
@@ -8042,7 +8055,7 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   });
 
   const keys = Object.keys(allData).sort();
-  if(keys.length < 2){ body.innerHTML='<div style="color:rgba(255,255,255,.5);font-family:DM Mono,monospace;padding:40px;text-align:center">Dados insuficientes para o gráfico.</div>'; return; }
+  if(keys.length < 2){ body.innerHTML='<div style="color:#494a48;font-family:DM Mono,monospace;padding:40px;text-align:center">Dados insuficientes para o gráfico.</div>'; return; }
 
   const vals = keys.map(k=>allData[k].g+allData[k].a);
   const trend = vals.length>=2 ? vals[vals.length-1]-vals[vals.length-2] : 0;
@@ -8064,8 +8077,8 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   const gridLines=[0,.25,.5,.75,1].map(t=>{
     const gv=Math.round(minV+t*range);
     const gy=PT+iH-(t*iH);
-    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="4,4"/>
-<text x="${PL-6}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="rgba(255,255,255,.35)">${gv}</text>`;
+    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="#b7b8b6" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="${PL-6}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="#494a48">${gv}</text>`;
   }).join('');
 
   // Area fill
@@ -8076,7 +8089,7 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   const segments=keys.slice(1).map((_,i)=>{
     const x1=xOf(i).toFixed(1),y1=yOf(vals[i]).toFixed(1);
     const x2=xOf(i+1).toFixed(1),y2=yOf(vals[i+1]).toFixed(1);
-    const col=vals[i+1]>vals[i]?'#40c960':vals[i+1]<vals[i]?'#FF5A7A':'#666';
+    const col=vals[i+1]>vals[i]?'#40c960':vals[i+1]<vals[i]?'#FF5A7A':'#888888';
     return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`;
   }).join('');
 
@@ -8084,10 +8097,10 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
   const dots=keys.map((k,i)=>{
     const x=xOf(i),y=yOf(vals[i]);
     const isCur=allData[k].current;
-    const col=isCur?'#40c960':'rgba(255,255,255,.8)';
+    const col=isCur?'#40c960':'#000000';
     const r=isCur?7:4.5;
-    const lbl=`<text x="${x.toFixed(1)}" y="${(y-r-5).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="${isCur?'#40c960':'rgba(255,255,255,.6)'}" font-weight="${isCur?'700':'400'}">${vals[i]}</text>`;
-    return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="${isCur?'#0d1117':'rgba(255,255,255,.2)'}" stroke-width="2" class="evol-dot" data-idx="${i}"/>`;
+    const lbl=`<text x="${x.toFixed(1)}" y="${(y-r-5).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="${isCur?'#1a5c2a':'#494a48'}" font-weight="${isCur?'700':'400'}">${vals[i]}</text>`;
+    return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="#ebebeb" stroke-width="2" class="evol-dot" data-idx="${i}"/>`;
   }).join('');
 
   // X labels — always show all (expanded mode)
@@ -8096,7 +8109,7 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
     const [ano,mes]=k.split('-');
     const mesNome=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]||mes;
     const lbl=`${mesNome}/${ano.slice(2)}`;
-    return`<text x="${xOf(i).toFixed(1)}" y="${(H-8).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>10?'7.5':'9'}" fill="${isCur?'#40c960':'rgba(255,255,255,.45)'}" font-weight="${isCur?'700':'400'}">${lbl}</text>`;
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-8).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>10?'7.5':'9'}" fill="${isCur?'#1a5c2a':'#494a48'}" font-weight="${isCur?'700':'400'}">${lbl}</text>`;
   }).join('');
 
   const svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible" id="evol-svg-expanded">
@@ -8119,25 +8132,25 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
     const ga = d.g+d.a;
     const prev = i>0?vals[i-1]:null;
     const diff = prev!==null?ga-prev:null;
-    const diffStr = diff===null?'—':diff>0?`<span style="color:#40c960">↑ +${diff}</span>`:diff<0?`<span style="color:#FF5A7A">↓ ${diff}</span>`:`<span style="color:#888">→</span>`;
+    const diffStr = diff===null?'—':diff>0?`<span style="color:#1a5c2a">↑ +${diff}</span>`:diff<0?`<span style="color:#cc2222">↓ ${diff}</span>`:`<span style="color:#888">→</span>`;
     const [ano,mes]=k.split('-');
     const mesNome=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1]||mes;
     const isCur=d.current;
-    const bg=isCur?'rgba(64,201,96,.08)':'transparent';
+    const bg=isCur?'rgba(64,201,96,.12)':'transparent';
     const pct=d.pb>0?Math.round(d.pk/d.pb*100)+'%':'—';
-    return`<tr style="background:${bg};border-bottom:1px solid rgba(255,255,255,.05)">
-      <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:${isCur?'#40c960':'rgba(255,255,255,.7)'};font-weight:${isCur?'700':'400'}">${mesNome} ${ano}${isCur?' ●':''}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#fff;font-weight:700">${ga}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.6)">${d.g}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,.6)">${d.a}</td>
+    return`<tr style="background:${bg};border-bottom:1px solid rgba(0,0,0,.08)">
+      <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:${isCur?'#1a5c2a':'#3a3a38'};font-weight:${isCur?'700':'400'}">${mesNome} ${ano}${isCur?' ●':''}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#1a1a1a;font-weight:700">${ga}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#494a48">${d.g}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#494a48">${d.a}</td>
       <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px">${diffStr}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.5)">${d.n} jogo${d.n!==1?'s':''}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.45)">${d.n>0?(ga/d.n).toFixed(1):'—'}</td>
-      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:${d.pb>0?'#FFD166':'rgba(255,255,255,.25)'}">${d.pb>0?pct:'—'}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#5c5d5a">${d.n} jogo${d.n!==1?'s':''}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#6b6c69">${d.n>0?(ga/d.n).toFixed(1):'—'}</td>
+      <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:${d.pb>0?'#a5780a':'#b7b8b6'}">${d.pb>0?pct:'—'}</td>
     </tr>`;
   }).reverse().join('');
 
-  const thStyle='padding:8px 10px;font-family:DM Mono,monospace;font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;font-weight:400;border-bottom:1px solid rgba(255,255,255,.1)';
+  const thStyle='padding:8px 10px;font-family:DM Mono,monospace;font-size:9px;color:#6b6c69;text-transform:uppercase;letter-spacing:.1em;font-weight:400;border-bottom:1px solid rgba(0,0,0,.12)';
 
   // ── Cálculos para a barra de stats resumo ──
   const totalGA = vals.reduce((s,v)=>s+v,0);
@@ -8167,9 +8180,9 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
       ${svg}
     </div>
     <div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px">
-      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#40c960;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#40c960;border-radius:2px"></span>Subiu</span>
-      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#FF5A7A;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
-      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#40c960;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#40c960;border-radius:50%"></span>Mês atual</span>
+      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#1a5c2a;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#40c960;border-radius:2px"></span>Subiu</span>
+      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#cc2222;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
+      <span style="font-size:10px;font-family:'DM Mono',monospace;color:#1a5c2a;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:#40c960;border-radius:50%"></span>Mês atual</span>
     </div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
       <table style="width:100%;border-collapse:collapse;min-width:480px">
@@ -9032,7 +9045,7 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
   const n = vals.length;
 
   if(n < 2){
-    return '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.5);font-family:DM Mono,monospace">Dados insuficientes para o gráfico.</div>';
+    return '<div style="text-align:center;padding:40px;color:#494a48;font-family:DM Mono,monospace">Dados insuficientes para o gráfico.</div>';
   }
 
   const W=1000, H=320, PL=46, PR=24, PT=24, PB=42;
@@ -9046,8 +9059,8 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
   const gridLines=[0,.25,.5,.75,1].map(t=>{
     const gv=minV+t*range;
     const gy=PT+iH-(t*iH);
-    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="4,4"/>
-<text x="${PL-8}" y="${(gy+4).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="rgba(255,255,255,.4)">${fmt(gv)}</text>`;
+    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="#b7b8b6" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="${PL-8}" y="${(gy+4).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="#494a48">${fmt(gv)}</text>`;
   }).join('');
 
   const ptLine=months.map((m,i)=>`${xOf(i).toFixed(1)},${yOf(vals[i]).toFixed(1)}`).join(' ');
@@ -9063,15 +9076,15 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
   const dots=months.map((m,i)=>{
     const x=xOf(i),y=yOf(vals[i]);
     const isLast=m.current;
-    const col=isLast?cor:'rgba(255,255,255,.85)';
+    const col=isLast?cor:'#000000';
     const r=isLast?8:5;
-    const lbl=`<text x="${x.toFixed(1)}" y="${(y-r-7).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="13" fill="${isLast?cor:'rgba(255,255,255,.65)'}" font-weight="${isLast?'700':'400'}">${fmt(vals[i])}</text>`;
-    return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="#0d1117" stroke-width="2"/>`;
+    const lbl=`<text x="${x.toFixed(1)}" y="${(y-r-7).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="13" fill="${isLast?corClaro:'#494a48'}" font-weight="${isLast?'700':'400'}">${fmt(vals[i])}</text>`;
+    return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="#ebebeb" stroke-width="2"/>`;
   }).join('');
 
   const xLabels=months.map((m,i)=>{
     const lbl=m.label;
-    return`<text x="${xOf(i).toFixed(1)}" y="${(H-12).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>14?'10':'12'}" fill="${m.current?cor:'rgba(255,255,255,.5)'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-12).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>14?'10':'12'}" fill="${m.current?corClaro:'#494a48'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
   }).join('');
 
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
@@ -9168,6 +9181,7 @@ window.abrirPerfChartExpandido = function(months, valueFn, opts){
   inner && inner.classList.add('fullscreen-landscape');
   if(btn){ btn.textContent='⊡'; btn.title='Sair da tela cheia'; }
   m.style.display = 'flex';
+  _esconderFabDuranteModal();
   requestAnimationFrame(()=>{
     m.classList.add('open');
     _renderPerfChartExpanded();
@@ -11194,13 +11208,13 @@ window.irParaRankingGA=()=>{
   <div id="evol-chart-inner">
     <div id="evol-chart-header">
       <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
-        <div id="evol-chart-title" style="font-size:12px;font-family:'DM Mono',monospace;color:#40c960;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">📈 Evolução G+A</div>
+        <div id="evol-chart-title" style="font-size:12px;font-family:'DM Mono',monospace;color:#1a5c2a;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">📈 Evolução G+A</div>
         <div id="evol-chart-trend" style="font-size:11px;font-family:'DM Mono',monospace;font-weight:700;flex-shrink:0"></div>
-        <select id="evol-ano-select" onchange="_evolFiltrarAno(this.value)" style="margin-left:4px;background:rgba(64,201,96,.1);border:1px solid rgba(64,201,96,.35);border-radius:6px;color:#40c960;font-family:'DM Mono',monospace;font-size:10px;padding:3px 5px;cursor:pointer;outline:none;flex-shrink:0"></select>
+        <select id="evol-ano-select" onchange="_evolFiltrarAno(this.value)" style="margin-left:4px;background:rgba(64,201,96,.12);border:1px solid rgba(64,201,96,.4);border-radius:6px;color:#1a5c2a;font-family:'DM Mono',monospace;font-size:10px;padding:3px 5px;cursor:pointer;outline:none;flex-shrink:0"></select>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        <button id="evol-fullscreen-btn" onclick="toggleEvolFullscreen()" title="Tela cheia" style="width:28px;height:28px;border-radius:8px;background:rgba(64,201,96,.12);border:1px solid rgba(64,201,96,.35);color:#40c960;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.25)'" onmouseout="this.style.background='rgba(64,201,96,.12)'">⛶</button>
-        <button onclick="fecharEvolChart()" style="width:28px;height:28px;border-radius:8px;background:rgba(255,90,122,.1);border:1px solid rgba(255,90,122,.28);color:#FF5A7A;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.25)'" onmouseout="this.style.background='rgba(255,90,122,.1)'">✕</button>
+        <button id="evol-fullscreen-btn" onclick="toggleEvolFullscreen()" title="Tela cheia" style="width:28px;height:28px;border-radius:8px;background:rgba(64,201,96,.14);border:1px solid rgba(64,201,96,.4);color:#1a5c2a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.28)'" onmouseout="this.style.background='rgba(64,201,96,.14)'">⛶</button>
+        <button onclick="fecharEvolChart()" style="width:28px;height:28px;border-radius:8px;background:rgba(255,90,122,.14);border:1px solid rgba(220,40,70,.35);color:#cc2222;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.28)'" onmouseout="this.style.background='rgba(255,90,122,.14)'">✕</button>
       </div>
     </div>
     <div id="evol-summary-bar" class="evol-summary-bar" style="display:none"></div>
