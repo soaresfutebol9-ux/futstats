@@ -1813,9 +1813,9 @@ select option{background:var(--bg3)}
   #evol-chart-body{ padding:10px 16px 12px; }
 }
 #evol-chart-inner.fullscreen-landscape{
-  width:100vw!important;max-width:100vw!important;
-  height:100vh!important;max-height:100vh!important;
-  border-radius:0!important;
+  width:92vw!important;max-width:92vw!important;
+  height:92vh!important;max-height:92vh!important;
+  border-radius:22px!important;
 }
 /* Fallback de rotação via CSS quando screen.orientation.lock() não está
    disponível (ex.: iOS Safari fora de PWA instalada). Gira o modal 90°
@@ -1824,11 +1824,11 @@ select option{background:var(--bg3)}
 #evol-chart-inner.rotate-fallback{
   position:fixed!important;
   top:50%!important;left:50%!important;
-  width:100vh!important;max-width:100vh!important;
-  height:100vw!important;max-height:100vw!important;
+  width:92vh!important;max-width:92vh!important;
+  height:92vw!important;max-height:92vw!important;
   transform:translate(-50%,-50%) rotate(90deg)!important;
   transform-origin:center center!important;
-  border-radius:0!important;
+  border-radius:22px!important;
 }
 #evol-chart-inner.rotate-fallback #evol-chart-body{
   -webkit-overflow-scrolling:touch;
@@ -8517,7 +8517,7 @@ function renderRanking(){
             <div style="font-size:11px;color:${txtMuted};font-family:'DM Mono',monospace;margin-top:2px">${p.penBat} cobranças</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:'ClassyVogue',sans-serif;font-size:30px;line-height:1;${isPodium?'background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))':'color:'+cor}">${p.pct}%</div>
+            <div style="font-family:'ClassyVogue',sans-serif;font-size:30px;line-height:1;${isPodium?'background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 1px 3px rgba(255,255,255,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.6))':'color:#1a1a1a'}">${p.pct}%</div>
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:${txtMuted};margin-top:1px">${p.penOk}/${p.penBat}</div>
           </div>
         </div>
@@ -9034,7 +9034,10 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
     return '<div style="text-align:center;padding:40px;color:#494a48;font-family:DM Mono,monospace">Dados insuficientes para o gráfico.</div>';
   }
 
-  const W=1000, H=320, PL=46, PR=24, PT=24, PB=54;
+  // Largura dinâmica: mínimo 72px por ponto para o gráfico ser legível com scroll
+  const MIN_PX_PER_POINT = 72;
+  const H=320, PL=46, PR=32, PT=24, PB=54;
+  const W = Math.max(900, PL + PR + (n - 1) * MIN_PX_PER_POINT);
   const iW=W-PL-PR, iH=H-PT-PB;
   const maxV=Math.max(...vals,1);
   const minV=Math.min(...vals,0);
@@ -9081,7 +9084,7 @@ function _renderPerfChartExpandedSVG(months, valueFn, opts){
     return`<text x="${xOf(i).toFixed(1)}" y="${(H-10).toFixed(1)}" text-anchor="start" font-family="DM Mono,monospace" font-size="10" fill="#6b6c69" font-weight="700" letter-spacing="0.5">${m.ano}</text>`;
   }).join('');
 
-  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:${W}px;height:auto;display:block;overflow:visible;min-width:${W}px">
   <defs>
     <linearGradient id="${gradId}Exp" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${cor}" stop-opacity="0.22"/>
@@ -9119,13 +9122,27 @@ function _renderPerfChartExpanded(){
   const svg = _renderPerfChartExpandedSVG(months, valueFn, opts);
 
   body.innerHTML = `
-    <div style="position:relative;margin-bottom:16px">${svg}</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;cursor:grab;user-select:none" id="perf-chart-scroll-wrap">
+      <div style="position:relative;min-width:max-content">${svg}</div>
+    </div>
     <div style="display:flex;gap:16px;justify-content:center">
       <span style="font-size:11px;font-family:'DM Mono',monospace;color:#40c960;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#40c960;border-radius:2px"></span>Subiu</span>
       <span style="font-size:11px;font-family:'DM Mono',monospace;color:#FF5A7A;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
       <span style="font-size:11px;font-family:'DM Mono',monospace;color:${opts.cor};display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:${opts.cor};border-radius:50%"></span>Atual</span>
     </div>
   `;
+  // Scroll suave com arraste do dedo (além do scroll nativo touch)
+  requestAnimationFrame(()=>{
+    const wrap = document.getElementById('perf-chart-scroll-wrap');
+    if(!wrap) return;
+    // Rola automaticamente para o final (mês mais recente) ao abrir
+    wrap.scrollLeft = wrap.scrollWidth;
+    // Drag-to-scroll com mouse (desktop)
+    let isDragging=false, startX=0, scrollStart=0;
+    wrap.addEventListener('mousedown', e=>{ isDragging=true; startX=e.pageX; scrollStart=wrap.scrollLeft; wrap.style.cursor='grabbing'; e.preventDefault(); });
+    document.addEventListener('mousemove', e=>{ if(!isDragging) return; wrap.scrollLeft=scrollStart-(e.pageX-startX); });
+    document.addEventListener('mouseup', ()=>{ isDragging=false; wrap.style.cursor='grab'; });
+  });
 }
 
 // Tenta forçar a orientação paisagem (funciona em PWA instalado / Android Chrome).
