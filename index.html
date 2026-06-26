@@ -760,25 +760,48 @@ html.is-touch .auth-ball{animation:none}
 .ni.active{color:var(--g)}
 .ni.active{color:var(--g)}
 /* ══════════════════════════════════════════════════════════
-   PREMIUM TAB TRANSITIONS — sem blur (performance)
+   FLUID TAB TRANSITIONS — swipe horizontal suave
    ══════════════════════════════════════════════════════════ */
-.tv{display:none;opacity:0}
+.tv{display:none;opacity:0;will-change:transform,opacity;}
 .tv.active{
   display:block;
   animation:tabEnterPremium .38s cubic-bezier(.16,1,.3,1) forwards;
 }
 .tv.leaving{
   display:block;
-  animation:tabExitPremium .18s cubic-bezier(.4,0,1,1) forwards;
+  animation:tabExitPremium .22s cubic-bezier(.4,0,1,1) forwards;
   pointer-events:none;
 }
+/* direção → (indo para tab à direita: ex. Ranking→Partida) */
+.tv.enter-from-right{animation:tabEnterFromRight .38s cubic-bezier(.16,1,.3,1) forwards}
+.tv.enter-from-left {animation:tabEnterFromLeft  .38s cubic-bezier(.16,1,.3,1) forwards}
+.tv.exit-to-left    {animation:tabExitToLeft      .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+.tv.exit-to-right   {animation:tabExitToRight     .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+
+@keyframes tabEnterFromRight{
+  0%  {opacity:0;transform:translateX(40px) scale(.97)}
+  100%{opacity:1;transform:translateX(0)    scale(1)}
+}
+@keyframes tabEnterFromLeft{
+  0%  {opacity:0;transform:translateX(-40px) scale(.97)}
+  100%{opacity:1;transform:translateX(0)     scale(1)}
+}
+@keyframes tabExitToLeft{
+  0%  {opacity:1;transform:translateX(0)}
+  100%{opacity:0;transform:translateX(-30px)}
+}
+@keyframes tabExitToRight{
+  0%  {opacity:1;transform:translateX(0)}
+  100%{opacity:0;transform:translateX(30px)}
+}
+/* fallback genérico (não deveria ser usado) */
 @keyframes tabEnterPremium{
-  0%  {opacity:0;transform:translateY(18px) scale(.97)}
-  100%{opacity:1;transform:translateY(0) scale(1)}
+  0%  {opacity:0;transform:translateY(10px) scale(.98)}
+  100%{opacity:1;transform:translateY(0)    scale(1)}
 }
 @keyframes tabExitPremium{
   0%  {opacity:1;transform:translateY(0)}
-  100%{opacity:0;transform:translateY(-8px)}
+  100%{opacity:0;transform:translateY(-6px)}
 }
 
 /* Ranking list switch — sem blur */
@@ -8628,8 +8651,8 @@ function buildRecordData(){
           mesLabel:label
         });
       }
-      // Recorde GA Total: só a partir de jun/2026
-      if(mesKey>=REC_GA_POR_JOGO_INICIO && ga>0){
+      // Recorde GA Total: histórico completo
+      if(ga>0){
         allGATotalEntries.push({
           ...p,
           ga,
@@ -9872,6 +9895,12 @@ function _createAvRing(avEl){
 window.showTab=(n,btn,e)=>{
   if(n===_lastTab)return;
   const map={r:'tr',add:'tadd',hist:'thist'};
+  const isLite=document.body.classList.contains('lite-mode');
+
+  // Determina direção com base na ordem das tabs
+  const tabOrder={r:0,add:1,hist:2};
+  const dir=(tabOrder[n]??0)>(tabOrder[_lastTab]??0)?'right':'left';
+
   // Empurra estado na pilha para o botão Voltar funcionar entre abas
   if(n!=='r'){history.pushState({futstatsBack:null,type:'tab',tab:n},'');}
   else{history.replaceState({futstatsBack:null,type:'tab',tab:'r'},'');}
@@ -9879,10 +9908,11 @@ window.showTab=(n,btn,e)=>{
   // Exit animation on current tab
   const curEl=$(map[_lastTab]);
   if(curEl&&curEl.classList.contains('active')){
-    curEl.classList.add('leaving');
-    curEl.classList.remove('active');
+    const exitCls=isLite?'leaving':(dir==='right'?'exit-to-left':'exit-to-right');
+    curEl.classList.remove('active','enter-from-right','enter-from-left');
+    curEl.classList.add(exitCls);
     curEl.addEventListener('animationend',()=>{
-      curEl.classList.remove('leaving');
+      curEl.classList.remove('leaving','exit-to-left','exit-to-right');
       curEl.style.display='none';
     },{once:true});
   }
@@ -9907,9 +9937,18 @@ window.showTab=(n,btn,e)=>{
   const nextEl=$(map[n]);
   if(nextEl){
     nextEl.style.display='block';
-    // Force reflow
     void nextEl.offsetHeight;
-    nextEl.classList.add('active');
+    if(!isLite){
+      const enterCls=dir==='right'?'enter-from-right':'enter-from-left';
+      nextEl.classList.remove('active','exit-to-left','exit-to-right');
+      nextEl.classList.add(enterCls);
+      nextEl.addEventListener('animationend',()=>{
+        nextEl.classList.remove('enter-from-right','enter-from-left');
+        nextEl.classList.add('active');
+      },{once:true});
+    } else {
+      nextEl.classList.add('active');
+    }
   }
 
   if(n==='r')renderRanking();
