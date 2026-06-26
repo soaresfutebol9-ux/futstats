@@ -8579,29 +8579,39 @@ window.setRank=(s,el)=>{
 };
 
 // ── SWIPE HORIZONTAL: troca de aba (Mês/Geral/Recordes/Pênaltis) arrastando ──
-// Restrito a #rl-wrap (área de conteúdo do ranking), não afeta navegação entre
-// telas do app. Reaproveita setRank() e a ordem já definida em _rankOrder.
+// Anexado em .ac (área de conteúdo inteira, compartilhada por todas as tabs do
+// app) para cobrir QUALQUER ponto da tela do Ranking, inclusive espaço vazio
+// abaixo dos cards. Para não vazar para outras telas (Histórico, etc.), checa
+// dinamicamente se #tr (Ranking) é a aba ativa no momento do toque/soltar.
+// Reaproveita setRank() e a ordem já definida em _rankOrder.
 (function _initRankSwipe(){
-  const wrap = document.getElementById('rl-wrap');
-  if(!wrap) return;
+  const ac = document.querySelector('.ac');
+  if(!ac) return;
   const THRESHOLD = 55; // px mínimos de arrasto horizontal para trocar de aba
-  let startX = 0, startY = 0, dragging = false, isHorizontal = false;
+  let startX = 0, startY = 0, dragging = false, isHorizontal = false, activeOnStart = false;
+
+  function _rankTabAtiva(){
+    const tr = document.getElementById('tr');
+    return !!(tr && tr.classList.contains('active'));
+  }
 
   function _ftButtons(){
     // Ordem no DOM é a mesma de _rankOrder: ga, geral, recordes, pen
     return Array.from(document.querySelectorAll('.tr-filter .ft'));
   }
 
-  wrap.addEventListener('touchstart', e=>{
+  ac.addEventListener('touchstart', e=>{
     if(e.touches.length !== 1) return;
+    activeOnStart = _rankTabAtiva();
+    if(!activeOnStart) return;
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     dragging = true;
     isHorizontal = false;
   }, {passive:true});
 
-  wrap.addEventListener('touchmove', e=>{
-    if(!dragging) return;
+  ac.addEventListener('touchmove', e=>{
+    if(!dragging || !activeOnStart) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
     if(!isHorizontal){
@@ -8613,10 +8623,10 @@ window.setRank=(s,el)=>{
     if(isHorizontal) e.preventDefault(); // impede scroll vertical durante o swipe horizontal
   }, {passive:false});
 
-  wrap.addEventListener('touchend', e=>{
+  ac.addEventListener('touchend', e=>{
     if(!dragging) return;
     dragging = false;
-    if(!isHorizontal) return;
+    if(!activeOnStart || !isHorizontal) return;
     const dx = e.changedTouches[0].clientX - startX;
     if(Math.abs(dx) < THRESHOLD) return;
 
