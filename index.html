@@ -4776,6 +4776,7 @@ window.closePCenter=id=>{
   // Detecta qual camada está aberta (por prioridade — mais alta primeiro)
   function _fecharTopoAtual(){
     // Modais fixos (z-index alto → baixo)
+    if(document.getElementById('modal-craque-semana')?.classList.contains('open')){fecharCraqueSemana();return true;}
     if(document.getElementById('modal-evol-chart')?.classList.contains('open')){fecharEvolChart();return true;}
     if(document.getElementById('modal-desafio')?.classList.contains('open')){fecharModalDesafio();return true;}
     if(document.getElementById('modal-duelo')?.classList.contains('open')){closeDuelo();return true;}
@@ -4798,14 +4799,30 @@ window.closePCenter=id=>{
     // Tenta fechar a camada mais alta aberta
     const fechou=_fecharTopoAtual();
     if(fechou){
-      // Reinsere o estado para manter a pilha funcional
       history.pushState({futstatsBack:null,type:'closed'},'');
       return;
     }
-    // Navegação entre telas principais: sa → sgroups → sl
+    // Se a tela do app (sa) está ativa, gerencia abas e saída
     const telasAtivas=document.querySelectorAll('.screen.active');
     const telaAtual=telasAtivas.length?telasAtivas[0].id:null;
-    if(telaAtual==='sa'){showScr('sgroups');return;}
+    if(telaAtual==='sa'){
+      // Se está numa aba secundária, volta para ranking (aba principal)
+      if(window._lastTab&&window._lastTab!=='r'){
+        const allNi=document.querySelectorAll('.ni');
+        let rankBtn=null;
+        allNi.forEach(b=>{if((b.getAttribute('onclick')||'').includes("showTab('r'"))rankBtn=b;});
+        window.showTab('r',rankBtn||null,null);
+        return;
+      }
+      // Já está na aba ranking — pergunta se quer sair
+      history.pushState({futstatsBack:null,type:'exitPrompt'},'');
+      if(confirm('Deseja sair do FutStats?')){
+        history.go(-(history.length-1));
+        window.close();
+      }
+      return;
+    }
+    // Navegação entre telas principais: sa → sgroups → sl
     if(telaAtual==='sgroups'){showScr('sl');history.replaceState({futstatsBack:null,type:'base'},'');return;}
     // Se já está no login, deixa o browser sair do app normalmente
   });
@@ -9719,6 +9736,9 @@ function _createAvRing(avEl){
 window.showTab=(n,btn,e)=>{
   if(n===_lastTab)return;
   const map={r:'tr',add:'tadd',hist:'thist'};
+  // Empurra estado na pilha para o botão Voltar funcionar entre abas
+  if(n!=='r'){history.pushState({futstatsBack:null,type:'tab',tab:n},'');}
+  else{history.replaceState({futstatsBack:null,type:'tab',tab:'r'},'');}
 
   // Exit animation on current tab
   const curEl=$(map[_lastTab]);
@@ -14324,6 +14344,7 @@ window.abrirCraqueSemana = function(){
   _renderCraqueModalContent();
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({futstatsBack:'modal-craque-semana',type:'modal'},'');
   // Tenta gravar o craque da semana passada ao abrir
   window._salvarCraqueSemana();
 };
