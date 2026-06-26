@@ -740,7 +740,7 @@ html.is-touch .auth-ball{animation:none}
 .info-btn{background:none;border:1px solid var(--bo2);color:var(--tx2);padding:7px 14px;border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;display:flex;align-items:center;gap:6px}
 .info-btn:hover{border-color:var(--bo3);color:var(--tx)}
 .info-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ac{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1.1rem;max-width:560px;margin:0 auto;width:100%;min-height:0}
+.ac{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1.1rem;max-width:560px;margin:0 auto;width:100%;min-height:0;overflow-anchor:none}
 .bn{
   background:var(--bn-bg);
   border-top:1px solid var(--bo2);
@@ -6926,8 +6926,20 @@ function subscribeGroup(){
     if(panel&&panel.classList.contains('open')) _renderNotifPanel();
     // Atualiza card de feed inline
     renderFeedCard();
+    // Evita re-render quando o snapshot não trouxe mudança real de dados
+    // (Firestore dispara onSnapshot também em confirmações de cache/metadata).
+    if(prevGd && JSON.stringify(prevGd)===JSON.stringify(gd)) return;
     const a=document.querySelector('.tv.active');if(!a)return;
-    if(a.id==='tr'){showRankingSkeleton();setTimeout(()=>renderRanking(),80);}
+    if(a.id==='tr'){
+      // Só mostra o skeleton se a lista ainda estiver vazia/carregando;
+      // se já há conteúdo renderizado, atualiza direto — o skeleton troca a
+      // altura do bloco e isso, durante o scroll, dispara um bug de scroll
+      // anchoring no Chrome que faz a tab bar de filtros parecer desaparecer.
+      const rl=$('rl');
+      const jaTemConteudo=rl && rl.children.length>0 && !rl.querySelector('.sk-ri-anim,.sk-podium');
+      if(jaTemConteudo){renderRanking();}
+      else{showRankingSkeleton();setTimeout(()=>renderRanking(),80);}
+    }
     else if(a.id==='thist')renderHistTab();
   });
 }
