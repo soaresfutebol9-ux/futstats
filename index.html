@@ -2048,12 +2048,12 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   display:flex;align-items:center;justify-content:center;
   font-size:22px;
   box-shadow:0 4px 20px rgba(77,255,176,.45),0 2px 8px rgba(0,0,0,.4);
-  transition:transform .25s cubic-bezier(.34,1.2,.64,1),box-shadow .2s;
+  transition:transform .38s cubic-bezier(.34,1.26,.64,1),box-shadow .25s;
   position:relative;color:#07090d;
   flex-shrink:0;
 }
-.mfab-main:active{transform:scale(.92);}
-.mfab-main.open{transform:rotate(45deg);}
+.mfab-main:active{transform:scale(.88);}
+.mfab-main.open{transform:rotate(45deg) scale(1.06);}
 .mfab-main-badge{
   position:absolute;top:-3px;right:-3px;
   min-width:18px;height:18px;border-radius:99px;padding:0 5px;
@@ -2064,14 +2064,22 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 .mfab-items{
   display:flex;flex-direction:column;align-items:flex-end;gap:10px;
-  overflow:visible;max-height:0;opacity:0;
-  transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s;
+  overflow:visible;
   pointer-events:none;
   padding:4px 6px;margin:-4px -6px;
 }
-.mfab-items.open{ max-height:400px;opacity:1;pointer-events:all; }
+.mfab-items.open{ pointer-events:all; }
 .mfab-item-wrap{
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  opacity:0;
+  transform:translateY(16px) scale(.92);
+  transition:opacity .28s cubic-bezier(.34,1.1,.64,1), transform .32s cubic-bezier(.34,1.1,.64,1);
+  pointer-events:none;
+}
+.mfab-items.open .mfab-item-wrap{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  pointer-events:all;
 }
 .mfab-item-label{
   background:rgba(14,18,30,.88);border:1px solid rgba(255,255,255,.13);
@@ -10708,6 +10716,43 @@ window.irParaRankingGA=()=>{
 
 <script>
 // ══ MULTI-FAB ══
+function _mfabStagger(open){
+  const wraps = Array.from(document.querySelectorAll('#mfab-items .mfab-item-wrap'))
+    .filter(w => w.style.display !== 'none');
+  // Na abertura: de baixo pra cima (ordem reversa); no fechamento: de cima pra baixo
+  const ordered = open ? [...wraps].reverse() : wraps;
+  ordered.forEach((w, i) => {
+    clearTimeout(w._staggerT);
+    w._staggerT = setTimeout(() => {
+      if(open){
+        w.style.transition = 'opacity .26s cubic-bezier(.34,1.1,.64,1), transform .30s cubic-bezier(.34,1.1,.64,1)';
+      } else {
+        w.style.transition = 'opacity .18s ease, transform .20s cubic-bezier(.4,0,1,1)';
+        w.style.opacity = '0';
+        w.style.transform = 'translateY(12px) scale(.90)';
+      }
+    }, i * 38);
+  });
+  if(open){
+    // garante reset antes de animar
+    wraps.forEach(w => {
+      w.style.transition = 'none';
+      w.style.opacity = '0';
+      w.style.transform = 'translateY(16px) scale(.92)';
+    });
+    requestAnimationFrame(() => {
+      ordered.forEach((w, i) => {
+        clearTimeout(w._staggerT);
+        w._staggerT = setTimeout(() => {
+          w.style.transition = 'opacity .28s cubic-bezier(.34,1.1,.64,1), transform .32s cubic-bezier(.34,1.1,.64,1)';
+          w.style.opacity = '1';
+          w.style.transform = 'translateY(0) scale(1)';
+        }, i * 42);
+      });
+    });
+  }
+}
+
 function mfabToggle(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
@@ -10719,6 +10764,7 @@ function mfabToggle(){
   icon.textContent = open ? '✕' : '＋';
   document.body.classList.toggle('mfab-open', open);
   if(overlay) overlay.classList.toggle('open', open);
+  _mfabStagger(open);
 }
 function mfabClose(){
   const items = document.getElementById('mfab-items');
@@ -10726,11 +10772,13 @@ function mfabClose(){
   const icon  = document.getElementById('mfab-main-icon');
   const overlay = document.getElementById('mfab-blur-overlay');
   if(!items) return;
+  const wasOpen = items.classList.contains('open');
   items.classList.remove('open');
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
   document.body.classList.remove('mfab-open');
   if(overlay) overlay.classList.remove('open');
+  if(wasOpen) _mfabStagger(false);
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
