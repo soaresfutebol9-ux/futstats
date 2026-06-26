@@ -2045,7 +2045,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   display:flex;align-items:center;justify-content:center;
   font-size:22px;
   box-shadow:0 4px 20px rgba(77,255,176,.45),0 2px 8px rgba(0,0,0,.4);
-  transition:transform .38s cubic-bezier(.34,1.26,.64,1),box-shadow .25s;
+  transition:transform .30s cubic-bezier(.34,1.26,.64,1),box-shadow .25s;
   position:relative;color:#07090d;
   flex-shrink:0;
 }
@@ -2071,7 +2071,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
   opacity:0;
   transform:translateY(12px) scale(.92);
-  transition:opacity .28s cubic-bezier(.34,1.1,.64,1), transform .32s cubic-bezier(.34,1.1,.64,1);
+  transition:opacity .21s cubic-bezier(.34,1.1,.64,1), transform .24s cubic-bezier(.34,1.1,.64,1);
   pointer-events:none;
 }
 .mfab-items.open .mfab-item-wrap{
@@ -2117,15 +2117,14 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   visibility:visible;
   pointer-events:all;
 }
-/* Fallback: borra o próprio conteúdo da tela quando backdrop-filter não é suportado/respeitado */
-body.mfab-open .screen.active{
-  filter:blur(5px);
-  -webkit-filter:blur(5px);
-  transition:filter .25s ease;
-}
-.screen.active{
-  transition:filter .25s ease;
-}
+/* Removido: filter:blur(5px) em body.mfab-open .screen.active. Esse filtro
+   rodava SEMPRE em paralelo ao #mfab-blur-overlay (que já usa backdrop-filter,
+   suportado pelos navegadores mobile atuais), aplicando blur pesado na tela
+   inteira (incluindo o cabeçalho .ah) sem feature-detection. No mobile, a
+   composição/remoção desse filter em um elemento grande com muitos filhos
+   causava um flash perceptível no cabeçalho ao fechar o FAB. O overlay já
+   entrega o efeito visual de blur sozinho, então o filter foi removido em
+   vez de mantido como "fallback" incondicional. */
 
 /* ══ MODAL HISTÓRICO DE CONFRONTOS ══ */
 #modal-historico-confrontos{
@@ -10932,13 +10931,13 @@ function _mfabStagger(open){
     clearTimeout(w._staggerT);
     w._staggerT = setTimeout(() => {
       if(open){
-        w.style.transition = 'opacity .26s cubic-bezier(.34,1.1,.64,1), transform .30s cubic-bezier(.34,1.1,.64,1)';
+        w.style.transition = 'opacity .20s cubic-bezier(.34,1.1,.64,1), transform .23s cubic-bezier(.34,1.1,.64,1)';
       } else {
-        w.style.transition = 'opacity .18s ease, transform .20s cubic-bezier(.4,0,1,1)';
+        w.style.transition = 'opacity .14s ease, transform .15s cubic-bezier(.4,0,1,1)';
         w.style.opacity = '0';
         w.style.transform = 'translateY(12px) scale(.90)';
       }
-    }, i * 38);
+    }, i * 28);
   });
   if(open){
     // garante reset antes de animar
@@ -10951,10 +10950,10 @@ function _mfabStagger(open){
       ordered.forEach((w, i) => {
         clearTimeout(w._staggerT);
         w._staggerT = setTimeout(() => {
-          w.style.transition = 'opacity .28s cubic-bezier(.34,1.1,.64,1), transform .32s cubic-bezier(.34,1.1,.64,1)';
+          w.style.transition = 'opacity .21s cubic-bezier(.34,1.1,.64,1), transform .24s cubic-bezier(.34,1.1,.64,1)';
           w.style.opacity = '1';
           w.style.transform = 'translateY(0) scale(1)';
-        }, i * 42);
+        }, i * 32);
       });
     });
   }
