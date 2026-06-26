@@ -16296,7 +16296,7 @@ window._cfgRemoverMembro = async function() {
       _hcFiltroJogador = '__todos__';
       _hcFiltroAno = '__todos__';
       modal.classList.add('open');
-      const gd = _gd();
+      const gd = window._gd;
       if(!gd){
         document.getElementById('hc-body').innerHTML='<div class="hc-empty">Carregue um grupo para ver os confrontos.</div>';
         return;
@@ -16311,7 +16311,7 @@ window._cfgRemoverMembro = async function() {
   };
 
   function _hcGetTodosDesafios(){
-    const gd = _gd();
+    const gd = window._gd || {};
     const atual = (gd.desafios||[]).filter(d => d.status === 'ativo' || d.status === 'encerrado');
     const doHistorico = [];
     Object.values(gd.historico||{}).forEach(h => {
@@ -16325,7 +16325,7 @@ window._cfgRemoverMembro = async function() {
   }
 
   function _hcBuildFilters(){
-    const gd = _gd();
+    const gd = window._gd || {};
     const desafios = _hcGetTodosDesafios();
 
     // ── Filtro por jogador ──
@@ -16382,7 +16382,7 @@ window._cfgRemoverMembro = async function() {
   };
 
   function _hcGetNome(uid){
-    const gd = _gd();
+    const gd = window._gd || {};
     const m = (gd.members||[]).find(x => x.uid === uid);
     return m ? m.name : (uid||'?').slice(0,8);
   }
