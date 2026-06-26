@@ -8571,8 +8571,11 @@ window.setRank=(s,el)=>{
 };
 
 // ── RECORDES ─────────────────────────────────────────────────────
+// Data de corte para o recorde GA/Jogo (só contar a partir de jun/2026)
+const REC_GA_POR_JOGO_INICIO='2026-06';
+
 function buildRecordData(){
-  if(!gd)return{golsTop:[],assistTop:[]};
+  if(!gd)return{golsTop:[],assistTop:[],gaPorJogoTop:[]};
   const hist=gd.historico||{};
   const allKeys=Object.keys(hist).sort();
   const vigenteKey=gd.mesAtivo||mesAtual();
@@ -8589,6 +8592,7 @@ function buildRecordData(){
 
   const allGolsEntries=[];
   const allAssistEntries=[];
+  const allGAPorJogoEntries=[];
 
   function processMatches(matches,mesKey){
     const byPlayer={};
@@ -8596,10 +8600,11 @@ function buildRecordData(){
       const key=m.uid||m.player;
       if(!byPlayer[key]){
         const nome=getPlayerName(m.uid,m.player);
-        byPlayer[key]={uid:m.uid||'',name:nome,gols:0,assist:0};
+        byPlayer[key]={uid:m.uid||'',name:nome,gols:0,assist:0,jogos:0};
       }
       byPlayer[key].gols+=(m.gols||0);
       byPlayer[key].assist+=(m.assist||0);
+      byPlayer[key].jogos+=1;
     });
     const label=getMesLabel(mesKey);
     Object.values(byPlayer).forEach(p=>{
@@ -8608,6 +8613,20 @@ function buildRecordData(){
       // (ex.: 1º e 2º lugar com dois meses diferentes dele).
       if(p.gols>0) allGolsEntries.push({...p,val:p.gols,mesKey,mesLabel:label});
       if(p.assist>0) allAssistEntries.push({...p,val:p.assist,mesKey,mesLabel:label});
+
+      // Recorde GA/Jogo: só a partir de jun/2026, mín. 5 jogos e 20 GA no mês
+      const ga=p.gols+p.assist;
+      if(mesKey>=REC_GA_POR_JOGO_INICIO && p.jogos>=5 && ga>=20){
+        const media=ga/p.jogos;
+        allGAPorJogoEntries.push({
+          ...p,
+          ga,
+          media,
+          val:parseFloat(media.toFixed(2)),
+          mesKey,
+          mesLabel:label
+        });
+      }
     });
   }
 
@@ -8622,8 +8641,12 @@ function buildRecordData(){
     .sort((a,b)=>b.val-a.val)
     .slice(0,3)
     .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
+  const gaPorJogoTop=allGAPorJogoEntries
+    .sort((a,b)=>b.media-a.media)
+    .slice(0,3)
+    .map(p=>({...p,isCurrentMonth:p.mesKey===vigenteKey}));
 
-  return{golsTop,assistTop};
+  return{golsTop,assistTop,gaPorJogoTop};
 }
 
 function recCardHTML(p,pos){
@@ -8674,27 +8697,59 @@ function recAssistCardHTML(p,pos){
   </div>`;
 }
 
+function recGAPorJogoCardHTML(p,pos){
+  const medals=['🥇','🥈','🥉'];
+  const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
+  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+  const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
+  const avWrap=isMe
+    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+  const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
+  const mediaFmt=p.media%1===0?p.media.toFixed(0):p.media.toFixed(2);
+  return`<div class="rec-card ${cls[pos]}">
+    <div class="rec-medal">${medals[pos]}</div>
+    ${avWrap}
+    <div class="rec-info">
+      <div class="rec-name">${p.name}</div>
+      <div class="rec-meta">${p.mesLabel} · ${p.jogos} jogos · ${p.ga} G+A</div>
+      ${atualBadge}
+    </div>
+    <div class="rec-val">
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${mediaFmt}</div>
+      <div class="rec-val-lbl">G+A/jogo</div>
+    </div>
+  </div>`;
+}
+
 function renderRecordes(){
-  const {golsTop,assistTop}=buildRecordData();
+  const {golsTop,assistTop,gaPorJogoTop}=buildRecordData();
   const empty='<div class="rec-empty">📭 Nenhum registro ainda</div>';
   const golsHTML=golsTop.length?golsTop.map((p,i)=>recCardHTML(p,i)).join(''):empty;
   const assistHTML=assistTop.length?assistTop.map((p,i)=>recAssistCardHTML(p,i)).join(''):empty;
+  const gaJogoHTML=gaPorJogoTop.length?gaPorJogoTop.map((p,i)=>recGAPorJogoCardHTML(p,i)).join('')
+    :`<div class="rec-empty">📭 Nenhum jogador qualificado ainda<br><span style="font-size:10px;opacity:.6">Mín. 5 jogos e 20 G+A no mesmo mês</span></div>`;
 
   $('rl').innerHTML=`
     <div style="padding-bottom:.5rem">
       <div class="rec-section">
         <div class="rec-section-header">
           <div class="rec-section-title">⚽ Mais Gols em um Mês</div>
-
         </div>
         <div id="rec-gols-list">${golsHTML}</div>
       </div>
       <div class="rec-section">
         <div class="rec-section-header">
           <div class="rec-section-title">👟 Mais Assistências em um Mês</div>
-
         </div>
         <div id="rec-assist-list">${assistHTML}</div>
+      </div>
+      <div class="rec-section">
+        <div class="rec-section-header">
+          <div class="rec-section-title">📊 Maior G+A por Jogo em um Mês</div>
+        </div>
+        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.04em;margin-bottom:.75rem;padding:0 2px">Mín. 5 jogos e 20 G+A no mês · a partir de jun/2026</div>
+        <div id="rec-gajogo-list">${gaJogoHTML}</div>
       </div>
     </div>`;
 }
