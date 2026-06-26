@@ -1813,6 +1813,22 @@ select option{background:var(--bg3)}
   height:100vh!important;max-height:100vh!important;
   border-radius:0!important;
 }
+/* Fallback de rotação via CSS quando screen.orientation.lock() não está
+   disponível (ex.: iOS Safari fora de PWA instalada). Gira o modal 90°
+   e o redimensiona para preencher a tela em paisagem mesmo com o
+   aparelho físico em retrato. */
+#evol-chart-inner.rotate-fallback{
+  position:fixed!important;
+  top:50%!important;left:50%!important;
+  width:100vh!important;max-width:100vh!important;
+  height:100vw!important;max-height:100vw!important;
+  transform:translate(-50%,-50%) rotate(90deg)!important;
+  transform-origin:center center!important;
+  border-radius:0!important;
+}
+#evol-chart-inner.rotate-fallback #evol-chart-body{
+  -webkit-overflow-scrolling:touch;
+}
 #evol-chart-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px 12px;
@@ -7945,12 +7961,16 @@ window.fecharEvolChart = function(){
   const m = document.getElementById('modal-evol-chart');
   const inner = document.getElementById('evol-chart-inner');
   const btn = document.getElementById('evol-fullscreen-btn');
+  const sel = document.getElementById('evol-ano-select');
   m.classList.remove('open');
   // Resetar fullscreen
   inner && inner.classList.remove('fullscreen-landscape');
   if(btn){ btn.textContent='⛶'; btn.title='Tela cheia'; }
+  if(sel) sel.style.display='';
   const sb = document.getElementById('evol-summary-bar');
   if(sb) sb.style.display='none';
+  _perfChartExpandedData = null;
+  _liberarOrientacao();
   setTimeout(()=>{ m.style.display='none'; }, 280);
 };
 
@@ -8175,6 +8195,7 @@ window.toggleEvolFullscreen = function(){
   const isFs = inner.classList.toggle('fullscreen-landscape');
   btn.textContent = isFs ? '⊡' : '⛶';
   btn.title = isFs ? 'Sair da tela cheia' : 'Tela cheia';
+  if(isFs) _forcarPaisagem(); else _liberarOrientacao();
 };
 
 window.addEventListener('keydown', e=>{ if(e.key==='Escape') fecharEvolChart(); });
@@ -8894,9 +8915,15 @@ window._buildRecordData = buildRecordData;
 // Gera o mesmo SVG de linha (verde=subiu, vermelho=caiu, cinza=estável) já
 // usado no app, parametrizado por título, cor e função de extração do valor.
 // `decimals` controla a formatação (0 para totais inteiros, 1 para médias).
+window._perfChartRegistry = window._perfChartRegistry || {};
 function _buildPerfChart(months,valueFn,opts){
   const {titulo,cor,corClaro,gradId,decimals=0,emptyMsg}=opts;
   const fmt=v=>decimals?v.toFixed(decimals):Math.round(v);
+  // Registra os dados deste gráfico para que o botão de expandir consiga
+  // recuperá-los (não dá pra serializar a valueFn direto num onclick).
+  const chartKey = gradId;
+  window._perfChartRegistry[chartKey] = {months, valueFn, opts};
+  const expandBtn = months.length>=2 ? `<button onclick="event.stopPropagation();abrirPerfChartExpandido(window._perfChartRegistry['${chartKey}'].months,window._perfChartRegistry['${chartKey}'].valueFn,window._perfChartRegistry['${chartKey}'].opts)" title="Expandir gráfico" style="width:22px;height:22px;border-radius:7px;background:rgba(0,0,0,.06);border:1px solid ${cor}55;color:${corClaro};font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0">⛶</button>` : '';
 
   // Sem nenhum mês qualificado (ex.: corte "por jogo" ainda não atingido, ou
   // temporada selecionada não tem dados) ──
@@ -8977,9 +9004,12 @@ function _buildPerfChart(months,valueFn,opts){
   ${lastLabel}
 </svg>`;
   return`<div style="background:#dedede;border:1.5px solid ${cor};border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
     <div style="font-size:10px;color:${corClaro};font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase">${titulo}</div>
-    <div style="font-size:11px;font-family:'DM Mono',monospace;color:${trendCol};font-weight:700">${trendTxt}</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:${trendCol};font-weight:700">${trendTxt}</div>
+      ${expandBtn}
+    </div>
   </div>
   <div style="width:100%;padding:0 2px">${svg}</div>
   <div style="display:flex;gap:12px;justify-content:center;margin-top:8px">
@@ -8989,6 +9019,161 @@ function _buildPerfChart(months,valueFn,opts){
   </div>
 </div>`;
 }
+
+// ══════════════════════════════════════════
+// EXPANDIR GRÁFICO DE PERFORMANCE — tela cheia horizontal
+// ══════════════════════════════════════════
+let _perfChartExpandedData = null; // guarda {months, valueFn, opts} do gráfico aberto
+
+function _renderPerfChartExpandedSVG(months, valueFn, opts){
+  const {cor, corClaro, gradId, decimals=0} = opts;
+  const fmt=v=>decimals?v.toFixed(decimals):Math.round(v);
+  const vals = months.map(valueFn);
+  const n = vals.length;
+
+  if(n < 2){
+    return '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.5);font-family:DM Mono,monospace">Dados insuficientes para o gráfico.</div>';
+  }
+
+  const W=1000, H=320, PL=46, PR=24, PT=24, PB=42;
+  const iW=W-PL-PR, iH=H-PT-PB;
+  const maxV=Math.max(...vals,1);
+  const minV=Math.min(...vals,0);
+  const range=(maxV-minV)||1;
+  const xOf=i=>PL+i*(iW/(n-1));
+  const yOf=v=>PT+iH-(((v-minV)/range)*iH);
+
+  const gridLines=[0,.25,.5,.75,1].map(t=>{
+    const gv=minV+t*range;
+    const gy=PT+iH-(t*iH);
+    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="${PL-8}" y="${(gy+4).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="rgba(255,255,255,.4)">${fmt(gv)}</text>`;
+  }).join('');
+
+  const ptLine=months.map((m,i)=>`${xOf(i).toFixed(1)},${yOf(vals[i]).toFixed(1)}`).join(' ');
+  const ptArea=`${PL.toFixed(1)},${(PT+iH).toFixed(1)} `+ptLine+` ${(W-PR).toFixed(1)},${(PT+iH).toFixed(1)}`;
+
+  const segments=months.slice(1).map((m,i)=>{
+    const x1=xOf(i).toFixed(1),y1=yOf(vals[i]).toFixed(1);
+    const x2=xOf(i+1).toFixed(1),y2=yOf(vals[i+1]).toFixed(1);
+    const col=vals[i+1]>vals[i]?'#40c960':vals[i+1]<vals[i]?'#FF5A7A':'#888888';
+    return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="3.5" stroke-linecap="round"/>`;
+  }).join('');
+
+  const dots=months.map((m,i)=>{
+    const x=xOf(i),y=yOf(vals[i]);
+    const isLast=m.current;
+    const col=isLast?cor:'rgba(255,255,255,.85)';
+    const r=isLast?8:5;
+    const lbl=`<text x="${x.toFixed(1)}" y="${(y-r-7).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="13" fill="${isLast?cor:'rgba(255,255,255,.65)'}" font-weight="${isLast?'700':'400'}">${fmt(vals[i])}</text>`;
+    return `${lbl}<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${col}" stroke="#0d1117" stroke-width="2"/>`;
+  }).join('');
+
+  const xLabels=months.map((m,i)=>{
+    const lbl=m.label;
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-12).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="${n>14?'10':'12'}" fill="${m.current?cor:'rgba(255,255,255,.5)'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
+  <defs>
+    <linearGradient id="${gradId}Exp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${cor}" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="${cor}" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  ${gridLines}
+  <polygon points="${ptArea}" fill="url(#${gradId}Exp)"/>
+  ${segments}
+  ${dots}
+  ${xLabels}
+</svg>`;
+}
+
+function _renderPerfChartExpanded(){
+  if(!_perfChartExpandedData) return;
+  const {months, valueFn, opts} = _perfChartExpandedData;
+  const body = document.getElementById('evol-chart-body');
+  const trendEl = document.getElementById('evol-chart-trend');
+  const titleEl = document.getElementById('evol-chart-title');
+  const sel = document.getElementById('evol-ano-select');
+  if(sel) sel.style.display='none'; // filtro de ano não se aplica aqui (já filtrado na aba Performance)
+  if(titleEl) titleEl.textContent = opts.titulo;
+
+  const vals = months.map(valueFn);
+  if(vals.length>=2){
+    const trend = vals[vals.length-1]-vals[vals.length-2];
+    const fmt=v=>opts.decimals?Math.abs(v).toFixed(opts.decimals):Math.round(Math.abs(v));
+    const trendTxt = trend>0?`↑ +${fmt(trend)}`:trend<0?`↓ -${fmt(trend)}`:'→ estável';
+    const trendCol = trend>0?'#40c960':trend<0?'#FF5A7A':'#888';
+    if(trendEl){ trendEl.textContent=trendTxt; trendEl.style.color=trendCol; }
+  } else if(trendEl){ trendEl.textContent=''; }
+
+  const svg = _renderPerfChartExpandedSVG(months, valueFn, opts);
+
+  body.innerHTML = `
+    <div style="position:relative;margin-bottom:16px">${svg}</div>
+    <div style="display:flex;gap:16px;justify-content:center">
+      <span style="font-size:11px;font-family:'DM Mono',monospace;color:#40c960;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#40c960;border-radius:2px"></span>Subiu</span>
+      <span style="font-size:11px;font-family:'DM Mono',monospace;color:#FF5A7A;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:16px;height:3px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
+      <span style="font-size:11px;font-family:'DM Mono',monospace;color:${opts.cor};display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;background:${opts.cor};border-radius:50%"></span>Atual</span>
+    </div>
+  `;
+}
+
+// Tenta forçar a orientação paisagem (funciona em PWA instalado / Android Chrome).
+// Quando a API de lock não está disponível (ex.: iOS Safari), aplica uma rotação
+// CSS de fallback para garantir a visualização horizontal mesmo assim.
+async function _forcarPaisagem(){
+  const inner = document.getElementById('evol-chart-inner');
+  try{
+    if(screen.orientation && screen.orientation.lock){
+      await screen.orientation.lock('landscape');
+      inner && inner.classList.remove('rotate-fallback');
+      return;
+    }
+  }catch(e){ /* lock indisponível ou bloqueado — segue para o fallback */ }
+  // Fallback: gira o modal via CSS se o aparelho estiver em retrato
+  if(window.innerHeight > window.innerWidth){
+    inner && inner.classList.add('rotate-fallback');
+  } else {
+    inner && inner.classList.remove('rotate-fallback');
+  }
+}
+function _liberarOrientacao(){
+  const inner = document.getElementById('evol-chart-inner');
+  inner && inner.classList.remove('rotate-fallback');
+  try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
+}
+// Reavalia o fallback de rotação se o usuário girar o aparelho manualmente
+// enquanto o modal expandido (de qualquer gráfico) estiver aberto.
+window.addEventListener('resize', ()=>{
+  const m = document.getElementById('modal-evol-chart');
+  if(m && m.classList.contains('open')){
+    const inner = document.getElementById('evol-chart-inner');
+    if(inner && inner.classList.contains('fullscreen-landscape') && !(screen.orientation&&screen.orientation.lock)){
+      if(window.innerHeight > window.innerWidth) inner.classList.add('rotate-fallback');
+      else inner.classList.remove('rotate-fallback');
+    }
+  }
+});
+
+window.abrirPerfChartExpandido = function(months, valueFn, opts){
+  _perfChartExpandedData = {months, valueFn, opts};
+  _evolCurrentUid = null; // não é o gráfico por-jogador; desativa filtro de ano
+  const m = document.getElementById('modal-evol-chart');
+  const inner = document.getElementById('evol-chart-inner');
+  const btn = document.getElementById('evol-fullscreen-btn');
+  const sb = document.getElementById('evol-summary-bar');
+  if(sb) sb.style.display='none';
+  inner && inner.classList.add('fullscreen-landscape');
+  if(btn){ btn.textContent='⊡'; btn.title='Sair da tela cheia'; }
+  m.style.display = 'flex';
+  requestAnimationFrame(()=>{
+    m.classList.add('open');
+    _renderPerfChartExpanded();
+    _forcarPaisagem();
+  });
+};
 
 function renderPerformanceTab(){
   if(!gd){$('rl').innerHTML='<div class="empty">Carregando...</div>';return;}
@@ -11009,7 +11194,7 @@ window.irParaRankingGA=()=>{
   <div id="evol-chart-inner">
     <div id="evol-chart-header">
       <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden">
-        <div style="font-size:12px;font-family:'DM Mono',monospace;color:#40c960;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">📈 Evolução G+A</div>
+        <div id="evol-chart-title" style="font-size:12px;font-family:'DM Mono',monospace;color:#40c960;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">📈 Evolução G+A</div>
         <div id="evol-chart-trend" style="font-size:11px;font-family:'DM Mono',monospace;font-weight:700;flex-shrink:0"></div>
         <select id="evol-ano-select" onchange="_evolFiltrarAno(this.value)" style="margin-left:4px;background:rgba(64,201,96,.1);border:1px solid rgba(64,201,96,.35);border-radius:6px;color:#40c960;font-family:'DM Mono',monospace;font-size:10px;padding:3px 5px;cursor:pointer;outline:none;flex-shrink:0"></select>
       </div>
