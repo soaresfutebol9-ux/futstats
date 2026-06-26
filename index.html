@@ -16529,6 +16529,7 @@ window._cfgRemoverMembro = async function() {
   let _hcFiltroAno = '__todos__';     // ano (string) ou '__todos__'
   let _hcPlayerOpen = false;          // acordeão de jogadores aberto?
   let _hcAnoOpen = false;             // acordeão de anos aberto?
+  let _hcJogadorEscolhido = false;    // true quando usuário já escolheu (inclusive "todos")
 
   window.abrirHistoricoConfrontos = function(){
     setTimeout(function(){
@@ -16536,6 +16537,7 @@ window._cfgRemoverMembro = async function() {
       if(!modal) return;
       _hcFiltroJogador = '__todos__';
       _hcFiltroAno = '__todos__';
+      _hcJogadorEscolhido = false;
       _hcPlayerOpen = false;
       _hcAnoOpen = false;
       modal.classList.add('open');
@@ -16640,6 +16642,7 @@ window._cfgRemoverMembro = async function() {
 
   window._hcSetJogador = function(uid){
     _hcFiltroJogador = uid;
+    _hcJogadorEscolhido = true;
     _hcPlayerOpen = false;
     _hcBuildFilters();
     _hcRender();
@@ -16679,8 +16682,8 @@ window._cfgRemoverMembro = async function() {
     const body = document.getElementById('hc-body');
     if(!body) return;
 
-    // Sem jogador selecionado → mostra apenas orientação, sem listar confrontos
-    if(_hcFiltroJogador === '__todos__'){
+    // Estado inicial (nenhum jogador escolhido ainda) → mostra orientação
+    if(_hcFiltroJogador === '__todos__' && !_hcJogadorEscolhido){
       body.innerHTML = '<div class="hc-empty" style="padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;gap:10px"><div style="font-size:36px">⚔️</div><div style="font-size:14px;color:var(--tx2);text-align:center">Selecione um jogador para ver os confrontos</div></div>';
       return;
     }
