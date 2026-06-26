@@ -6983,7 +6983,23 @@ window._toggleFeedExpand = function(){
 
 let _dc = { rivalUid: null, tipo: 'gols' };
 
+// Retorna todas as partidas de um uid com ts >= startTs (sem limite superior),
+// juntando gd.matches (mês corrente) e gd.historico (meses arquivados),
+// ordenadas da mais antiga para a mais nova. Usada pelos desafios de
+// "única partida", que não têm endTs fixo: o desafio encerra na primeira
+// partida que cada jogador registrar a partir do início do desafio.
+function _dcPartidasDesde(uid, startTs){
+  if(!gd || !uid || startTs==null) return [];
+  const doPeriodo = x => x.uid === uid && x.ts >= startTs;
+  let todas = (gd.matches||[]).filter(doPeriodo);
+  Object.values(gd.historico||{}).forEach(h => {
+    todas = todas.concat((h.matches||[]).filter(doPeriodo));
+  });
+  return todas.sort((a,b) => a.ts - b.ts);
+}
+
 function _dcTimeLeft(endTs){
+  if(endTs==null) return { label:'Aguardando partida', urgent:false, ended:false };
   const diff = endTs - Date.now();
   if(diff <= 0) return { label:'Encerrado', urgent: false, ended: true };
   const h = Math.floor(diff / 3600000);
@@ -7007,7 +7023,12 @@ function _dcStatValor(x, tipo){
 // essa virada, então é preciso somar as duas fontes — senão o placar de
 // desafios mais antigos volta a 0 depois que o mês deles é arquivado.
 function _dcGetScore(uid, challenge){
-  if(!gd || !uid || challenge.startTs==null || challenge.endTs==null) return 0;
+  if(!gd || !uid || challenge.startTs==null) return 0;
+  if(challenge.duracao === '1partida'){
+    const primeira = _dcPartidasDesde(uid, challenge.startTs)[0];
+    return primeira ? _dcStatValor(primeira, challenge.tipo) : 0;
+  }
+  if(challenge.endTs==null) return 0;
   const noPeriodo = x => x.uid === uid && x.ts >= challenge.startTs && x.ts <= challenge.endTs;
   let total = (gd.matches||[]).filter(noPeriodo)
     .reduce((s,x) => s + _dcStatValor(x, challenge.tipo), 0);
@@ -7083,7 +7104,7 @@ function _dcCardHTML(challenge, perspectiveUid){
       +avatarHTML(mbB.name,32,mbB.uid)
       +'</div>'
       +'<div style=\"font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:8px\">'
-      +'Stat: <span style=\"color:rgba(255,200,0,.8)\">'+(challenge.tipo==='gols'?'⚽ Gols':challenge.tipo==='assist'?'👟 Assistências':'🏅 G+A')+'</span> · 7 dias</div>'
+      +'Stat: <span style=\"color:rgba(255,200,0,.8)\">'+(challenge.tipo==='gols'?'⚽ Gols':challenge.tipo==='assist'?'👟 Assistências':'🏅 G+A')+'</span> · '+(challenge.duracao==='1partida'?'Única partida':'7 dias')+'</div>'
       +(aguardandoLabel?'<div style=\"margin-bottom:8px\">'+aguardandoLabel+'</div>':'')
       +(aceitarBtn||recusarBtn?'<div style=\"display:flex;gap:8px;margin-top:4px\">'+aceitarBtn+recusarBtn+'</div>':'')
       +'</div>';
@@ -7137,7 +7158,7 @@ window._dcGetScore = _dcGetScore;
 window._dcFinalScore = _dcFinalScore;
 
 window.abrirCriarDesafio = function(preSelectUid){
-  _dc = { rivalUid: preSelectUid || null, tipo: 'gols' };
+  _dc = { rivalUid: preSelectUid || null, tipo: 'gols', duracao: '7dias' };
   _dcRenderCriarBody();
   const modal = document.getElementById('modal-desafio');
   modal.style.display = 'flex';
@@ -7191,7 +7212,13 @@ function _dcRenderCriarBody(){
     + '<div style="display:flex;gap:8px;margin-bottom:1.25rem">'
     + tipoOpts.map(t => '<button class="dc-tipo-btn'+(_dc.tipo===t.val?' selected':'')+'" onclick="_dcSelectTipo(\'' + t.val + '\')">' + t.label + '</button>').join('')
     + '</div>'
-    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:10px">Duração: <strong style="color:var(--tx)">7 dias</strong> a partir de agora</div>'
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Duração do desafio</div>'
+    + '<div style="display:flex;gap:8px;margin-bottom:1.25rem">'
+    + [{val:'7dias',label:'\ud83d\udcc5 7 dias'},{val:'1partida',label:'\u26bd Única partida'}].map(o => '<button class="dc-tipo-btn'+(_dc.duracao===o.val?' selected':'')+'" onclick="_dcSelectDuracao(\'' + o.val + '\')">' + o.label + '</button>').join('')
+    + '</div>'
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--tx3);margin-bottom:10px">' + (_dc.duracao==='1partida'
+        ? 'Vale a <strong style="color:var(--tx)">próxima partida</strong> que cada um registrar a partir de agora'
+        : 'Duração: <strong style="color:var(--tx)">7 dias</strong> a partir de agora') + '</div>'
     + '<div id="dc-err" style="display:none;font-size:12px;color:var(--re);font-family:\'DM Mono\',monospace;margin-bottom:8px"></div>'
     + (euJaEmDesafio
         ? '<button disabled style="width:100%;padding:14px;border-radius:14px;border:none;background:rgba(120,120,120,.25);color:rgba(255,255,255,.35);font-family:\'DM Sans\',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;letter-spacing:.04em;">\u2694\ufe0f Você já tem um desafio ativo</button>'
@@ -7200,6 +7227,7 @@ function _dcRenderCriarBody(){
 
 window._dcSelectRival = function(uid){ _dc.rivalUid = uid; _dcRenderCriarBody(); };
 window._dcSelectTipo  = function(tipo){ _dc.tipo = tipo; _dcRenderCriarBody(); };
+window._dcSelectDuracao = function(duracao){ _dc.duracao = duracao; _dcRenderCriarBody(); };
 
 window._dcConfirmar = async function(){
   const errEl = document.getElementById('dc-err');
@@ -7222,7 +7250,7 @@ window._dcConfirmar = async function(){
     id: now+'_'+Math.random().toString(36).slice(2,6),
     uidA: currentUser.uid, nameA: myProfile.displayName,
     uidB: _dc.rivalUid,    nameB: rival?.name||'?',
-    tipo: _dc.tipo, startTs: null, endTs: null,
+    tipo: _dc.tipo, duracao: _dc.duracao || '7dias', startTs: null, endTs: null,
     status: 'pendente', createdAt: now,
   };
   try{
@@ -7257,7 +7285,7 @@ window._dcAceitar = async function(id){
     const now=Date.now();
     d.status='ativo';
     d.startTs=now;
-    d.endTs=now+7*24*60*60*1000;
+    d.endTs = (d.duracao==='1partida') ? null : now+7*24*60*60*1000;
     // Notificação para o desafiante (uidA)
     cur.notifs=cur.notifs||{};
     cur.notifs[d.uidA]=cur.notifs[d.uidA]||[];
@@ -7309,7 +7337,12 @@ function _dcCheckEncerrar(){
   if(!gd||!gd.desafios) return;
   const now=Date.now(); let changed=false;
   (gd.desafios||[]).forEach(d=>{
-    if(d.status==='ativo'&&now>d.endTs){
+    if(d.status!=='ativo') return;
+    const prazoEncerrado = d.duracao!=='1partida' && now>d.endTs;
+    const partidaUnicaCompleta = d.duracao==='1partida'
+      && _dcPartidasDesde(d.uidA, d.startTs).length>0
+      && _dcPartidasDesde(d.uidB, d.startTs).length>0;
+    if(prazoEncerrado || partidaUnicaCompleta){
       d.status='encerrado'; changed=true;
       // Calcula placar final e CONGELA no registro (scoreA/scoreB), para
       // que o resultado não dependa de onde as partidas estarão guardadas
@@ -7587,6 +7620,9 @@ window.addMatch=async()=>{
     // Atualiza o estado local imediatamente (o onSnapshot também vai confirmar em seguida).
     if(!gd.matches)gd.matches=[];gd.matches.push(novaPartida);
     if(!already){if(!gd.members)gd.members=[];gd.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});}
+    // Verifica se essa partida completa algum desafio de "única partida" em
+    // andamento (envolvendo este jogador), encerrando-o imediatamente.
+    if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar();
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
     // Se teve pênaltis, abre modal de marcação após o modal de partida salva fechar
@@ -12554,9 +12590,9 @@ const XP_OURO     = 200;
 const XP_PRATA    = 100;
 const XP_BRONZE   = 50;
 const XP_CRAQUE   = 40;
-const XP_DESAFIO_VITORIA  = 75;
-const XP_DESAFIO_EMPATE   = 30;
-const XP_DESAFIO_DERROTA  = 15;
+const XP_DESAFIO_VITORIA  = 150;
+const XP_DESAFIO_EMPATE   = 60;
+const XP_DESAFIO_DERROTA  = 30;
 
 // ── Conquistas repetíveis (mensais/sequenciais) ────────────────
 // Conquistas cujo tipo pode se repetir pagam metade na 2ª vez em diante
@@ -12672,15 +12708,22 @@ function calcXP(uid, gd){
   (gd.desafios || []).forEach(d => {
     if(d.status !== 'encerrado') return;
     if(d.uidA !== uid && d.uidB !== uid) return;
-    // Calcula placar do desafio
-    function dcScore(u) {
-      const src = [...(gd.matches||[])].filter(x => x.uid === u && x.ts >= d.startTs && x.ts <= d.endTs);
-      if(d.tipo === 'gols')   return src.reduce((s,x) => s+(x.gols||0), 0);
-      if(d.tipo === 'assist') return src.reduce((s,x) => s+(x.assist||0), 0);
-      return src.reduce((s,x) => s+(x.gols||0)+(x.assist||0), 0);
+    // Usa o placar final já CONGELADO no desafio (scoreA/scoreB), gravado em
+    // _dcCheckEncerrar no momento do encerramento. Isso garante que o XP
+    // sempre bata com o placar exibido, tanto para desafios de 7 dias quanto
+    // para desafios de 1 partida (cuja janela de tempo não tem fim fixo).
+    let sA = d.scoreA, sB = d.scoreB;
+    if(typeof sA !== 'number' || typeof sB !== 'number'){
+      // Fallback para registros antigos sem placar congelado.
+      function dcScore(u) {
+        const src = [...(gd.matches||[])].filter(x => x.uid === u && x.ts >= d.startTs && x.ts <= d.endTs);
+        if(d.tipo === 'gols')   return src.reduce((s,x) => s+(x.gols||0), 0);
+        if(d.tipo === 'assist') return src.reduce((s,x) => s+(x.assist||0), 0);
+        return src.reduce((s,x) => s+(x.gols||0)+(x.assist||0), 0);
+      }
+      sA = dcScore(d.uidA);
+      sB = dcScore(d.uidB);
     }
-    const sA = dcScore(d.uidA);
-    const sB = dcScore(d.uidB);
     const myScore  = uid === d.uidA ? sA : sB;
     const oppScore = uid === d.uidA ? sB : sA;
     if(myScore > oppScore)       xp += XP_DESAFIO_VITORIA;
