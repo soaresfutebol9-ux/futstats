@@ -762,46 +762,25 @@ html.is-touch .auth-ball{animation:none}
 /* ══════════════════════════════════════════════════════════
    FLUID TAB TRANSITIONS — swipe horizontal suave
    ══════════════════════════════════════════════════════════ */
-.tv{display:none;opacity:0;will-change:transform,opacity;}
-.tv.active{
-  display:block;
-  animation:tabEnterPremium .38s cubic-bezier(.16,1,.3,1) forwards;
-}
-.tv.leaving{
-  display:block;
-  animation:tabExitPremium .22s cubic-bezier(.4,0,1,1) forwards;
-  pointer-events:none;
-}
-/* direção → (indo para tab à direita: ex. Ranking→Partida) */
-.tv.enter-from-right{animation:tabEnterFromRight .38s cubic-bezier(.16,1,.3,1) forwards}
-.tv.enter-from-left {animation:tabEnterFromLeft  .38s cubic-bezier(.16,1,.3,1) forwards}
-.tv.exit-to-left    {animation:tabExitToLeft      .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
-.tv.exit-to-right   {animation:tabExitToRight     .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+.tv{display:none;opacity:0}
+.tv.active{display:block;opacity:1}
+.tv.tab-animating{will-change:transform,opacity}
 
 @keyframes tabEnterFromRight{
-  0%  {opacity:0;transform:translateX(40px) scale(.97)}
-  100%{opacity:1;transform:translateX(0)    scale(1)}
+  0%  {opacity:0;transform:translateX(36px)}
+  100%{opacity:1;transform:translateX(0)}
 }
 @keyframes tabEnterFromLeft{
-  0%  {opacity:0;transform:translateX(-40px) scale(.97)}
-  100%{opacity:1;transform:translateX(0)     scale(1)}
+  0%  {opacity:0;transform:translateX(-36px)}
+  100%{opacity:1;transform:translateX(0)}
 }
 @keyframes tabExitToLeft{
   0%  {opacity:1;transform:translateX(0)}
-  100%{opacity:0;transform:translateX(-30px)}
+  100%{opacity:0;transform:translateX(-28px)}
 }
 @keyframes tabExitToRight{
   0%  {opacity:1;transform:translateX(0)}
-  100%{opacity:0;transform:translateX(30px)}
-}
-/* fallback genérico (não deveria ser usado) */
-@keyframes tabEnterPremium{
-  0%  {opacity:0;transform:translateY(10px) scale(.98)}
-  100%{opacity:1;transform:translateY(0)    scale(1)}
-}
-@keyframes tabExitPremium{
-  0%  {opacity:1;transform:translateY(0)}
-  100%{opacity:0;transform:translateY(-6px)}
+  100%{opacity:0;transform:translateX(28px)}
 }
 
 /* Ranking list switch — sem blur */
@@ -9892,39 +9871,51 @@ function _createAvRing(avEl){
 }
 
 /* ── PREMIUM TAB SWITCHER ── */
+// IDs dos timers de limpeza de animação por tab
+const _tabAnimTimers={};
+
 window.showTab=(n,btn,e)=>{
   if(n===_lastTab)return;
   const map={r:'tr',add:'tadd',hist:'thist'};
   const isLite=document.body.classList.contains('lite-mode');
-
-  // Determina direção com base na ordem das tabs
   const tabOrder={r:0,add:1,hist:2};
   const dir=(tabOrder[n]??0)>(tabOrder[_lastTab]??0)?'right':'left';
+  const ENTER_MS=340;
+  const EXIT_MS=200;
 
   // Empurra estado na pilha para o botão Voltar funcionar entre abas
   if(n!=='r'){history.pushState({futstatsBack:null,type:'tab',tab:n},'');}
   else{history.replaceState({futstatsBack:null,type:'tab',tab:'r'},'');}
 
-  // Exit animation on current tab
+  // ── Sai a tab atual ──
   const curEl=$(map[_lastTab]);
-  if(curEl&&curEl.classList.contains('active')){
-    const exitCls=isLite?'leaving':(dir==='right'?'exit-to-left':'exit-to-right');
-    curEl.classList.remove('active','enter-from-right','enter-from-left');
-    curEl.classList.add(exitCls);
-    curEl.addEventListener('animationend',()=>{
-      curEl.classList.remove('leaving','exit-to-left','exit-to-right');
-      curEl.style.display='none';
-    },{once:true});
+  if(curEl){
+    // Cancela qualquer timer pendente desta tab
+    clearTimeout(_tabAnimTimers[_lastTab]);
+    // Remove tudo e aplica saída
+    curEl.classList.remove('active','tab-animating');
+    curEl.style.cssText='display:block;opacity:1';
+    void curEl.offsetHeight;
+    if(!isLite){
+      const exitAnim=dir==='right'?'tabExitToLeft':'tabExitToRight';
+      curEl.classList.add('tab-animating');
+      curEl.style.animation=`${exitAnim} ${EXIT_MS}ms cubic-bezier(.4,0,1,1) forwards`;
+      _tabAnimTimers[_lastTab]=setTimeout(()=>{
+        curEl.style.cssText='display:none;opacity:0';
+        curEl.classList.remove('tab-animating');
+        curEl.style.animation='';
+      }, EXIT_MS+20);
+    } else {
+      curEl.style.cssText='display:none;opacity:0';
+    }
   }
 
   // Nav ripple
   if(btn&&e)_createNavRipple(btn,e);
 
-  // Update nav indicators
+  // Atualiza nav
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-
-  // Move indicator pill
   const indicator=document.querySelector('.bn-indicator');
   if(indicator){
     const idx=_tabOrder[n]??0;
@@ -9933,26 +9924,32 @@ window.showTab=(n,btn,e)=>{
 
   _lastTab=n;
 
-  // Enter new tab
+  // Renderiza conteúdo antes de animar
+  if(n==='r')renderRanking();
+  if(n==='hist')renderHistTab();
+
+  // ── Entra a nova tab ──
   const nextEl=$(map[n]);
   if(nextEl){
-    nextEl.style.display='block';
-    void nextEl.offsetHeight;
+    clearTimeout(_tabAnimTimers[n]);
+    nextEl.classList.remove('tab-animating');
+    nextEl.style.animation='';
     if(!isLite){
-      const enterCls=dir==='right'?'enter-from-right':'enter-from-left';
-      nextEl.classList.remove('active','exit-to-left','exit-to-right');
-      nextEl.classList.add(enterCls);
-      nextEl.addEventListener('animationend',()=>{
-        nextEl.classList.remove('enter-from-right','enter-from-left');
+      const enterAnim=dir==='right'?'tabEnterFromRight':'tabEnterFromLeft';
+      nextEl.style.cssText='display:block;opacity:0';
+      void nextEl.offsetHeight;
+      nextEl.classList.add('tab-animating');
+      nextEl.style.animation=`${enterAnim} ${ENTER_MS}ms cubic-bezier(.16,1,.3,1) forwards`;
+      _tabAnimTimers[n]=setTimeout(()=>{
+        nextEl.style.cssText='';
+        nextEl.classList.remove('tab-animating');
         nextEl.classList.add('active');
-      },{once:true});
+      }, ENTER_MS+20);
     } else {
+      nextEl.style.cssText='';
       nextEl.classList.add('active');
     }
   }
-
-  if(n==='r')renderRanking();
-  if(n==='hist')renderHistTab();
 };
 
 // ── CONTADOR ANIMADO — centralizado ──
