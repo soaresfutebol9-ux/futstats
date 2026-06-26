@@ -937,6 +937,8 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   animation:modalBgIn .25s ease forwards;
 }
 @keyframes modalBgIn{from{opacity:0}to{opacity:1}}
+@keyframes modalBgOut{from{opacity:1}to{opacity:0}}
+@keyframes modalOut{from{transform:translateY(0) scale(1);opacity:1}to{transform:translateY(24px) scale(.97);opacity:0}}
 .modal-partidas-inner{
   background:var(--bg2);
   border-radius:20px;
@@ -1787,6 +1789,8 @@ select option{background:var(--bg3)}
   
 }
 #modal-evol-chart.open{display:flex;animation:modalBgIn .22s ease forwards;}
+#modal-evol-chart.closing{display:flex;animation:modalBgOut .22s ease forwards;}
+#modal-evol-chart.closing #evol-chart-inner{animation:modalOut .22s cubic-bezier(.4,0,.6,1) forwards;}
 #evol-chart-inner{
   background:#dedede;
   border:1.5px solid #40c960;
@@ -7974,10 +7978,12 @@ window.fecharEvolChart = function(){
   const btn = document.getElementById('evol-fullscreen-btn');
   const sel = document.getElementById('evol-ano-select');
   m.classList.remove('open');
+  m.classList.add('closing');
   _perfChartExpandedData = null;
   _liberarOrientacao();
   _restaurarFabAposModal();
   setTimeout(()=>{
+    m.classList.remove('closing');
     m.style.display='none';
     // Resetar fullscreen só após o modal estar invisível (evita flash do mini gráfico)
     inner && inner.classList.remove('fullscreen-landscape');
@@ -7985,7 +7991,7 @@ window.fecharEvolChart = function(){
     if(sel) sel.style.display='';
     const sb = document.getElementById('evol-summary-bar');
     if(sb) sb.style.display='none';
-  }, 280);
+  }, 230);
 };
 
 let _evolCurrentUid = null;
@@ -8426,27 +8432,16 @@ function renderRanking(){
       .map(p=>({...p,pct:Math.round(p.penOk/p.penBat*100)}))
       .sort((a,b)=>b.pct-a.pct||(b.penOk-a.penOk));
 
-    // ── Dados: Ano atual (histórico do ano atual + mês vigente) ──
-    const penAnoAtual=mbs.map(m=>{
-      const allSrc=[];
-      allSrc.push(...(gd.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
-      Object.entries(gd.historico||{}).forEach(([k,h])=>{
-        if(k.startsWith(anoAtual)){
-          allSrc.push(...(h.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
-        }
-      });
-      const penBat=allSrc.reduce((s,x)=>s+(x.penBat||0),0);
-      const penOk=allSrc.reduce((s,x)=>s+(x.penOk||0),0);
-      return{name:m.name,uid:m.uid,penBat,penOk};
-    }).filter(p=>p.penBat>0)
-      .map(p=>({...p,pct:Math.round(p.penOk/p.penBat*100)}))
-      .sort((a,b)=>b.pct-a.pct||(b.penOk-a.penOk));
+    // ── Todos os anos para "Temporadas": ano atual + históricos ──
+    const todosAnos=[anoAtual,...anosPassados];
 
-    // ── Dados: Ano selecionado ──
-    if(window._penSubTab==='ano'&&!window._penAnoSel&&anosPassados.length) window._penAnoSel=anosPassados[anosPassados.length-1];
+    // ── Dados: Ano selecionado (padrão = ano atual) ──
+    if(window._penSubTab==='ano'&&!window._penAnoSel) window._penAnoSel=anoAtual;
     const anoSel=window._penAnoSel||null;
     const penAnoSel=anoSel?mbs.map(m=>{
       const allSrc=[];
+      // Ano atual inclui mês vigente
+      if(anoSel===anoAtual) allSrc.push(...(gd.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
       Object.entries(gd.historico||{}).forEach(([k,h])=>{
         if(k.startsWith(anoSel)){
           allSrc.push(...(h.matches||[]).filter(x=>m.uid?x.uid===m.uid:x.player===m.name));
@@ -8460,18 +8455,14 @@ function renderRanking(){
       .sort((a,b)=>b.pct-a.pct||(b.penOk-a.penOk)):[];
 
     // ── Aba ativa e dados correspondentes ──
-    const activeData=window._penSubTab==='mes'?penMes:window._penSubTab==='total'?penAnoAtual:penAnoSel;
+    const activeData=window._penSubTab==='mes'?penMes:penAnoSel;
 
-    // ── Accordion de seleção de ano (centralizado, substituindo picker antigo) ──
-    const anoPickerHTML=''; // removido — agora é feito pelo accordion abaixo
-
-    // ── Sub-abas HTML ──
+    // ── Sub-abas HTML (sem "Ano atual" separado — está dentro de "Temporadas") ──
     const subTabsHTML=`<div class="pen-subtabs">
       <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">Mês atual</div>
-      <div class="pen-subtab${window._penSubTab==='total'?' active':''}" onclick="setPenSubTab('total')">Ano atual</div>
-      ${anosPassados.length?`<div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">Selecionar ano</div>`:''}
+      <div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">Temporadas</div>
       <div class="pen-subtab${window._penSubTab==='mapa'?' active':''}" onclick="setPenSubTab('mapa')">Mapa</div>
-    </div>${anoPickerHTML}`;
+    </div>`;
 
     // ── Aba "Mapa": renderizada inline no próprio painel, sem modal ──
     if(window._penSubTab==='mapa'){
@@ -8491,27 +8482,28 @@ function renderRanking(){
       return;
     }
 
-    if(!activeData.length){
-      $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+(window._penAnoSel||'')}.</div></div>`;
-      return;
-    }
-
-    // ── Accordion do ano selecionado (centralizado, com dropdown para outros anos) ──
-    const _temOutrosAnos = anosPassados.length > 1;
+    // ── Accordion do ano selecionado (inclui "Ano atual" como opção) ──
+    const _temOutrosAnos = todosAnos.length > 1;
+    const anoLabelDisplay = anoSel===anoAtual ? `Ano atual (${anoAtual})` : anoSel;
     const anoLabelHTML=(window._penSubTab==='ano'&&anoSel)
       ? `<div style="display:flex;flex-direction:column;align-items:center;padding:6px 1rem 14px;gap:0">
           <button onclick="window._togglePenAnoAccordion()" id="pen-ano-trigger"
             style="display:inline-flex;align-items:center;gap:7px;background:none;border:none;cursor:${_temOutrosAnos?'pointer':'default'};padding:0;outline:none;-webkit-tap-highlight-color:transparent">
-            <span style="font-family:'DM Mono',monospace;font-size:32px;font-weight:700;letter-spacing:-1px;color:var(--tx);line-height:1">${anoSel}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:${anoSel===anoAtual?'22':'32'}px;font-weight:700;letter-spacing:-1px;color:var(--tx);line-height:1">${anoLabelDisplay}</span>
             ${_temOutrosAnos?`<svg id="pen-ano-arrow" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--tx2);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .28s cubic-bezier(.34,1.1,.64,1);flex-shrink:0;margin-top:4px"><polyline points="6 9 12 15 18 9"/></svg>`:''}
           </button>
           <div id="pen-ano-dropdown" style="overflow:hidden;max-height:0;opacity:0;transition:max-height .32s cubic-bezier(.4,0,.2,1),opacity .22s ease;width:100%;display:flex;justify-content:center">
             <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px 0 2px">
-              ${anosPassados.filter(a=>a!==anoSel).map(a=>`<button onclick="setPenAno('${a}')" style="padding:6px 18px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent">${a}</button>`).join('')}
+              ${todosAnos.filter(a=>a!==anoSel).map(a=>`<button onclick="setPenAno('${a}')" style="padding:6px 18px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent">${a===anoAtual?'Ano atual ('+anoAtual+')':a}</button>`).join('')}
             </div>
           </div>
         </div>`
       : '';
+
+    if(!activeData.length){
+      $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':' em '+(anoSel===anoAtual?'Ano atual':anoSel||'')}.</div></div>`;
+      return;
+    }
 
     $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
       const isMe=p.uid===currentUser?.uid;
@@ -11581,8 +11573,9 @@ document.addEventListener('click', e=>{
     const tipo = window._rankStat; // 'geral', 'ga', 'pen'
 
     if (tipo === 'pen') {
-      // Pênaltis — usa subtab atual (mes/total)
+      // Pênaltis — usa subtab atual (mes/ano)
       const sub = window._penSubTab || 'mes';
+      const anoSel = window._penAnoSel || anoAtual;
       let src;
       if (sub === 'mes') {
         src = mbs.map(m => {
@@ -11592,9 +11585,9 @@ document.addEventListener('click', e=>{
       } else {
         src = mbs.map(m => {
           const all = [];
-          all.push(...(window._gd.matches || []).filter(x => m.uid ? x.uid === m.uid : x.player === m.name));
+          if (anoSel === anoAtual) all.push(...(window._gd.matches || []).filter(x => m.uid ? x.uid === m.uid : x.player === m.name));
           Object.entries(window._gd.historico || {}).forEach(([k, h]) => {
-            if (k.startsWith(anoAtual))
+            if (k.startsWith(anoSel))
               all.push(...(h.matches || []).filter(x => m.uid ? x.uid === m.uid : x.player === m.name));
           });
           const penBat = all.reduce((s, x) => s + (x.penBat || 0), 0);
@@ -11604,7 +11597,7 @@ document.addEventListener('click', e=>{
       }
       return {
         tipo: 'pen',
-        subtitulo: sub === 'mes' ? 'Mês Atual' : 'Temporada',
+        subtitulo: sub === 'mes' ? 'Mês Atual' : (anoSel === anoAtual ? 'Ano Atual' : anoSel),
         players: src
           .filter(p => p.penBat > 0)
           .map(p => ({ ...p, pct: Math.round(p.penOk / p.penBat * 100) }))
