@@ -4810,7 +4810,11 @@ window.closePCenter=id=>{
     const telaAtual=telasAtivas.length?telasAtivas[0].id:null;
     if(telaAtual==='sa'){
       // Se está numa aba secundária, volta para ranking (aba principal)
-      if(window._lastTab&&window._lastTab!=='r'){
+      // OBS: usa a variável real _lastTab (declarada mais abaixo, no mesmo
+      // <script>) — antes lia window._lastTab, que nunca era escrito por
+      // showTab() e por isso ficava sempre undefined, fazendo o app cair
+      // direto no prompt de saída em qualquer aba.
+      if(typeof _lastTab!=='undefined' && _lastTab && _lastTab!=='r'){
         const allNi=document.querySelectorAll('.ni');
         let rankBtn=null;
         allNi.forEach(b=>{if((b.getAttribute('onclick')||'').includes("showTab('r'"))rankBtn=b;});
