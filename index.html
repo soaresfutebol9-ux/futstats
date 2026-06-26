@@ -3827,6 +3827,7 @@ body::before{
         <div class="ft" onclick="setRank('geral',this)">Geral</div>
         <div class="ft" onclick="setRank('recordes',this)">Recordes</div>
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
+        <div class="ft" onclick="setRank('performance',this)">Performance</div>
       </div>
       <div id="rl-wrap"><div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div></div>
 
@@ -8315,6 +8316,15 @@ function renderRanking(){
     return;
   }
 
+  // ── PERFORMANCE (evolução mensal individual) ──
+  if(rankStat==='performance'){
+    if(banner)banner.style.display='none';
+    if(geralWrap)geralWrap.style.display='none';
+    renderPerformanceTab();
+    renderFeedCard();
+    return;
+  }
+
   // ── RANKING GERAL ──
   if(rankStat==='geral'){
     if(banner)banner.style.display='none';
@@ -8551,10 +8561,12 @@ function renderRanking(){
   // Feed de atividade
   renderFeedCard();
 }
-const _rankOrder={ga:0,geral:1,recordes:2,pen:3};
+const _rankOrder={ga:0,geral:1,recordes:2,pen:3,performance:4};
+let _perfUid=null; // uid do jogador exibido na aba Performance do Ranking
 let _rankAtivo='ga';
 window.setRank=(s,el)=>{
   if(s===_rankAtivo) return;
+  if(s==='performance') _perfUid=null; // sempre reabre mostrando o próprio jogador logado
   const rl=$('rl');
   const isLite = document.body.classList.contains('lite-mode');
   const dir = (_rankOrder[s]??0) > (_rankOrder[_rankAtivo]??0) ? 'left' : 'right';
@@ -8877,6 +8889,123 @@ function renderRecordes(){
 // expose for share module
 window._buildRecordData = buildRecordData;
 
+// ── ABA PERFORMANCE: gráficos de evolução mensal individual ──────────────
+// Gera o mesmo SVG de linha (verde=subiu, vermelho=caiu, cinza=estável) já
+// usado no app, parametrizado por título, cor e função de extração do valor.
+// `decimals` controla a formatação (0 para totais inteiros, 1 para médias).
+function _buildPerfChart(months,valueFn,opts){
+  const {titulo,cor,corClaro,gradId,decimals=0,emptyMsg}=opts;
+  if(months.length<2){
+    return `<div style="background:#dedede;border:1.5px solid ${cor};border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+  <div style="font-size:10px;color:${corClaro};font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">${titulo}</div>
+  <div style="text-align:center;padding:1rem .5rem;color:#494a48;font-size:12px;font-family:'DM Mono',monospace">${emptyMsg||'Ainda não há meses suficientes para exibir a evolução.'}</div>
+</div>`;
+  }
+  const fmt=v=>decimals?v.toFixed(decimals):Math.round(v);
+  const W=320,H=110,PL=36,PR=10,PT=12,PB=28;
+  const iW=W-PL-PR,iH=H-PT-PB;
+  const vals=months.map(valueFn);
+  const maxV=Math.max(...vals,1);
+  const minV=Math.min(...vals,0);
+  const range=(maxV-minV)||1;
+  const n=vals.length;
+  const xOf=i=>PL+i*(iW/(n-1));
+  const yOf=v=>PT+iH-(((v-minV)/range)*iH);
+  const gridLines=[0,.5,1].map(t=>{
+    const gv=minV+t*range;
+    const gy=PT+iH-(t*iH);
+    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="#b7b8b6" stroke-width="1" stroke-dasharray="3,3"/>
+<text x="${PL-4}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="#494a48">${fmt(gv)}</text>`;
+  }).join('');
+  const ptLine=months.map((m,i)=>`${xOf(i).toFixed(1)},${yOf(vals[i]).toFixed(1)}`).join(' ');
+  const ptArea=`${PL.toFixed(1)},${(PT+iH).toFixed(1)} `+ptLine+` ${(W-PR).toFixed(1)},${(PT+iH).toFixed(1)}`;
+  const segments=months.slice(1).map((m,i)=>{
+    const x1=xOf(i).toFixed(1),y1=yOf(vals[i]).toFixed(1);
+    const x2=xOf(i+1).toFixed(1),y2=yOf(vals[i+1]).toFixed(1);
+    const col=vals[i+1]>vals[i]?'#40c960':vals[i+1]<vals[i]?'#FF5A7A':'#888888';
+    return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`;
+  }).join('');
+  const dots=months.map((m,i)=>{
+    const x=xOf(i).toFixed(1),y=yOf(vals[i]).toFixed(1);
+    const isLast=m.current;
+    const col=isLast?cor:'#000000';
+    return`<circle cx="${x}" cy="${y}" r="${isLast?5:3.5}" fill="${col}" stroke="#ebebeb" stroke-width="1.5"/>`;
+  }).join('');
+  const step=n<=6?1:n<=12?2:3;
+  const xLabels=months.map((m,i)=>{
+    if(i%step!==0&&i!==n-1)return'';
+    const lbl=m.label.substring(0,3);
+    return`<text x="${xOf(i).toFixed(1)}" y="${(H-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="${m.current?corClaro:'#494a48'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
+  }).join('');
+  const lastX=xOf(n-1),lastY=yOf(vals[n-1]);
+  const lastLabel=`<text x="${lastX.toFixed(1)}" y="${(lastY-8).toFixed(1)}" text-anchor="${lastX>W-40?'end':'middle'}" font-family="ClassyVogue,sans-serif" font-size="11" fill="${corClaro}" font-weight="normal">${fmt(vals[n-1])}</text>`;
+  const trend=vals[vals.length-1]-vals[vals.length-2];
+  const trendTxt=trend>0?`↑ +${fmt(Math.abs(trend))}`:(trend<0?`↓ -${fmt(Math.abs(trend))}`:'→ estável');
+  const trendCol=trend>0?'#1a5c2a':(trend<0?'#cc2222':'#494a48');
+  const svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${cor}" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="${cor}" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  ${gridLines}
+  <polygon points="${ptArea}" fill="url(#${gradId})"/>
+  ${segments}
+  ${dots}
+  ${xLabels}
+  ${lastLabel}
+</svg>`;
+  return`<div style="background:#dedede;border:1.5px solid ${cor};border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:10px;color:${corClaro};font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase">${titulo}</div>
+    <div style="font-size:11px;font-family:'DM Mono',monospace;color:${trendCol};font-weight:700">${trendTxt}</div>
+  </div>
+  <div style="width:100%;padding:0 2px">${svg}</div>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:8px">
+    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#1a5c2a;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:2.5px;background:#40c960;border-radius:2px"></span>Subiu</span>
+    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#cc2222;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:2.5px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
+    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#494a48;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:8px;height:8px;background:${cor};border-radius:50%"></span>Atual</span>
+  </div>
+</div>`;
+}
+
+function renderPerformanceTab(){
+  if(!gd){$('rl').innerHTML='<div class="empty">Carregando...</div>';return;}
+  const mbs=gd.members||[];
+  if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return;}
+
+  // Sempre abre mostrando o próprio jogador logado; troca é manual via seletor.
+  if(!_perfUid||!mbs.some(m=>m.uid===_perfUid)){
+    _perfUid=(currentUser&&mbs.some(m=>m.uid===currentUser.uid))?currentUser.uid:mbs[0].uid;
+  }
+  const mb=mbs.find(m=>m.uid===_perfUid);
+  if(!mb){$('rl').innerHTML='<div class="empty">Jogador não encontrado.</div>';return;}
+
+  const allMonths=_buildAllMonths(_perfUid,mb);
+  // Gráficos "por jogo" só valem a partir de jun/2026 (mesmo corte usado no recorde G+A/Jogo)
+  const mesesPorJogo=allMonths.filter(m=>m.key>=REC_GA_POR_JOGO_INICIO&&m.jogos>0);
+  const msgCorte='Estatística por jogo válida a partir de Jun/2026.';
+
+  const seletor=`<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">👤 Jogador:</span>
+    <select onchange="_perfSelecionarJogador(this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center">
+      ${mbs.map(m=>`<option value="${m.uid}" ${m.uid===_perfUid?'selected':''}>${m.name}</option>`).join('')}
+    </select>
+  </div>`;
+
+  const chartGA=_buildPerfChart(allMonths,m=>m.g+m.a,{titulo:'📈 Evolução G+A mensal',cor:'#40c960',corClaro:'#1a5c2a',gradId:'perfGradGA'});
+  const chartGols=_buildPerfChart(allMonths,m=>m.g,{titulo:'⚽ Evolução de gols mensal',cor:'#2a9cc9',corClaro:'#1b5c78',gradId:'perfGradGols'});
+  const chartAssist=_buildPerfChart(allMonths,m=>m.a,{titulo:'👟 Evolução de assistências mensal',cor:'#9b6fd9',corClaro:'#5a3a8a',gradId:'perfGradAssist'});
+  const chartGolsJogo=_buildPerfChart(mesesPorJogo,m=>m.g/m.jogos,{titulo:'⚽ Gols por jogo (mensal)',cor:'#2a9cc9',corClaro:'#1b5c78',gradId:'perfGradGolsJogo',decimals:1,emptyMsg:msgCorte});
+  const chartAssistJogo=_buildPerfChart(mesesPorJogo,m=>m.a/m.jogos,{titulo:'👟 Assistências por jogo (mensal)',cor:'#9b6fd9',corClaro:'#5a3a8a',gradId:'perfGradAssistJogo',decimals:1,emptyMsg:msgCorte});
+  const chartGAJogo=_buildPerfChart(mesesPorJogo,m=>(m.g+m.a)/m.jogos,{titulo:'📊 G+A por jogo (mensal)',cor:'#40c960',corClaro:'#1a5c2a',gradId:'perfGradGAJogo',decimals:1,emptyMsg:msgCorte});
+
+  $('rl').innerHTML=`<div style="padding-bottom:.5rem">${seletor}${chartGA}${chartGols}${chartAssist}${chartGolsJogo}${chartAssistJogo}${chartGAJogo}</div>`;
+}
+
+window._perfSelecionarJogador=(uid)=>{ _perfUid=uid; renderPerformanceTab(); };
+
 function renderPerfil(){
   if(!gd)return;const s=getSt(currentUser.uid,null,true);const pct=s.penBat>0?Math.round(s.penOk/s.penBat*100):null;
   const allMatches=gd.matches||[];const myMatches=allMatches.map((m,i)=>({...m,_gi:i})).filter(m=>m.uid===currentUser.uid||m.player===myProfile.displayName).sort((a,b)=>b.ts-a.ts);
@@ -9075,13 +9204,9 @@ let _mpAnoTotal=null;
 let _mpAnoMedia=null;
 let _mpAnoMeses=null;
 
-function _buildPlayerProfile(uid){
-  if(!gd||!uid)return;
-  const mb=(gd.members||[]).find(m=>m.uid===uid);
-  if(!mb)return;
-  const name=mb.name;
-
-  // ── Coleta TODOS os meses ──
+// ── Monta o histórico mês a mês (gols, assist, pênaltis, jogos, posição) de um jogador ──
+// Reaproveitado pelo perfil do jogador e pela aba "Performance" do Ranking.
+function _buildAllMonths(uid,mb){
   const hist=gd.historico||{};
   const allMonths=[];
 
@@ -9092,13 +9217,14 @@ function _buildPlayerProfile(uid){
     const a=ms.reduce((s,x)=>s+(x.assist||0),0);
     const pb=ms.reduce((s,x)=>s+(x.penBat||0),0);
     const pk=ms.reduce((s,x)=>s+(x.penOk||0),0);
+    const jogos=ms.length;
     const mbsH=h.members||[];
     const ranked=[...mbsH].map(mm=>{
       const mms=(h.matches||[]).filter(x=>m_uid_match(x,mm));
       return{uid:mm.uid,ga:mms.reduce((s,x)=>s+(x.gols||0)+(x.assist||0),0)};
     }).sort((x,y)=>y.ga-x.ga);
     const pos=ranked.findIndex(r=>r.uid===uid)+1||ranked.length+1;
-    allMonths.push({key:k,label:getMesLabel(k),g,a,pb,pk,pos,current:false,ano:k.split('-')[0]});
+    allMonths.push({key:k,label:getMesLabel(k),g,a,pb,pk,jogos,pos,current:false,ano:k.split('-')[0]});
   });
 
   // Mês atual
@@ -9108,6 +9234,7 @@ function _buildPlayerProfile(uid){
     const a=ms.reduce((s,x)=>s+(x.assist||0),0);
     const pb=ms.reduce((s,x)=>s+(x.penBat||0),0);
     const pk=ms.reduce((s,x)=>s+(x.penOk||0),0);
+    const jogos=ms.length;
     const mbs=gd.members||[];
     const ranked=[...mbs].map(mm=>{
       const mms=(gd.matches||[]).filter(x=>m_uid_match(x,mm));
@@ -9115,8 +9242,20 @@ function _buildPlayerProfile(uid){
     }).sort((x,y)=>y.ga-x.ga);
     const pos=ranked.findIndex(r=>r.uid===uid)+1||ranked.length+1;
     const mesKey=gd.mesAtivo||getMesKey();
-    allMonths.push({key:mesKey,label:getMesLabel(mesKey),g,a,pb,pk,pos,current:true,ano:mesKey.split('-')[0]});
+    allMonths.push({key:mesKey,label:getMesLabel(mesKey),g,a,pb,pk,jogos,pos,current:true,ano:mesKey.split('-')[0]});
   }
+
+  return allMonths;
+}
+
+function _buildPlayerProfile(uid){
+  if(!gd||!uid)return;
+  const mb=(gd.members||[]).find(m=>m.uid===uid);
+  if(!mb)return;
+  const name=mb.name;
+
+  // ── Coleta TODOS os meses ──
+  const allMonths=_buildAllMonths(uid,mb);
 
   // ── Anos disponíveis ──
   const anosSet=new Set(allMonths.map(m=>m.ano));
@@ -9334,87 +9473,6 @@ function _buildPlayerProfile(uid){
 
   const anoResCard='';
 
-  // ── GRÁFICO DE EVOLUÇÃO MENSAL G+A ──────────────────────────────
-  const chartMonths=(isAllMeses?allMonths:allMonths.filter(m=>m.ano===_mpAnoMeses));
-  const evolCard=(()=>{
-    if(chartMonths.length<2)return'';
-    const W=320,H=110,PL=36,PR=10,PT=12,PB=28;
-    const iW=W-PL-PR,iH=H-PT-PB;
-    const vals=chartMonths.map(m=>m.g+m.a);
-    const maxV=Math.max(...vals,1);
-    const minV=Math.min(...vals,0);
-    const range=maxV-minV||1;
-    const n=vals.length;
-    const xOf=i=>PL+i*(iW/(n-1));
-    const yOf=v=>PT+iH-(((v-minV)/range)*iH);
-    // Linhas de grade (3 níveis)
-    const gridLines=[0,.5,1].map(t=>{
-      const gv=minV+t*range;
-      const gy=PT+iH-(t*iH);
-      return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W-PR}" y2="${gy.toFixed(1)}" stroke="#b7b8b6" stroke-width="1" stroke-dasharray="3,3"/>
-<text x="${PL-4}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="#494a48">${Math.round(gv)}</text>`;
-    }).join('');
-    // Área fill
-    const ptLine=chartMonths.map((m,i)=>`${xOf(i).toFixed(1)},${yOf(vals[i]).toFixed(1)}`).join(' ');
-    const ptArea=`${PL.toFixed(1)},${(PT+iH).toFixed(1)} `+ptLine+` ${(W-PR).toFixed(1)},${(PT+iH).toFixed(1)}`;
-    // Segmentos coloridos (verde se subiu, vermelho se desceu, cinza igual)
-    const segments=chartMonths.slice(1).map((m,i)=>{
-      const x1=xOf(i).toFixed(1),y1=yOf(vals[i]).toFixed(1);
-      const x2=xOf(i+1).toFixed(1),y2=yOf(vals[i+1]).toFixed(1);
-      const col=vals[i+1]>vals[i]?'#40c960':vals[i+1]<vals[i]?'#FF5A7A':'#888888';
-      return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`;
-    }).join('');
-    // Pontos
-    const dots=chartMonths.map((m,i)=>{
-      const x=xOf(i).toFixed(1),y=yOf(vals[i]).toFixed(1);
-      const isLast=m.current;
-      const col=isLast?'#40c960':'#000000';
-      return`<circle cx="${x}" cy="${y}" r="${isLast?5:3.5}" fill="${col}" stroke="#ebebeb" stroke-width="1.5"/>`;
-    }).join('');
-    // Labels eixo X (só mostra alguns para não sobrepor)
-    const step=n<=6?1:n<=12?2:3;
-    const xLabels=chartMonths.map((m,i)=>{
-      if(i%step!==0&&i!==n-1)return'';
-      const lbl=m.label.substring(0,3);
-      return`<text x="${xOf(i).toFixed(1)}" y="${(H-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="${m.current?'#1a5c2a':'#494a48'}" font-weight="${m.current?'700':'400'}">${lbl}</text>`;
-    }).join('');
-    // Valor do ponto atual (último)
-    const lastX=xOf(n-1),lastY=yOf(vals[n-1]);
-    const lastLabel=`<text x="${lastX.toFixed(1)}" y="${(lastY-8).toFixed(1)}" text-anchor="${lastX>W-40?'end':'middle'}" font-family="ClassyVogue,sans-serif" font-size="11" fill="#1a5c2a" font-weight="normal">${vals[n-1]}</text>`;
-    // Tendência
-    const trend=vals.length>=2?(vals[vals.length-1]-vals[vals.length-2]):0;
-    const trendTxt=trend>0?`↑ +${trend}`:(trend<0?`↓ ${trend}`:'→ estável');
-    const trendCol=trend>0?'#1a5c2a':(trend<0?'#cc2222':'#494a48');
-    const svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible">
-  <defs>
-    <linearGradient id="gaGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#40c960" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#40c960" stop-opacity="0.03"/>
-    </linearGradient>
-  </defs>
-  ${gridLines}
-  <polygon points="${ptArea}" fill="url(#gaGrad)"/>
-  ${segments}
-  ${dots}
-  ${xLabels}
-  ${lastLabel}
-</svg>`;
-    return`<div style="background:#dedede;border:1.5px solid #40c960;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:10px;color:#1a5c2a;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase">📈 Evolução G+A mensal</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div style="font-size:11px;font-family:'DM Mono',monospace;color:${trendCol};font-weight:700">${trendTxt}</div>
-      <button onclick="abrirEvolChart(_mpUid)" title="Expandir gráfico" style="width:26px;height:26px;border-radius:8px;background:rgba(26,92,42,.15);border:1px solid rgba(64,201,96,.4);color:#40c960;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.25)'" onmouseout="this.style.background='rgba(26,92,42,.15)'">⛶</button>
-    </div>
-  </div>
-  <div style="width:100%;padding:0 2px">${svg}</div>
-  <div style="display:flex;gap:12px;justify-content:center;margin-top:8px">
-    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#1a5c2a;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:2.5px;background:#40c960;border-radius:2px"></span>Subiu</span>
-    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#cc2222;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:2.5px;background:#FF5A7A;border-radius:2px"></span>Caiu</span>
-    <span style="font-size:9px;font-family:'DM Mono',monospace;color:#494a48;display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:8px;height:8px;background:#1a5c2a;border-radius:50%"></span>Atual</span>
-  </div>
-</div>`;
-  })();
 
   const sepLabel=`${selMeses}<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">📅 ${isAllMeses?'Todos os anos':'Ano '+_mpAnoMeses} — mês a mês</div>`;
 
@@ -9488,7 +9546,7 @@ function _buildPlayerProfile(uid){
 
   document.getElementById('mp-body').innerHTML=allMonths.length===0
     ?'<div class="empty">Nenhum dado registrado.</div>'
-    :conquistasCard+medalhasCard+totalCard+mediaCard+evolCard+sepLabel+monthCards;
+    :conquistasCard+medalhasCard+totalCard+mediaCard+sepLabel+monthCards;
 
   // (confrontos diretos movidos para o FAB "Histórico de Confrontos")
 }
