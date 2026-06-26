@@ -4800,8 +4800,14 @@ window.closePCenter=id=>{
     if(fechou){
       // Reinsere o estado para manter a pilha funcional
       history.pushState({futstatsBack:null,type:'closed'},'');
+      return;
     }
-    // Se não havia nada aberto, deixa o browser navegar normalmente (sai do app)
+    // Navegação entre telas principais: sa → sgroups → sl
+    const telasAtivas=document.querySelectorAll('.screen.active');
+    const telaAtual=telasAtivas.length?telasAtivas[0].id:null;
+    if(telaAtual==='sa'){showScr('sgroups');return;}
+    if(telaAtual==='sgroups'){showScr('sl');history.replaceState({futstatsBack:null,type:'base'},'');return;}
+    // Se já está no login, deixa o browser sair do app normalmente
   });
 
   // Hook nos abridores de modais para empurrar estado na pilha
@@ -4857,7 +4863,8 @@ window.closePCenter=id=>{
   }
 })();
 // ── FIM BACK NAVIGATION ──────────────────────────────────────────────
-function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');(document.body.classList.contains('lite-mode')?el.style.opacity='1':requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1')))}
+function showScr(id){const sp=$('splash');if(sp)sp.classList.add('hide');document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='0'});const el=$(id);el.classList.add('active');(document.body.classList.contains('lite-mode')?el.style.opacity='1':requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.opacity='1')));// Empurra estado na pilha para suportar botão Voltar entre telas
+if(id!=='sl'){history.pushState({futstatsBack:null,type:'screen',screen:id},'');}}
 function setBtn(id,loading,txt){const b=$(id);if(!b)return;b.disabled=loading;b.textContent=loading?'⏳ Aguarde...':txt}
 
 window.switchAuth=mode=>{
