@@ -8672,8 +8672,8 @@ function recCardHTML(p,pos){
   const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
-    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
-    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+    ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div>${avatarHTML(p.name,44,p.uid)}</div>`;
   const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   return`<div class="rec-card ${cls[pos]}">
     <div class="rec-medal">${medals[pos]}</div>
@@ -8696,8 +8696,8 @@ function recAssistCardHTML(p,pos){
   const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
-    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
-    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+    ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div>${avatarHTML(p.name,44,p.uid)}</div>`;
   const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   return`<div class="rec-card ${cls[pos]}">
     <div class="rec-medal">${medals[pos]}</div>
@@ -8720,8 +8720,8 @@ function recGAPorJogoCardHTML(p,pos){
   const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
-    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
-    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+    ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div>${avatarHTML(p.name,44,p.uid)}</div>`;
   const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   const mediaFmt=p.media%1===0?p.media.toFixed(0):p.media.toFixed(2);
   return`<div class="rec-card ${cls[pos]}">
@@ -8745,15 +8745,15 @@ function recGATotalCardHTML(p,pos){
   const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
-    ?`<div class="av-you-ring" onclick="openPlayerProfile('${p.uid}')" style="cursor:pointer">${avatarHTML(p.name,44,p.uid)}</div>`
-    :`<div onclick="openPlayerProfile('${p.uid||''}')" style="cursor:${p.uid?'pointer':'default'}">${avatarHTML(p.name,44,p.uid)}</div>`;
+    ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
+    :`<div>${avatarHTML(p.name,44,p.uid)}</div>`;
   const atualBadge=p.isCurrentMonth?`<div class="rec-atual-badge">⚡ recorde atual</div>`:'';
   return`<div class="rec-card ${cls[pos]}">
     <div class="rec-medal">${medals[pos]}</div>
     ${avWrap}
     <div class="rec-info">
       <div class="rec-name">${p.name}</div>
-      <div class="rec-meta">${p.mesLabel} · ${p.jogos} jogos</div>
+      <div class="rec-meta">${p.mesLabel}</div>
       ${atualBadge}
     </div>
     <div class="rec-val">
