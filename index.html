@@ -2164,31 +2164,51 @@ body.mfab-open .screen.active{
   border-bottom:1px solid var(--bo);
   flex-shrink:0;display:flex;flex-direction:column;gap:8px;
 }
-/* Filtro de jogador */
-.hc-player-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.hc-player-filter::-webkit-scrollbar{display:none;}
-.hc-player-chip{
-  padding:7px 13px;border-radius:99px;
+/* Linha com os botões de filtro (Geral / Selecionar jogador / Selecionar ano) */
+.hc-filter-row{display:flex;gap:8px;}
+.hc-mode-btn{
+  padding:9px 14px;border-radius:12px;
   border:1.5px solid var(--bo2);background:var(--bg3);
-  color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+  color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;
   cursor:pointer;white-space:nowrap;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   transition:all .18s;
 }
-.hc-player-chip.active{
+.hc-mode-btn.active{
   border-color:#38bdf8;background:rgba(56,189,248,.15);color:#38bdf8;
 }
-/* Filtro de ano */
-.hc-year-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-.hc-year-filter::-webkit-scrollbar{display:none;}
-.hc-year-chip{
-  padding:5px 11px;border-radius:99px;
-  border:1.5px solid var(--bo2);background:var(--bg3);
-  color:var(--tx3);font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
-  cursor:pointer;white-space:nowrap;flex-shrink:0;
-  transition:all .15s;
+#hc-btn-jogador{flex:1;min-width:0;}
+#hc-btn-jogador span,#hc-btn-ano span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hc-mode-btn-full{flex:1;width:100%;}
+.hc-chevron{width:13px;height:13px;flex-shrink:0;transition:transform .2s ease;}
+.hc-chevron.open{transform:rotate(180deg);}
+/* Painel-acordeão com a lista de opções (jogadores / anos) */
+.hc-accordion{
+  max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .25s ease,opacity .2s ease;
 }
-.hc-year-chip.active{
+.hc-accordion.open{max-height:230px;opacity:1;}
+.hc-accordion-list{
+  max-height:230px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;gap:4px;
+  padding:6px 2px 2px;
+}
+.hc-accordion-list::-webkit-scrollbar{width:3px;}
+.hc-accordion-list::-webkit-scrollbar-thumb{background:var(--bo3);border-radius:99px;}
+.hc-accordion-item{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:8px 10px;border-radius:10px;text-align:left;
+  border:1px solid transparent;background:var(--bg3);
+  color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.hc-accordion-item.active{
   border-color:#38bdf8;background:rgba(56,189,248,.12);color:#38bdf8;
+}
+.hc-accordion-item-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hc-accordion-empty{
+  text-align:center;padding:10px;color:var(--tx3);
+  font-family:'DM Mono',monospace;font-size:11px;
 }
 /* Body scrollável */
 .hc-body{
@@ -10456,10 +10476,27 @@ window.irParaRankingGA=()=>{
       <button class="hc-close" onclick="fecharHistoricoConfrontos()">×</button>
     </div>
     <div class="hc-filters">
-      <!-- Filtro por jogador -->
-      <div class="hc-player-filter" id="hc-player-filter"></div>
+      <!-- Filtro por jogador: Geral (agregado) ou escolher 1 jogador específico -->
+      <div class="hc-filter-row">
+        <button class="hc-mode-btn" id="hc-btn-geral" onclick="window._hcSetJogador('__todos__')">Geral</button>
+        <button class="hc-mode-btn" id="hc-btn-jogador" onclick="window._hcTogglePlayerAccordion()">
+          <span id="hc-btn-jogador-label">Selecionar jogador</span>
+          <svg class="hc-chevron" id="hc-chevron-jogador" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="hc-accordion" id="hc-player-accordion">
+        <div class="hc-accordion-list" id="hc-player-accordion-list"></div>
+      </div>
       <!-- Filtro por ano -->
-      <div class="hc-year-filter" id="hc-year-filter"></div>
+      <div class="hc-filter-row">
+        <button class="hc-mode-btn hc-mode-btn-full" id="hc-btn-ano" onclick="window._hcToggleYearAccordion()">
+          <span id="hc-btn-ano-label">Todos os anos</span>
+          <svg class="hc-chevron" id="hc-chevron-ano" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="hc-accordion" id="hc-year-accordion">
+        <div class="hc-accordion-list" id="hc-year-accordion-list"></div>
+      </div>
     </div>
     <div class="hc-body" id="hc-body">
       <div class="hc-empty">Carregando confrontos...</div>
@@ -16342,7 +16379,9 @@ window._cfgRemoverMembro = async function() {
 // ══════════════════════════════════════════════════════
 (function(){
   let _hcFiltroJogador = '__todos__'; // uid ou '__todos__'
-  let _hcFiltroAno = '__todos__';     // '2024' ou '__todos__'
+  let _hcFiltroAno = '__todos__';     // ano (string) ou '__todos__'
+  let _hcPlayerOpen = false;          // acordeão de jogadores aberto?
+  let _hcAnoOpen = false;             // acordeão de anos aberto?
 
   window.abrirHistoricoConfrontos = function(){
     setTimeout(function(){
@@ -16350,6 +16389,8 @@ window._cfgRemoverMembro = async function() {
       if(!modal) return;
       _hcFiltroJogador = '__todos__';
       _hcFiltroAno = '__todos__';
+      _hcPlayerOpen = false;
+      _hcAnoOpen = false;
       modal.classList.add('open');
       const gd = window._gd;
       if(!gd){
@@ -16383,55 +16424,82 @@ window._cfgRemoverMembro = async function() {
     const gd = window._gd || {};
     const desafios = _hcGetTodosDesafios();
 
-    // ── Filtro por jogador ──
-    const playerWrap = document.getElementById('hc-player-filter');
-    if(!playerWrap) return;
+    // ── Jogador: botão "Geral" + botão/acordeão "Selecionar jogador" ──
+    const btnGeral    = document.getElementById('hc-btn-geral');
+    const btnJogador   = document.getElementById('hc-btn-jogador');
+    const lblJogador   = document.getElementById('hc-btn-jogador-label');
+    const chevJogador  = document.getElementById('hc-chevron-jogador');
+    const accJogador   = document.getElementById('hc-player-accordion');
+    const listJogador  = document.getElementById('hc-player-accordion-list');
+    if(btnGeral && btnJogador && lblJogador && accJogador && listJogador){
+      const geralAtivo = _hcFiltroJogador === '__todos__';
+      btnGeral.classList.toggle('active', geralAtivo);
+      btnJogador.classList.toggle('active', !geralAtivo);
+      lblJogador.textContent = geralAtivo ? 'Selecionar jogador' : _hcGetNome(_hcFiltroJogador);
+      if(chevJogador) chevJogador.classList.toggle('open', _hcPlayerOpen);
+      accJogador.classList.toggle('open', _hcPlayerOpen);
 
-    // Coletar UIDs/nomes únicos que participaram de confrontos
-    const memberMap = {};
-    (gd.members||[]).forEach(m => { if(m.uid) memberMap[m.uid] = m.name; });
+      // Lista TODOS os jogadores do grupo (não só quem já teve confronto),
+      // ordenados por nome — evita expor 15+ chips soltos na tela.
+      const membros = (gd.members||[]).filter(m => m.uid).sort((a,b) => (a.name||'').localeCompare(b.name||'', 'pt-BR'));
+      listJogador.innerHTML = membros.length
+        ? membros.map(m => `<button class="hc-accordion-item${_hcFiltroJogador===m.uid?' active':''}" onclick="window._hcSetJogador('${m.uid}')">`
+            + (window.avatarHTML ? window.avatarHTML(m.name,24,m.uid) : '')
+            + `<span class="hc-accordion-item-name">${m.name}</span></button>`
+          ).join('')
+        : '<div class="hc-accordion-empty">Nenhum jogador no grupo.</div>';
+    }
 
-    const uidsVisiveis = new Set();
-    desafios.forEach(d => {
-      if(d.uidA) uidsVisiveis.add(d.uidA);
-      if(d.uidB) uidsVisiveis.add(d.uidB);
-    });
+    // ── Ano: botão/acordeão "Selecionar ano" ──
+    const btnAno   = document.getElementById('hc-btn-ano');
+    const lblAno   = document.getElementById('hc-btn-ano-label');
+    const chevAno  = document.getElementById('hc-chevron-ano');
+    const accAno   = document.getElementById('hc-year-accordion');
+    const listAno  = document.getElementById('hc-year-accordion-list');
+    if(btnAno && lblAno && accAno && listAno){
+      // Só entram anos que de fato têm confronto salvo (atual ou arquivado).
+      const anos = new Set();
+      desafios.forEach(d => {
+        const ts = d.criadoEm || d.ts || 0;
+        if(ts) anos.add(String(new Date(ts).getFullYear()));
+        if(d.dataFim) anos.add(d.dataFim.slice(0,4));
+      });
+      const anosOrdenados = Array.from(anos).sort((a,b) => b-a);
 
-    const playerChips = [{ uid: '__todos__', name: 'Geral' }];
-    uidsVisiveis.forEach(uid => {
-      playerChips.push({ uid, name: memberMap[uid] || uid.slice(0,6) });
-    });
+      btnAno.classList.toggle('active', _hcFiltroAno !== '__todos__');
+      lblAno.textContent = _hcFiltroAno === '__todos__' ? 'Todos os anos' : _hcFiltroAno;
+      if(chevAno) chevAno.classList.toggle('open', _hcAnoOpen);
+      accAno.classList.toggle('open', _hcAnoOpen);
 
-    playerWrap.innerHTML = playerChips.map(p =>
-      `<button class="hc-player-chip${_hcFiltroJogador===p.uid?' active':''}" onclick="window._hcSetJogador('${p.uid}')">${p.name}</button>`
-    ).join('');
-
-    // ── Filtro por ano ──
-    const yearWrap = document.getElementById('hc-year-filter');
-    if(!yearWrap) return;
-
-    const anos = new Set();
-    desafios.forEach(d => {
-      const ts = d.criadoEm || d.ts || 0;
-      if(ts) anos.add(new String(new Date(ts).getFullYear()).toString());
-      // também tenta extrair do campo data se existir
-      if(d.dataFim) anos.add(d.dataFim.slice(0,4));
-    });
-    const anosOrdenados = ['__todos__', ...Array.from(anos).sort((a,b)=>b-a)];
-
-    yearWrap.innerHTML = anosOrdenados.map(a =>
-      `<button class="hc-year-chip${_hcFiltroAno===a?' active':''}" onclick="window._hcSetAno('${a}')">${a==='__todos__'?'Todos os anos':a}</button>`
-    ).join('');
+      const opcoesAno = ['__todos__', ...anosOrdenados];
+      listAno.innerHTML = opcoesAno.map(a =>
+        `<button class="hc-accordion-item${_hcFiltroAno===a?' active':''}" onclick="window._hcSetAno('${a}')"><span class="hc-accordion-item-name">${a==='__todos__'?'Todos os anos':a}</span></button>`
+      ).join('');
+    }
   }
+
+  window._hcTogglePlayerAccordion = function(){
+    _hcPlayerOpen = !_hcPlayerOpen;
+    if(_hcPlayerOpen) _hcAnoOpen = false; // mantém só 1 acordeão aberto por vez
+    _hcBuildFilters();
+  };
+
+  window._hcToggleYearAccordion = function(){
+    _hcAnoOpen = !_hcAnoOpen;
+    if(_hcAnoOpen) _hcPlayerOpen = false;
+    _hcBuildFilters();
+  };
 
   window._hcSetJogador = function(uid){
     _hcFiltroJogador = uid;
+    _hcPlayerOpen = false;
     _hcBuildFilters();
     _hcRender();
   };
 
   window._hcSetAno = function(ano){
     _hcFiltroAno = ano;
+    _hcAnoOpen = false;
     _hcBuildFilters();
     _hcRender();
   };
