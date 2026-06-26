@@ -2063,7 +2063,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   animation:badgePulse 1.8s ease-in-out infinite;
 }
 .mfab-items{
-  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+  display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
   overflow:visible;
   pointer-events:none;
   padding:4px 6px;margin:-4px -6px;
@@ -2072,7 +2072,7 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 .mfab-item-wrap{
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
   opacity:0;
-  transform:translateY(16px) scale(.92);
+  transform:translateY(12px) scale(.92);
   transition:opacity .28s cubic-bezier(.34,1.1,.64,1), transform .32s cubic-bezier(.34,1.1,.64,1);
   pointer-events:none;
 }
@@ -7819,6 +7819,22 @@ window.setPenAno=ano=>{
   rl.classList.add('switching');
   setTimeout(()=>{renderRanking();rl.classList.remove('switching');},120);
 };
+window._penAnoAccordionOpen=false;
+window._togglePenAnoAccordion=function(){
+  const dd=document.getElementById('pen-ano-dropdown');
+  const arrow=document.getElementById('pen-ano-arrow');
+  if(!dd)return;
+  window._penAnoAccordionOpen=!window._penAnoAccordionOpen;
+  if(window._penAnoAccordionOpen){
+    dd.style.maxHeight=dd.scrollHeight+'px';
+    dd.style.opacity='1';
+    if(arrow)arrow.style.transform='rotate(180deg)';
+  } else {
+    dd.style.maxHeight='0';
+    dd.style.opacity='0';
+    if(arrow)arrow.style.transform='rotate(0deg)';
+  }
+};
 
 function penColor(pct){
   if(pct<=50)return'#EB5757';
@@ -8387,15 +8403,8 @@ function renderRanking(){
     // ── Aba ativa e dados correspondentes ──
     const activeData=window._penSubTab==='mes'?penMes:window._penSubTab==='total'?penAnoAtual:penAnoSel;
 
-    // ── Seletor de anos passados (apenas na aba "ano", se houver mais de 1) ──
-    const anoPickerHTML=(window._penSubTab==='ano'&&anosPassados.length>1)
-      ?('<div style="display:flex;gap:7px;flex-wrap:wrap;padding:4px 1rem 8px">'+
-          anosPassados.map(a=>{
-            const act=anoSel===a;
-            return '<button onclick="setPenAno(\'' + a + '\')" style="padding:5px 14px;border-radius:99px;border:1.5px solid '+(act?'var(--g)':'var(--bo2)')+';background:'+(act?'rgba(77,255,176,.15)':'var(--bg3)')+';color:'+(act?'var(--g)':'var(--tx2)')+';font-family:\'DM Mono\',monospace;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">'+a+'</button>';
-          }).join('')+
-        '</div>')
-      :'';
+    // ── Accordion de seleção de ano (centralizado, substituindo picker antigo) ──
+    const anoPickerHTML=''; // removido — agora é feito pelo accordion abaixo
 
     // ── Sub-abas HTML ──
     const subTabsHTML=`<div class="pen-subtabs">
@@ -8424,14 +8433,26 @@ function renderRanking(){
     }
 
     if(!activeData.length){
-      $('rl').innerHTML=subTabsHTML+((window._penSubTab==='ano'&&anoSel)?`<div style="display:flex;align-items:center;gap:8px;padding:2px 1rem 10px"><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--tx)">${anoSel}</span><span style="font-size:12px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-weight:500">· estatísticas do ano</span></div>`:'')+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+(window._penAnoSel||'')}.</div></div>`;
+      $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':window._penSubTab==='total'?' neste ano':' em '+(window._penAnoSel||'')}.</div></div>`;
       return;
     }
 
-    // Label do ano selecionado (visível apenas na aba 'ano')
+    // ── Accordion do ano selecionado (centralizado, com dropdown para outros anos) ──
+    const _temOutrosAnos = anosPassados.length > 1;
     const anoLabelHTML=(window._penSubTab==='ano'&&anoSel)
-      ?`<div style="display:flex;align-items:center;gap:8px;padding:2px 1rem 10px"><span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--tx)">${anoSel}</span><span style="font-size:12px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-weight:500">· estatísticas do ano</span></div>`
-      :'';
+      ? `<div style="display:flex;flex-direction:column;align-items:center;padding:6px 1rem 14px;gap:0">
+          <button onclick="window._togglePenAnoAccordion()" id="pen-ano-trigger"
+            style="display:inline-flex;align-items:center;gap:7px;background:none;border:none;cursor:${_temOutrosAnos?'pointer':'default'};padding:0;outline:none;-webkit-tap-highlight-color:transparent">
+            <span style="font-family:'DM Mono',monospace;font-size:32px;font-weight:700;letter-spacing:-1px;color:var(--tx);line-height:1">${anoSel}</span>
+            ${_temOutrosAnos?`<svg id="pen-ano-arrow" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--tx2);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .28s cubic-bezier(.34,1.1,.64,1);flex-shrink:0;margin-top:4px"><polyline points="6 9 12 15 18 9"/></svg>`:''}
+          </button>
+          <div id="pen-ano-dropdown" style="overflow:hidden;max-height:0;opacity:0;transition:max-height .32s cubic-bezier(.4,0,.2,1),opacity .22s ease;width:100%;display:flex;justify-content:center">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px 0 2px">
+              ${anosPassados.filter(a=>a!==anoSel).map(a=>`<button onclick="setPenAno('${a}')" style="padding:6px 18px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx2);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent">${a}</button>`).join('')}
+            </div>
+          </div>
+        </div>`
+      : '';
 
     $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
       const isMe=p.uid===currentUser?.uid;
@@ -10719,8 +10740,10 @@ window.irParaRankingGA=()=>{
 function _mfabStagger(open){
   const wraps = Array.from(document.querySelectorAll('#mfab-items .mfab-item-wrap'))
     .filter(w => w.style.display !== 'none');
-  // Na abertura: de baixo pra cima (ordem reversa); no fechamento: de cima pra baixo
-  const ordered = open ? [...wraps].reverse() : wraps;
+  // column-reverse: primeiro item no DOM = mais próximo do botão (baixo); último = mais longe (cima)
+  // Abertura: do mais próximo ao mais distante (baixo→cima) = ordem normal do DOM
+  // Fechamento: do mais distante ao mais próximo (cima→baixo) = ordem reversa
+  const ordered = open ? wraps : [...wraps].reverse();
   ordered.forEach((w, i) => {
     clearTimeout(w._staggerT);
     w._staggerT = setTimeout(() => {
