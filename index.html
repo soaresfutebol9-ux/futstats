@@ -760,27 +760,25 @@ html.is-touch .auth-ball{animation:none}
 .ni.active{color:var(--g)}
 .ni.active{color:var(--g)}
 /* ══════════════════════════════════════════════════════════
-   FLUID TAB TRANSITIONS — swipe horizontal suave
+   FLUID TAB TRANSITIONS — transition simples e robusta
    ══════════════════════════════════════════════════════════ */
 .tv{display:none;opacity:0}
 .tv.active{display:block;opacity:1}
-.tv.tab-animating{will-change:transform,opacity}
-
-@keyframes tabEnterFromRight{
-  0%  {opacity:0;transform:translateX(36px)}
-  100%{opacity:1;transform:translateX(0)}
+.tv.tab-enter{
+  display:block;
+  opacity:0;
+  transform:translateX(32px);
+  transition:opacity .28s ease, transform .28s cubic-bezier(.16,1,.3,1);
 }
-@keyframes tabEnterFromLeft{
-  0%  {opacity:0;transform:translateX(-36px)}
-  100%{opacity:1;transform:translateX(0)}
+.tv.tab-enter-left{
+  display:block;
+  opacity:0;
+  transform:translateX(-32px);
+  transition:opacity .28s ease, transform .28s cubic-bezier(.16,1,.3,1);
 }
-@keyframes tabExitToLeft{
-  0%  {opacity:1;transform:translateX(0)}
-  100%{opacity:0;transform:translateX(-28px)}
-}
-@keyframes tabExitToRight{
-  0%  {opacity:1;transform:translateX(0)}
-  100%{opacity:0;transform:translateX(28px)}
+.tv.tab-enter-run{
+  opacity:1;
+  transform:translateX(0);
 }
 
 /* Ranking list switch — sem blur */
@@ -9873,54 +9871,21 @@ function _createAvRing(avEl){
 }
 
 /* ── PREMIUM TAB SWITCHER ── */
-const _tabAnimTimers={};
-
-function _tabHide(el){
-  el.classList.remove('active','tab-animating');
-  el.style.display='none';
-  el.style.opacity='0';
-  el.style.animation='';
-  el.style.transform='';
-}
-function _tabShow(el){
-  el.classList.remove('tab-animating');
-  el.style.display='block';
-  el.style.opacity='1';
-  el.style.animation='';
-  el.style.transform='';
-  el.classList.add('active');
-}
-
 window.showTab=(n,btn,e)=>{
   if(n===_lastTab)return;
   const map={r:'tr',add:'tadd',hist:'thist'};
   const isLite=document.body.classList.contains('lite-mode');
   const tabOrder={r:0,add:1,hist:2};
   const dir=(tabOrder[n]??0)>(tabOrder[_lastTab]??0)?'right':'left';
-  const ENTER_MS=320;
-  const EXIT_MS=180;
 
   if(n!=='r'){history.pushState({futstatsBack:null,type:'tab',tab:n},'');}
   else{history.replaceState({futstatsBack:null,type:'tab',tab:'r'},'');}
 
-  // ── Sai a tab atual ──
+  // ── Esconde tab atual imediatamente (sem animação de saída) ──
   const curEl=$(map[_lastTab]);
-  const leavingTab=_lastTab;
   if(curEl){
-    clearTimeout(_tabAnimTimers[leavingTab]);
-    if(!isLite){
-      const exitAnim=dir==='right'?'tabExitToLeft':'tabExitToRight';
-      curEl.classList.remove('active');
-      curEl.style.display='block';
-      curEl.style.opacity='1';
-      curEl.style.transform='';
-      curEl.classList.add('tab-animating');
-      void curEl.offsetHeight;
-      curEl.style.animation=`${exitAnim} ${EXIT_MS}ms cubic-bezier(.4,0,1,1) forwards`;
-      _tabAnimTimers[leavingTab]=setTimeout(()=>_tabHide(curEl), EXIT_MS+30);
-    } else {
-      _tabHide(curEl);
-    }
+    curEl.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
+    curEl.style.cssText='display:none;opacity:0;transform:none;transition:none';
   }
 
   // Nav
@@ -9935,29 +9900,35 @@ window.showTab=(n,btn,e)=>{
 
   _lastTab=n;
 
-  // Renderiza antes de animar
+  // Renderiza antes de mostrar
   if(n==='r')renderRanking();
   if(n==='hist')renderHistTab();
 
   // ── Entra a nova tab ──
   const nextEl=$(map[n]);
-  if(nextEl){
-    clearTimeout(_tabAnimTimers[n]);
-    if(!isLite){
-      const enterAnim=dir==='right'?'tabEnterFromRight':'tabEnterFromLeft';
-      // Garante estado limpo antes de animar
-      nextEl.classList.remove('active','tab-animating');
-      nextEl.style.display='block';
-      nextEl.style.opacity='0';
-      nextEl.style.animation='none';
-      nextEl.style.transform='';
-      void nextEl.offsetHeight;
-      nextEl.classList.add('tab-animating');
-      nextEl.style.animation=`${enterAnim} ${ENTER_MS}ms cubic-bezier(.16,1,.3,1) forwards`;
-      _tabAnimTimers[n]=setTimeout(()=>_tabShow(nextEl), ENTER_MS+30);
-    } else {
-      _tabShow(nextEl);
-    }
+  if(!nextEl)return;
+
+  // Limpa qualquer estado anterior
+  nextEl.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
+  nextEl.style.cssText='';
+
+  if(!isLite){
+    // Posiciona fora da tela (sem transition ainda)
+    nextEl.classList.add(dir==='right'?'tab-enter':'tab-enter-left');
+    void nextEl.offsetHeight; // força reflow
+    // Aciona transition para posição final
+    nextEl.classList.add('tab-enter-run');
+    // Após a transition, limpa e marca como active
+    const onDone=()=>{
+      nextEl.classList.remove('tab-enter','tab-enter-left','tab-enter-run');
+      nextEl.style.cssText='';
+      nextEl.classList.add('active');
+    };
+    nextEl.addEventListener('transitionend', onDone, {once:true});
+    // Fallback: garante active mesmo se transitionend não disparar
+    setTimeout(onDone, 350);
+  } else {
+    nextEl.classList.add('active');
   }
 };
 
