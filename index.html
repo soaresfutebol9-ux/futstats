@@ -15768,28 +15768,14 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
   };
   const textMap  = { gold:'#1a0f00', silver:'#1a2030', bronze:'#1a0a00', elite:'#fff' };
   const barMap   = { gold:'rgba(0,0,0,.5)', silver:'rgba(0,0,0,.45)', bronze:'rgba(0,0,0,.5)', elite:'#a855f7' };
-  // Sombra de contato sob a silhueta da foto, para "assentar" o jogador no
-  // card mesmo sem moldura — varia de tom conforme a raridade.
-  const photoShadeMap = {
-    gold:  'rgba(80,55,0,.55)',
-    silver:'rgba(30,40,55,.5)',
-    bronze:'rgba(50,25,10,.55)',
-    elite: 'rgba(20,5,40,.65)',
-  };
 
   const textC = textMap[rarity];
   const barC  = barMap[rarity];
-  const photoShade = photoShadeMap[rarity];
   const editionTxt = (groupName||'FutStats') + '  ·  ' + new Date().getFullYear();
 
-  // Foto via background-image + background-size:cover em vez de <img object-fit>:
-  // html2canvas (usado no download) frequentemente IGNORA object-fit em <img>
-  // e estica a imagem original para caber no elemento, achatando o rosto da
-  // pessoa. background-size:cover é respeitado de forma confiável tanto na
-  // tela quanto no PNG exportado.
   const photoEl = photo
-    ? `<div style="position:absolute;inset:0;background-image:url('${photo}');background-size:cover;background-position:center top;background-repeat:no-repeat"></div>`
-    : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:64px;color:rgba(255,255,255,.55);background:rgba(0,0,0,.22)">${(name||'?')[0].toUpperCase()}</div>`;
+    ? `<img src="${photo}" alt="${name}" style="width:100%;height:100%;object-fit:cover">`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:40px;background:rgba(0,0,0,.25)">${(name||'?')[0].toUpperCase()}</div>`;
 
   const statsHTML = SURVEY_ATTRS.map(a=>`
     <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;color:${textC}">
@@ -15810,29 +15796,26 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
     box-shadow:${shadowMap[rarity]},0 2px 16px rgba(0,0,0,.6);
     flex-shrink:0;
   ">
-    <!-- Textura metálica diagonal sutil, estilo verniz de carta física -->
-    <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(125deg,rgba(255,255,255,.07) 0px,rgba(255,255,255,.07) 1px,transparent 1px,transparent 5px);pointer-events:none;z-index:1"></div>
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 28% 16%,rgba(255,255,255,.3) 0%,transparent 50%);pointer-events:none;z-index:1"></div>
-    <!-- Faixa de header e divisória -->
-    <div style="position:absolute;left:12px;right:12px;top:96px;height:1px;background:rgba(255,255,255,.22);pointer-events:none;z-index:2"></div>
-    <div style="position:relative;z-index:4;width:100%;padding:14px 18px 0;display:flex;align-items:flex-start;justify-content:space-between">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.25) 0%,transparent 55%);pointer-events:none;z-index:1"></div>
+    <div style="position:absolute;left:12px;right:12px;top:50px;height:1px;background:rgba(255,255,255,.18);pointer-events:none;z-index:2"></div>
+    <div style="position:relative;z-index:3;width:100%;padding:14px 18px 0;display:flex;align-items:flex-start;justify-content:space-between">
       <div>
-        <div style="font-size:44px;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.4);letter-spacing:-2px;color:${textC}">${rating}</div>
-        <div style="font-size:15px;letter-spacing:1.5px;line-height:1;margin-top:2px;color:${textC}">${posLabel}</div>
+        <div style="font-size:42px;line-height:1;text-shadow:0 2px 8px rgba(0,0,0,.4);letter-spacing:-2px;color:${textC}">${rating}</div>
+        <div style="font-size:15px;letter-spacing:.5px;line-height:1;color:${textC}">${posLabel}</div>
       </div>
-      <span style="font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))">⚽</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:4px">
+        <span style="font-size:22px">⚽</span>
+      </div>
     </div>
-    <!-- Foto: retangular, "sangrando" no card como nas cartas FUT reais, sem moldura circular -->
-    <div style="position:relative;z-index:3;width:100%;height:172px;margin-top:8px;flex-shrink:0;overflow:hidden">
+    <div style="position:relative;z-index:3;width:120px;height:120px;border-radius:50%;margin-top:6px;overflow:hidden;border:3px solid rgba(255,255,255,.35);box-shadow:0 4px 20px rgba(0,0,0,.5);flex-shrink:0">
       ${photoEl}
-      <div style="position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(to bottom,transparent 0%,${photoShade} 100%)"></div>
     </div>
-    <div style="position:relative;z-index:4;font-family:'VarsityTeam',sans-serif;font-size:${(name||'Jogador').length>16?14:(name||'Jogador').length>12?17:21}px;letter-spacing:${(name||'Jogador').length>12?1:2}px;text-align:center;margin-top:8px;padding:0 12px;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${textC}">${name||'Jogador'}</div>
-    <div style="position:relative;z-index:4;width:calc(100% - 40px);height:1px;background:rgba(255,255,255,.22);margin:7px 0"></div>
-    <div style="position:relative;z-index:4;width:calc(100% - 28px);padding-bottom:14px">
+    <div style="position:relative;z-index:3;font-family:'VarsityTeam',sans-serif;font-size:${(name||'Jogador').length>16?14:(name||'Jogador').length>12?17:22}px;letter-spacing:${(name||'Jogador').length>12?1:2}px;text-align:center;margin-top:10px;padding:0 12px;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.5);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${textC}">${name||'Jogador'}</div>
+    <div style="position:relative;z-index:3;width:calc(100% - 40px);height:1px;background:rgba(255,255,255,.2);margin:8px 0"></div>
+    <div style="position:relative;z-index:3;width:calc(100% - 28px);padding-bottom:14px">
       ${statsHTML}
     </div>
-    <div style="position:absolute;bottom:14px;left:0;right:0;z-index:4;text-align:center;font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.45;color:${textC}">${editionTxt}</div>
+    <div style="position:absolute;bottom:14px;left:0;right:0;z-index:3;text-align:center;font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.45;color:${textC}">${editionTxt}</div>
   </div>`;
 }
 
