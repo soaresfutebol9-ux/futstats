@@ -13892,13 +13892,11 @@ window._attachTemaLongPress = function(){
   });
 };
 
-(function(){
-  const obs = new MutationObserver(()=>{
-    const unattached = document.querySelector('.carta-tema-btn:not(.bloqueado):not([data-lp-attached])');
-    if(unattached) window._attachTemaLongPress();
-  });
-  obs.observe(document.body, {childList:true, subtree:true});
-})();
+// OBS: anteriormente havia um MutationObserver global em document.body (subtree)
+// que disparava a cada mutação de DOM em QUALQUER parte do app (ranking, histórico,
+// feed, modais etc. — 114+ pontos de innerHTML=) só para detectar a criação destes
+// botões. Substituído por chamada direta no único local onde eles são criados
+// (dentro de window.abrirCartaJogador), eliminando varreduras globais constantes.
 
 /* Tema em prévia (ainda não salvo) */
 let _cartaTemaPendente = null;
@@ -16258,6 +16256,9 @@ window.abrirCartaJogador = function(uidParam){
       btns.style.transition='opacity .35s .2s ease, transform .35s .2s ease';
       requestAnimationFrame(()=>{ btns.style.opacity='1'; btns.style.transform='translateY(0)'; });
     }
+    // Anexa long-press nos botões de tema recém-criados (apenas quando existem,
+    // ou seja, isMyCard === true). Substitui o antigo MutationObserver global.
+    if(isMyCard && window._attachTemaLongPress) window._attachTemaLongPress();
   });
 };
 
