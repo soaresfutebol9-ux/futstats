@@ -304,7 +304,7 @@ html.save-data #sl::after{display:none}
 
 .screen{display:none;min-height:100vh;flex-direction:column;opacity:0;transition:opacity .3s}
 .screen.active{display:flex;opacity:1}
-#sa.screen.active{height:calc(var(--vh,1vh)*100);min-height:unset;overflow:hidden}
+#sa.screen.active{height:calc(var(--vh,1vh)*100);height:100dvh;min-height:unset;overflow:hidden}
 @keyframes fadein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @keyframes slideup{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
@@ -534,7 +534,7 @@ html.is-touch .auth-ball{animation:none}
 .sg-actions{display:flex;flex-direction:column;gap:.6rem;}
 .sg-skeleton{height:66px;border-radius:14px;background:var(--c1);border:1px solid var(--bo);animation:sk-pulse 1.4s ease-in-out infinite;}
 
-#sa{background:var(--bg);height:100dvh;height:calc(var(--vh,1vh)*100);display:flex;flex-direction:column;overflow:hidden;position:relative}
+#sa{background:var(--bg);height:calc(var(--vh,1vh)*100);height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
 #sa::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
     radial-gradient(ellipse 55% 40% at 15% 0%,rgba(77,255,176,.07) 0%,transparent 65%),
@@ -3304,10 +3304,13 @@ html, body {
   }
 }
 
-/* ── REMOVE DUPLA BARRA DE ROLAGEM NO iOS ── */
-#sa {
-  height: 100dvh;
+/* ── REMOVE DUPLA BARRA DE ROLAGEM NO iOS ──
+   Restrito a iOS: no Chrome/Android, --vh é recalculado via 'resize' quando a barra de
+   endereço recolhe/expande durante o scroll, o que fazia a altura de #sa oscilar e a
+   tab bar de filtros parecer desaparecer. 100dvh já resolve o caso iOS sem JS. */
+html.os-ios #sa {
   height: calc(var(--vh, 1vh) * 100);
+  height: 100dvh;
 }
 
 /* ── BANNER MVP: não cortar texto ── */
@@ -9817,13 +9820,28 @@ const _tabOrder={r:0,add:1,hist:2};let _lastTab='r';
   const dpr=Math.min(window.devicePixelRatio||1,3);
   html.dataset.dpr=dpr;
 
-  // Viewport height fix (iOS Safari 100vh bug)
+  // Viewport height fix (iOS Safari 100vh bug) — fallback apenas para navegadores sem suporte a 100dvh.
+  // IMPORTANTE: no Chrome/Android, a barra de endereço recolhe/expande durante o scroll e dispara
+  // 'resize' várias vezes; recalcular --vh nesses momentos fazia a altura de #sa oscilar e a tab bar
+  // "desaparecer" visualmente. Por isso: (1) debounce, e (2) só atualiza se a mudança for grande
+  // (>120px), que indica rotação de tela / teclado, não a barra do navegador recolhendo.
   function setVH(){
     const vh=window.innerHeight*0.01;
     document.documentElement.style.setProperty('--vh',vh+'px');
   }
   setVH();
-  window.addEventListener('resize',setVH,{passive:true});
+  let _vhPrevHeight=window.innerHeight;
+  let _vhDebounce=null;
+  window.addEventListener('resize',()=>{
+    clearTimeout(_vhDebounce);
+    _vhDebounce=setTimeout(()=>{
+      const diff=Math.abs(window.innerHeight-_vhPrevHeight);
+      if(diff>120){ // mudança real de viewport (rotação, teclado) — não o toolbar do navegador
+        _vhPrevHeight=window.innerHeight;
+        setVH();
+      }
+    },150);
+  },{passive:true});
 
   // Reduce motion
   const prefersReduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
