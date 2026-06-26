@@ -7974,16 +7974,18 @@ window.fecharEvolChart = function(){
   const btn = document.getElementById('evol-fullscreen-btn');
   const sel = document.getElementById('evol-ano-select');
   m.classList.remove('open');
-  // Resetar fullscreen
-  inner && inner.classList.remove('fullscreen-landscape');
-  if(btn){ btn.textContent='⛶'; btn.title='Tela cheia'; }
-  if(sel) sel.style.display='';
-  const sb = document.getElementById('evol-summary-bar');
-  if(sb) sb.style.display='none';
   _perfChartExpandedData = null;
   _liberarOrientacao();
   _restaurarFabAposModal();
-  setTimeout(()=>{ m.style.display='none'; }, 280);
+  setTimeout(()=>{
+    m.style.display='none';
+    // Resetar fullscreen só após o modal estar invisível (evita flash do mini gráfico)
+    inner && inner.classList.remove('fullscreen-landscape');
+    if(btn){ btn.textContent='⛶'; btn.title='Tela cheia'; }
+    if(sel) sel.style.display='';
+    const sb = document.getElementById('evol-summary-bar');
+    if(sb) sb.style.display='none';
+  }, 280);
 };
 
 let _evolCurrentUid = null;
