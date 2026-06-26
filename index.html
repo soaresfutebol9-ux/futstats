@@ -10574,10 +10574,9 @@ window.irParaRankingGA=()=>{
       <button class="hc-close" onclick="fecharHistoricoConfrontos()">×</button>
     </div>
     <div class="hc-filters">
-      <!-- Filtro por jogador: Geral (agregado) ou escolher 1 jogador específico -->
+      <!-- Filtro por jogador: accordion com "Todos os jogadores" + lista -->
       <div class="hc-filter-row">
-        <button class="hc-mode-btn" id="hc-btn-geral" onclick="window._hcSetJogador('__todos__')">Geral</button>
-        <button class="hc-mode-btn" id="hc-btn-jogador" onclick="window._hcTogglePlayerAccordion()">
+        <button class="hc-mode-btn hc-mode-btn-full" id="hc-btn-jogador" onclick="window._hcTogglePlayerAccordion()">
           <span id="hc-btn-jogador-label">Selecionar jogador</span>
           <svg class="hc-chevron" id="hc-chevron-jogador" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
@@ -16572,30 +16571,29 @@ window._cfgRemoverMembro = async function() {
     const gd = window._gd || {};
     const desafios = _hcGetTodosDesafios();
 
-    // ── Jogador: botão "Geral" + botão/acordeão "Selecionar jogador" ──
-    const btnGeral    = document.getElementById('hc-btn-geral');
+    // ── Jogador: accordion único com "Todos os jogadores" + lista ──
     const btnJogador   = document.getElementById('hc-btn-jogador');
     const lblJogador   = document.getElementById('hc-btn-jogador-label');
     const chevJogador  = document.getElementById('hc-chevron-jogador');
     const accJogador   = document.getElementById('hc-player-accordion');
     const listJogador  = document.getElementById('hc-player-accordion-list');
-    if(btnGeral && btnJogador && lblJogador && accJogador && listJogador){
+    if(btnJogador && lblJogador && accJogador && listJogador){
       const geralAtivo = _hcFiltroJogador === '__todos__';
-      btnGeral.classList.toggle('active', geralAtivo);
       btnJogador.classList.toggle('active', !geralAtivo);
-      lblJogador.textContent = geralAtivo ? 'Selecionar jogador' : _hcGetNome(_hcFiltroJogador);
+      lblJogador.textContent = geralAtivo ? 'Todos os jogadores' : _hcGetNome(_hcFiltroJogador);
       if(chevJogador) chevJogador.classList.toggle('open', _hcPlayerOpen);
       accJogador.classList.toggle('open', _hcPlayerOpen);
 
       // Lista TODOS os jogadores do grupo (não só quem já teve confronto),
       // ordenados por nome — evita expor 15+ chips soltos na tela.
       const membros = (gd.members||[]).filter(m => m.uid).sort((a,b) => (a.name||'').localeCompare(b.name||'', 'pt-BR'));
-      listJogador.innerHTML = membros.length
+      const todosBtn = `<button class="hc-accordion-item${_hcFiltroJogador==='__todos__'?' active':''}" onclick="window._hcSetJogador('__todos__')"><span class="hc-accordion-item-name">Todos os jogadores</span></button>`;
+      listJogador.innerHTML = todosBtn + (membros.length
         ? membros.map(m => `<button class="hc-accordion-item${_hcFiltroJogador===m.uid?' active':''}" onclick="window._hcSetJogador('${m.uid}')">`
             + (window.avatarHTML ? window.avatarHTML(m.name,24,m.uid) : '')
             + `<span class="hc-accordion-item-name">${m.name}</span></button>`
           ).join('')
-        : '<div class="hc-accordion-empty">Nenhum jogador no grupo.</div>';
+        : '<div class="hc-accordion-empty">Nenhum jogador no grupo.</div>');
     }
 
     // ── Ano: botão/acordeão "Selecionar ano" ──
@@ -16606,11 +16604,13 @@ window._cfgRemoverMembro = async function() {
     const listAno  = document.getElementById('hc-year-accordion-list');
     if(btnAno && lblAno && accAno && listAno){
       // Só entram anos que de fato têm confronto salvo (atual ou arquivado).
+      const anoCorrente = String(new Date().getFullYear());
       const anos = new Set();
       desafios.forEach(d => {
         const ts = d.criadoEm || d.ts || 0;
         if(ts) anos.add(String(new Date(ts).getFullYear()));
-        if(d.dataFim) anos.add(d.dataFim.slice(0,4));
+        else if(d.dataFim) anos.add(d.dataFim.slice(0,4));
+        else anos.add(anoCorrente); // fallback: desafio sem timestamp usa o ano atual
       });
       const anosOrdenados = Array.from(anos).sort((a,b) => b-a);
 
@@ -16662,7 +16662,7 @@ window._cfgRemoverMembro = async function() {
     const ts = d.criadoEm || d.ts || 0;
     if(ts) return String(new Date(ts).getFullYear());
     if(d.dataFim) return d.dataFim.slice(0,4);
-    return '—';
+    return String(new Date().getFullYear()); // fallback: usa o ano corrente
   }
 
   // Placar real de um confronto. d.scoreA/d.scoreB nem sempre existem no
@@ -16678,6 +16678,12 @@ window._cfgRemoverMembro = async function() {
   function _hcRender(){
     const body = document.getElementById('hc-body');
     if(!body) return;
+
+    // Sem jogador selecionado → mostra apenas orientação, sem listar confrontos
+    if(_hcFiltroJogador === '__todos__'){
+      body.innerHTML = '<div class="hc-empty" style="padding:2rem 1rem;display:flex;flex-direction:column;align-items:center;gap:10px"><div style="font-size:36px">⚔️</div><div style="font-size:14px;color:var(--tx2);text-align:center">Selecione um jogador para ver os confrontos</div></div>';
+      return;
+    }
 
     const myUid = currentUser?.uid;
     let desafios = _hcGetTodosDesafios();
