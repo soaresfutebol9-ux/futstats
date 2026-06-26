@@ -9871,6 +9871,19 @@ function _createAvRing(avEl){
 }
 
 /* ── PREMIUM TAB SWITCHER ── */
+// Estado de transição pendente por elemento — evita que um onDone "antigo"
+// (de uma troca de aba anterior interrompida) rode depois e deixe a view
+// num estado inconsistente (ex.: opacity/transform travados, abas "somem").
+const _tabTransitionState=new WeakMap();
+function _cancelPendingTabTransition(el){
+  if(!el)return;
+  const st=_tabTransitionState.get(el);
+  if(st){
+    if(st.timeoutId)clearTimeout(st.timeoutId);
+    if(st.listener)el.removeEventListener('transitionend',st.listener);
+    _tabTransitionState.delete(el);
+  }
+}
 window.showTab=(n,btn,e)=>{
   if(n===_lastTab)return;
   const map={r:'tr',add:'tadd',hist:'thist'};
@@ -9884,8 +9897,12 @@ window.showTab=(n,btn,e)=>{
   // ── Esconde tab atual imediatamente (sem animação de saída) ──
   const curEl=$(map[_lastTab]);
   if(curEl){
+    _cancelPendingTabTransition(curEl);
     curEl.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
-    curEl.style.cssText='display:none;opacity:0;transform:none;transition:none';
+    curEl.style.transition='none';
+    curEl.style.transform='none';
+    curEl.style.opacity='0';
+    curEl.style.display='none';
   }
 
   // Nav
@@ -9908,6 +9925,10 @@ window.showTab=(n,btn,e)=>{
   const nextEl=$(map[n]);
   if(!nextEl)return;
 
+  // Cancela qualquer transição pendente nesse elemento (ex.: o usuário voltou
+  // pra essa aba antes da animação de saída anterior terminar de limpar)
+  _cancelPendingTabTransition(nextEl);
+
   // Limpa qualquer estado anterior
   nextEl.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
   nextEl.style.cssText='';
@@ -9920,17 +9941,38 @@ window.showTab=(n,btn,e)=>{
     nextEl.classList.add('tab-enter-run');
     // Após a transition, limpa e marca como active
     const onDone=()=>{
+      _tabTransitionState.delete(nextEl);
       nextEl.classList.remove('tab-enter','tab-enter-left','tab-enter-run');
       nextEl.style.cssText='';
       nextEl.classList.add('active');
     };
     nextEl.addEventListener('transitionend', onDone, {once:true});
     // Fallback: garante active mesmo se transitionend não disparar
-    setTimeout(onDone, 350);
+    // (ex.: app foi pra background e o navegador pausou a animação)
+    const timeoutId=setTimeout(onDone, 350);
+    _tabTransitionState.set(nextEl,{timeoutId,listener:onDone});
   } else {
     nextEl.classList.add('active');
   }
 };
+
+// ── GUARDA DE CONSISTÊNCIA ──
+// Se por qualquer motivo a aba marcada como "active" ficar com opacity/display
+// inconsistentes (animação interrompida por troca de app, aba em background,
+// etc.), corrige automaticamente ao voltar o foco pro app — sem precisar de F5.
+function _fixActiveTabVisibility(){
+  const activeEl=document.querySelector('.tv.active');
+  if(!activeEl)return;
+  const cs=getComputedStyle(activeEl);
+  if(cs.display==='none'||parseFloat(cs.opacity)<1){
+    activeEl.style.cssText='';
+    activeEl.classList.add('active');
+  }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')setTimeout(_fixActiveTabVisibility,50);
+});
+window.addEventListener('focus',()=>setTimeout(_fixActiveTabVisibility,50));
 
 // ── CONTADOR ANIMADO — centralizado ──
 // Dispara somente após o welcome card ser fechado
