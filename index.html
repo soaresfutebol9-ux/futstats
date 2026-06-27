@@ -15503,9 +15503,15 @@ document.addEventListener('touchstart', e => {
     const sx=W/GW, sy=H/GH;
     const gx=GOAL.x*sx, gy=GOAL.y*sy, gw=GOAL.w*sx, gh=GOAL.h*sy;
 
-    // Fundo campo
+    // Fundo: gramado (abaixo da base das traves) + céu/área do gol (acima)
+    // Base das traves em coordenadas virtuais: GOAL.y + GOAL.h = 170
+    const baseY = (GOAL.y + GOAL.h) * sy; // linha do chão do gol em pixels do canvas
+    // Céu / área aérea — cinza escuro
+    ctx.fillStyle='#6b7280';
+    ctx.fillRect(0,0,W,baseY);
+    // Gramado — verde escuro
     ctx.fillStyle='#2d5a1b';
-    ctx.fillRect(0,0,W,H);
+    ctx.fillRect(0,baseY,W,H-baseY);
 
     // Grade da rede (mais sutil que as traves)
     const cols=6,rows=3;
