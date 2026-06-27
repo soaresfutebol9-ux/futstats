@@ -11500,6 +11500,18 @@ window.irParaRankingGA=()=>{
 
 <script>
 // ══ MULTI-FAB ══
+// Calcula a duração total (ms) do stagger de abertura/fechamento dos itens
+// do multi-FAB, com base na contagem real de itens visíveis. Usado para
+// sincronizar o overlay de blur com o momento em que os botões realmente
+// terminam de aparecer/recolher (em vez de um valor fixo chutado).
+function _mfabStaggerDuration(open){
+  const n = document.querySelectorAll('#mfab-items .mfab-item-wrap')
+    .length || 1;
+  const delayStep = open ? 32 : 28;
+  const animDur   = open ? 240 : 150; // ms — um pouco acima da duration real (.21s/.24s ou .14s/.15s) como margem
+  return Math.max(0, (n - 1) * delayStep + animDur);
+}
+
 function _mfabStagger(open){
   const wraps = Array.from(document.querySelectorAll('#mfab-items .mfab-item-wrap'))
     .filter(w => w.style.display !== 'none');
@@ -11559,7 +11571,16 @@ function mfabToggle(){
   main.classList.toggle('open', open);
   icon.textContent = open ? '✕' : '＋';
   document.body.classList.toggle('mfab-open', open);
-  if(overlay) overlay.classList.toggle('open', open);
+  if(overlay){
+    clearTimeout(overlay._closeT);
+    if(open){
+      overlay.classList.add('open');
+    } else {
+      // Só remove o blur depois que os botões já terminaram de recolher
+      // (stagger), evitando o overlay desaparecer antes dos FABs.
+      overlay._closeT = setTimeout(() => overlay.classList.remove('open'), _mfabStaggerDuration(false));
+    }
+  }
   _mfabStagger(open);
 }
 function mfabClose(){
@@ -11573,7 +11594,12 @@ function mfabClose(){
   main && main.classList.remove('open');
   if(icon) icon.textContent = '＋';
   document.body.classList.remove('mfab-open');
-  if(overlay) overlay.classList.remove('open');
+  if(overlay){
+    clearTimeout(overlay._closeT);
+    // Só remove o blur depois que os botões já terminaram de recolher
+    // (stagger), evitando o overlay desaparecer antes dos FABs.
+    overlay._closeT = setTimeout(() => overlay.classList.remove('open'), _mfabStaggerDuration(false));
+  }
   if(wasOpen) _mfabStagger(false);
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
