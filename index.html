@@ -16553,10 +16553,10 @@ function _renderSurveyAdmin(inner, gd){
       </div>`;
   } else if(todosResponderam){
     statusHTML = `
-      <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.3);border-radius:14px;padding:16px;margin-bottom:4px;text-align:center">
+      <div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.12);border-radius:14px;padding:16px;margin-bottom:4px;text-align:center">
         <div style="font-size:28px;margin-bottom:6px">✅</div>
-        <div style="font-family:'Manrope',sans-serif;font-size:15px;color:#4dffb0;margin-bottom:4px">Concluído!</div>
-        <div style="font-family:'DM Mono',monospace;font-size:22px;color:#4dffb0">${totalRespostas}/${totalMembros}</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:15px;color:var(--tx);margin-bottom:4px">Concluído!</div>
+        <div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--tx)">${totalRespostas}/${totalMembros}</div>
         <div style="font-size:11px;color:var(--tx2);margin-top:4px">Todos responderam — cards gerados</div>
       </div>`;
   } else {
@@ -16661,7 +16661,7 @@ function _renderSurveyTodasRespostas(inner, survey, members){
             : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
           <div style="flex:1">
             <div style="font-family:'Manrope',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
-            <div style="font-size:11px;font-family:'DM Mono',monospace;color:${respondeu ? '#4dffb0' : '#f87171'};margin-top:2px">${respondeu ? '✅ Respondeu' : '⏳ Aguardando'}</div>
+            <div style="font-size:11px;font-family:'DM Mono',monospace;color:${respondeu ? 'var(--tx)' : '#f87171'};margin-top:2px">${respondeu ? '✅ Respondeu' : '⏳ Aguardando'}</div>
           </div>
           ${result ? `<div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;font-weight:700">${result.rating}</div>` : ''}
         </div>
