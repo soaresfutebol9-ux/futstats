@@ -782,7 +782,12 @@ html.is-touch .auth-ball{animation:none}
 
 /* Ranking list switch — sem blur */
 #rl-wrap{overflow:visible;position:relative;}
-#rl{will-change:transform,opacity;}
+/* will-change só durante a transição: aplicado nas classes de animação,
+   nunca no estado base. Tê-lo sempre ativo forçava o navegador a manter
+   #rl (que contém listas longas, ex.: Recordes) em uma camada de
+   composição separada o tempo todo — causa raiz de travamentos
+   esporádicos de scroll e de glitches de repaint em elementos vizinhos
+   (ex.: barra de navegação inferior "desaparecendo"). */
 @keyframes rl-slide-in-right {
   0%  {transform:translateX(100%);opacity:0}
   100%{transform:translateX(0);opacity:1}
@@ -799,10 +804,10 @@ html.is-touch .auth-ball{animation:none}
   0%  {transform:translateX(0);opacity:1}
   100%{transform:translateX(100%);opacity:0}
 }
-#rl.slide-in-right  {animation:rl-slide-in-right  .32s cubic-bezier(.25,1,.5,1) forwards;}
-#rl.slide-in-left   {animation:rl-slide-in-left   .32s cubic-bezier(.25,1,.5,1) forwards;}
-#rl.slide-out-left  {animation:rl-slide-out-left  .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
-#rl.slide-out-right {animation:rl-slide-out-right .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
+#rl.slide-in-right  {will-change:transform,opacity;animation:rl-slide-in-right  .32s cubic-bezier(.25,1,.5,1) forwards;}
+#rl.slide-in-left   {will-change:transform,opacity;animation:rl-slide-in-left   .32s cubic-bezier(.25,1,.5,1) forwards;}
+#rl.slide-out-left  {will-change:transform,opacity;animation:rl-slide-out-left  .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
+#rl.slide-out-right {will-change:transform,opacity;animation:rl-slide-out-right .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
 
 /* ── BOTTOM NAV — pill indicator + ripple ── */
 .bn{position:relative}
