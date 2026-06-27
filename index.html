@@ -11396,8 +11396,8 @@ window.irParaRankingGA=()=>{
 </div>
 
 <!-- ══ MODAL SURVEY (Questionário de Atributos) ══ -->
-<div id="modal-survey" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.72);overflow-y:auto;padding:20px 0">
-  <div id="survey-inner" style="max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--bo);border-radius:20px;padding:24px 20px 32px;position:relative">
+<div id="modal-survey" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.72);overflow-y:auto;padding:16px;align-items:center;justify-content:center">
+  <div id="survey-inner" style="max-width:440px;width:100%;margin:auto;background:var(--bg2);border:1px solid var(--bo);border-radius:20px;padding:20px 18px 24px;position:relative;max-height:calc(100vh - 48px);overflow-y:auto">
     <!-- preenchido dinamicamente -->
   </div>
 </div>
@@ -16428,7 +16428,7 @@ window.abrirSurvey = function(){
       </div>`;
   }
 
-  modal.style.display = 'block';
+  modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 };
 
@@ -16465,57 +16465,171 @@ function _renderSurveyBloqueado(inner){
 }
 
 /* ── REGRA B/C: Tela ADMIN — criar ou resetar survey ── */
+
+/* ── CICLO SEMESTRAL FIXO ──────────────────────────────────────────
+   S1 = Janeiro a Junho   → próximo ciclo começa em 1º de Julho
+   S2 = Julho a Dezembro  → próximo ciclo começa em 1º de Janeiro
+   ────────────────────────────────────────────────────────────────── */
+
+/* Retorna o ciclo semestral de uma data: "S1/YYYY" ou "S2/YYYY" */
+function _getCicloKey(date){
+  const d = date || new Date();
+  const mes = d.getMonth(); // 0-indexed
+  const ano = d.getFullYear();
+  return mes <= 5 ? `S1/${ano}` : `S2/${ano}`;
+}
+
+/* Retorna o ciclo semestral atual */
+function _getCicloAtual(){
+  return _getCicloKey(new Date());
+}
+
+/* Retorna true se o survey pode ser renovado:
+   - Sem survey existente: sempre pode criar
+   - Com survey: só pode renovar se o ciclo atual for DIFERENTE
+     do ciclo em que o survey foi criado */
+function _surveyPodeRenovar(survey){
+  if(!survey || !survey.createdAt) return true;
+  const cicloSurvey = _getCicloKey(new Date(survey.createdAt));
+  const cicloAtual  = _getCicloAtual();
+  return cicloAtual !== cicloSurvey;
+}
+
+/* Retorna a data de início do próximo ciclo */
+function _proximoCicloInicio(survey){
+  if(!survey?.createdAt) return null;
+  const d = new Date(survey.createdAt);
+  const mes = d.getMonth();
+  const ano = d.getFullYear();
+  // S1 (Jan-Jun) → próximo começa em Jul/mesmo ano
+  // S2 (Jul-Dez) → próximo começa em Jan/ano seguinte
+  if(mes <= 5) return new Date(ano, 6, 1);   // 1º de Julho
+  else         return new Date(ano + 1, 0, 1); // 1º de Janeiro
+}
+
+/* Retorna objeto com dias restantes para o próximo ciclo */
+function _surveyTempoRestante(survey){
+  const proximo = _proximoCicloInicio(survey);
+  if(!proximo) return null;
+  const restMs = proximo.getTime() - Date.now();
+  if(restMs <= 0) return null;
+  const dias = Math.ceil(restMs / (24*60*60*1000));
+  const meses = Math.floor(dias / 30);
+  const diasRest = dias % 30;
+  return { dias, meses, diasRest };
+}
+
+/* Formata a data de criação do survey */
+function _surveyDataCriacao(survey){
+  if(!survey?.createdAt) return '—';
+  return new Date(survey.createdAt).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+/* Retorna a data formatada de início do próximo ciclo */
+function _surveyDataProxima(survey){
+  const d = _proximoCicloInicio(survey);
+  if(!d) return '—';
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+}
+
 function _renderSurveyAdmin(inner, gd){
   const survey = gd.survey || null;
   const members = gd.members || [];
-  // Apenas membros elegíveis (Nível >= 5) entram na contagem
   const membrosElegiveis = members.filter(m => _usuarioElegivelSurvey(m.uid));
   const totalRespostas = survey ? Object.keys(survey.responses||{}).length : 0;
   const totalMembros = membrosElegiveis.length;
-  const totalGeral = members.length;
+  const podeRenovar = _surveyPodeRenovar(survey);
+  const tempoRest = survey ? _surveyTempoRestante(survey) : null;
+  const todosResponderam = totalRespostas === totalMembros && totalMembros > 0;
+
+  /* ── STATUS BADGE ── */
+  let statusHTML = '';
+  if(!survey){
+    statusHTML = `
+      <div style="text-align:center;padding:28px 16px 20px">
+        <div style="font-size:44px;margin-bottom:12px">📋</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:16px;color:var(--tx);margin-bottom:6px">Nenhum questionário ativo</div>
+        <div style="font-size:13px;color:var(--tx2)">Crie o questionário semestral para gerar os Cards dos jogadores.</div>
+      </div>`;
+  } else if(todosResponderam){
+    statusHTML = `
+      <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.3);border-radius:14px;padding:16px;margin-bottom:4px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-family:'Freshman',sans-serif;font-size:15px;color:#4dffb0;margin-bottom:4px">Concluído!</div>
+        <div style="font-family:'DM Mono',monospace;font-size:22px;color:#4dffb0">${totalRespostas}/${totalMembros}</div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:4px">Todos responderam — cards gerados</div>
+      </div>`;
+  } else {
+    const pct = totalMembros > 0 ? Math.round(totalRespostas/totalMembros*100) : 0;
+    statusHTML = `
+      <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:16px;margin-bottom:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;color:var(--tx2)">Respostas recebidas</div>
+          <div style="font-family:'DM Mono',monospace;font-size:20px;color:#a855f7">${totalRespostas}<span style="font-size:13px;color:var(--tx2)">/${totalMembros}</span></div>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a855f7,#7c3aed);border-radius:99px;transition:width .4s"></div>
+        </div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:6px">Criado em ${_surveyDataCriacao(survey)}</div>
+      </div>`;
+  }
+
+  /* ── BLOCO DE RENOVAÇÃO ── */
+  let renovacaoHTML = '';
+  if(survey && !podeRenovar && tempoRest){
+    const label = tempoRest.meses > 0
+      ? `${tempoRest.meses} ${tempoRest.meses===1?'mês':'meses'}${tempoRest.diasRest>0?' e '+tempoRest.diasRest+' dias':''}`
+      : `${tempoRest.dias} dias`;
+    renovacaoHTML = `
+      <div style="background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.25);border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:28px;flex-shrink:0">🔒</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fb923c;margin-bottom:2px">Novo ciclo bloqueado</div>
+          <div style="font-size:12px;color:var(--tx2);line-height:1.4">Liberado em <strong style="color:var(--tx)">${_surveyDataProxima(survey)}</strong> — faltam ${label}</div>
+        </div>
+      </div>`;
+  }
+
+  /* ── BOTÃO DE AÇÃO PRINCIPAL ── */
+  let btnHTML = '';
+  if(!survey){
+    btnHTML = `
+      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        ✨ Criar Question<span style="font-family:'DM Sans',sans-serif">á</span>rio
+      </button>`;
+  } else if(podeRenovar){
+    btnHTML = `
+      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        🔄 Novo Ciclo Semestral
+      </button>`;
+  }
+
+  /* ── VER RESPOSTAS ── */
+  const verRespostasHTML = totalRespostas > 0 ? `
+    <button onclick="_verTodasRespostas()" style="width:100%;padding:13px;border-radius:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:10px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      👁️ Ver respostas (${totalRespostas}/${totalMembros})
+    </button>` : '';
 
   inner.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Question<span style="font-family:'DM Sans',sans-serif">á</span>rio do Card</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="font-family:'Freshman',sans-serif;font-size:19px;color:var(--tx)">📋 Question<span style="font-family:'DM Sans',sans-serif">á</span>rio</div>
       <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
 
-    ${survey ? `
-    <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:4px">Questionário ativo — Elegíveis: ${totalMembros} de ${totalGeral} membros (Nível ${SURVEY_NIVEL_MINIMO}+)</div>
-      <div style="font-size:15px;font-family:'DM Mono',monospace;color:#4dffb0">${totalRespostas} / ${totalMembros} responderam</div>
-      ${totalRespostas===totalMembros && totalMembros>0 ? `<div style="font-size:12px;color:#4dffb0;margin-top:6px">✅ Todos os elegíveis responderam — cards gerados!</div>` : ''}
-    </div>
-    ` : `
-    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
-      <div style="font-size:32px;margin-bottom:8px">✨</div>
-      <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx);margin-bottom:6px">Nenhum question<span style="font-family:'DM Sans',sans-serif">á</span>rio ativo</div>
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:${totalMembros < totalGeral ? '8px' : '0'}">Crie um questionário para que os membros avaliem uns aos outros e gerem seus Cards.</div>
-      ${totalMembros < totalGeral ? `<div style="font-size:12px;color:#a855f7;margin-top:4px">⚡ ${totalGeral - totalMembros} membro(s) ainda abaixo do Nível ${SURVEY_NIVEL_MINIMO} — serão incluídos ao atingir o nível.</div>` : ''}
-    </div>
-    `}
+    ${statusHTML}
 
-    <div style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.5">
-      Membros com <strong>Nível ${SURVEY_NIVEL_MINIMO}+</strong> podem avaliar uns aos outros nas 6 características e ter seu Card do Jogador gerado. Novos membros são incluídos automaticamente ao atingir o nível — sem perder respostas existentes.
-    </div>
-
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:14px 0">
       ${SURVEY_ATTRS.map(a=>`
-        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,.06);border:1px solid var(--bo);border-radius:20px;font-size:13px;color:var(--tx2)">
+        <div style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid var(--bo);border-radius:20px;font-size:12px;color:var(--tx2)">
           ${a.icon} ${a.label}
         </div>`).join('')}
     </div>
 
-    ${totalRespostas > 0 ? `
-    <button onclick="_verTodasRespostas()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:10px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      👁️ Ver respostas de todos (${totalRespostas}/${totalMembros})
-    </button>
-    ` : ''}
+    ${renovacaoHTML}
+    ${verRespostasHTML}
+    ${btnHTML}
 
-    <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      ${survey ? '🔄 Novo Question<span style="font-family:\'DM Sans\',sans-serif">á</span>rio (zera respostas)' : '✨ Criar Question<span style="font-family:\'DM Sans\',sans-serif">á</span>rio'}
-    </button>
-    <div style="font-size:11px;color:var(--tx2);text-align:center;margin-top:8px;opacity:.6">🔒 Visível apenas para o administrador do grupo</div>
+    <div style="font-size:11px;color:var(--tx2);text-align:center;margin-top:6px;opacity:.55">🔒 Visível apenas para o administrador</div>
   `;
 }
 
@@ -16607,7 +16721,23 @@ function _renderSurveyTodasRespostas(inner, survey, members){
 window._criarSurvey = async function(){
   const gid = window._groupId;
   if(!gid) return;
-  if(!confirm('Criar um novo questionário? Isso substituirá o questionário atual e todas as respostas serão reiniciadas.')) return;
+
+  // Trava semestral: bloqueia se não passaram 6 meses
+  const surveyAtual = window._gd?.survey || null;
+  if(surveyAtual && !_surveyPodeRenovar(surveyAtual)){
+    const tempoRest = _surveyTempoRestante(surveyAtual);
+    const label = tempoRest
+      ? (tempoRest.meses > 0
+          ? `${tempoRest.meses} ${tempoRest.meses===1?'mês':'meses'}${tempoRest.diasRest>0?' e '+tempoRest.diasRest+' dias':''}`
+          : `${tempoRest.dias} dias`)
+      : '';
+    alert(`🔒 O questionário deste semestre já foi realizado.\n\nO próximo ciclo será liberado em ${_surveyDataProxima(surveyAtual)}${label ? ' (faltam '+label+')' : ''}.`);
+    return;
+  }
+
+  const acao = surveyAtual ? 'Iniciar novo ciclo semestral?' : 'Criar o questionário?';
+  const aviso = surveyAtual ? '\n\nIsso encerrará o ciclo atual e reiniciará as respostas.' : '';
+  if(!confirm(acao + aviso)) return;
 
   const survey = { createdAt: Date.now(), responses: {}, results: {} };
   try{
