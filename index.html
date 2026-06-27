@@ -11286,38 +11286,38 @@ window.irParaRankingGA=()=>{
   <div class="mfab-items" id="mfab-items">
     <div class="mfab-item-wrap" id="mfab-survey-wrap" style="display:none">
       <span class="mfab-item-label">Question<span style="font-family:'DM Sans',sans-serif">á</span>rio</span>
-      <button class="mfab-item" id="mfab-survey-btn" onclick="_fecharModaisDoFab();mfabClose();abrirSurvey()" title="Questionário de Atributos" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">
+      <button class="mfab-item" id="mfab-survey-btn" onclick="_fecharModaisDoFab();mfabClose(true);abrirSurvey()" title="Questionário de Atributos" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">
         📋
       </button>
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Carta do Jogador</span>
-      <button class="mfab-item mfab-item-carta" onclick="_fecharModaisDoFab();mfabClose();abrirCartaJogador()" title="Carta do Jogador">
+      <button class="mfab-item mfab-item-carta" onclick="_fecharModaisDoFab();mfabClose(true);abrirCartaJogador()" title="Carta do Jogador">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><rect x="3" y="2" width="18" height="20" rx="3"/><circle cx="12" cy="9" r="3"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
       </button>
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Calendário</span>
-      <button class="mfab-item mfab-item-calendario" onclick="_fecharModaisDoFab();mfabClose();abrirCalendario()" title="Calendário de Partidas">
+      <button class="mfab-item mfab-item-calendario" onclick="_fecharModaisDoFab();mfabClose(true);abrirCalendario()" title="Calendário de Partidas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
     </div>
     <div class="mfab-item-wrap" style="position:relative;">
       <span class="mfab-item-label">Conquistas</span>
-      <button class="mfab-item mfab-item-conquistas" onclick="_fecharModaisDoFab();mfabClose();_abrirConquistasComScroll()" title="Conquistas">
+      <button class="mfab-item mfab-item-conquistas" onclick="_fecharModaisDoFab();mfabClose(true);_abrirConquistasComScroll()" title="Conquistas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </button>
       <div class="mfab-cq-alert" id="mfab-cq-alert">!</div>
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Histórico de Confrontos</span>
-      <button class="mfab-item mfab-item-confrontos" onclick="_fecharModaisDoFab();mfabClose();abrirHistoricoConfrontos()" title="Histórico de Confrontos">
+      <button class="mfab-item mfab-item-confrontos" onclick="_fecharModaisDoFab();mfabClose(true);abrirHistoricoConfrontos()" title="Histórico de Confrontos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       </button>
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Modo Duelo</span>
-      <button class="mfab-item mfab-item-duelo" onclick="_fecharModaisDoFab();mfabClose();openDuelo()" title="Modo Duelo">⚔️</button>
+      <button class="mfab-item mfab-item-duelo" onclick="_fecharModaisDoFab();mfabClose(true);openDuelo()" title="Modo Duelo">⚔️</button>
     </div>
   </div>
   <!-- Botão principal -->
@@ -11583,7 +11583,7 @@ function mfabToggle(){
   }
   _mfabStagger(open);
 }
-function mfabClose(){
+function mfabClose(immediate){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
   const icon  = document.getElementById('mfab-main-icon');
@@ -11596,9 +11596,17 @@ function mfabClose(){
   document.body.classList.remove('mfab-open');
   if(overlay){
     clearTimeout(overlay._closeT);
-    // Só remove o blur depois que os botões já terminaram de recolher
-    // (stagger), evitando o overlay desaparecer antes dos FABs.
-    overlay._closeT = setTimeout(() => overlay.classList.remove('open'), _mfabStaggerDuration(false));
+    if(immediate){
+      // Fechamento causado por uma ação explícita (clique num item do
+      // menu, ex.: abrir Conquistas) — o usuário já indicou o que quer
+      // fazer, então o blur deve sumir na hora, sem esperar o stagger
+      // de recolhimento dos botões (que é só um efeito visual de saída).
+      overlay.classList.remove('open');
+    } else {
+      // Fechamento "passivo" (toque fora do menu, botão X) — aguarda os
+      // botões terminarem de recolher antes de remover o blur.
+      overlay._closeT = setTimeout(() => overlay.classList.remove('open'), _mfabStaggerDuration(false));
+    }
   }
   if(wasOpen) _mfabStagger(false);
 }
