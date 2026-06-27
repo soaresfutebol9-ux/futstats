@@ -15000,6 +15000,13 @@ function _cartaFallbackDownload(card){
 }
 .craque-tab-btn.active{color:#000000;border-bottom-color:#000000;}
 .craque-tab-btn:hover:not(.active){color:rgba(0,0,0,.6);}
+/* ── TRANSIÇÃO ENTRE ABAS (Semana ↔ Histórico) — mesma animação de slide
+   usada na troca de abas do Ranking (#rl), aplicada ao corpo do modal. ── */
+#craque-modal-body{overflow:hidden;position:relative;}
+#craque-modal-body.slide-in-right  {will-change:transform,opacity;animation:rl-slide-in-right  .32s cubic-bezier(.25,1,.5,1) forwards;}
+#craque-modal-body.slide-in-left   {will-change:transform,opacity;animation:rl-slide-in-left   .32s cubic-bezier(.25,1,.5,1) forwards;}
+#craque-modal-body.slide-out-left  {will-change:transform,opacity;animation:rl-slide-out-left  .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
+#craque-modal-body.slide-out-right {will-change:transform,opacity;animation:rl-slide-out-right .22s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
 /* ── HISTÓRICO DE CRAQUES ── */
 .craque-hist-item{
   display:flex;align-items:center;gap:10px;
@@ -15475,10 +15482,33 @@ window.abrirCraqueSemana = function(){
   window._salvarCraqueSemana();
 };
 
+const _craqueTabOrder = {semana:0, historico:1};
 window._setCraqueTab = function(tab){
-  _craque_tab = tab;
-  _atualizarTabsCraque();
-  _renderCraqueModalContent();
+  if(tab === _craque_tab) return;
+  const body = document.getElementById('craque-modal-body');
+  const dir = (_craqueTabOrder[tab] ?? 0) > (_craqueTabOrder[_craque_tab] ?? 0) ? 'left' : 'right';
+
+  if(!body){
+    _craque_tab = tab;
+    _atualizarTabsCraque();
+    _renderCraqueModalContent();
+    return;
+  }
+
+  body.classList.remove('slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+  body.classList.add(dir === 'left' ? 'slide-out-left' : 'slide-out-right');
+
+  setTimeout(() => {
+    _craque_tab = tab;
+    _atualizarTabsCraque();
+    _renderCraqueModalContent();
+    body.classList.remove('slide-out-left','slide-out-right');
+    void body.offsetHeight; // força reflow
+    body.classList.add(dir === 'left' ? 'slide-in-right' : 'slide-in-left');
+    body.addEventListener('animationend', () => {
+      body.classList.remove('slide-in-right','slide-in-left');
+    }, {once:true});
+  }, 200);
 };
 
 function _atualizarTabsCraque(){
