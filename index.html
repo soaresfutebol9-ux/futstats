@@ -10485,10 +10485,6 @@ window.showTab=(n,btn,e)=>{
 
   _lastTab=n;
 
-  // Renderiza antes de mostrar
-  if(n==='r')renderRanking();
-  if(n==='hist')renderHistTab();
-
   // ── Entra a nova tab ──
   const nextEl=$(map[n]);
   if(!nextEl)return;
@@ -10516,6 +10512,10 @@ window.showTab=(n,btn,e)=>{
     // Posiciona fora da tela (sem transition ainda)
     nextEl.classList.add(dir==='right'?'tab-enter':'tab-enter-left');
     void nextEl.offsetHeight; // força reflow
+    // Renderiza o conteúdo após o reflow e antes de acionar a animação,
+    // evitando que o DOM mutation cause piscada durante a transição de entrada
+    if(n==='r')renderRanking();
+    if(n==='hist')renderHistTab();
     // Aciona transition para posição final
     nextEl.classList.add('tab-enter-run');
     // Após a transition, limpa e marca como active
@@ -10538,6 +10538,8 @@ window.showTab=(n,btn,e)=>{
     const timeoutId=setTimeout(onDone, 350);
     _tabTransitionState.set(nextEl,{timeoutId,listener:onDone});
   } else {
+    if(n==='r')renderRanking();
+    if(n==='hist')renderHistTab();
     nextEl.classList.add('active');
   }
 };
@@ -13951,16 +13953,17 @@ window.abrirConquistas = async function(uid){
   if(searchInput) searchInput.value = '';
   const clearBtn = document.getElementById('conquistas-search-clear');
   if(clearBtn) clearBtn.style.display = 'none';
-  // Renderiza o conteúdo ANTES de exibir o modal, pra não mostrar o estado
-  // de placeholder ("Carregando...") por um instante — o modal só aparece
-  // (com fade suave) já com as conquistas prontas na tela.
-  await _renderConquistasModal(_cqUid);
+  // Mostra o modal imediatamente (com "Carregando...") para que a animação
+  // de entrada seja instantânea — igual ao comportamento dos outros painéis
+  // do FAB. O conteúdo é renderizado em paralelo, sem bloquear a transição.
+  const body = document.getElementById('conquistas-body');
+  if(body) body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--tx3);font-family:\'DM Mono\',monospace">Carregando...</div>';
+  modal.style.opacity='0';
+  modal.style.transition='opacity .22s ease';
   modal.style.display='flex';
-  requestAnimationFrame(()=>{
-    modal.style.opacity='0';
-    modal.style.transition='opacity .22s ease';
-    requestAnimationFrame(()=>{ modal.style.opacity='1'; });
-  });
+  requestAnimationFrame(()=>{ modal.style.opacity='1'; });
+  // Renderiza o conteúdo depois que o modal já está visível
+  await _renderConquistasModal(_cqUid);
 };
 
 // Filtra os cards de conquistas exibidos por palavra-chave (nome, descrição ou categoria).
