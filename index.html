@@ -3993,15 +3993,15 @@ body::before{
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
 
           <!-- Gols -->
-          <div style="background:linear-gradient(135deg,rgba(255,220,50,.15),rgba(255,209,102,.05));border:1px solid rgba(255,209,102,.4);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 20px rgba(255,209,102,.12)">
+          <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:rgba(255,209,102,.2);border:1px solid rgba(255,209,102,.45);display:flex;align-items:center;justify-content:center;font-size:16px">⚽</div>
+              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
                 <div style="font-size:12px;font-weight:700;color:var(--tx)">Gols</div>
                 <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">marcados</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.2);border-radius:10px;overflow:hidden;border:1px solid rgba(255,209,102,.25)">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fgols',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
               <input type="number" id="fgols" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
               <button onclick="stepField('fgols',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
@@ -4009,15 +4009,15 @@ body::before{
           </div>
 
           <!-- Assistências -->
-          <div style="background:linear-gradient(135deg,rgba(96,165,250,.1),rgba(96,165,250,.03));border:1px solid rgba(96,165,250,.25);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 16px rgba(96,165,250,.06)">
+          <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.3);display:flex;align-items:center;justify-content:center;font-size:16px">👟</div>
+              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Assist.</div>
+                <div style="font-size:12px;font-weight:700;color:var(--tx)">Assistências</div>
                 <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">assistências</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.2);border-radius:10px;overflow:hidden;border:1px solid rgba(96,165,250,.15)">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fassist',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
               <input type="number" id="fassist" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
               <button onclick="stepField('fassist',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
@@ -4037,15 +4037,15 @@ body::before{
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 
           <!-- Pênaltis batidos -->
-          <div style="background:linear-gradient(135deg,rgba(160,170,190,.12),rgba(140,150,170,.04));border:1px solid rgba(160,170,190,.35);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 16px rgba(140,150,170,.1)">
+          <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:rgba(160,170,190,.2);border:1px solid rgba(160,170,190,.4);display:flex;align-items:center;justify-content:center;font-size:16px">🥅</div>
+              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
                 <div style="font-size:12px;font-weight:700;color:var(--tx)">Pên. Batidos</div>
                 <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">cobranças</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.2);border-radius:10px;overflow:hidden;border:1px solid rgba(160,170,190,.2)">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpb',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
               <input type="number" id="fpb" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
               <button onclick="stepField('fpb',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
@@ -4053,15 +4053,15 @@ body::before{
           </div>
 
           <!-- Pênaltis convertidos -->
-          <div style="background:linear-gradient(135deg,rgba(77,255,176,.13),rgba(38,214,138,.04));border:1px solid rgba(77,255,176,.4);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 0 20px rgba(77,255,176,.12)">
+          <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:rgba(77,255,176,.2);border:1px solid rgba(77,255,176,.45);display:flex;align-items:center;justify-content:center;font-size:16px">✅</div>
+              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Pên. Golos</div>
+                <div style="font-size:12px;font-weight:700;color:var(--tx)">Pên. Convertidos</div>
                 <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">convertidos</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.2);border-radius:10px;overflow:hidden;border:1px solid rgba(77,255,176,.25)">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpk',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
               <input type="number" id="fpk" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
               <button onclick="stepField('fpk',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
