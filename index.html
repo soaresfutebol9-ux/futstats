@@ -2323,28 +2323,27 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
   box-shadow:0 4px 12px rgba(255,180,0,.55),0 2px 6px rgba(0,0,0,.4);
   color:#07090d;
-  position:relative;
 }
-/* Badge ! no botão conquistas do MFAB */
+/* Badge ! no botão conquistas do MFAB — sobrepõe o botão, posicionado no wrap */
 .mfab-cq-alert{
   position:absolute;top:-4px;right:-4px;
   width:18px;height:18px;border-radius:50%;
-  background:#FF5A7A;border:2px solid #07090d;
+  background:#FF5A7A;border:2px solid var(--bg,#f5f7fc);
   font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
   color:#fff;display:none;align-items:center;justify-content:center;
   animation:badgePulse 1.8s ease-in-out infinite;
-  pointer-events:none;z-index:2;
+  pointer-events:none;z-index:10;
 }
 .mfab-cq-alert.visible{display:flex;}
 /* Badge ! no botão principal + */
 .mfab-main-cq-alert{
-  position:absolute;top:-3px;right:-3px;
-  min-width:18px;height:18px;border-radius:99px;padding:0 4px;
-  background:#FF5A7A;border:2px solid #07090d;
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;border-radius:50%;
+  background:#FF5A7A;border:2px solid var(--bg,#f5f7fc);
   font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
   color:#fff;display:none;align-items:center;justify-content:center;
   animation:badgePulse 1.8s ease-in-out infinite;
-  pointer-events:none;z-index:2;
+  pointer-events:none;z-index:10;
 }
 .mfab-main-cq-alert.visible{display:flex;}
 /* Card de conquista com alerta pendente */
@@ -11209,12 +11208,12 @@ window.irParaRankingGA=()=>{
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
     </div>
-    <div class="mfab-item-wrap">
+    <div class="mfab-item-wrap" style="position:relative;">
       <span class="mfab-item-label">Conquistas</span>
       <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();_abrirConquistasComScroll()" title="Conquistas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <div class="mfab-cq-alert" id="mfab-cq-alert">!</div>
       </button>
+      <div class="mfab-cq-alert" id="mfab-cq-alert">!</div>
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Histórico de Confrontos</span>
@@ -11228,11 +11227,13 @@ window.irParaRankingGA=()=>{
     </div>
   </div>
   <!-- Botão principal -->
-  <button class="mfab-main" id="mfab-main" onclick="mfabToggle()">
-    <span id="mfab-main-icon">＋</span>
-    <div class="mfab-main-badge" id="mfab-main-badge"></div>
+  <div style="position:relative;display:inline-flex;">
+    <button class="mfab-main" id="mfab-main" onclick="mfabToggle()">
+      <span id="mfab-main-icon">＋</span>
+      <div class="mfab-main-badge" id="mfab-main-badge"></div>
+    </button>
     <div class="mfab-main-cq-alert" id="mfab-main-cq-alert">!</div>
-  </button>
+  </div>
 </div>
 
 <!-- ══ MODAL HISTÓRICO DE CONFRONTOS ══ -->
@@ -13951,6 +13952,7 @@ async function _renderConquistasModal(uid){
 }
 
 // ── Fecha o modal de detalhe de conquista e marca como visto ──
+// Após fechar, rola automaticamente para a próxima conquista pendente (se houver)
 function _cqDetFechar(modal){
   if(!modal) return;
   const cqId = modal._currentCqId;
@@ -13960,6 +13962,23 @@ function _cqDetFechar(modal){
     // Remove classe de alerta do card correspondente
     const card = document.querySelector(`.cq-card[data-cqid="${cqId}"]`);
     if(card) card.classList.remove('cq-nova-alerta');
+    // Se ainda há conquistas pendentes, rola para a próxima
+    if(window._cqPendingAlerts && window._cqPendingAlerts.size > 0){
+      setTimeout(()=>{
+        const nextId = [...window._cqPendingAlerts][0];
+        _cqScrollToCard(nextId);
+      }, 300);
+    }
+  }
+}
+
+// Rola o modal de conquistas até o card de uma conquista específica
+function _cqScrollToCard(cqId){
+  const body = document.getElementById('conquistas-body');
+  if(!body || !cqId) return;
+  const card = body.querySelector(`.cq-card[data-cqid="${cqId}"]`);
+  if(card){
+    card.scrollIntoView({behavior:'smooth', block:'center'});
   }
 }
 
@@ -14121,28 +14140,14 @@ window._cqInitAlerts = async function(){
   } catch(e){ console.warn('[CQ Alert] erro ao inicializar alertas:', e); }
 };
 
-// Abre conquistas com scroll automático até a conquista pendente
+// Abre conquistas com scroll automático até a primeira conquista pendente
 window._abrirConquistasComScroll = function(){
   window.abrirConquistas();
   if(window._cqPendingAlerts.size === 0) return;
-  // Aguarda render do modal e faz scroll
+  // Aguarda render do modal e faz scroll até a primeira pendente
   setTimeout(()=>{
-    const body = document.getElementById('conquistas-body');
-    if(!body) return;
-    // Pega o primeiro cqId pendente
     const firstId = [...window._cqPendingAlerts][0];
-    // Busca o card pelo data-cqid ou pelo onclick
-    const cards = body.querySelectorAll('.cq-card.desbloqueada');
-    let targetCard = null;
-    cards.forEach(card => {
-      const onclick = card.getAttribute('onclick') || '';
-      if(onclick.includes(`'${firstId}'`) || onclick.includes(`"${firstId}"`)){
-        targetCard = card;
-      }
-    });
-    if(targetCard){
-      targetCard.scrollIntoView({behavior:'smooth', block:'center'});
-    }
+    _cqScrollToCard(firstId);
   }, 420);
 };
 
