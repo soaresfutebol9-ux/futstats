@@ -3937,8 +3937,8 @@ body::before{
     <!-- NOVA PARTIDA -->
     <div class="tv" id="tadd">
       <!-- Header premium -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-top:.2rem">
-        <div>
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;padding-top:.2rem">
+        <div style="text-align:center">
           <div style="font-family:'VarsityTeam',serif;font-size:19px;font-weight:bold;letter-spacing:.3px;color:#000;text-transform:uppercase;white-space:nowrap">Registre a sua performance</div>
         </div>
 
@@ -10768,7 +10768,9 @@ window._fecharCrownToast=function(){
 let _dueloA=null,_dueloB=null,_dueloScope='mes';
 let _dueloDateA=null,_dueloDateB=null;
 
+let _dueloCloseTimer=null;
 window.openDuelo=()=>{
+  if(_dueloCloseTimer){clearTimeout(_dueloCloseTimer);_dueloCloseTimer=null;}
   _dueloA=null;_dueloB=null;_dueloScope='mes';_dueloDateA=null;_dueloDateB=null;
   _renderDueloBody();
   const modal=document.getElementById('modal-duelo');
@@ -10778,7 +10780,8 @@ window.openDuelo=()=>{
 window.closeDuelo=()=>{
   const modal=document.getElementById('modal-duelo');
   modal.classList.remove('open');
-  setTimeout(()=>{modal.style.display='none';},300);
+  if(_dueloCloseTimer)clearTimeout(_dueloCloseTimer);
+  _dueloCloseTimer=setTimeout(()=>{modal.style.display='none';_dueloCloseTimer=null;},300);
 };
 window.setDueloScope=scope=>{
   _dueloScope=scope;
@@ -13937,11 +13940,13 @@ function _cqEscapeAttr(str){
   return (str||'').toString().replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 }
 
+let _cqCloseTimer=null;
 window.abrirConquistas = function(uid){
   _cqUid = uid || (window._currentUserUid);
   if(!_cqUid) return;
   const modal = document.getElementById('modal-conquistas');
   if(!modal) return;
+  if(_cqCloseTimer){clearTimeout(_cqCloseTimer);_cqCloseTimer=null;}
   // Reseta a busca de uma sessão anterior antes de abrir novamente
   const searchInput = document.getElementById('conquistas-search-input');
   if(searchInput) searchInput.value = '';
@@ -14008,7 +14013,8 @@ window.fecharConquistas = function(){
   if(!modal) return;
   modal.style.transition='opacity .2s ease';
   modal.style.opacity='0';
-  setTimeout(()=>{ modal.style.display='none'; modal.style.opacity=''; modal.style.transition=''; },220);
+  if(_cqCloseTimer)clearTimeout(_cqCloseTimer);
+  _cqCloseTimer=setTimeout(()=>{ modal.style.display='none'; modal.style.opacity=''; modal.style.transition=''; _cqCloseTimer=null; },220);
 };
 
 window.verConquistasDoToast = function(){
@@ -14871,6 +14877,7 @@ function _atualizarBotaoAplicar(){
 
 /* Stub: substituído pela versão definitiva baseada no questionário (ver abaixo) */
 window.abrirCartaJogador = function(){};
+window._cartaCloseTimer=null;
 
 window.fecharCartaJogador = function(){
   // Apenas limpa o pendente sem reverter — o tema salvo persiste no localStorage
@@ -14885,11 +14892,13 @@ window.fecharCartaJogador = function(){
     inner.style.transform='translateY(24px) scale(.97)';
     inner.style.opacity='0';
   }
-  setTimeout(()=>{
+  if(window._cartaCloseTimer)clearTimeout(window._cartaCloseTimer);
+  window._cartaCloseTimer=setTimeout(()=>{
     modal.classList.remove('open');
     modal.style.cssText='';
     if(inner) inner.style.cssText='';
     document.body.style.overflow='';
+    window._cartaCloseTimer=null;
   },220);
 };
 
@@ -16944,6 +16953,10 @@ window.abrirCartaJogador = function(uidParam){
   const modal = document.getElementById('modal-carta');
   const inner = document.getElementById('carta-inner');
   if(!modal||!inner) return;
+
+  if(window._cartaCloseTimer){clearTimeout(window._cartaCloseTimer);window._cartaCloseTimer=null;}
+  modal.style.cssText='';
+  inner.style.cssText='';
 
   const survey = gd?.survey;
   const temCard = survey?.completed && survey?.results?.[uid];
