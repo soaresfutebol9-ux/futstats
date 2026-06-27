@@ -8030,15 +8030,7 @@ window.abrirEvolChart = function(uid){
   body.innerHTML = '<div style="text-align:center;padding:40px;color:#494a48;font-family:DM Mono,monospace">Carregando...</div>';
   m.style.display = 'flex';
   _esconderFabDuranteModal();
-  requestAnimationFrame(()=>{
-    m.classList.add('open');
-    // Reseta zoom para 100% ao abrir
-    const zSlider = document.getElementById('evol-zoom-slider');
-    const zLabel  = document.getElementById('evol-zoom-label');
-    if(zSlider){ zSlider.value = '4'; }
-    if(zLabel)  { zLabel.textContent = '100%'; }
-    _renderEvolChartExpanded(uid, body, trendEl, '__all__');
-  });
+  requestAnimationFrame(()=>{ m.classList.add('open'); _renderEvolChartExpanded(uid, body, trendEl, '__all__'); });
 };
 window._evolFiltrarAno = function(ano){
   if(!_evolCurrentUid) return;
@@ -8242,11 +8234,6 @@ function _renderEvolChartExpanded(uid, body, trendEl, filtroAno){
       </table>
     </div>
   `;
-  // Reaplicar zoom atual após re-renderizar
-  requestAnimationFrame(()=>{
-    const zSlider = document.getElementById('evol-zoom-slider');
-    if(zSlider) window._evolAplicarZoom(zSlider.value);
-  });
 }
 
 window.toggleEvolFullscreen = function(){
@@ -8256,44 +8243,6 @@ window.toggleEvolFullscreen = function(){
   btn.textContent = isFs ? '⊡' : '⛶';
   btn.title = isFs ? 'Sair da tela cheia' : 'Tela cheia';
   if(isFs) _forcarPaisagem(); else _liberarOrientacao();
-};
-
-// Zoom do gráfico de evolução
-// Passos: 0=25%, 1=50%, 2=75%, 3=87.5%, 4=100%
-// Conforme pedido: 0=pequenininho, 1=pequeno, 2=médio, 3=intermediário, 4=exatamente como está
-const _evolZoomLevels = [25, 50, 75, 87, 100]; // índices 0–4
-window._evolAplicarZoom = function(val){
-  const idx = parseInt(val);
-  const pct = _evolZoomLevels[idx];
-  const label = document.getElementById('evol-zoom-label');
-  if(label) label.textContent = pct + '%';
-
-  // Gráfico da aba Performance (perf-chart-scroll-wrap → div filho → svg)
-  const perfWrap = document.getElementById('perf-chart-scroll-wrap');
-  if(perfWrap){
-    const inner = perfWrap.querySelector('div');
-    if(inner){
-      inner.style.transformOrigin = 'left top';
-      inner.style.transform = `scale(${pct/100})`;
-      // Ajusta a altura do container para não deixar espaço vazio
-      const svgEl = inner.querySelector('svg');
-      if(svgEl){
-        const naturalH = svgEl.getBoundingClientRect().height / (pct/100);
-        perfWrap.style.height = Math.round(naturalH * pct/100) + 'px';
-      }
-    }
-    return;
-  }
-
-  // Gráfico G+A individual (evol-svg-expanded)
-  const svg = document.getElementById('evol-svg-expanded');
-  if(!svg) return;
-  const wrap = svg.parentElement;
-  if(!wrap) return;
-  wrap.style.width = pct + '%';
-  wrap.style.margin = '0 auto';
-  const body = document.getElementById('evol-chart-body');
-  if(body) body.style.overflowX = pct < 100 ? 'hidden' : 'visible';
 };
 
 window.addEventListener('keydown', e=>{ if(e.key==='Escape') fecharEvolChart(); });
@@ -9217,9 +9166,6 @@ function _renderPerfChartExpanded(){
     wrap.addEventListener('mousedown', e=>{ isDragging=true; startX=e.pageX; scrollStart=wrap.scrollLeft; wrap.style.cursor='grabbing'; e.preventDefault(); });
     document.addEventListener('mousemove', e=>{ if(!isDragging) return; wrap.scrollLeft=scrollStart-(e.pageX-startX); });
     document.addEventListener('mouseup', ()=>{ isDragging=false; wrap.style.cursor='grab'; });
-    // Reaplicar zoom atual após renderizar
-    const zSlider = document.getElementById('evol-zoom-slider');
-    if(zSlider) window._evolAplicarZoom(zSlider.value);
   });
 }
 
@@ -9274,11 +9220,6 @@ window.abrirPerfChartExpandido = function(months, valueFn, opts){
   _esconderFabDuranteModal();
   requestAnimationFrame(()=>{
     m.classList.add('open');
-    // Reseta zoom para 100% ao abrir
-    const zSlider = document.getElementById('evol-zoom-slider');
-    const zLabel  = document.getElementById('evol-zoom-label');
-    if(zSlider){ zSlider.value = '4'; }
-    if(zLabel)  { zLabel.textContent = '100%'; }
     _renderPerfChartExpanded();
     _forcarPaisagem();
   });
@@ -11313,14 +11254,6 @@ window.irParaRankingGA=()=>{
         <button id="evol-fullscreen-btn" onclick="toggleEvolFullscreen()" title="Tela cheia" style="width:28px;height:28px;border-radius:8px;background:rgba(64,201,96,.14);border:1px solid rgba(64,201,96,.4);color:#1a5c2a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(64,201,96,.28)'" onmouseout="this.style.background='rgba(64,201,96,.14)'">&#x26F6;</button>
         <button onclick="fecharEvolChart()" style="width:28px;height:28px;border-radius:8px;background:rgba(255,90,122,.14);border:1px solid rgba(220,40,70,.35);color:#cc2222;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,90,122,.28)'" onmouseout="this.style.background='rgba(255,90,122,.14)'">&#x2715;</button>
       </div>
-    </div>
-    <!-- Barra de zoom do gr&#xE1;fico -->
-    <div id="evol-zoom-bar" style="display:flex;align-items:center;gap:8px;padding:6px 14px 4px;border-bottom:1px solid rgba(64,201,96,.12)">
-      <span style="font-family:'DM Mono',monospace;font-size:9px;color:#5c5d5a;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">&#x1F50D; Zoom</span>
-      <input id="evol-zoom-slider" type="range" min="0" max="4" step="1" value="4"
-        oninput="_evolAplicarZoom(this.value)"
-        style="flex:1;height:3px;accent-color:#40c960;cursor:pointer;outline:none">
-      <span id="evol-zoom-label" style="font-family:'DM Mono',monospace;font-size:9px;color:#40c960;min-width:34px;text-align:right;flex-shrink:0">100%</span>
     </div>
     <div id="evol-summary-bar" class="evol-summary-bar" style="display:none"></div>
     <div id="evol-chart-body">
