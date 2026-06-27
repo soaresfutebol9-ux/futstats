@@ -16410,7 +16410,7 @@ window.abrirSurvey = function(){
     inner.innerHTML = `
       <div style="text-align:center;padding:40px 20px">
         <div style="font-size:48px;margin-bottom:16px">📋</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:12px">
+        <div style="font-family:'Manrope',sans-serif;font-size:18px;color:var(--tx);margin-bottom:12px">
           Nenhum questionário ativo
         </div>
         <div style="font-size:14px;color:var(--tx2);line-height:1.6;max-width:290px;margin:0 auto 24px">
@@ -16448,8 +16448,8 @@ function _renderSurveyBloqueado(inner){
   inner.innerHTML = `
     <div style="text-align:center;padding:40px 0">
       <div style="font-size:48px;margin-bottom:16px">🔒</div>
-      <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);margin-bottom:10px">
-        Question<span style="font-family:'DM Sans',sans-serif">á</span>rio do Card do Jogador
+      <div style="font-family:'Manrope',sans-serif;font-size:18px;color:var(--tx);margin-bottom:10px">
+        Questionário do Card do Jogador
       </div>
       <div style="font-size:14px;color:var(--tx2);line-height:1.6;max-width:300px;margin:0 auto 20px">
         Você ainda não atingiu o <strong style="color:#a855f7">Nível ${SURVEY_NIVEL_MINIMO}</strong> necessário.<br><br>
@@ -16457,7 +16457,7 @@ function _renderSurveyBloqueado(inner){
       </div>
       <div style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 20px;display:inline-block;margin-bottom:24px">
         <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">Nível mínimo necessário</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:28px;color:#a855f7">★ N<span style="font-family:'DM Sans',sans-serif">í</span>vel ${SURVEY_NIVEL_MINIMO}</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:28px;color:#a855f7">★ Nível ${SURVEY_NIVEL_MINIMO}</div>
       </div>
       <br>
       <button onclick="fecharSurvey()" style="padding:10px 28px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Fechar</button>
@@ -16548,14 +16548,14 @@ function _renderSurveyAdmin(inner, gd){
     statusHTML = `
       <div style="text-align:center;padding:28px 16px 20px">
         <div style="font-size:44px;margin-bottom:12px">📋</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:16px;color:var(--tx);margin-bottom:6px">Nenhum question<span style="font-family:'DM Sans',sans-serif">á</span>rio ativo</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:16px;color:var(--tx);margin-bottom:6px">Nenhum questionário ativo</div>
         <div style="font-size:13px;color:var(--tx2)">Crie o questionário semestral para gerar os Cards dos jogadores.</div>
       </div>`;
   } else if(todosResponderam){
     statusHTML = `
       <div style="background:rgba(77,255,176,.08);border:1px solid rgba(77,255,176,.3);border-radius:14px;padding:16px;margin-bottom:4px;text-align:center">
         <div style="font-size:28px;margin-bottom:6px">✅</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:15px;color:#4dffb0;margin-bottom:4px">Conclu<span style="font-family:'DM Sans',sans-serif">í</span>do!</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:15px;color:#4dffb0;margin-bottom:4px">Concluído!</div>
         <div style="font-family:'DM Mono',monospace;font-size:22px;color:#4dffb0">${totalRespostas}/${totalMembros}</div>
         <div style="font-size:11px;color:var(--tx2);margin-top:4px">Todos responderam — cards gerados</div>
       </div>`;
@@ -16594,25 +16594,25 @@ function _renderSurveyAdmin(inner, gd){
   let btnHTML = '';
   if(!survey){
     btnHTML = `
-      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        ✨ Criar Question<span style="font-family:'DM Sans',sans-serif">á</span>rio
+      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Manrope',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        ✨ Criar Questionário
       </button>`;
   } else if(podeRenovar){
     btnHTML = `
-      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <button onclick="_criarSurvey()" style="width:100%;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Manrope',sans-serif;font-size:16px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         🔄 Novo Ciclo Semestral
       </button>`;
   }
 
   /* ── VER RESPOSTAS ── */
   const verRespostasHTML = totalRespostas > 0 ? `
-    <button onclick="_verTodasRespostas()" style="width:100%;padding:13px;border-radius:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:10px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    <button onclick="_verTodasRespostas()" style="width:100%;padding:13px;border-radius:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;color:#fff;font-family:'Manrope',sans-serif;font-size:15px;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;margin-bottom:10px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       👁️ Ver respostas (${totalRespostas}/${totalMembros})
     </button>` : '';
 
   inner.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <div style="font-family:'Freshman',sans-serif;font-size:19px;color:var(--tx)">📋 Question<span style="font-family:'DM Sans',sans-serif">á</span>rio</div>
+      <div style="font-family:'Manrope',sans-serif;font-size:19px;color:var(--tx)">📋 Questionário</div>
       <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
 
@@ -16658,9 +16658,9 @@ function _renderSurveyTodasRespostas(inner, survey, members){
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:${respondeu ? '14px' : '0'}">
           ${m.photo
             ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--bo)">`
-            : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
+            : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
           <div style="flex:1">
-            <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
+            <div style="font-family:'Manrope',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
             <div style="font-size:11px;font-family:'DM Mono',monospace;color:${respondeu ? '#4dffb0' : '#f87171'};margin-top:2px">${respondeu ? '✅ Respondeu' : '⏳ Aguardando'}</div>
           </div>
           ${result ? `<div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;font-weight:700">${result.rating}</div>` : ''}
@@ -16670,7 +16670,7 @@ function _renderSurveyTodasRespostas(inner, survey, members){
           ${SURVEY_ATTRS.map(a=>`
             <div style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:6px 8px;text-align:center">
               <div style="font-size:9px;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">${attrLabels[a.id]||a.id}</div>
-              <div style="font-family:'Freshman',sans-serif;font-size:18px;color:#a855f7">${result.attrs?.[a.id] ?? '—'}</div>
+              <div style="font-family:'Manrope',sans-serif;font-size:18px;color:#a855f7">${result.attrs?.[a.id] ?? '—'}</div>
             </div>
           `).join('')}
         </div>
@@ -16706,7 +16706,7 @@ function _renderSurveyTodasRespostas(inner, survey, members){
   inner.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
       <button onclick="abrirSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
-      <div style="font-family:'Freshman',sans-serif;font-size:18px;color:var(--tx);flex:1">👁️ Respostas (Admin)</div>
+      <div style="font-family:'Manrope',sans-serif;font-size:18px;color:var(--tx);flex:1">👁️ Respostas (Admin)</div>
       <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;padding:8px 12px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px">
@@ -16817,9 +16817,9 @@ function _renderSurveyForm(inner, survey, members, uid){
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
             ${m.photo
               ? `<img src="${m.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--bo)">`
-              : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
+              : `<div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-size:16px;color:#a855f7">${(m.name||'?')[0].toUpperCase()}</div>`}
             <div>
-              <div style="font-family:'Freshman',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
+              <div style="font-family:'Manrope',sans-serif;font-size:15px;color:var(--tx)">${m.name||'Jogador'}</div>
               ${isMe ? `<div style="font-size:11px;color:#a855f7;font-family:'DM Mono',monospace">Você mesmo</div>` : ''}
             </div>
           </div>
@@ -16827,7 +16827,7 @@ function _renderSurveyForm(inner, survey, members, uid){
             <div style="margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
                 <div style="font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase">${a.icon} ${a.label}</div>
-                <div style="font-family:'Freshman',sans-serif;font-size:18px;color:#a855f7" id="val-${m.uid}-${a.id}">${vals[a.id]}</div>
+                <div style="font-family:'Manrope',sans-serif;font-size:18px;color:#a855f7" id="val-${m.uid}-${a.id}">${vals[a.id]}</div>
               </div>
               <input type="range" min="0" max="99" value="${vals[a.id]}"
                 ${confirming ? 'disabled' : ''}
@@ -16840,7 +16840,7 @@ function _renderSurveyForm(inner, survey, members, uid){
 
     inner.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Question<span style="font-family:'DM Sans',sans-serif">á</span>rio</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
         <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
       </div>
       <div style="font-size:12px;color:var(--tx2);margin-bottom:20px;font-family:'DM Mono',monospace">Avalie cada jogador de 0 a 99</div>
@@ -16854,10 +16854,10 @@ function _renderSurveyForm(inner, survey, members, uid){
 
       <div style="display:flex;gap:10px;margin-top:8px">
         ${confirming ? `
-          <button onclick="_surveySubmit()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer">✅ Confirmar</button>
+          <button onclick="_surveySubmit()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Manrope',sans-serif;font-size:15px;cursor:pointer">✅ Confirmar</button>
           <button onclick="_surveyVoltarEditar()" style="padding:14px 20px;border-radius:40px;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Editar</button>
         ` : `
-          <button onclick="_surveyConfirmar()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Freshman',sans-serif;font-size:15px;cursor:pointer">Enviar respostas →</button>
+          <button onclick="_surveyConfirmar()" style="flex:1;padding:14px;border-radius:40px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-family:'Manrope',sans-serif;font-size:15px;cursor:pointer">Enviar respostas →</button>
         `}
       </div>
     `;
@@ -16954,12 +16954,12 @@ function _renderSurveyResultado(inner, survey, members, uid){
   if(!todos){
     inner.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">📋 Question<span style="font-family:'DM Sans',sans-serif">á</span>rio</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:20px;color:var(--tx)">📋 Questionário</div>
         <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
       </div>
       <div style="text-align:center;padding:30px 0">
         <div style="font-size:48px;margin-bottom:16px">⏳</div>
-        <div style="font-family:'Freshman',sans-serif;font-size:17px;color:var(--tx);margin-bottom:8px">Sua resposta foi enviada!</div>
+        <div style="font-family:'Manrope',sans-serif;font-size:17px;color:var(--tx);margin-bottom:8px">Sua resposta foi enviada!</div>
         <div style="font-size:13px;color:var(--tx2);margin-bottom:20px;line-height:1.5">Aguardando os outros membros responderem.<br>Quando todos concluírem, seu card FIFA aparecerá automaticamente na <strong style="color:var(--tx)">Carta do Jogador</strong> ⚽</div>
         <div style="font-family:'DM Mono',monospace;font-size:22px;color:#a855f7;margin-bottom:8px">${totalRespostas} / ${totalMembros}</div>
         <div style="font-size:12px;color:var(--tx2)">responderam</div>
@@ -16983,7 +16983,7 @@ function _renderSurveyResultado(inner, survey, members, uid){
 
   inner.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Freshman',sans-serif;font-size:20px;color:var(--tx)">🏆 Seu Card</div>
+      <div style="font-family:'Manrope',sans-serif;font-size:20px;color:var(--tx)">🏆 Seu Card</div>
       <button onclick="fecharSurvey()" style="width:32px;height:32px;border-radius:50%;background:var(--bg3,#ecedeb);border:1px solid var(--bo);color:var(--tx);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div id="survey-card-wrap" style="display:flex;justify-content:center;margin-bottom:16px"></div>
@@ -17032,11 +17032,11 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
 
   const photoEl = photo
     ? `<img src="${photo}" alt="${name}" style="width:100%;height:100%;object-fit:cover">`
-    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Freshman',sans-serif;font-size:40px;background:rgba(0,0,0,.25)">${(name||'?')[0].toUpperCase()}</div>`;
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-size:40px;background:rgba(0,0,0,.25)">${(name||'?')[0].toUpperCase()}</div>`;
 
   const statsHTML = SURVEY_ATTRS.map(a=>`
     <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;color:${textC}">
-      <div style="font-family:'Freshman',sans-serif;font-size:20px;line-height:1;min-width:26px;text-align:right">${attrs[a.id]??50}</div>
+      <div style="font-family:'Manrope',sans-serif;font-size:20px;line-height:1;min-width:26px;text-align:right">${attrs[a.id]??50}</div>
       <div style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;opacity:.75;min-width:24px">${attrLabels[a.id]}</div>
       <div style="flex:1;height:4px;border-radius:2px;background:rgba(0,0,0,.18);overflow:hidden">
         <div style="height:100%;border-radius:2px;background:${barC};width:${attrs[a.id]??50}%"></div>
@@ -17048,7 +17048,7 @@ function _buildSurveyCardHTML(name, photo, attrs, rating, rarity, groupName){
     width:280px;height:390px;border-radius:22px;
     position:relative;overflow:hidden;
     display:flex;flex-direction:column;align-items:center;
-    font-family:'Freshman',sans-serif;
+    font-family:'Manrope',sans-serif;
     background:${bgMap[rarity]};
     box-shadow:${shadowMap[rarity]},0 2px 16px rgba(0,0,0,.6);
     flex-shrink:0;
