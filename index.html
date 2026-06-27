@@ -15974,6 +15974,15 @@ document.addEventListener('touchstart', e => {
       _inlineResultados = [];
       _inlinePendente = null; _inlineResult = null; _inlinePos = null;
     } else {
+      // pb é o mesmo, mas pk pode ter mudado: se o que já foi marcado não
+      // cabe mais nas novas contagens (ex.: já tinha 1 verde confirmado e
+      // o usuário mudou convertidos para 0), o mapeamento fica inválido.
+      const okCount = _inlineResultados.filter(r=>r.ok).length;
+      const errCount = _inlineResultados.length - okCount;
+      if(okCount > pk || errCount > (pb-pk)){
+        _inlineResultados = [];
+        _inlinePendente = null; _inlineResult = null; _inlinePos = null;
+      }
       _inlinePk = pk;
     }
 
@@ -15982,6 +15991,22 @@ document.addEventListener('touchstart', e => {
     _inlineRender();
     setTimeout(()=>_inlineSetupCanvas(), 50);
   };
+
+  // Calcula se, dadas as cobranças já confirmadas, só resta uma opção
+  // possível para as próximas marcações: ex. pb=2/pk=1 e já marquei 1
+  // verde → as restantes só podem ser vermelhas (e vice-versa).
+  // Retorna true (só pode ser convertido), false (só pode ser errado) ou
+  // null (ainda há escolha livre entre os dois).
+  function _inlineForcedResult(){
+    if(_inlinePb<=0) return null;
+    const okCount = _inlineResultados.filter(r=>r.ok).length;
+    const errCount = _inlineResultados.length - okCount;
+    const remOk  = _inlinePk - okCount;
+    const remErr = (_inlinePb - _inlinePk) - errCount;
+    if(remOk<=0 && remErr>0) return false;
+    if(remErr<=0 && remOk>0) return true;
+    return null;
+  }
 
   function _inlineRender(){
     const sub = document.getElementById('inline-pen-map-sub');
@@ -16018,12 +16043,27 @@ document.addEventListener('touchstart', e => {
       }
     }
 
+    const forced = _inlineForcedResult();
     const btnOk  = document.getElementById('inline-pen-btn-ok');
     const btnErr = document.getElementById('inline-pen-btn-err');
     if(btnOk)  btnOk.style.borderWidth  = (_inlineResult===true)  ? '3px':'2px';
     if(btnErr) btnErr.style.borderWidth = (_inlineResult===false) ? '3px':'2px';
     if(btnOk)  btnOk.style.background   = (_inlineResult===true)  ? 'rgba(76,175,80,.28)':'rgba(76,175,80,.12)';
     if(btnErr) btnErr.style.background  = (_inlineResult===false) ? 'rgba(229,57,53,.28)':'rgba(229,57,53,.12)';
+    // Trava a opção que não cabe mais nas contagens restantes de
+    // convertidos/errados, forçando a única opção válida.
+    if(btnOk){
+      const blockOk = forced===false;
+      btnOk.disabled = blockOk;
+      btnOk.style.opacity = blockOk ? '.4' : '1';
+      btnOk.style.cursor = blockOk ? 'not-allowed' : 'pointer';
+    }
+    if(btnErr){
+      const blockErr = forced===true;
+      btnErr.disabled = blockErr;
+      btnErr.style.opacity = blockErr ? '.4' : '1';
+      btnErr.style.cursor = blockErr ? 'not-allowed' : 'pointer';
+    }
   }
 
   function _inlineSetupCanvas(){
@@ -16048,7 +16088,12 @@ document.addEventListener('touchstart', e => {
       const normX = Math.round(pos.x * GW / CW);
       const normY = Math.round(pos.y * GH / CH);
       _inlinePos = {x:normX, y:normY};
-      _inlinePendente = {x:normX, y:normY, ok: _inlineResult !== null ? _inlineResult : true};
+      const forced = _inlineForcedResult();
+      // Se só resta verde ou só resta vermelho possível, o mapa já define
+      // sozinho — não dá pra escolher errado o que a contagem não permite.
+      if(forced!==null) _inlineResult = forced;
+      else if(_inlineResult===null) _inlineResult = true;
+      _inlinePendente = {x:normX, y:normY, ok: _inlineResult};
       _inlineRender();
       redraw();
     }
@@ -16067,6 +16112,8 @@ document.addEventListener('touchstart', e => {
 
   window._inlinePenSetResult = function(ok){
     if(_inlineResultados.length >= _inlinePb) return;
+    const forced = _inlineForcedResult();
+    if(forced!==null && ok!==forced) return; // só resta uma opção válida — ignora a outra
     _inlineResult = ok;
     if(_inlinePos) _inlinePendente = {x:_inlinePos.x, y:_inlinePos.y, ok};
     _inlineRender();
@@ -16151,6 +16198,19 @@ document.addEventListener('touchstart', e => {
     setTimeout(()=>_setupMarcarCanvas(), 80);
   };
 
+  // Mesma regra do mapeamento inline: se a contagem de convertidos/errados
+  // já fechou, só resta uma opção válida para as próximas cobranças.
+  function _marcarForcedResult(){
+    if(_marcarTotal<=0) return null;
+    const okCount = _marcarResultados.filter(r=>r.ok).length;
+    const errCount = _marcarResultados.length - okCount;
+    const remOk  = _marcarOk - okCount;
+    const remErr = (_marcarTotal - _marcarOk) - errCount;
+    if(remOk<=0 && remErr>0) return false;
+    if(remErr<=0 && remOk>0) return true;
+    return null;
+  }
+
   function _renderMarcar(){
     const sub = document.getElementById('pen-marcar-sub');
     const ind  = document.getElementById('pen-marcar-indicator');
@@ -16174,12 +16234,26 @@ document.addEventListener('touchstart', e => {
     }
 
     // Atualiza visuais dos botões de resultado
+    const forced = _marcarForcedResult();
     const btnOk  = document.getElementById('pen-btn-ok');
     const btnErr = document.getElementById('pen-btn-err');
     if(btnOk)  btnOk.style.borderWidth  = (_marcarResult===true)  ? '3px':'2px';
     if(btnErr) btnErr.style.borderWidth = (_marcarResult===false) ? '3px':'2px';
     if(btnOk)  btnOk.style.background   = (_marcarResult===true)  ? 'rgba(76,175,80,.28)':'rgba(76,175,80,.12)';
     if(btnErr) btnErr.style.background  = (_marcarResult===false) ? 'rgba(229,57,53,.28)':'rgba(229,57,53,.12)';
+    // Trava a opção que não cabe mais nas contagens restantes
+    if(btnOk){
+      const blockOk = forced===false;
+      btnOk.disabled = blockOk;
+      btnOk.style.opacity = blockOk ? '.4' : '1';
+      btnOk.style.cursor = blockOk ? 'not-allowed' : 'pointer';
+    }
+    if(btnErr){
+      const blockErr = forced===true;
+      btnErr.disabled = blockErr;
+      btnErr.style.opacity = blockErr ? '.4' : '1';
+      btnErr.style.cursor = blockErr ? 'not-allowed' : 'pointer';
+    }
   }
 
   function _setupMarcarCanvas(){
@@ -16210,7 +16284,10 @@ document.addEventListener('touchstart', e => {
       const normX = Math.round(pos.x * GW / CW);
       const normY = Math.round(pos.y * GH / CH);
       _marcarPos = {x:normX, y:normY};
-      _marcarPendente = {x:normX, y:normY, ok: _marcarResult !== null ? _marcarResult : true};
+      const forced = _marcarForcedResult();
+      if(forced!==null) _marcarResult = forced;
+      else if(_marcarResult===null) _marcarResult = true;
+      _marcarPendente = {x:normX, y:normY, ok: _marcarResult};
       _renderMarcar();
       redraw();
     }
@@ -16230,6 +16307,8 @@ document.addEventListener('touchstart', e => {
   }
 
   window.setPenResult = function(ok){
+    const forced = _marcarForcedResult();
+    if(forced!==null && ok!==forced) return; // só resta uma opção válida — ignora a outra
     _marcarResult = ok;
     if(_marcarPos) _marcarPendente = {x:_marcarPos.x, y:_marcarPos.y, ok};
     _renderMarcar();
