@@ -9416,7 +9416,7 @@ function renderPerformanceTab(){
   const chartAssistJogo=_buildPerfChart(mesesPorJogo,m=>m.a/m.jogos,{titulo:'👟 Assistências por jogo (mensal)',cor:'#9b6fd9',corClaro:'#5a3a8a',gradId:'perfGradAssistJogo',decimals:1,emptyMsg:msgCorte});
   const chartGAJogo=_buildPerfChart(mesesPorJogo,m=>(m.g+m.a)/m.jogos,{titulo:'📊 G+A por jogo (mensal)',cor:'#40c960',corClaro:'#1a5c2a',gradId:'perfGradGAJogo',decimals:1,emptyMsg:msgCorte});
 
-  $('rl').innerHTML=`<div style="padding-bottom:.5rem">${seletorJogador}${seletorTemporada}${chartGA}${chartGols}${chartAssist}${chartGolsJogo}${chartAssistJogo}${chartGAJogo}</div>`;
+  $('rl').innerHTML=`<div style="padding-bottom:.5rem">${seletorJogador}${seletorTemporada}${chartGA}${chartGols}${chartAssist}${chartGAJogo}${chartGolsJogo}${chartAssistJogo}</div>`;
 }
 
 window._perfSelecionarJogador=(uid)=>{ _perfUid=uid; renderPerformanceTab(); };
@@ -9732,7 +9732,7 @@ function _buildPlayerProfile(uid){
 
   // ── SELETOR INDEPENDENTE: MEDALHAS ──
   const selMedalhas=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">🏅 Temporada:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">Selecionar a temporada:</span>
     <select onchange="setMpAnoMedalhas('${uid}',this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center">
       ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMedalhas&&_mpAnoMedalhas!=='__all__'?'selected':''}>` + a + `</option>`).join('')}
       <option value="__all__" ${_mpAnoMedalhas==='__all__'?'selected':''}>Geral</option>
@@ -9742,7 +9742,7 @@ function _buildPlayerProfile(uid){
   // ── SELETOR INDEPENDENTE: TOTAL ──
   const isAllTotal=(_mpAnoTotal==='__all__');
   const selTotal=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📊 Temporada:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">Selecionar a temporada:</span>
     <select onchange="setMpAnoTotal('${uid}',this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center">
       ${anos.map(a=>`<option value="${a}" ${a===_mpAnoTotal&&!isAllTotal?'selected':''}>` + a + `</option>`).join('')}
       <option value="__all__" ${isAllTotal?'selected':''}>Geral</option>
@@ -9752,7 +9752,7 @@ function _buildPlayerProfile(uid){
   // ── SELETOR INDEPENDENTE: MESES ──
   const isAllMeses=(_mpAnoMeses==='__all__');
   const selMeses=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📅 Temporada:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">Selecionar a temporada:</span>
     <select onchange="setMpAnoMeses('${uid}',this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center">
       ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMeses&&!isAllMeses?'selected':''}>` + a + `</option>`).join('')}
       <option value="__all__" ${isAllMeses?'selected':''}>Todos</option>
@@ -9765,13 +9765,12 @@ function _buildPlayerProfile(uid){
   const cardA=mesesParaTotal.reduce((s,m)=>s+m.a,0);
   const cardPB=mesesParaTotal.reduce((s,m)=>s+m.pb,0);
   const cardPK=mesesParaTotal.reduce((s,m)=>s+m.pk,0);
-  const cardLabel=isAllTotal?'Todos os tempos':`Temporada ${_mpAnoTotal}`;
 
   // Card totais
   const totalCard=`
   <div style="background:#dedede;border:1.5px solid #000000;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.2)">
+    <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Estatísticas</div>
     ${selTotal}
-    <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📊 ${cardLabel}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
       <div style="background:#dedede;border:1.5px solid rgba(77,255,176,.3);border-radius:10px;padding:12px 8px;text-align:center">
         <div style="font-family:'ClassyVogue',sans-serif;font-size:32px;color:#000000;line-height:1">${cardG}</div>
@@ -9803,12 +9802,12 @@ function _buildPlayerProfile(uid){
   const outros=mesesDispHistorico.filter(m=>m.pos>3).length;
 
   const medalhasCard=totalMesesDisputados>0?`
-  <div style="background:#ebebeb;border:1.5px solid #e8df2c;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
-    ${selMedalhas}
-    <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-      <span>🏅 Pódio ${_mpAnoMedalhas==='__all__'?'Geral':_mpAnoMedalhas}</span>
+  <div style="background:#ebebeb;border:1.5px solid #000000;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+    <div style="font-size:10px;color:#494a48;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <span>Pódio</span>
       <span style="color:#494a48">${totalMesesDisputados} mês${totalMesesDisputados!==1?'es':''} disputado${totalMesesDisputados!==1?'s':''}</span>
     </div>
+    ${selMedalhas}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
       <div style="background:linear-gradient(160deg,#f5ec60 0%,#c8ba00 25%,#e8df2c 50%,#f0e840 65%,#b8aa00 100%);border:1px solid #e8df2c;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.7) inset">
         <div style="font-size:26px;line-height:1;margin-bottom:6px">🥇</div>
@@ -9852,7 +9851,7 @@ function _buildPlayerProfile(uid){
   // ── SELETOR INDEPENDENTE: MÉDIAS ──
   const isAllMedia=(_mpAnoMedia==='__all__');
   const selMedia=anos.length>1?`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">📈 Temporada:</span>
+    <span style="font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em">Selecionar a temporada:</span>
     <select onchange="setMpAnoMedia('${uid}',this.value)" style="padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center">
       ${anos.map(a=>`<option value="${a}" ${a===_mpAnoMedia&&!isAllMedia?'selected':''}>` + a + `</option>`).join('')}
       <option value="__all__" ${isAllMedia?'selected':''}>Geral</option>
@@ -9864,11 +9863,10 @@ function _buildPlayerProfile(uid){
   const mediaG=nMedia?(mesesParaMedia.reduce((s,m)=>s+m.g,0)/nMedia):0;
   const mediaA=nMedia?(mesesParaMedia.reduce((s,m)=>s+m.a,0)/nMedia):0;
   const mediaGA=mediaG+mediaA;
-  const mediaLabel=isAllMedia?'Todos os tempos':`Temporada ${_mpAnoMedia}`;
 
   const mediaCard=`<div style="background:#dedede;border:1.5px solid #000000;border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.2)">
+    <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Médias de G+A</div>
     ${selMedia}
-    <div style="font-size:10px;color:#000000;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">📈 Médias de G+A — ${mediaLabel}</div>
     ${nMedia===0?`<div style="text-align:center;padding:.5rem;color:#000000;font-size:12px;font-family:'DM Mono',monospace">Nenhum mês finalizado.</div>`:`
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
       <div style="background:#dedede;border:1.5px solid rgba(77,255,176,.3);border-radius:10px;padding:12px 8px;text-align:center">
@@ -9890,7 +9888,7 @@ function _buildPlayerProfile(uid){
   const anoResCard='';
 
 
-  const sepLabel=`${selMeses}<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">📅 ${isAllMeses?'Todos os anos':'Ano '+_mpAnoMeses} — mês a mês</div>`;
+  const sepLabel=`<div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px">Mês a Mês</div>${selMeses}`;
 
   const monthCards=mesesDoAno.length===0
     ?`<div style="text-align:center;padding:1.5rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace">Nenhum dado em ${isAll?'nenhum mês':_mpAnoAtivo}.</div>`
