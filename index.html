@@ -5762,11 +5762,35 @@ function calcCraqueRodada(){
     byPlayer[key].penErr += Math.max(0, pb - pk);
   });
 
-  // ── Fórmula: (Gols × 5) + (Assistências × 3) + (Pên. convertidos × 2) − (Pên. errados × 3) ──
-  const players = Object.values(byPlayer).map(p => ({
-    ...p,
-    score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 3) - (p.penErr * 3),
-  }));
+  // ── Coleta bônus/penalidade de confrontos de única partida encerrados nesta semana ──
+  // Vencedor: +5 pts | Perdedor: −5 pts
+  const confrontoBonus = {};
+  (gd.desafios || []).forEach(d => {
+    if(d.duracao !== '1partida' || d.status !== 'encerrado') return;
+    if(d.endedTs == null) return;
+    // Verifica se o encerramento ocorreu dentro da semana avaliada
+    const endDate = new Date(d.endedTs);
+    const pad2 = n => String(n).padStart(2,'0');
+    const endStr = `${endDate.getFullYear()}-${pad2(endDate.getMonth()+1)}-${pad2(endDate.getDate())}`;
+    if(endStr < weekStart || endStr > weekEnd) return;
+    const sA = typeof d.scoreA === 'number' ? d.scoreA : 0;
+    const sB = typeof d.scoreB === 'number' ? d.scoreB : 0;
+    if(sA === sB) return; // empate: sem bônus
+    const winnerUid = sA > sB ? d.uidA : d.uidB;
+    const loserUid  = sA > sB ? d.uidB : d.uidA;
+    confrontoBonus[winnerUid] = (confrontoBonus[winnerUid] || 0) + 5;
+    confrontoBonus[loserUid]  = (confrontoBonus[loserUid]  || 0) - 5;
+  });
+
+  // ── Fórmula: (Gols × 4) + (Assistências × 3) + (Pên. convertidos × 5) − (Pên. errados × 5) + bônus confronto ──
+  const players = Object.values(byPlayer).map(p => {
+    const bonus = confrontoBonus[p.uid] || 0;
+    return {
+      ...p,
+      confrontoBonus: bonus,
+      score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 5) - (p.penErr * 5) + bonus,
+    };
+  });
 
   // Filtra pontuação > 0 — se todos zerados, omite o card
   const ativos = players.filter(p => p.score > 0);
@@ -7411,7 +7435,7 @@ function _dcCheckEncerrar(){
       && _dcPartidasDesde(d.uidA, d.startTs).length>0
       && _dcPartidasDesde(d.uidB, d.startTs).length>0;
     if(prazoEncerrado || partidaUnicaCompleta){
-      d.status='encerrado'; changed=true;
+      d.status='encerrado'; d.endedTs = now; changed=true;
       // Calcula placar final e CONGELA no registro (scoreA/scoreB), para
       // que o resultado não dependa de onde as partidas estarão guardadas
       // no futuro (gd.matches do mês corrente é zerado a cada virada de mês).
@@ -14793,8 +14817,32 @@ function _calcRankingSemana(allMatches, weekStart, weekEnd, members){
       byPlayer[key] = { uid: mb.uid||null, name: mb.name||key, gols:0, assist:0, penOk:0, penErr:0 };
     }
   });
+  // ── Bônus/penalidade de confrontos de única partida encerrados nesta semana ──
+  // Vencedor: +5 pts | Perdedor: −5 pts
+  const confrontoBonus = {};
+  const gd = window._gd;
+  if(gd){
+    (gd.desafios || []).forEach(d => {
+      if(d.duracao !== '1partida' || d.status !== 'encerrado') return;
+      if(d.endedTs == null) return;
+      const endDate = new Date(d.endedTs);
+      const pad2 = n => String(n).padStart(2,'0');
+      const endStr = `${endDate.getFullYear()}-${pad2(endDate.getMonth()+1)}-${pad2(endDate.getDate())}`;
+      if(endStr < weekStart || endStr > weekEnd) return;
+      const sA = typeof d.scoreA === 'number' ? d.scoreA : 0;
+      const sB = typeof d.scoreB === 'number' ? d.scoreB : 0;
+      if(sA === sB) return; // empate: sem bônus
+      const winnerUid = sA > sB ? d.uidA : d.uidB;
+      const loserUid  = sA > sB ? d.uidB : d.uidA;
+      confrontoBonus[winnerUid] = (confrontoBonus[winnerUid] || 0) + 5;
+      confrontoBonus[loserUid]  = (confrontoBonus[loserUid]  || 0) - 5;
+    });
+  }
   return Object.values(byPlayer)
-    .map(p => ({ ...p, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 5) - (p.penErr * 5) }))
+    .map(p => {
+      const bonus = confrontoBonus[p.uid] || 0;
+      return { ...p, confrontoBonus: bonus, score: (p.gols * 4) + (p.assist * 3) + (p.penOk * 5) - (p.penErr * 5) + bonus };
+    })
     .sort((a, b) => b.score !== a.score ? b.score - a.score : b.gols - a.gols);
 }
 
