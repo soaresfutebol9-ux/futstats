@@ -5728,6 +5728,7 @@ window.salvarApelido=async()=>{
     mbs[idx].apelido=valor;
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
+    window._gdRef=gd;
     okEl.style.display='block';setTimeout(()=>okEl.style.display='none',2500);
     _renderApelidoGrid();
     renderRanking();
@@ -5749,6 +5750,7 @@ window.removerApelido=async()=>{
     mbs[idx].apelido='';
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
+    window._gdRef=gd;
     _renderApelidoGrid();
     renderRanking();
   }catch(e){errEl.textContent='Erro ao remover.';errEl.style.display='block';}
@@ -6055,6 +6057,7 @@ window._apagarNotif = async function(id){
       await setDoc(doc(db,'groups',groupId),cur);
       gd = cur;
       window._gd = cur;
+      window._gdRef = cur;
       _renderNotifPanel();
       _updateNotifBadge();
     }
@@ -6472,6 +6475,7 @@ async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pe
     if(mudou){
       await setDoc(doc(db, 'groups', groupId), cur);
       gd = cur;
+      window._gdRef = cur;
       _updateNotifBadge();
       if(document.getElementById('notif-panel')?.classList.contains('open')) _renderNotifPanel();
     }
@@ -6707,6 +6711,7 @@ window.adicionarMembroPorFutId=async()=>{
     // Também adiciona o groupId ao perfil do jogador adicionado
     await updateDoc(doc(db,'users',targetUid),{groupIds:arrayUnion(groupId)});
     gd=cur;
+    window._gdRef=gd;
     if(okEl){okEl.textContent='✅ '+novoMembro.name+' adicionado ao grupo!';okEl.style.display='';}
     if(input)input.value='';
     // Publica no feed
@@ -6732,6 +6737,7 @@ window.removerMembroPorFutId=async(futId)=>{
   await setDoc(doc(db,'groups',groupId),cur);
   await updateDoc(doc(db,'users',targetUid),{groupIds:arrayRemove(groupId)}).catch(()=>{});
   gd=cur;
+  window._gdRef=gd;
   try{await _publishFeed('membro',`<strong>${membros[idx].name||'Jogador'}</strong> foi removido do grupo. 🚪`);}catch(e){}
   renderGal&&renderGal();renderRanking&&renderRanking();
 };
@@ -6765,7 +6771,7 @@ window.deleteGroupPerfil=async()=>{
     myProfile.groupIds=(myProfile.groupIds||[]).filter(id=>id!==groupId);
     myProfile.groupId='';
     localStorage.removeItem('futstats-last-group');
-    groupId=null;gd=null;
+    groupId=null;gd=null;window._gdRef=null;
     closeP('pperfil');
     enterGroupSelect();
   }catch(e){alert('Erro ao apagar grupo: '+e.message);}
@@ -6868,7 +6874,7 @@ window._selecionarGrupoModal = async function(gid){
   if(overlay) overlay.remove();
   if(gid === groupId) return; // já está nesse grupo
   if(unsubGroup){unsubGroup();unsubGroup=null;}
-  groupId=null;gd=null;
+  groupId=null;gd=null;window._gdRef=null;
   await loadGroup(gid);
 };
 
@@ -6913,7 +6919,7 @@ onAuthStateChanged(auth,async user=>{
       enterGroupSelect();
     }
   }else{
-    currentUser=null;myProfile=null;gd=null;groupId=null;
+    currentUser=null;myProfile=null;gd=null;groupId=null;window._gdRef=null;
     if(unsubGroup){unsubGroup();unsubGroup=null;}
     showScr('sl');setBtn('btn-login',false,'Entrar');setBtn('btn-register',false,'Criar conta');
     const btn=$('btn-google');if(btn){btn.disabled=false;btn.innerHTML=googleIconHTML;}
@@ -7021,7 +7027,7 @@ window.createGroup=async()=>{
     const ma=mesAtual();const member={uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()};
     const data={name:gn,members:[member],matches:[],historico:{},mesAtivo:ma,createdAt:serverTimestamp(),createdBy:currentUser.uid};
     const ref=await addDoc(collection(db,'groups'),data);
-    groupId=ref.id;window.groupId=ref.id;gd=data;
+    groupId=ref.id;window.groupId=ref.id;gd=data;window._gdRef=data;
     await updateDoc(doc(db,'users',currentUser.uid),{groupIds:arrayUnion(ref.id),groupId:''});
     myProfile.groupIds=[...(myProfile.groupIds||[]),ref.id];myProfile.groupId='';
     localStorage.setItem('futstats-last-group', ref.id);
@@ -7035,7 +7041,7 @@ window.joinGroup=async()=>{
     let data=snap.data();data=await checkMesViradaWith(code,data);
     const already=(data.members||[]).some(m=>m.uid===currentUser.uid);
     if(!already){data.members=[...(data.members||[]),{uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()}];await setDoc(doc(db,'groups',code),data);}
-    groupId=code;window.groupId=code;gd=data;
+    groupId=code;window.groupId=code;gd=data;window._gdRef=data;
     myProfile.groupIds=[...(myProfile.groupIds||[]),code];myProfile.groupId='';
     localStorage.setItem('futstats-last-group', code);
     closePCenter('pj');enterApp();subscribeGroup();
@@ -7456,6 +7462,7 @@ window._dcConfirmar = async function(){
     });
     await setDoc(doc(db,'groups',groupId),cur);
     gd = cur;
+    window._gdRef = cur;
     fecharModalDesafio();
     renderRanking();
     _updateNotifBadge();
@@ -7483,6 +7490,7 @@ window._dcAceitar = async function(id){
     });
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
+    window._gdRef=cur;
     const tipoLabel=d.tipo==='gols'?'gols':d.tipo==='assist'?'assistências':'G+A';
     await _publishFeed('nota','⚔️ <strong>'+myProfile.displayName+'</strong> aceitou o desafio de <strong>'+d.nameA+'</strong>! Briga por mais '+tipoLabel+' começa agora.');
     renderRanking();
@@ -7515,6 +7523,7 @@ window._dcCancelar = async function(id){
     }
     await setDoc(doc(db,'groups',groupId),cur);
     gd=cur;
+    window._gdRef=cur;
     _updateNotifBadge();
     renderRanking();
     if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')) _buildPlayerProfile(_mpUid);
@@ -7993,7 +8002,7 @@ window.saveEdit=async()=>{
   if(editIdx===null)return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return showErr('eerr','Erro.');
   const cur=snap.data();const m=cur.matches[editIdx];if(!m)return;
   m.date=$('edate').value;m.name=$('ename').value.trim()||'Pelada';m.gols=parseInt($('egols').value)||0;m.assist=parseInt($('eassist').value)||0;m.penBat=parseInt($('epb').value)||0;m.penOk=Math.min(parseInt($('epk').value)||0,m.penBat);
-  await setDoc(doc(db,'groups',groupId),cur);gd=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
+  await setDoc(doc(db,'groups',groupId),cur);gd=cur;window._gdRef=cur;editIdx=null;closeP('pedit');renderPerfilPanelStats();
   if(typeof window._admEditCallback==='function'){const cb=window._admEditCallback;window._admEditCallback=null;cb();}
 };
 window.savePenMap=async(partida, pontos)=>{
@@ -8012,7 +8021,7 @@ window.savePenMap=async(partida, pontos)=>{
 };
 window.deleteMatch=async gi=>{
   if(!confirm('Deletar essa partida?'))return;const snap=await getDoc(doc(db,'groups',groupId)).catch(()=>null);if(!snap)return;
-  const cur=snap.data();cur.matches.splice(gi,1);await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+  const cur=snap.data();cur.matches.splice(gi,1);await setDoc(doc(db,'groups',groupId),cur);gd=cur;window._gdRef=cur;
 };
 
 function getSt(nameOrUid,matches,byUid){
@@ -8100,23 +8109,6 @@ window.setPenAno=ano=>{
   rl.classList.add('switching');
   setTimeout(()=>{renderRanking();rl.classList.remove('switching');},120);
 };
-window._penAnoAccordionOpen=false;
-window._togglePenAnoAccordion=function(){
-  const dd=document.getElementById('pen-ano-dropdown');
-  const arrow=document.getElementById('pen-ano-arrow');
-  if(!dd)return;
-  window._penAnoAccordionOpen=!window._penAnoAccordionOpen;
-  if(window._penAnoAccordionOpen){
-    dd.style.maxHeight=dd.scrollHeight+'px';
-    dd.style.opacity='1';
-    if(arrow)arrow.style.transform='rotate(180deg)';
-  } else {
-    dd.style.maxHeight='0';
-    dd.style.opacity='0';
-    if(arrow)arrow.style.transform='rotate(0deg)';
-  }
-};
-
 function penColor(pct){
   if(pct<=50)return'#EB5757';
   if(pct<=65)return'#F2994A';
@@ -9408,10 +9400,16 @@ function _renderPerfChartExpanded(){
     // Rola automaticamente para o final (mês mais recente) ao abrir
     wrap.scrollLeft = wrap.scrollWidth;
     // Drag-to-scroll com mouse (desktop)
+    // Remove handlers de uma renderização anterior antes de religar (evita
+    // acumular listeners em document a cada vez que o gráfico é reaberto)
+    if(window._perfChartMoveHandler) document.removeEventListener('mousemove', window._perfChartMoveHandler);
+    if(window._perfChartUpHandler) document.removeEventListener('mouseup', window._perfChartUpHandler);
     let isDragging=false, startX=0, scrollStart=0;
     wrap.addEventListener('mousedown', e=>{ isDragging=true; startX=e.pageX; scrollStart=wrap.scrollLeft; wrap.style.cursor='grabbing'; e.preventDefault(); });
-    document.addEventListener('mousemove', e=>{ if(!isDragging) return; wrap.scrollLeft=scrollStart-(e.pageX-startX); });
-    document.addEventListener('mouseup', ()=>{ isDragging=false; wrap.style.cursor='grab'; });
+    window._perfChartMoveHandler = e=>{ if(!isDragging) return; wrap.scrollLeft=scrollStart-(e.pageX-startX); };
+    window._perfChartUpHandler = ()=>{ isDragging=false; wrap.style.cursor='grab'; };
+    document.addEventListener('mousemove', window._perfChartMoveHandler);
+    document.addEventListener('mouseup', window._perfChartUpHandler);
   });
 }
 
@@ -9702,7 +9700,7 @@ window.salvarMesHistorico=async()=>{
   mbs.forEach(m=>{const sid=(m.uid||m.name).replace(/[^a-z0-9]/gi,'_');const g=parseInt(document.getElementById('hf_g_'+sid)?.value)||0,a=parseInt(document.getElementById('hf_a_'+sid)?.value)||0,pb=parseInt(document.getElementById('hf_pb_'+sid)?.value)||0,pk=Math.min(parseInt(document.getElementById('hf_pk_'+sid)?.value)||0,pb);if(g>0||a>0||pb>0)matches.push({player:m.name,uid:m.uid||'',date:key+'-01',name:'(retroativo)',gols:g,assist:a,penBat:pb,penOk:pk,ts:new Date(key+'-01').getTime(),retroativo:true});});
   try{
     const snap=await getDoc(doc(db,'groups',groupId));const cur=snap.data();if(!cur.historico)cur.historico={};
-    cur.historico[key]={matches,members:[...mbs],retroativo:true,savedAt:Date.now()};await setDoc(doc(db,'groups',groupId),cur);gd=cur;
+    cur.historico[key]={matches,members:[...mbs],retroativo:true,savedAt:Date.now()};await setDoc(doc(db,'groups',groupId),cur);gd=cur;window._gdRef=cur;
     const ok=$('ppmok');ok.style.display='block';setTimeout(()=>{ok.style.display='none';closeP('ppreenchemes');renderHistTab();renderRanking();// Atualiza perfil se estiver aberto
     if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')){_buildPlayerProfile(_mpUid);}
     },1800);
@@ -9711,7 +9709,7 @@ window.salvarMesHistorico=async()=>{
 window.deletarMesHist=async key=>{
   if(!confirm(`Deletar o histórico de ${getMesLabel(key)}?`))return;
   const snap=await getDoc(doc(db,'groups',groupId));const cur=snap.data();if(cur.historico&&cur.historico[key])delete cur.historico[key];
-  await setDoc(doc(db,'groups',groupId),cur);gd=cur;renderHistTab();renderRanking();
+  await setDoc(doc(db,'groups',groupId),cur);gd=cur;window._gdRef=cur;renderHistTab();renderRanking();
   if(_mpUid&&document.getElementById('modal-player')?.classList.contains('open')){_buildPlayerProfile(_mpUid);}
 };
 
@@ -10225,7 +10223,6 @@ window.closeModalPartidas=()=>{
 window.deleteMatchModal=async gi=>{
   await deleteMatch(gi);
   renderPerfilPanelStats();
-  renderPerfil();
   openModalPartidas();
 };
 
@@ -10365,6 +10362,7 @@ window.addMatchMembro = async () => {
         if(cur2.notifs[mb.uid].length > 50) cur2.notifs[mb.uid].splice(0, cur2.notifs[mb.uid].length - 50);
         await setDoc(doc(db,'groups',groupId), cur2);
         gd = cur2;
+        window._gdRef = cur2;
         _updateNotifBadge && _updateNotifBadge();
       } catch(e){ console.warn('notif adm match:', e); }
     }
@@ -11713,23 +11711,6 @@ function mfabClose(immediate){
   }
   if(wasOpen) _mfabStagger(false);
 }
-// Sincroniza o badge do multi-fab com o badge de conquistas
-(function(){
-  const _orig = document.getElementById.bind(document);
-  // Sobrescreve getElementById para interceptar conquistas-fab-badge
-  const _patchBadge = ()=>{
-    const fakeBadge = document.getElementById('conquistas-fab-badge');
-    if(!fakeBadge) return;
-    const observer = new MutationObserver(()=>{
-      const mainBadge = document.getElementById('mfab-main-badge');
-      if(!mainBadge) return;
-      mainBadge.textContent = fakeBadge.textContent;
-      mainBadge.style.display = fakeBadge.textContent ? 'flex' : 'none';
-    });
-    observer.observe(fakeBadge, {childList:true, attributes:true, attributeFilter:['style']});
-  };
-  setTimeout(_patchBadge, 500);
-})();
 // Fecha o menu ao clicar fora
 document.addEventListener('click', e=>{
   const wrap = document.getElementById('mfab-wrap');
@@ -14417,6 +14398,13 @@ function _cqUpdateAlertBadges(){
   const mainAlert = document.getElementById('mfab-main-cq-alert');
   if(cqAlert) cqAlert.classList.toggle('visible', hasAlert);
   if(mainAlert) mainAlert.classList.toggle('visible', hasAlert);
+  // Badge numérico do botão principal do multi-fab
+  const mainBadge = document.getElementById('mfab-main-badge');
+  if(mainBadge){
+    const n = window._cqPendingAlerts.size;
+    mainBadge.textContent = n > 0 ? String(n) : '';
+    mainBadge.style.display = n > 0 ? 'flex' : 'none';
+  }
 }
 
 // Adiciona alerta para conquistas novas pela 1ª vez (não retroativo)
