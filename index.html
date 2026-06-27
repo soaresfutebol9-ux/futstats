@@ -2982,6 +2982,36 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
 }
 .conquistas-body{overflow-y:auto;padding:.9rem 1rem 1.5rem;flex:1;}
 
+/* Barra de pesquisa */
+.conquistas-search{
+  padding:.7rem 1.2rem;border-bottom:1px solid var(--bo);
+  flex-shrink:0;background:var(--bg2);
+}
+.conquistas-search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--bo2);
+  border-radius:var(--r);padding:9px 12px;
+  transition:border-color .15s;
+}
+.conquistas-search-box:focus-within{border-color:var(--g)}
+.conquistas-search-box svg{width:16px;height:16px;color:var(--tx3);flex-shrink:0}
+.conquistas-search-box input{
+  flex:1;min-width:0;border:none;background:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--tx);
+}
+.conquistas-search-box input::placeholder{color:var(--tx3)}
+.conquistas-search-clear{
+  display:none;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;
+  color:var(--tx3);font-size:18px;line-height:1;padding:2px 4px;
+  flex-shrink:0;transition:color .15s;
+}
+.conquistas-search-clear:hover{color:var(--tx2)}
+.cq-empty-search{
+  text-align:center;padding:2.5rem 1rem;color:var(--tx3);
+  font-family:'DM Mono',monospace;font-size:13px;line-height:1.5;
+}
+
 /* Cards de categoria */
 .cq-categoria{margin-bottom:1.5rem}
 .cq-cat-title{
@@ -4051,7 +4081,7 @@ body::before{
     <!-- HISTÓRICO -->
     <div class="tv" id="thist">
       <div style="margin-bottom:1.1rem;text-align:center">
-        <div class="stit" style="margin-bottom:0">Histórico</div>
+        <div class="stit" style="margin-bottom:0;text-transform:uppercase">Histórico</div>
       </div>
       <div id="hist-list"></div>
     </div>
@@ -4551,6 +4581,13 @@ body::before{
       <div style="display:flex;align-items:center;gap:8px">
         <div id="conquistas-player-name" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3)"></div>
         <button onclick="fecharConquistas()" class="duelo-close">×</button>
+      </div>
+    </div>
+    <div class="conquistas-search">
+      <div class="conquistas-search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="conquistas-search-input" placeholder="Pesquisar conquistas..." oninput="_cqFiltrar(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="conquistas-search-clear" id="conquistas-search-clear" onclick="_cqLimparBusca()" aria-label="Limpar busca">×</button>
       </div>
     </div>
     <div class="conquistas-body" id="conquistas-body">
@@ -10828,7 +10865,6 @@ function _renderDueloBody(){
       return`<div onclick="toggleDueloPlayer('${m.uid}')" style="background:var(--bg3);border:1.5px solid var(--bo2);border-radius:14px;padding:12px 8px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s;${selStyle}">
         ${avatarHTML(m.name,36,m.uid)}
         <div style="font-family:'Freshman',sans-serif;font-size:11px;letter-spacing:.4px;color:var(--tx);word-break:break-word;overflow-wrap:break-word;max-width:100%;line-height:1.2;text-align:center">${m.name}</div>
-        <div style="font-family:'ClassyVogue',sans-serif;font-size:17px;color:var(--tx2)">${s.gols+s.assist}<span style="font-size:10px;font-family:'DM Mono',monospace"> G+A</span></div>
         ${badge}
       </div>`;
     }).join('')}
@@ -11341,7 +11377,6 @@ window.irParaRankingGA=()=>{
     <div class="duelo-header">
       <div class="duelo-title" style="display:flex;align-items:center;white-space:nowrap">⚔️ Modo Duelo</div>
       <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="abrirCriarDesafio()" title="Criar desafio com prazo" style="background:linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2));border:1px solid rgba(255,90,122,.5);color:#FF5A7A;border-radius:10px;padding:6px 12px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,90,122,.5),rgba(255,150,0,.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,90,122,.3),rgba(255,150,0,.2))'">+ Desafiar</button>
         <div class="duelo-close" onclick="closeDuelo()">×</div>
       </div>
     </div>
@@ -13854,11 +13889,25 @@ window.salvarCqPinadas = async function(uid){
 
 let _cqUid = null;
 
+// Remove acentos e baixa a caixa, para comparação de busca tolerante a acentuação
+function _cqNorm(str){
+  return (str||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+// Evita que aspas no texto da conquista quebrem o atributo HTML data-cq-search
+function _cqEscapeAttr(str){
+  return (str||'').toString().replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+}
+
 window.abrirConquistas = function(uid){
   _cqUid = uid || (window._currentUserUid);
   if(!_cqUid) return;
   const modal = document.getElementById('modal-conquistas');
   if(!modal) return;
+  // Reseta a busca de uma sessão anterior antes de abrir novamente
+  const searchInput = document.getElementById('conquistas-search-input');
+  if(searchInput) searchInput.value = '';
+  const clearBtn = document.getElementById('conquistas-search-clear');
+  if(clearBtn) clearBtn.style.display = 'none';
   modal.style.display='flex';
   requestAnimationFrame(()=>{
     modal.style.opacity='0';
@@ -13866,6 +13915,53 @@ window.abrirConquistas = function(uid){
     requestAnimationFrame(()=>{ modal.style.opacity='1'; });
   });
   _renderConquistasModal(_cqUid);
+};
+
+// Filtra os cards de conquistas exibidos por palavra-chave (nome, descrição ou categoria).
+// Categorias que ficam sem nenhum card visível são ocultadas inteiras.
+window._cqFiltrar = function(termo){
+  const body = document.getElementById('conquistas-body');
+  if(!body) return;
+  const clearBtn = document.getElementById('conquistas-search-clear');
+  const termoNorm = _cqNorm(termo);
+  if(clearBtn) clearBtn.style.display = termoNorm ? 'flex' : 'none';
+
+  const categorias = body.querySelectorAll('.cq-categoria');
+  let totalVisiveis = 0;
+
+  categorias.forEach(catEl=>{
+    const cards = catEl.querySelectorAll('.cq-card');
+    let visiveisNaCategoria = 0;
+    cards.forEach(card=>{
+      const texto = card.dataset.cqSearch || '';
+      const match = !termoNorm || texto.includes(termoNorm);
+      card.style.display = match ? '' : 'none';
+      if(match) visiveisNaCategoria++;
+    });
+    catEl.style.display = visiveisNaCategoria > 0 ? '' : 'none';
+    totalVisiveis += visiveisNaCategoria;
+  });
+
+  let emptyMsg = document.getElementById('cq-search-empty');
+  if(totalVisiveis === 0 && termoNorm){
+    if(!emptyMsg){
+      emptyMsg = document.createElement('div');
+      emptyMsg.id = 'cq-search-empty';
+      emptyMsg.className = 'cq-empty-search';
+      body.appendChild(emptyMsg);
+    }
+    emptyMsg.textContent = `Nenhuma conquista encontrada para "${termo}"`;
+    emptyMsg.style.display = '';
+  } else if(emptyMsg){
+    emptyMsg.style.display = 'none';
+  }
+};
+
+window._cqLimparBusca = function(){
+  const input = document.getElementById('conquistas-search-input');
+  if(input) input.value = '';
+  window._cqFiltrar('');
+  if(input) input.focus();
 };
 
 window.fecharConquistas = function(){
@@ -13887,7 +13983,7 @@ async function _renderConquistasModal(uid){
   const nameEl = document.getElementById('conquistas-player-name');
   if(!body) return;
 
-  body.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--tx3);font-family:'DM Mono',monospace"><span style="display:inline-block;animation:sp 1s linear infinite">◌</span> calculando...</div>`;
+  body.innerHTML = '';
 
   const gd = window._gd;
   if(!gd){ body.innerHTML='<div style="text-align:center;padding:2rem;color:var(--tx3)">Sem dados.</div>'; return; }
@@ -13950,10 +14046,11 @@ async function _renderConquistasModal(uid){
       const _tsDate = _tsMs ? new Date(_tsMs) : null;
       const dataDesb = (_tsDate && !isNaN(_tsDate)) ? _tsDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : null;
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
+      const searchTxt = _cqEscapeAttr(_cqNorm(`${cq.nome} ${cq.desc} ${cat}`));
 
       if(r.achieved){
         const isPending = window._cqPendingAlerts && window._cqPendingAlerts.has(cq.id);
-        html += `<div class="cq-card desbloqueada${isPending?' cq-nova-alerta':''}" data-cqid="${cq.id}" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
+        html += `<div class="cq-card desbloqueada${isPending?' cq-nova-alerta':''}" data-cqid="${cq.id}" data-cq-search="${searchTxt}" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
           ${(!tipoUnico && stackCount > 1) ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
@@ -13961,7 +14058,7 @@ async function _renderConquistasModal(uid){
           ${dataDesb?`<div class="cq-card-data">🗓 ${dataDesb}</div>`:''}
         </div>`;
       } else {
-        html += `<div class="cq-card bloqueada">
+        html += `<div class="cq-card bloqueada" data-cqid="${cq.id}" data-cq-search="${searchTxt}">
           <div class="cq-lock">🔒</div>
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
