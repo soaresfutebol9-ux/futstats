@@ -4022,7 +4022,7 @@ body::before{
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpb',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
-              <input type="number" id="fpb" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0;if(window._inlinePenSync)window._inlinePenSync()">
+              <input type="number" id="fpb" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="window._stepPenField('fpb','fpk','pb',0);window._updatePenStepperUI();if(window._inlinePenSync)window._inlinePenSync()">
               <button onclick="stepField('fpb',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
             </div>
           </div>
@@ -4034,8 +4034,8 @@ body::before{
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpk',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
-              <input type="number" id="fpk" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0;if(window._inlinePenSync)window._inlinePenSync()">
-              <button onclick="stepField('fpk',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
+              <input type="number" id="fpk" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="window._stepPenField('fpb','fpk','pk',0);window._updatePenStepperUI();if(window._inlinePenSync)window._inlinePenSync()">
+              <button onclick="stepField('fpk',1)" id="fpk-plus" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
             </div>
           </div>
 
@@ -4516,9 +4516,9 @@ body::before{
     <div class="fr fr3" style="margin-bottom:10px">
       <div class="ig" style="margin:0"><label>Gols</label><input type="number" id="egols" min="0"></div>
       <div class="ig" style="margin:0"><label>Assist.</label><input type="number" id="eassist" min="0"></div>
-      <div class="ig" style="margin:0"><label>Pên. bat.</label><input type="number" id="epb" min="0"></div>
+      <div class="ig" style="margin:0"><label>Pên. bat.</label><input type="number" id="epb" min="0" oninput="window._stepPenField&&window._stepPenField('epb','epk','pb',0)"></div>
     </div>
-    <div class="ig"><label>Pênaltis convertidos</label><input type="number" id="epk" min="0"></div>
+    <div class="ig"><label>Pênaltis convertidos</label><input type="number" id="epk" min="0" oninput="window._stepPenField&&window._stepPenField('epb','epk','pk',0)"></div>
     <div class="err" id="eerr"></div>
     <button class="btn bp" onclick="saveEdit()" style="margin-bottom:10px">Salvar</button>
     <button class="bg2btn" onclick="closeP('pedit')">Cancelar</button>
@@ -7803,7 +7803,44 @@ window.leaveGroup=async()=>{
 window.copyCode=()=>{navigator.clipboard.writeText(groupId).then(()=>{const b=$('copybtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));};
 window.copyInviteLink=()=>{const link=location.href.split('?')[0]+'?join='+groupId;navigator.clipboard.writeText(link).then(()=>{const b=$('linkbtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));};
 
-window.stepField=(id,delta)=>{const el=$(id);el.value=Math.max(0,(parseInt(el.value)||0)+delta);if((id==='fpb'||id==='fpk')&&window._inlinePenSync)window._inlinePenSync();};
+// Garante a regra de negócio: nunca pode haver mais "convertidos" do que
+// "batidos" — não existe pênalti convertido sem uma cobrança batida antes.
+// Usada tanto pelos botões +/- quanto pela digitação manual (oninput),
+// para os dois pares de campos existentes no app (form principal e form admin).
+window._stepPenField=function(pbId,pkId,which,delta){
+  const pbEl=$(pbId),pkEl=$(pkId);
+  if(!pbEl||!pkEl)return;
+  let pb=Math.max(0,parseInt(pbEl.value)||0);
+  let pk=Math.max(0,parseInt(pkEl.value)||0);
+  if(which==='pb')pb=Math.max(0,pb+delta);
+  else pk=Math.max(0,pk+delta);
+  if(pk>pb)pk=pb; // convertidos nunca excede batidos, em nenhuma direção
+  pbEl.value=pb;pkEl.value=pk;
+};
+// Reflete visualmente a regra acima: desabilita o botão "+" de Convertidos
+// quando não há cobranças batidas disponíveis para converter.
+window._updatePenStepperUI=function(){
+  [['fpb','fpk','fpk-plus'],['adm-fpb','adm-fpk','adm-fpk-plus']].forEach(([pbId,pkId,plusId])=>{
+    const pbEl=$(pbId),pkEl=$(pkId),plusBtn=$(plusId);
+    if(!pbEl||!pkEl||!plusBtn)return;
+    const pb=Math.max(0,parseInt(pbEl.value)||0);
+    const pk=Math.max(0,parseInt(pkEl.value)||0);
+    const blocked=pk>=pb;
+    plusBtn.disabled=blocked;
+    plusBtn.style.opacity=blocked?'.35':'1';
+    plusBtn.style.cursor=blocked?'not-allowed':'pointer';
+  });
+};
+window.stepField=(id,delta)=>{
+  if(id==='fpb'||id==='fpk'){
+    window._stepPenField('fpb','fpk', id==='fpb'?'pb':'pk', delta);
+    window._updatePenStepperUI();
+    if(window._inlinePenSync)window._inlinePenSync();
+    return;
+  }
+  const el=$(id);el.value=Math.max(0,(parseInt(el.value)||0)+delta);
+};
+window._updatePenStepperUI();
 window.addMatch=async()=>{
   const date=$('fdate').value;if(!date)return showErr('aerr','Selecione a data.');
   const name=$('fname').value.trim()||'Pelada',gols=parseInt($('fgols').value)||0,assist=parseInt($('fassist').value)||0,pb=parseInt($('fpb').value)||0,pk=Math.min(parseInt($('fpk').value)||0,pb);
@@ -7903,7 +7940,7 @@ window._executarSalvarPartida=async({date,name,gols,assist,pb,pk})=>{
     // Verifica se essa partida completa algum desafio de "única partida" em
     // andamento (envolvendo este jogador), encerrando-o imediatamente.
     if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar();
-    ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
+    ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';if(window._updatePenStepperUI)window._updatePenStepperUI();
     showPartidaSalvaModal();
     // Publica no feed
     (async()=>{
@@ -10249,17 +10286,17 @@ function _renderAdmPartidasModal(){
         <div>
           <div style="font-size:11px;color:#666;font-family:'DM Mono',monospace;margin-bottom:4px">Batidos</div>
           <div style="display:flex;align-items:center;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;overflow:hidden">
-            <button type="button" onclick="var el=document.getElementById('adm-fpb');el.value=Math.max(0,(parseInt(el.value)||0)-1)" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">−</button>
-            <input type="number" id="adm-fpb" min="0" value="0" style="flex:1;border:none;background:none;color:#000;padding:0;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none;min-width:0">
-            <button type="button" onclick="var el=document.getElementById('adm-fpb');el.value=(parseInt(el.value)||0)+1" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">+</button>
+            <button type="button" onclick="window._stepPenField('adm-fpb','adm-fpk','pb',-1);window._updatePenStepperUI()" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">−</button>
+            <input type="number" id="adm-fpb" min="0" value="0" style="flex:1;border:none;background:none;color:#000;padding:0;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none;min-width:0" oninput="window._stepPenField('adm-fpb','adm-fpk','pb',0);window._updatePenStepperUI()">
+            <button type="button" onclick="window._stepPenField('adm-fpb','adm-fpk','pb',1);window._updatePenStepperUI()" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">+</button>
           </div>
         </div>
         <div>
           <div style="font-size:11px;color:#666;font-family:'DM Mono',monospace;margin-bottom:4px">Convertidos</div>
           <div style="display:flex;align-items:center;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:8px;overflow:hidden">
-            <button type="button" onclick="var el=document.getElementById('adm-fpk');el.value=Math.max(0,(parseInt(el.value)||0)-1)" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">−</button>
-            <input type="number" id="adm-fpk" min="0" value="0" style="flex:1;border:none;background:none;color:#000;padding:0;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none;min-width:0">
-            <button type="button" onclick="var el=document.getElementById('adm-fpk');el.value=(parseInt(el.value)||0)+1" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">+</button>
+            <button type="button" onclick="window._stepPenField('adm-fpb','adm-fpk','pk',-1);window._updatePenStepperUI()" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">−</button>
+            <input type="number" id="adm-fpk" min="0" value="0" style="flex:1;border:none;background:none;color:#000;padding:0;font-size:14px;font-family:'ClassyVogue',sans-serif;text-align:center;outline:none;min-width:0" oninput="window._stepPenField('adm-fpb','adm-fpk','pk',0);window._updatePenStepperUI()">
+            <button type="button" id="adm-fpk-plus" onclick="window._stepPenField('adm-fpb','adm-fpk','pk',1);window._updatePenStepperUI()" style="width:36px;height:36px;border:none;background:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0">+</button>
           </div>
         </div>
       </div>
@@ -10275,6 +10312,7 @@ function _renderAdmPartidasModal(){
     if((m.penBat||0)>0) pl.push(`<span class="pi pa">${m.penOk||0}/${m.penBat} pen</span>`);
     return `<div class="mr"><div class="md">${fd(m.date)}</div><div style="flex:1"><div class="mt2">${m.name}</div><div class="mp">${pl.join('')||'<span class="pi pp">sem stats</span>'}</div></div><div class="ma-actions">${(m.penBat||0)>0?`<button class="ma-btn" onclick="openPenMarcarAdmin(${m._gi})" title="Marcar pênaltis">🎯</button>`:''}<button class="ma-btn" onclick="admOpenEdit(${m._gi})">✏️</button><button class="ma-btn del" onclick="admDeleteMatch(${m._gi})">🗑</button></div></div>`;
   }).join('');
+  if(window._updatePenStepperUI) window._updatePenStepperUI();
 
   const modal = $('modal-partidas');
   modal.style.display = 'flex';
