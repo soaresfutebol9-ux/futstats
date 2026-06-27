@@ -889,6 +889,14 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 /* ── CONTENT AREA SMART SCROLL ── */
 .ac{
   overscroll-behavior-y:contain;
+  /* Declara ao navegador que o scroll vertical é sempre nativo, permitindo
+     que ele comece a rolar imediatamente sem esperar o resultado do
+     touchmove não-passivo usado pelo swipe horizontal de troca de aba
+     (ver _initRankSwipe). Sem isso, todo gesto vertical nesta área —
+     mesmo quando não é um swipe horizontal — sofre um pequeno atraso
+     de entrada, que se acumula e fica mais perceptível em listas longas
+     como a aba Recordes. */
+  touch-action:pan-y;
 }
 
 /* ── MATCHES LIST SCROLL ── */
