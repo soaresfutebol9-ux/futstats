@@ -3939,8 +3939,7 @@ body::before{
       <!-- Header premium -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-top:.2rem">
         <div>
-          <div style="font-family:'VarsityTeam',serif;font-size:28px;font-weight:bold;letter-spacing:1px;background:linear-gradient(135deg,var(--tx) 0%,rgba(77,255,176,.9) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 6px rgba(77,255,176,.15))">Nova Partida</div>
-          <div style="font-size:12px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.06em;margin-top:2px">Registre sua performance</div>
+          <div style="font-family:'VarsityTeam',serif;font-size:19px;font-weight:bold;letter-spacing:.3px;color:#000;text-transform:uppercase;white-space:nowrap">Registre a sua performance</div>
         </div>
 
       </div>
@@ -10502,6 +10501,17 @@ window.showTab=(n,btn,e)=>{
   nextEl.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
   nextEl.style.cssText='';
 
+  // Blindagem: força todas as outras .tv (que não a que está entrando) a
+  // ficarem escondidas. Evita o bug em que uma aba anterior (ex.: "Partida")
+  // fica visualmente travada por uma transição interrompida e aparece
+  // sobreposta à aba nova mesmo depois dela virar "active".
+  document.querySelectorAll('.tv').forEach(el=>{
+    if(el===nextEl)return;
+    _cancelPendingTabTransition(el);
+    el.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
+    el.style.cssText='';
+  });
+
   if(!isLite){
     // Posiciona fora da tela (sem transition ainda)
     nextEl.classList.add(dir==='right'?'tab-enter':'tab-enter-left');
@@ -10514,6 +10524,13 @@ window.showTab=(n,btn,e)=>{
       nextEl.classList.remove('tab-enter','tab-enter-left','tab-enter-run');
       nextEl.style.cssText='';
       nextEl.classList.add('active');
+      // Reforça a blindagem ao final da transição também, pra cobrir o caso
+      // de outra aba ter sido reaberta entre o início e o fim da animação.
+      document.querySelectorAll('.tv').forEach(el=>{
+        if(el===nextEl)return;
+        el.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
+        el.style.cssText='';
+      });
     };
     nextEl.addEventListener('transitionend', onDone, {once:true});
     // Fallback: garante active mesmo se transitionend não disparar
@@ -10529,6 +10546,8 @@ window.showTab=(n,btn,e)=>{
 // Se por qualquer motivo a aba marcada como "active" ficar com opacity/display
 // inconsistentes (animação interrompida por troca de app, aba em background,
 // etc.), corrige automaticamente ao voltar o foco pro app — sem precisar de F5.
+// Também garante que nenhuma OUTRA aba (.tv) tenha ficado visível por engano,
+// sobreposta à aba ativa (bug de duas telas aparecendo juntas).
 function _fixActiveTabVisibility(){
   const activeEl=document.querySelector('.tv.active');
   if(!activeEl)return;
@@ -10537,6 +10556,15 @@ function _fixActiveTabVisibility(){
     activeEl.style.cssText='';
     activeEl.classList.add('active');
   }
+  document.querySelectorAll('.tv').forEach(el=>{
+    if(el===activeEl)return;
+    const elCs=getComputedStyle(el);
+    if(elCs.display!=='none'){
+      _cancelPendingTabTransition(el);
+      el.classList.remove('active','tab-enter','tab-enter-left','tab-enter-run');
+      el.style.cssText='';
+    }
+  });
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')setTimeout(_fixActiveTabVisibility,50);
@@ -11506,6 +11534,16 @@ function _mfabStagger(open){
   }
 }
 
+function _fecharModaisDoFab(){
+  // Fecha qualquer modal aberto pelos itens do multi-FAB, evitando que um
+  // modal novo se sobreponha a outro que ficou aberto da seleção anterior.
+  window.closeDuelo?.();
+  window.fecharConquistas?.();
+  window.fecharCartaJogador?.();
+  window.fecharSurvey?.();
+  window.fecharCalendario?.();
+  window.fecharHistoricoConfrontos?.();
+}
 function mfabToggle(){
   const items = document.getElementById('mfab-items');
   const main  = document.getElementById('mfab-main');
@@ -11532,6 +11570,7 @@ function mfabClose(){
   document.body.classList.remove('mfab-open');
   if(overlay) overlay.classList.remove('open');
   if(wasOpen) _mfabStagger(false);
+  _fecharModaisDoFab();
 }
 // Sincroniza o badge do multi-fab com o badge de conquistas
 (function(){
