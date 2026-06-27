@@ -1336,7 +1336,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rec-section-title{font-family:'VarsityTeam',serif;font-size:15px;font-weight:bold;letter-spacing:.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec-share-btn{background:none;border:1px solid var(--bo2);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--tx2);display:flex;align-items:center;gap:6px;transition:all .15s;flex-shrink:0}
 .rec-share-btn:hover{border-color:var(--g);color:var(--g);background:rgba(77,255,176,.07)}
-.rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:#e0dedc;box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;transition:all .18s}
+.rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:#e0dedc;box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden}
 .rec-card::before{
   content:'';position:absolute;top:0;left:-80%;width:40%;height:100%;
   background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 50%,transparent 100%);
@@ -9037,7 +9037,7 @@ function buildRecordData(){
 function recCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9061,7 +9061,7 @@ function recCardHTML(p,pos){
 function recAssistCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9085,7 +9085,7 @@ function recAssistCardHTML(p,pos){
 function recGAPorJogoCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9110,7 +9110,7 @@ function recGAPorJogoCardHTML(p,pos){
 function recGATotalCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 1px 3px rgba(255,255,255,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.6))';
+  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -15263,6 +15263,7 @@ body.lite-mode .craque-banner {
 body.lite-mode .podium-crown,
 body.lite-mode .podium-av-crown,
 body.lite-mode .rec-medal,
+body.lite-mode .rec-val-num,
 body.lite-mode .craque-crown-icon,
 body.lite-mode .cq-card-icon,
 body.lite-mode .av,
