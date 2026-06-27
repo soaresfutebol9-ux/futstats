@@ -366,6 +366,7 @@ html.is-touch .auth-ball{animation:none}
 .ig label{display:block;font-size:12px;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace}
 .ig input,.ig select{width:100%;background:var(--bg3);border:1px solid var(--bo2);border-radius:var(--r);color:var(--tx);padding:13px 16px;font-size:16px;font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s}
 .ig input:focus,.ig select:focus{outline:none;border-color:var(--g);background:var(--bg4);box-shadow:0 0 0 3px rgba(77,255,176,.1),0 0 12px rgba(77,255,176,.08)}
+#fname::placeholder{color:var(--tx3)}
 .ig input::placeholder{color:var(--tx3)}
 
 .pass-wrap{position:relative}
@@ -7812,6 +7813,74 @@ window.addMatch=async()=>{
   if(pb>0 && window._inlinePenValidar && !window._inlinePenValidar(pb)){
     return showErr('aerr','Mapeamento de pênalti obrigatório.');
   }
+  // Em vez de salvar direto, mostra um resumo para o jogador confirmar.
+  // Isso evita partidas salvas por engano (toque acidental, número errado)
+  // e dá uma última chance de revisar o mapeamento de pênaltis antes de gravar.
+  window._abrirConfirmacaoPartida({date,name,gols,assist,pb,pk});
+};
+
+window._abrirConfirmacaoPartida=function({date,name,gols,assist,pb,pk}){
+  const modal = document.getElementById('confirmar-partida-modal');
+  const resumo = document.getElementById('confirmar-partida-resumo');
+  if(!modal || !resumo) return;
+
+  const penMap = (pb>0 && window._inlinePenGetPontos) ? window._inlinePenGetPontos() : [];
+  const penErr = pb - pk;
+  const dataFmt = (()=>{ const [y,m,d]=date.split('-'); return `${d}/${m}/${y}`; })();
+
+  const linha=(label,val,cor)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bo)">
+    <span style="font-size:13px;color:var(--tx2);font-family:'DM Sans',sans-serif">${label}</span>
+    <span style="font-size:15px;font-weight:700;color:${cor||'var(--tx)'};font-family:'ClassyVogue',sans-serif">${val}</span>
+  </div>`;
+
+  let html = `
+    ${linha('📅 Data', dataFmt)}
+    ${linha('📍 Local', name)}
+    ${linha('⚽ Gols', gols)}
+    ${linha('👟 Assistências', assist)}`;
+
+  if(pb>0){
+    html += `
+    ${linha('🥅 Pênaltis batidos', pb)}
+    ${linha('✅ Convertidos', pk, '#4caf50')}
+    ${penErr>0?linha('❌ Errados', penErr, '#e53935'):''}`;
+
+    if(penMap.length){
+      html += `<div style="margin-top:12px;margin-bottom:6px;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em">Mapeamento das cobranças</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${penMap.map((p,i)=>`<div style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;background:${p.ok?'rgba(76,175,80,.12)':'rgba(229,57,53,.12)'};border:1px solid ${p.ok?'rgba(76,175,80,.4)':'rgba(229,57,53,.4)'}">
+          <span style="font-size:12px;font-weight:700;color:${p.ok?'#4caf50':'#e53935'}">${p.ok?'✅':'❌'}</span>
+          <span style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">#${i+1}</span>
+        </div>`).join('')}
+      </div>`;
+    }
+  }
+
+  resumo.innerHTML = html;
+  window._pendingMatchData = {date,name,gols,assist,pb,pk};
+  modal.style.display = 'flex';
+};
+
+window._cancelarConfirmacaoPartida=function(){
+  const modal = document.getElementById('confirmar-partida-modal');
+  if(modal) modal.style.display = 'none';
+  window._pendingMatchData = null;
+  // Não altera nada: mapeamento de pênaltis e campos do formulário continuam
+  // intactos, permitindo ao jogador voltar e editar antes de tentar de novo.
+};
+
+window._confirmarESalvarPartida=async function(){
+  const dados = window._pendingMatchData;
+  const modal = document.getElementById('confirmar-partida-modal');
+  if(!dados) return;
+  const btn = modal?.querySelector('button[onclick="window._confirmarESalvarPartida()"]');
+  if(btn){ btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = 'Salvando...'; }
+  await window._executarSalvarPartida(dados);
+  if(modal) modal.style.display = 'none';
+  window._pendingMatchData = null;
+};
+
+window._executarSalvarPartida=async({date,name,gols,assist,pb,pk})=>{
   try{
     const novaPartida={player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()};
     if(pb>0 && window._inlinePenGetPontos){
@@ -15429,7 +15498,7 @@ function _renderCraqueModalContent(){
 
   } else {
     // ── ABA HISTÓRICO ──
-    periodoEl.textContent = 'todos os tempos';
+    periodoEl.textContent = '';
     const hist = (gd.craquesSemana || []).slice().sort((a,b) => b.key.localeCompare(a.key));
     if(!hist.length){
       body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O histórico é gravado automaticamente<br>ao final de cada semana.</div>';
@@ -16544,6 +16613,22 @@ document.addEventListener('touchstart', e => {
     <div class="pen-marcar-actions">
       <button class="pen-marcar-btn skip" onclick="skipPenMarcar()">Pular</button>
       <button class="pen-marcar-btn save" onclick="confirmarPenAtual()" id="pen-marcar-confirmar" disabled style="opacity:.4">Confirmar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: confirmar antes de salvar a partida (revisão final) ── -->
+<div id="confirmar-partida-modal" style="display:none;position:fixed;inset:0;z-index:3350;background:rgba(0,0,0,.82);align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border-radius:22px;width:calc(100% - 2rem);max-width:440px;max-height:85vh;overflow-y:auto;padding:1.4rem 1.2rem;box-shadow:0 8px 48px rgba(0,0,0,.6);position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+      <div style="font-size:16px;font-weight:700;color:var(--tx);font-family:'DM Sans',sans-serif">Confirme sua partida</div>
+      <button onclick="window._cancelarConfirmacaoPartida()" style="background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;padding:4px;line-height:1">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:14px;font-family:'DM Sans',sans-serif">Revise os números antes de salvar.</div>
+    <div id="confirmar-partida-resumo"></div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button onclick="window._cancelarConfirmacaoPartida()" style="flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--bo2);background:none;color:var(--tx2);font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif">Voltar e editar</button>
+      <button onclick="window._confirmarESalvarPartida()" style="flex:1.3;padding:13px;border-radius:12px;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;background:var(--grad-green);color:#07090d;box-shadow:0 4px 18px rgba(77,255,176,.3)">Confirmar e salvar ✓</button>
     </div>
   </div>
 </div>
