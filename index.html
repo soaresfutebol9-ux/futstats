@@ -3962,7 +3962,7 @@ body::before{
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--tx)">Data</div>
             </div>
-            <input type="date" id="fdate" style="background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;width:150px;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bo2)'">
+            <input type="date" id="fdate" style="background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;width:160px;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bo2)'">
           </div>
         </div>
 
@@ -3988,9 +3988,7 @@ body::before{
           <!-- Gols -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Gols</div>
-              </div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx)">Gols</div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fgols',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
@@ -4002,9 +4000,7 @@ body::before{
           <!-- Assistências -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Assistências</div>
-              </div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx)">Assistências</div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fassist',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
@@ -4025,7 +4021,7 @@ body::before{
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpb',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
-              <input type="number" id="fpb" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
+              <input type="number" id="fpb" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0;if(window._inlinePenSync)window._inlinePenSync()">
               <button onclick="stepField('fpb',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
             </div>
           </div>
@@ -4037,12 +4033,36 @@ body::before{
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpk',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
-              <input type="number" id="fpk" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0">
+              <input type="number" id="fpk" min="0" value="0" style="width:50px;background:none;border:none;color:#000;text-align:center;font-family:'ClassyVogue',sans-serif;font-size:26px;font-weight:normal;padding:4px 0;-moz-appearance:textfield;outline:none" oninput="if(this.value<0)this.value=0;if(window._inlinePenSync)window._inlinePenSync()">
               <button onclick="stepField('fpk',1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">+</button>
             </div>
           </div>
 
         </div><!-- /grid -->
+
+        <!-- Mapeamento de pênaltis (obrigatório quando há cobranças) -->
+        <div id="inline-pen-map-wrap" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bo)">
+          <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+            <span style="width:16px;height:1px;background:var(--bo3);display:inline-block"></span>
+            🎯 Mapear cobranças
+            <span style="flex:1;height:1px;background:var(--bo3);display:inline-block"></span>
+          </div>
+          <div id="inline-pen-map-sub" style="font-size:12px;color:var(--tx2);text-align:center;margin-bottom:8px;font-family:'DM Sans',sans-serif">Cobrança 1 de 1 — Toque no gol onde você bateu</div>
+          <div id="inline-pen-map-indicator" class="pen-marcar-indicator" style="margin-bottom:8px"></div>
+          <div class="pen-gol-wrap">
+            <canvas id="inline-pen-map-canvas" class="pen-gol-canvas"></canvas>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;margin:.6rem 0">
+            <button onclick="window._inlinePenSetResult(true)" id="inline-pen-btn-ok" style="flex:1;padding:11px;border-radius:12px;border:2px solid #4caf50;background:rgba(76,175,80,.12);color:#4caf50;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">✅ Convertido</button>
+            <button onclick="window._inlinePenSetResult(false)" id="inline-pen-btn-err" style="flex:1;padding:11px;border-radius:12px;border:2px solid #e53935;background:rgba(229,57,53,.12);color:#e53935;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">❌ Errado</button>
+          </div>
+          <button onclick="window._inlinePenConfirmar()" id="inline-pen-confirmar" disabled style="width:100%;padding:13px;border-radius:12px;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;background:var(--bo2);color:var(--tx3);opacity:.5;transition:all .15s">Confirmar cobrança →</button>
+        </div>
+
+        <!-- Aviso de mapeamento obrigatório pendente -->
+        <div id="inline-pen-map-warning" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.4);color:#e53935;font-size:12px;font-weight:600;text-align:center;font-family:'DM Sans',sans-serif">
+          ⚠️ Mapeamento de pênalti obrigatório
+        </div>
       </div><!-- /card stats -->
 
       <div class="err" id="aerr"></div>
@@ -5873,11 +5893,6 @@ function renderCraqueRodada(){
       : `<div class="av av0">${(craque.name||'?')[0].toUpperCase()}</div>`
   }</div>`;
 
-  const golapiace = craque.gols   > 0 ? `<span class="craque-stat-chip">⚽ ${craque.gols}G</span>` : "";
-  const assistace = craque.assist > 0 ? `<span class="craque-stat-chip">👟 ${craque.assist}A</span>` : "";
-  const penOkChip  = craque.penOk  > 0 ? `<span class="craque-stat-chip">🟢 ${craque.penOk}P</span>` : "";
-  const penErrChip = craque.penErr > 0 ? `<span class="craque-stat-chip" style="color:#ff6b6b">🔴 ${craque.penErr}PE</span>` : "";
-
   return `<div class="craque-banner">
     <div onclick="${craque.uid ? `openPlayerProfile('${craque.uid}')` : ''}" style="cursor:${craque.uid ? 'pointer' : 'default'};flex-shrink:0">
       ${avWrap}
@@ -5885,10 +5900,8 @@ function renderCraqueRodada(){
     <div class="craque-left">
       <div class="craque-label-row">
         <div class="craque-label">🏆 CRAQUE DA SEMANA</div>
-        <div class="craque-periodo">${craque.rodadaLabel}</div>
       </div>
       <div class="craque-name">${craque.name}${isMe ? ' <span style="font-size:12px;opacity:.7">(você)</span>' : ''}</div>
-      <div class="craque-stats">${golapiace}${assistace}${penOkChip}${penErrChip}</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
       <div class="craque-score">
@@ -7789,12 +7802,22 @@ window.leaveGroup=async()=>{
 window.copyCode=()=>{navigator.clipboard.writeText(groupId).then(()=>{const b=$('copybtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2000);}).catch(()=>prompt('Código:',groupId));};
 window.copyInviteLink=()=>{const link=location.href.split('?')[0]+'?join='+groupId;navigator.clipboard.writeText(link).then(()=>{const b=$('linkbtn');const o=b.textContent;b.textContent='✓ Copiado!';setTimeout(()=>b.textContent=o,2500);}).catch(()=>prompt('Link:',link));};
 
-window.stepField=(id,delta)=>{const el=$(id);el.value=Math.max(0,(parseInt(el.value)||0)+delta);};
+window.stepField=(id,delta)=>{const el=$(id);el.value=Math.max(0,(parseInt(el.value)||0)+delta);if((id==='fpb'||id==='fpk')&&window._inlinePenSync)window._inlinePenSync();};
 window.addMatch=async()=>{
   const date=$('fdate').value;if(!date)return showErr('aerr','Selecione a data.');
   const name=$('fname').value.trim()||'Pelada',gols=parseInt($('fgols').value)||0,assist=parseInt($('fassist').value)||0,pb=parseInt($('fpb').value)||0,pk=Math.min(parseInt($('fpk').value)||0,pb);
+  // Mapeamento de pênaltis é obrigatório: se houve cobranças, todas precisam
+  // estar mapeadas ANTES de salvar a partida. Isso evita partidas salvas
+  // sem mapeamento (jogador sai do app antes do modal pós-salvamento abrir).
+  if(pb>0 && window._inlinePenValidar && !window._inlinePenValidar(pb)){
+    return showErr('aerr','Mapeamento de pênalti obrigatório.');
+  }
   try{
     const novaPartida={player:myProfile.displayName,uid:currentUser.uid,date,name,gols,assist,penBat:pb,penOk:pk,ts:Date.now()};
+    if(pb>0 && window._inlinePenGetPontos){
+      const penMap = window._inlinePenGetPontos();
+      if(penMap && penMap.length) novaPartida.penMap = penMap;
+    }
     // Usa o estado local (gd), já mantido em sincronia pelo onSnapshot,
     // em vez de baixar o documento inteiro do grupo de novo (getDoc).
     const already=((gd&&gd.members)||[]).some(m=>m.uid===currentUser.uid);
@@ -7802,6 +7825,9 @@ window.addMatch=async()=>{
     if(!already)updates.members=arrayUnion({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});
     // updateDoc só envia o incremento, sem reler/regravar o documento inteiro — bem mais rápido em grupos com muito histórico.
     await updateDoc(doc(db,'groups',groupId),updates);
+    // Só reseta o mapeamento DEPOIS da gravação confirmada — se o updateDoc
+    // falhar, os pontos marcados continuam disponíveis para nova tentativa.
+    if(pb>0 && window._inlinePenResetar) window._inlinePenResetar();
     // Atualiza o estado local imediatamente (o onSnapshot também vai confirmar em seguida).
     if(!gd.matches)gd.matches=[];gd.matches.push(novaPartida);
     if(!already){if(!gd.members)gd.members=[];gd.members.push({uid:currentUser.uid,name:myProfile.displayName,photo:myProfile.photo||'',joined:Date.now()});}
@@ -7810,10 +7836,6 @@ window.addMatch=async()=>{
     if(typeof _dcCheckEncerrar==='function') _dcCheckEncerrar();
     ['fgols','fassist','fpb','fpk'].forEach(id=>$(id).value=0);$('fname').value='';
     showPartidaSalvaModal();
-    // Se teve pênaltis, abre modal de marcação após o modal de partida salva fechar
-    if(pb>0){
-      setTimeout(()=>{ openPenMarcar(novaPartida, pb, pk); }, 5200);
-    }
     // Publica no feed
     (async()=>{
       const partes=[];
@@ -15808,6 +15830,190 @@ document.addEventListener('touchstart', e => {
     const pad=CLICK_PAD;
     return x>=(GOAL.x-pad) && x<=(GOAL.x+GOAL.w+pad) && y>=(GOAL.y-pad) && y<=(GOAL.y+GOAL.h+pad);
   }
+
+  /* ═══ MAPEAMENTO INLINE (no formulário, ANTES de salvar a partida) ═══
+     Resolve o problema de partidas salvas sem mapeamento: o jogador
+     mapeia as cobranças dentro do próprio formulário de "Salvar Partida".
+     O botão de salvar fica bloqueado até o mapeamento estar completo. */
+  let _inlinePb = 0, _inlinePk = 0;
+  let _inlineResultados = [];   // [{x,y,ok}] já confirmados nesta sessão
+  let _inlinePendente = null;   // {x,y,ok} aguardando confirmação
+  let _inlineResult = null;     // true/false selecionado
+  let _inlinePos = null;        // {x,y} clicado
+
+  // Chamado a cada mudança em fpb/fpk — mostra/esconde e mantém o
+  // progresso já marcado quando possível (ex.: usuário aumentou pb sem querer)
+  window._inlinePenSync = function(){
+    const pbEl = document.getElementById('fpb');
+    const pkEl = document.getElementById('fpk');
+    const wrap = document.getElementById('inline-pen-map-wrap');
+    const warning = document.getElementById('inline-pen-map-warning');
+    if(!pbEl || !wrap) return;
+    const pb = Math.max(0, parseInt(pbEl.value)||0);
+    const pk = Math.max(0, parseInt(pkEl?.value)||0);
+
+    if(pb <= 0){
+      // Sem cobranças: esconde tudo e limpa estado
+      wrap.style.display = 'none';
+      if(warning) warning.style.display = 'none';
+      _inlinePb = 0; _inlinePk = 0;
+      _inlineResultados = []; _inlinePendente = null; _inlineResult = null; _inlinePos = null;
+      return;
+    }
+
+    // Se o total de cobranças mudou, o mapeamento anterior não é mais válido
+    if(pb !== _inlinePb){
+      _inlinePb = pb; _inlinePk = pk;
+      _inlineResultados = [];
+      _inlinePendente = null; _inlineResult = null; _inlinePos = null;
+    } else {
+      _inlinePk = pk;
+    }
+
+    wrap.style.display = 'block';
+    if(warning) warning.style.display = 'none';
+    _inlineRender();
+    setTimeout(()=>_inlineSetupCanvas(), 50);
+  };
+
+  function _inlineRender(){
+    const sub = document.getElementById('inline-pen-map-sub');
+    const ind = document.getElementById('inline-pen-map-indicator');
+    const btn = document.getElementById('inline-pen-confirmar');
+    const idx = _inlineResultados.length;
+
+    if(sub) sub.textContent = idx >= _inlinePb
+      ? 'Todas as cobranças mapeadas ✓'
+      : `Cobrança ${idx+1} de ${_inlinePb} — Toque no gol onde você bateu`;
+
+    if(ind){
+      ind.innerHTML = Array.from({length:_inlinePb}).map((_,i)=>{
+        const r = _inlineResultados[i];
+        const cls = r===undefined?'':r.ok?'ok':'err';
+        return `<div class="pen-marcar-dot ${cls}"></div>`;
+      }).join('');
+    }
+
+    if(btn){
+      if(idx >= _inlinePb){
+        btn.disabled = true;
+        btn.style.opacity = '1';
+        btn.style.background = '#4caf50';
+        btn.style.color = '#fff';
+        btn.textContent = 'Mapeamento completo ✓';
+      } else {
+        const canConfirm = _inlinePos!==null && _inlineResult!==null;
+        btn.disabled = !canConfirm;
+        btn.style.opacity = canConfirm?'1':'.5';
+        btn.style.background = canConfirm?'var(--grad-green)':'var(--bo2)';
+        btn.style.color = canConfirm?'#07090d':'var(--tx3)';
+        btn.textContent = 'Confirmar cobrança →';
+      }
+    }
+
+    const btnOk  = document.getElementById('inline-pen-btn-ok');
+    const btnErr = document.getElementById('inline-pen-btn-err');
+    if(btnOk)  btnOk.style.borderWidth  = (_inlineResult===true)  ? '3px':'2px';
+    if(btnErr) btnErr.style.borderWidth = (_inlineResult===false) ? '3px':'2px';
+    if(btnOk)  btnOk.style.background   = (_inlineResult===true)  ? 'rgba(76,175,80,.28)':'rgba(76,175,80,.12)';
+    if(btnErr) btnErr.style.background  = (_inlineResult===false) ? 'rgba(229,57,53,.28)':'rgba(229,57,53,.12)';
+  }
+
+  function _inlineSetupCanvas(){
+    const canvas = document.getElementById('inline-pen-map-canvas');
+    if(!canvas) return;
+    const cssW = canvas.offsetWidth || GW;
+    const cssH = Math.round(cssW * GH / GW);
+    canvas.width = cssW; canvas.height = cssH;
+    const CW = cssW, CH = cssH;
+    const ctx = canvas.getContext('2d');
+
+    function redraw(){
+      const pts = [..._inlineResultados, ...(_inlinePendente ? [_inlinePendente] : [])];
+      const scaled = pts.map(p=>({...p, x:p.x*CW/GW, y:p.y*CH/GH}));
+      drawGoal(ctx, CW, CH, scaled, _inlineResultados.length);
+    }
+    redraw();
+
+    function handleXY(clientX, clientY){
+      if(_inlineResultados.length >= _inlinePb) return;
+      const pos = canvasToVirtual(canvas, clientX, clientY);
+      const normX = Math.round(pos.x * GW / CW);
+      const normY = Math.round(pos.y * GH / CH);
+      _inlinePos = {x:normX, y:normY};
+      _inlinePendente = {x:normX, y:normY, ok: _inlineResult !== null ? _inlineResult : true};
+      _inlineRender();
+      redraw();
+    }
+
+    if(canvas._inlineClickH) canvas.removeEventListener('click', canvas._inlineClickH);
+    if(canvas._inlineTouchH) canvas.removeEventListener('touchend', canvas._inlineTouchH);
+    canvas._inlineClickH = function(e){ e.preventDefault(); handleXY(e.clientX, e.clientY); };
+    canvas._inlineTouchH = function(e){
+      e.preventDefault();
+      const t = e.changedTouches && e.changedTouches[0];
+      if(t) handleXY(t.clientX, t.clientY);
+    };
+    canvas.addEventListener('click', canvas._inlineClickH);
+    canvas.addEventListener('touchend', canvas._inlineTouchH, {passive:false});
+  }
+
+  window._inlinePenSetResult = function(ok){
+    if(_inlineResultados.length >= _inlinePb) return;
+    _inlineResult = ok;
+    if(_inlinePos) _inlinePendente = {x:_inlinePos.x, y:_inlinePos.y, ok};
+    _inlineRender();
+    const canvas = document.getElementById('inline-pen-map-canvas');
+    if(canvas){
+      const ctx = canvas.getContext('2d');
+      const CW = canvas.width, CH = canvas.height;
+      const pts = [..._inlineResultados, ...(_inlinePendente?[_inlinePendente]:[])];
+      const scaled = pts.map(p=>({...p, x:p.x*CW/GW, y:p.y*CH/GH}));
+      drawGoal(ctx, CW, CH, scaled, _inlineResultados.length);
+    }
+  };
+
+  window._inlinePenConfirmar = function(){
+    if(_inlinePos===null || _inlineResult===null) return;
+    _inlineResultados.push({x:_inlinePos.x, y:_inlinePos.y, ok:_inlineResult});
+    _inlinePos = null; _inlineResult = null; _inlinePendente = null;
+    _inlineRender();
+    if(_inlineResultados.length < _inlinePb) setTimeout(()=>_inlineSetupCanvas(), 40);
+  };
+
+  // Verifica se o mapeamento está pendente (chamado por addMatch antes de salvar).
+  // Retorna true se PODE salvar, false se está faltando mapear (e mostra o aviso).
+  window._inlinePenValidar = function(pb){
+    if(pb <= 0) return true;
+    const warning = document.getElementById('inline-pen-map-warning');
+    if(_inlineResultados.length < pb){
+      if(warning){
+        warning.style.display = 'block';
+        warning.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+      return false;
+    }
+    if(warning) warning.style.display = 'none';
+    return true;
+  };
+
+  // Retorna o penMap atual em memória (sem resetar nada) — chamado por
+  // addMatch ao montar a partida, ANTES de tentar gravar no Firestore.
+  window._inlinePenGetPontos = function(){
+    return _inlineResultados.slice();
+  };
+
+  // Reseta o estado de mapeamento — chamado por addMatch SOMENTE depois
+  // que a gravação no Firestore foi confirmada com sucesso. Se a gravação
+  // falhar, o estado permanece intacto para uma nova tentativa de salvar.
+  window._inlinePenResetar = function(){
+    _inlinePb = 0; _inlinePk = 0;
+    _inlineResultados = []; _inlinePendente = null; _inlineResult = null; _inlinePos = null;
+    const wrap = document.getElementById('inline-pen-map-wrap');
+    const warning = document.getElementById('inline-pen-map-warning');
+    if(wrap) wrap.style.display = 'none';
+    if(warning) warning.style.display = 'none';
+  };
 
   /* ═══ MODAL DE MARCAÇÃO ═══════════════════════════════ */
   window.openPenMarcar = function(partida, total, ok, pontosExistentes){
