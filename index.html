@@ -1378,7 +1378,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rec-card-bronze .rec-name{color:#000000}
 .rec-card-bronze .rec-meta{color:#5a3000}
 .rec-card-bronze .rec-val-lbl{color:#6a3800}
-.rec-medal{font-size:26px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));line-height:1}
+.rec-medal{font-size:26px;flex-shrink:0;line-height:1}
 .rec-info{flex:1;min-width:0}
 .rec-name{font-family:'Freshman',sans-serif;font-size:15px;font-weight:normal;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec-meta{font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.03em}
@@ -9045,7 +9045,6 @@ function buildRecordData(){
 function recCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9060,7 +9059,7 @@ function recCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${p.val}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'gol':'gols'}</div>
     </div>
   </div>`;
@@ -9069,7 +9068,6 @@ function recCardHTML(p,pos){
 function recAssistCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9084,7 +9082,7 @@ function recAssistCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${p.val}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${p.val}</div>
       <div class="rec-val-lbl">${p.val===1?'assist.':'assists.'}</div>
     </div>
   </div>`;
@@ -9093,7 +9091,6 @@ function recAssistCardHTML(p,pos){
 function recGAPorJogoCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9109,7 +9106,7 @@ function recGAPorJogoCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${mediaFmt}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${mediaFmt}</div>
       <div class="rec-val-lbl">G+A/jogo</div>
     </div>
   </div>`;
@@ -9118,7 +9115,6 @@ function recGAPorJogoCardHTML(p,pos){
 function recGATotalCardHTML(p,pos){
   const medals=['🥇','🥈','🥉'];
   const cls=['rec-card-gold','rec-card-silver','rec-card-bronze'];
-  const valShadow='drop-shadow(0 2px 5px rgba(0,0,0,.55))';
   const isMe=p.uid&&currentUser&&p.uid===currentUser.uid;
   const avWrap=isMe
     ?`<div class="av-you-ring">${avatarHTML(p.name,44,p.uid)}</div>`
@@ -9133,7 +9129,7 @@ function recGATotalCardHTML(p,pos){
       ${atualBadge}
     </div>
     <div class="rec-val">
-      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:${valShadow}">${p.ga}</div>
+      <div class="rec-val-num" style="background:linear-gradient(180deg,#4a4a4a 0%,#1a1a1a 30%,#000 55%,#2a2a2a 75%,#111 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${p.ga}</div>
       <div class="rec-val-lbl">G+A</div>
     </div>
   </div>`;
