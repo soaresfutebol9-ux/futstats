@@ -1285,7 +1285,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
   text-transform:uppercase;margin-top:3px;opacity:.7;
 }
 
-.tr-filter{display:flex;gap:4px;flex-wrap:nowrap;margin-bottom:1.1rem;will-change:transform}
+.tr-filter{display:flex;gap:4px;flex-wrap:nowrap;margin-bottom:1.1rem}
 .ft{
   padding:9px 4px;border-radius:99px;font-size:clamp(10px,3.1vw,14px);cursor:pointer;
   border:1px solid #b8b6b4;flex:1 1 0;min-width:0;white-space:nowrap;
@@ -8780,6 +8780,31 @@ window.setRank=(s,el)=>{
     const btns = _ftButtons();
     const btnProximo = btns[proximo];
     if(btnProximo) window.setRank(nomeProximo, btnProximo);
+  }, {passive:true});
+})();
+
+// ── REDE DE SEGURANÇA: repaint da barra de filtros (.tr-filter) ──
+// Bug conhecido do WebKit/iOS: elementos com camadas de composição
+// (will-change / animações infinitas em filhos) por vezes ficam em
+// branco após um fling rápido seguido do "rubber-band bounce" no topo
+// da lista, mesmo com o scroll já estabilizado. Esse guard observa o
+// scroll do container real (.ac) e, ~150ms após ele parar, força um
+// reflow/repaint inócuo da barra para garantir que ela nunca fique
+// presa em branco — independente da causa exata do glitch.
+(function _trFilterRepaintGuard(){
+  const ac = document.querySelector('.ac');
+  if(!ac) return;
+  let scrollTimer = null;
+  function forceRepaint(){
+    const bar = document.querySelector('.tr-filter');
+    if(!bar) return;
+    bar.style.transform = 'translateZ(0)';
+    void bar.offsetHeight; // força reflow síncrono
+    bar.style.transform = '';
+  }
+  ac.addEventListener('scroll', ()=>{
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(forceRepaint, 150);
   }, {passive:true});
 })();
 
