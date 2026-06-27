@@ -1345,7 +1345,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rec-section-title{font-family:'VarsityTeam',serif;font-size:15px;font-weight:bold;letter-spacing:.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec-share-btn{background:none;border:1px solid var(--bo2);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--tx2);display:flex;align-items:center;gap:6px;transition:all .15s;flex-shrink:0}
 .rec-share-btn:hover{border-color:var(--g);color:var(--g);background:rgba(77,255,176,.07)}
-.rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:#e0dedc;box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden;contain:layout style}
+.rec-card{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;border:1px solid var(--bo);background:#e0dedc;box-shadow:var(--glow-card);margin-bottom:8px;position:relative;overflow:hidden}
 .rec-card::before{
   content:'';position:absolute;top:0;left:0;width:40%;height:100%;
   background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.6) 50%,transparent 100%);
@@ -1388,8 +1388,8 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .rec-val-lbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;opacity:.6;text-transform:uppercase;text-align:right}
 .rec-empty{text-align:center;padding:2rem 1rem;color:var(--tx3);font-size:13px;font-family:'DM Mono',monospace;letter-spacing:.04em}
 /* ── BADGE RECORDE ATUAL ── */
-.rec-atual-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.12);border:1px solid rgba(77,255,176,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:#000000;letter-spacing:.06em;text-transform:uppercase;animation:recAtualPulse 1.8s ease-in-out infinite;white-space:nowrap;margin-top:5px}
-.rec-atual-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:recAtualDot 1.8s ease-in-out infinite}
+.rec-atual-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(77,255,176,.12);border:1px solid rgba(77,255,176,.45);border-radius:99px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;color:#000000;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;margin-top:5px}
+.rec-atual-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g)}
 @keyframes recAtualPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.4),0 0 8px rgba(77,255,176,.15)}50%{box-shadow:0 0 0 5px rgba(77,255,176,.0),0 0 16px rgba(77,255,176,.3)}}
 @keyframes recAtualDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 /* ── ANEL "VOCÊ" NO AVATAR ── */
