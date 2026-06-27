@@ -3961,7 +3961,6 @@ body::before{
           <div style="flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px">
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--tx)">Data</div>
-              <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:1px">Quando foi a pelada?</div>
             </div>
             <input type="date" id="fdate" style="background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;width:150px;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bo2)'">
           </div>
@@ -3973,7 +3972,6 @@ body::before{
           <div style="flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px">
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--tx)">Local / Pelada</div>
-              <div style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;margin-top:1px">Nome do jogo</div>
             </div>
             <input type="text" id="fname" placeholder="Ex: Pelada da sexta" style="background:var(--bg3);border:1px solid var(--bo2);border-radius:10px;color:var(--tx);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;width:160px;transition:border-color .15s;outline:none" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bo2)'">
           </div>
@@ -3983,11 +3981,6 @@ body::before{
       <!-- Card stats -->
       <div style="background:var(--bg2);border:1px solid var(--bo2);border-radius:20px;padding:1.2rem 1.25rem;margin-bottom:1rem;box-shadow:var(--glow-card);position:relative;overflow:hidden">
         <div style="position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.035) 0%,transparent 60%)"></div>
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:6px">
-          <span style="width:16px;height:1px;background:var(--bo3);display:inline-block"></span>
-          Seus números
-          <span style="flex:1;height:1px;background:var(--bo3);display:inline-block"></span>
-        </div>
 
         <!-- Linha 1: Gols + Assistências -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
@@ -3995,10 +3988,8 @@ body::before{
           <!-- Gols -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
                 <div style="font-size:12px;font-weight:700;color:var(--tx)">Gols</div>
-                <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">marcados</div>
               </div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
@@ -4011,10 +4002,8 @@ body::before{
           <!-- Assistências -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
               <div>
                 <div style="font-size:12px;font-weight:700;color:var(--tx)">Assistências</div>
-                <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">assistências</div>
               </div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
@@ -4026,24 +4015,13 @@ body::before{
 
         </div><!-- /grid linha 1 -->
 
-        <!-- Separador pênaltis -->
-        <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-          <span style="width:16px;height:1px;background:var(--bo3);display:inline-block"></span>
-          Pênaltis
-          <span style="flex:1;height:1px;background:var(--bo3);display:inline-block"></span>
-        </div>
-
         <!-- Linha 2: Pênaltis -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
 
           <!-- Pênaltis batidos -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Pên. Batidos</div>
-                <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">cobranças</div>
-              </div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx)">Pên. Batidos</div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpb',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
@@ -4055,11 +4033,7 @@ body::before{
           <!-- Pênaltis convertidos -->
           <div style="background:#ececec;border:1px solid #d8d8d8;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:32px;height:32px;border-radius:10px;background:#dcdcdc;border:1px solid #cccccc"></div>
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--tx)">Pên. Convertidos</div>
-                <div style="font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace">convertidos</div>
-              </div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx)">Pên. Convertidos</div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:#e2e2e2;border-radius:10px;overflow:hidden;border:1px solid #d2d2d2">
               <button onclick="stepField('fpk',-1)" style="width:40px;height:40px;background:none;border:none;color:rgba(0,0,0,.85);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,.1)'" onmouseout="this.style.background='none'">−</button>
@@ -4238,7 +4212,7 @@ body::before{
         <button class="pac-toggle" onclick="_pacToggle(this,'pac-body-historico')">
           <div style="display:flex;align-items:center;gap:10px">
             <span class="pac-icon">📈</span>
-            <div><div class="pac-title">Histórico geral</div></div>
+            <div><div class="pac-title">Histórico de partidas</div></div>
           </div>
           <svg class="pac-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
