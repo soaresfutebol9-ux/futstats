@@ -2323,6 +2323,43 @@ body.conquistas-fab-visible .mfab-wrap{ display:flex; }
   background:linear-gradient(135deg,#FFD700 0%,#FF8C00 100%);
   box-shadow:0 4px 12px rgba(255,180,0,.55),0 2px 6px rgba(0,0,0,.4);
   color:#07090d;
+  position:relative;
+}
+/* Badge ! no botão conquistas do MFAB */
+.mfab-cq-alert{
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;border-radius:50%;
+  background:#FF5A7A;border:2px solid #07090d;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
+  color:#fff;display:none;align-items:center;justify-content:center;
+  animation:badgePulse 1.8s ease-in-out infinite;
+  pointer-events:none;z-index:2;
+}
+.mfab-cq-alert.visible{display:flex;}
+/* Badge ! no botão principal + */
+.mfab-main-cq-alert{
+  position:absolute;top:-3px;right:-3px;
+  min-width:18px;height:18px;border-radius:99px;padding:0 4px;
+  background:#FF5A7A;border:2px solid #07090d;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:700;
+  color:#fff;display:none;align-items:center;justify-content:center;
+  animation:badgePulse 1.8s ease-in-out infinite;
+  pointer-events:none;z-index:2;
+}
+.mfab-main-cq-alert.visible{display:flex;}
+/* Card de conquista com alerta pendente */
+.cq-card.cq-nova-alerta{
+  outline:2px solid #FF5A7A;
+  position:relative;
+}
+.cq-card.cq-nova-alerta::after{
+  content:'!';
+  position:absolute;top:-6px;right:-6px;
+  width:20px;height:20px;border-radius:50%;
+  background:#FF5A7A;border:2px solid #ebebeb;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  animation:badgePulse 1.8s ease-in-out infinite;
 }
 .mfab-item-carta{
   background:linear-gradient(135deg,#6ee7f7 0%,#2563eb 100%);
@@ -7707,6 +7744,17 @@ function enterApp(){
   const cfab=$('conquistas-fab');if(cfab)cfab.style.display='flex';
   // Crown check com delay para renderização completa
   setTimeout(()=>maybeFiraCrown(),900);
+  // Inicializa alertas de conquistas novas (não retroativo)
+  setTimeout(()=>{
+    // Re-inicializa o timestamp de início agora que uid e gid são conhecidos
+    if(window._currentUserUid && window._groupId){
+      const key = `cq_notif_start_${window._currentUserUid}_${window._groupId}`;
+      if(!localStorage.getItem(key)){
+        localStorage.setItem(key, String(Date.now()));
+      }
+    }
+    if(window._cqInitAlerts) window._cqInitAlerts();
+  }, 2000);
   // Conquistas check após carregar dados
   setTimeout(async()=>{
     if(window._checkConquistas && currentUser && gd){
@@ -11163,8 +11211,9 @@ window.irParaRankingGA=()=>{
     </div>
     <div class="mfab-item-wrap">
       <span class="mfab-item-label">Conquistas</span>
-      <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();abrirConquistas()" title="Conquistas">
+      <button class="mfab-item mfab-item-conquistas" onclick="mfabClose();_abrirConquistasComScroll()" title="Conquistas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <div class="mfab-cq-alert" id="mfab-cq-alert">!</div>
       </button>
     </div>
     <div class="mfab-item-wrap">
@@ -11182,6 +11231,7 @@ window.irParaRankingGA=()=>{
   <button class="mfab-main" id="mfab-main" onclick="mfabToggle()">
     <span id="mfab-main-icon">＋</span>
     <div class="mfab-main-badge" id="mfab-main-badge"></div>
+    <div class="mfab-main-cq-alert" id="mfab-main-cq-alert">!</div>
   </button>
 </div>
 
@@ -13876,7 +13926,8 @@ async function _renderConquistasModal(uid){
       const pct = r.max > 0 ? Math.round((r.progress/r.max)*100) : 0;
 
       if(r.achieved){
-        html += `<div class="cq-card desbloqueada" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
+        const isPending = window._cqPendingAlerts && window._cqPendingAlerts.has(cq.id);
+        html += `<div class="cq-card desbloqueada${isPending?' cq-nova-alerta':''}" data-cqid="${cq.id}" onclick="abrirDetalheCQ('${cq.id}')" style="cursor:pointer">
           ${(!tipoUnico && stackCount > 1) ? `<div class="cq-stack-badge">×${stackCount}</div>` : ''}
           <div class="cq-card-icon">${cq.icon}</div>
           <div class="cq-card-nome">${cq.nome}</div>
@@ -13899,6 +13950,19 @@ async function _renderConquistasModal(uid){
   body.innerHTML = html;
 }
 
+// ── Fecha o modal de detalhe de conquista e marca como visto ──
+function _cqDetFechar(modal){
+  if(!modal) return;
+  const cqId = modal._currentCqId;
+  modal.style.display='none';
+  if(cqId && window._cqMarkSeen){
+    window._cqMarkSeen(cqId);
+    // Remove classe de alerta do card correspondente
+    const card = document.querySelector(`.cq-card[data-cqid="${cqId}"]`);
+    if(card) card.classList.remove('cq-nova-alerta');
+  }
+}
+
 // ── Detalhe de conquista: quem no grupo tem e quantas vezes ────
 window.abrirDetalheCQ = async function(cqId){
   const cq = CONQUISTAS.find(c=>c.id===cqId);
@@ -13914,15 +13978,18 @@ window.abrirDetalheCQ = async function(cqId){
     modal.innerHTML=`<div id="modal-cq-detalhe-inner" style="background:#ebebeb;border-radius:18px;width:100%;max-width:380px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4)">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #b7b8b6;flex-shrink:0">
         <div id="cq-det-title" style="font-family:'VarsityTeam',serif;font-size:17px;color:#000;letter-spacing:.3px"></div>
-        <button onclick="document.getElementById('modal-cq-detalhe').style.display='none'" style="width:30px;height:30px;border-radius:50%;background:#dedede;border:1px solid #b7b8b6;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#494a48;line-height:1">×</button>
+        <button id="cq-det-close-btn" style="width:30px;height:30px;border-radius:50%;background:#dedede;border:1px solid #b7b8b6;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#494a48;line-height:1">×</button>
       </div>
       <div id="cq-det-body" style="overflow-y:auto;padding:14px 16px 18px;flex:1"></div>
     </div>`;
-    modal.addEventListener('click',e=>{ if(e.target===modal) modal.style.display='none'; });
+    modal.addEventListener('click',e=>{ if(e.target===modal){ _cqDetFechar(modal); } });
     document.body.appendChild(modal);
   }
 
   modal.style.display='flex';
+  modal._currentCqId = cqId; // rastreia qual conquista está aberta
+  const closeBtn = document.getElementById('cq-det-close-btn');
+  if(closeBtn) closeBtn.onclick = () => _cqDetFechar(modal);
   document.getElementById('cq-det-title').innerHTML=`${cq.icon} ${cq.nome}`;
   const body = document.getElementById('cq-det-body');
   body.innerHTML=`<div style="text-align:center;padding:1.5rem;font-family:'DM Mono',monospace;color:#494a48"><span style="display:inline-block;animation:sp 1s linear infinite">◌</span> carregando...</div>`;
@@ -13962,19 +14029,139 @@ window.abrirDetalheCQ = async function(cqId){
 };
 
 // ── Toast de nova conquista ────────────────────────────────────
-// A fila interna foi substituída pelo orquestrador central (_toastEnqueueCentral).
-// Cada conquista é enfileirada individualmente, garantindo que não
-// sobreponha levelup-toast, crown-toast ou outras conquistas.
+// O toast visual foi REMOVIDO. Novas conquistas pela 1ª vez agora:
+//   1. Aparecem no sininho (notificação já existente)
+//   2. Mostram badge "!" no botão conquistas do FAB e no botão "+"
+//   3. Ao clicar no FAB conquistas → scroll automático até a conquista
+//   4. O "!" some somente ao clicar e fechar o card da conquista
+// Re-conquistas NÃO ativam nenhuma dessas notificações.
+// NÃO retroativo: só conquistas desbloqueadas após a primeira execução deste código.
+
+// ── Sistema de alertas de conquistas novas ────────────────────
+window._cqPendingAlerts = window._cqPendingAlerts || new Set();
+
+// Inicializa o timestamp de "início do sistema" para garantir não-retroatividade
+(function _cqInitNotifStart(){
+  const uid = window._currentUserUid || '';
+  const gid = window._groupId || '';
+  const key = `cq_notif_start_${uid}_${gid}`;
+  if(!localStorage.getItem(key)){
+    localStorage.setItem(key, String(Date.now()));
+  }
+})();
+
+window._cqGetNotifStart = function(){
+  const uid = window._currentUserUid || '';
+  const gid = window._groupId || '';
+  const key = `cq_notif_start_${uid}_${gid}`;
+  const val = localStorage.getItem(key);
+  return val ? parseInt(val, 10) : Date.now();
+};
+
+// Retorna o Set de cqIds que foram vistos (fechados) pelo usuário
+window._cqGetSeen = function(){
+  const uid = window._currentUserUid || '';
+  const gid = window._groupId || '';
+  const key = `cq_seen_${uid}_${gid}`;
+  try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')); }
+  catch(e){ return new Set(); }
+};
+
+window._cqMarkSeen = function(cqId){
+  const uid = window._currentUserUid || '';
+  const gid = window._groupId || '';
+  const key = `cq_seen_${uid}_${gid}`;
+  const seen = window._cqGetSeen();
+  seen.add(cqId);
+  try { localStorage.setItem(key, JSON.stringify([...seen])); } catch(e){}
+  window._cqPendingAlerts.delete(cqId);
+  _cqUpdateAlertBadges();
+};
+
+function _cqUpdateAlertBadges(){
+  const hasAlert = window._cqPendingAlerts.size > 0;
+  const cqAlert = document.getElementById('mfab-cq-alert');
+  const mainAlert = document.getElementById('mfab-main-cq-alert');
+  if(cqAlert) cqAlert.classList.toggle('visible', hasAlert);
+  if(mainAlert) mainAlert.classList.toggle('visible', hasAlert);
+}
+
+// Adiciona alerta para conquistas novas pela 1ª vez (não retroativo)
+window._cqAddAlert = function(cqId, tsUnlock){
+  const notifStart = window._cqGetNotifStart();
+  // Só alerta se o desbloqueio ocorreu APÓS o início do sistema de alertas
+  if(tsUnlock && tsUnlock < notifStart) return;
+  const seen = window._cqGetSeen();
+  if(seen.has(cqId)) return;
+  window._cqPendingAlerts.add(cqId);
+  _cqUpdateAlertBadges();
+};
+
+// Inicializa os alertas ao carregar (conquistas salvas no Firestore após notifStart)
+window._cqInitAlerts = async function(){
+  try {
+    const uid = window._currentUserUid;
+    if(!uid) return;
+    const snap = await window._db_getDoc(window._db_doc('users', uid));
+    if(!snap || !snap.exists()) return;
+    const gid = window._groupId || '';
+    const allDesb = snap.data().conquistasDesbloqueadas || {};
+    const desbGid = (allDesb[gid] && typeof allDesb[gid]==='object' && !allDesb[gid].ts) ? allDesb[gid] : {};
+    const notifStart = window._cqGetNotifStart();
+    const seen = window._cqGetSeen();
+    Object.entries(desbGid).forEach(([cqId, entry])=>{
+      if(seen.has(cqId)) return;
+      const tsRaw = entry.ts;
+      const tsMs = tsRaw ? (tsRaw.seconds ? tsRaw.seconds*1000 : tsRaw) : 0;
+      if(tsMs >= notifStart){
+        window._cqPendingAlerts.add(cqId);
+      }
+    });
+    _cqUpdateAlertBadges();
+  } catch(e){ console.warn('[CQ Alert] erro ao inicializar alertas:', e); }
+};
+
+// Abre conquistas com scroll automático até a conquista pendente
+window._abrirConquistasComScroll = function(){
+  window.abrirConquistas();
+  if(window._cqPendingAlerts.size === 0) return;
+  // Aguarda render do modal e faz scroll
+  setTimeout(()=>{
+    const body = document.getElementById('conquistas-body');
+    if(!body) return;
+    // Pega o primeiro cqId pendente
+    const firstId = [...window._cqPendingAlerts][0];
+    // Busca o card pelo data-cqid ou pelo onclick
+    const cards = body.querySelectorAll('.cq-card.desbloqueada');
+    let targetCard = null;
+    cards.forEach(card => {
+      const onclick = card.getAttribute('onclick') || '';
+      if(onclick.includes(`'${firstId}'`) || onclick.includes(`"${firstId}"`)){
+        targetCard = card;
+      }
+    });
+    if(targetCard){
+      targetCard.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }, 420);
+};
 
 window._mostrarToastConquistas = function(conquistas){
+  // Toast visual REMOVIDO — só notif no sino (já tratado em _processarNovasConquistas)
+  // Adiciona alertas "!" para conquistas de 1ª vez
   if(!conquistas || !conquistas.length) return;
   conquistas.forEach(cq => {
-    if(window._toastEnqueueCentral){
-      window._toastEnqueueCentral(function(done){
-        _mostrarUmToast(cq, done);
-      });
-    } else {
-      _mostrarUmToast(cq, null);
+    // Conquistas vindas de _processarNovasConquistas são sempre de 1ª vez
+    // (re-conquistas não chegam aqui)
+    // ts = agora, portanto sempre >= notifStart
+    const tsNow = Date.now();
+    const notifStart = window._cqGetNotifStart();
+    if(tsNow >= notifStart){
+      const seen = window._cqGetSeen();
+      if(!seen.has(cq.id)){
+        window._cqPendingAlerts.add(cq.id);
+        _cqUpdateAlertBadges();
+      }
     }
   });
 };
