@@ -1477,6 +1477,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .ri-pen.ri-me{border-color:rgba(77,255,176,.35);background:linear-gradient(135deg,rgba(77,255,176,.08) 0%,var(--bg2) 70%);box-shadow:0 0 0 1px rgba(77,255,176,.15),var(--glow-card)}
 
 /* ── SUB-TABS PÊNALTIS ── */
+#rl-subtabs:empty{display:none}
 .pen-subtabs{display:flex;background:var(--bg3);border-radius:12px;padding:4px;margin-bottom:1.2rem;border:1px solid var(--bo)}
 .pen-subtab{flex:1;padding:9px 3px;text-align:center;font-size:11.5px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pen-subtab.active{background:linear-gradient(135deg,rgba(255,90,122,.85) 0%,rgba(200,30,70,.9) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700}
@@ -3935,6 +3936,7 @@ body::before{
         <div class="ft" onclick="setRank('pen',this)">Pênaltis</div>
         <div class="ft" onclick="setRank('performance',this)">Performance</div>
       </div>
+      <div id="rl-subtabs"></div>
       <div id="rl-wrap"><div id="rl"><div class="ld"><span class="spin">◌</span> carregando...</div></div></div>
 
       <!-- ══ FEED DE ATIVIDADE ══ -->
@@ -8644,6 +8646,8 @@ function renderRanking(){
   if(!mbs.length){$('rl').innerHTML='<div class="empty">Nenhum membro ainda.</div>';return}
   const banner=document.querySelector('.mes-vigente-banner');
   const geralWrap=document.getElementById('geral-banner-wrap');
+  // Sub-abas fixas (fora da área animada) — só a aba "Pênaltis" usa; nas demais fica vazio/escondido
+  if(rankStat!=='pen'){ const _rlst=$('rl-subtabs'); if(_rlst) _rlst.innerHTML=''; }
 
   // ── RECORDES ──
   if(rankStat==='recordes'){
@@ -8754,15 +8758,17 @@ function renderRanking(){
     const activeData=window._penSubTab==='mes'?penMes:penAnoSel;
 
     // ── Sub-abas HTML (sem "Ano atual" separado — está dentro de "Temporadas") ──
+    // Ficam num container fixo fora da área animada (#rl), para não sumirem durante a transição de slide
     const subTabsHTML=`<div class="pen-subtabs">
       <div class="pen-subtab${window._penSubTab==='mes'?' active':''}" onclick="setPenSubTab('mes')">Mês atual</div>
       <div class="pen-subtab${window._penSubTab==='ano'?' active':''}" onclick="setPenSubTab('ano')">Temporadas</div>
       <div class="pen-subtab${window._penSubTab==='mapa'?' active':''}" onclick="setPenSubTab('mapa')">Mapa</div>
     </div>`;
+    if($('rl-subtabs')) $('rl-subtabs').innerHTML=subTabsHTML;
 
     // ── Aba "Mapa": renderizada inline no próprio painel, sem modal ──
     if(window._penSubTab==='mapa'){
-      $('rl').innerHTML=subTabsHTML+`
+      $('rl').innerHTML=`
         <div class="pen-mapa-legend">
           <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#4caf50"></div>Convertido</div>
           <div class="pen-mapa-legend-item"><div class="pen-mapa-legend-dot" style="background:#e53935"></div>Errado</div>
@@ -8787,11 +8793,11 @@ function renderRanking(){
       : '';
 
     if(!activeData.length){
-      $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':' em '+(anoSel||'')}.</div></div>`;
+      $('rl').innerHTML=anoLabelHTML+`<div class="empty" style="padding:3rem 1rem"><div style="font-size:36px;margin-bottom:12px">🥅</div><div>Nenhum pênalti registrado${window._penSubTab==='mes'?' no mês vigente':' em '+(anoSel||'')}.</div></div>`;
       return;
     }
 
-    $('rl').innerHTML=subTabsHTML+anoLabelHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
+    $('rl').innerHTML=anoLabelHTML+`<div id="pen-cards-list">${activeData.map((p,i)=>{
       const isMe=p.uid===currentUser?.uid;
       const cor=penColor(p.pct);
       const isPodium=i<3;
