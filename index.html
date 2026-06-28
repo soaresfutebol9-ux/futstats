@@ -15622,8 +15622,7 @@ function _renderCraqueModalContent(){
             <div class="craque-rank-name">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
           </div>
           <div class="craque-rank-score">
-            <div class="craque-rank-score-num">${p.count}</div>
-            <div class="craque-rank-score-lbl">${p.count === 1 ? 'coroa' : 'coroas'}</div>
+            <div class="craque-rank-score-num" style="font-size:18px">👑 ${p.count}×</div>
           </div>
         </div>`;
       }).join('');
