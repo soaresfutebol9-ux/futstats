@@ -1800,9 +1800,17 @@ select option{background:var(--bg3)}
   align-items:center;justify-content:center;
   
 }
-#modal-evol-chart.open{display:flex;animation:modalBgIn .22s ease forwards;}
-#modal-evol-chart.closing{display:flex;animation:modalBgOut .22s ease forwards;}
-#modal-evol-chart.closing #evol-chart-inner{animation:modalOut .22s cubic-bezier(.4,0,.6,1) forwards;}
+#modal-evol-chart.open{display:flex;animation:modalBgIn .25s ease forwards;}
+#modal-evol-chart.closing{display:flex;animation:modalBgOut .26s ease forwards;}
+#modal-evol-chart.closing #evol-chart-inner{animation:evolChartOut .26s cubic-bezier(.22,.61,.36,1) forwards;}
+@keyframes evolChartIn{
+  from{transform:translateY(22px) scale(.96);opacity:0}
+  to{transform:translateY(0) scale(1);opacity:1}
+}
+@keyframes evolChartOut{
+  from{transform:translateY(0) scale(1);opacity:1}
+  to{transform:translateY(14px) scale(.965);opacity:0}
+}
 #evol-chart-inner{
   background:#dedede;
   border:1.5px solid #40c960;
@@ -1811,7 +1819,7 @@ select option{background:var(--bg3)}
   max-height:92vh;
   display:flex;flex-direction:column;
   box-shadow:0 12px 60px rgba(0,0,0,.35),0 0 0 1px rgba(64,201,96,.15);
-  animation:modalIn .25s cubic-bezier(.32,1,.6,1) forwards;
+  animation:evolChartIn .3s cubic-bezier(.22,1,.36,1) forwards;
   overflow:hidden;
 }
 /* Landscape: aproveita largura total */
@@ -8104,19 +8112,54 @@ function drawPizzaPen(canvasId,ok,bat){
   ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);ctx.strokeStyle=bgClr;ctx.lineWidth=1.5;ctx.stroke();
 }
 
+const _penSubOrder={mes:0,ano:1,mapa:2};
 window.setPenSubTab=sub=>{
+  if(sub===window._penSubTab) return;
   if(window._penSubTab==='mapa' && sub!=='mapa' && typeof window._mapaConfirmLeave==='function' && !window._mapaConfirmLeave()) return;
+  const rl=$('rl');
+  const isLite = document.body.classList.contains('lite-mode');
+  const dir = (_penSubOrder[sub]??0) > (_penSubOrder[window._penSubTab]??0) ? 'left' : 'right';
+
+  rl.classList.remove('slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+  if(!isLite) rl.classList.add(dir==='left' ? 'slide-out-left' : 'slide-out-right');
+
   window._penSubTab=sub;
   if(sub!=='ano') window._penAnoSel=null; // limpa seleção ao trocar de aba
-  const rl=$('rl');
-  rl.classList.add('switching');
-  setTimeout(()=>{renderRanking();rl.classList.remove('switching');},120);
+
+  setTimeout(()=>{
+    renderRanking();
+    rl.classList.remove('slide-out-left','slide-out-right');
+    if(!isLite){
+      void rl.offsetHeight;
+      rl.classList.add(dir==='left' ? 'slide-in-right' : 'slide-in-left');
+      rl.addEventListener('animationend', ()=>{
+        rl.classList.remove('slide-in-right','slide-in-left');
+      }, {once:true});
+    }
+  }, isLite ? 50 : 200);
 };
 window.setPenAno=ano=>{
-  window._penAnoSel=ano;
+  if(ano===window._penAnoSel) return;
   const rl=$('rl');
-  rl.classList.add('switching');
-  setTimeout(()=>{renderRanking();rl.classList.remove('switching');},120);
+  const isLite = document.body.classList.contains('lite-mode');
+  const dir = 'left'; // seleção de temporada sempre avança no mesmo sentido
+
+  rl.classList.remove('slide-in-right','slide-in-left','slide-out-left','slide-out-right');
+  if(!isLite) rl.classList.add('slide-out-left');
+
+  window._penAnoSel=ano;
+
+  setTimeout(()=>{
+    renderRanking();
+    rl.classList.remove('slide-out-left','slide-out-right');
+    if(!isLite){
+      void rl.offsetHeight;
+      rl.classList.add('slide-in-right');
+      rl.addEventListener('animationend', ()=>{
+        rl.classList.remove('slide-in-right','slide-in-left');
+      }, {once:true});
+    }
+  }, isLite ? 50 : 200);
 };
 function penColor(pct){
   if(pct<=50)return'#EB5757';
@@ -8228,18 +8271,23 @@ window.fecharEvolChart = function(){
   m.classList.remove('open');
   m.classList.add('closing');
   _perfChartExpandedData = null;
-  _liberarOrientacao();
   _restaurarFabAposModal();
+  // Importante: NÃO libera a orientação/rotação aqui. Fazer isso agora
+  // forçava um "salto" de layout (a tela girando de volta) bem no meio do
+  // fade de saída, dando a sensação de transição travada. Em vez disso,
+  // todo o reset de orientação/tela cheia só ocorre após o modal já estar
+  // completamente invisível (fim do setTimeout abaixo).
   setTimeout(()=>{
     m.classList.remove('closing');
     m.style.display='none';
+    _liberarOrientacao();
     // Resetar fullscreen só após o modal estar invisível (evita flash do mini gráfico)
     inner && inner.classList.remove('fullscreen-landscape');
     if(btn){ btn.textContent='⛶'; btn.title='Tela cheia'; }
     if(sel) sel.style.display='';
     const sb = document.getElementById('evol-summary-bar');
     if(sb) sb.style.display='none';
-  }, 230);
+  }, 270);
 };
 
 let _evolCurrentUid = null;
@@ -13149,6 +13197,8 @@ const CONQUISTAS = [
   { id:'assist_25', cat:'👟 Assistências', nome:'Construtor',        desc:'25 assistências em um mês', icon:'🎯', tipo:'assist_mes', val:25 },
   { id:'assist_30', cat:'👟 Assistências', nome:'Arquiteto',                desc:'30 assistências em um mês', icon:'🐐', tipo:'assist_mes', val:30 },
   { id:'assist_35', cat:'👟 Assistências', nome:'Visão de Águia',           desc:'35 assistências em um mês', icon:'🦅', tipo:'assist_mes', val:35 },
+  { id:'assist_40', cat:'👟 Assistências', nome:'Cirurgião',                desc:'40 assistências em um mês', icon:'🪡', tipo:'assist_mes', val:40 },
+  { id:'assist_45', cat:'👟 Assistências', nome:'Gênio',                    desc:'45 assistências em um mês', icon:'🧩', tipo:'assist_mes', val:45 },
   // ── ASSISTÊNCIAS NO ANO ─────────────────────────────────────
   { id:'assist_ano_100', cat:'📅 Assistências no Ano', nome:'Özil',            desc:'100 assistências em um ano', icon:'🎁',  tipo:'assist_ano', val:100 },
   { id:'assist_ano_150', cat:'📅 Assistências no Ano', nome:'David Beckham',   desc:'150 assistências em um ano', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tipo:'assist_ano', val:150 },
@@ -13567,7 +13617,7 @@ const XP_CONQUISTAS = {
   gols_30: 200, gols_35: 300, gols_40: 450, gols_50: 650,
   // 👟 Assistências no Mês — começa baixo, dispara no fim
   assist_10: 30, assist_15: 50, assist_20: 80, assist_25: 130,
-  assist_30: 200, assist_35: 300,
+  assist_30: 200, assist_35: 300, assist_40: 450, assist_45: 650,
   // 📅 Assistências no Ano — muito difícil
   assist_ano_100: 200, assist_ano_150: 320, assist_ano_200: 480,
   assist_ano_250: 680, assist_ano_300: 920,
@@ -15120,6 +15170,7 @@ function _cartaFallbackDownload(card){
     <div class="craque-tabs">
       <button class="craque-tab-btn active" data-tab="semana" onclick="_setCraqueTab('semana')">🏆 Semana</button>
       <button class="craque-tab-btn" data-tab="historico" onclick="_setCraqueTab('historico')">📜 Histórico</button>
+      <button class="craque-tab-btn" data-tab="rank" onclick="_setCraqueTab('rank')">👑 Ranking</button>
     </div>
     <div class="craque-modal-body" id="craque-modal-body">
     </div>
@@ -15492,7 +15543,7 @@ async function _persistCraqueSemana(groupId, key, registro){
 }
 
 // ── RENDERIZAÇÃO DO MODAL ──────────────────────────────────────────
-let _craque_tab = 'semana'; // 'semana' | 'historico'
+let _craque_tab = 'semana'; // 'semana' | 'historico' | 'rank'
 
 function _renderCraqueModalContent(){
   const gd = window._gd;
@@ -15540,6 +15591,44 @@ function _renderCraqueModalContent(){
       }).join('');
     }
 
+  } else if(_craque_tab === 'rank'){
+    // ── ABA RANKING DE CRAQUES — quantas vezes cada jogador já venceu o Craque da Semana ──
+    periodoEl.textContent = '';
+    const hist = gd.craquesSemana || [];
+    if(!hist.length){
+      body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O ranking é gerado automaticamente<br>ao final de cada semana.</div>';
+    } else {
+      const porJogador = {};
+      hist.forEach(c => {
+        const k = c.uid || c.name;
+        if(!porJogador[k]) porJogador[k] = { uid: c.uid, name: c.name, count: 0 };
+        porJogador[k].count++;
+      });
+      const ranking = Object.values(porJogador).sort((a, b) => b.count - a.count);
+      const posEmoji = ['🥇','🥈','🥉'];
+      const posClass = ['gold','silver','bronze'];
+      body.innerHTML = ranking.map((p, i) => {
+        const isMe = p.uid === (typeof currentUser !== 'undefined' ? currentUser?.uid : null);
+        const pos  = i + 1;
+        const posLabel = pos <= 3 ? posEmoji[i] : pos;
+        const pClass   = pos <= 3 ? posClass[i] : '';
+        const av = typeof avatarHTML === 'function'
+          ? avatarHTML(p.name, 36, p.uid)
+          : `<div class="av av0">${(p.name||'?')[0].toUpperCase()}</div>`;
+        return `<div class="craque-rank-row" ${p.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${p.uid}')" style="cursor:pointer"` : ''}>
+          <div class="craque-rank-pos ${pClass}">${posLabel}</div>
+          <div onclick="${p.uid ? `event.stopPropagation();openPlayerProfile('${p.uid}')` : ''}" style="cursor:${p.uid?'pointer':'default'};flex-shrink:0">${av}</div>
+          <div class="craque-rank-info">
+            <div class="craque-rank-name">${p.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
+          </div>
+          <div class="craque-rank-score">
+            <div class="craque-rank-score-num">${p.count}</div>
+            <div class="craque-rank-score-lbl">${p.count === 1 ? 'coroa' : 'coroas'}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
   } else {
     // ── ABA HISTÓRICO ──
     periodoEl.textContent = '';
@@ -15547,13 +15636,6 @@ function _renderCraqueModalContent(){
     if(!hist.length){
       body.innerHTML = '<div class="craque-hist-empty">Nenhum craque registrado ainda.<br>O histórico é gravado automaticamente<br>ao final de cada semana.</div>';
     } else {
-      // Conta quantas vezes cada jogador foi craque (total geral)
-      const contagem = {};
-      hist.forEach(c => {
-        const k = c.uid || c.name;
-        contagem[k] = (contagem[k] || 0) + 1;
-      });
-
       // Agrupa por mês da SEGUNDA-FEIRA (início da semana)
       const meses = {};
       const mesesOrdem = [];
@@ -15585,15 +15667,13 @@ function _renderCraqueModalContent(){
           const gChip  = c.gols   > 0 ? `<span class="craque-hist-chip">⚽ ${c.gols}G</span>` : '';
           const aChip  = c.assist > 0 ? `<span class="craque-hist-chip">👟 ${c.assist}A</span>` : '';
           const pkChip = c.penOk  > 0 ? `<span class="craque-hist-chip">🟢 ${c.penOk}PK</span>` : '';
-          const vezes  = contagem[c.uid || c.name];
-          const vezesLabel = vezes > 1 ? `<span class="craque-hist-chip" style="color:#FFD700">👑 ${vezes}×</span>` : '';
           return `<div class="craque-hist-item" ${c.uid ? `onclick="fecharCraqueSemana();openPlayerProfile('${c.uid}')"` : ''}>
             <div class="craque-hist-crown">👑</div>
             <div onclick="${c.uid ? `event.stopPropagation();openPlayerProfile('${c.uid}')` : ''}" style="cursor:${c.uid?'pointer':'default'};flex-shrink:0">${av}</div>
             <div class="craque-hist-info">
               <div class="craque-hist-name">${c.name}${isMe ? ' <span style="font-size:11px;opacity:.6">(você)</span>' : ''}</div>
               <div class="craque-hist-periodo">${c.label}</div>
-              <div class="craque-hist-chips">${gChip}${aChip}${pkChip}${vezesLabel}</div>
+              <div class="craque-hist-chips">${gChip}${aChip}${pkChip}</div>
             </div>
             <div>
               <div class="craque-hist-score">${c.score}</div>
@@ -15630,7 +15710,7 @@ window.abrirCraqueSemana = function(){
   window._salvarCraqueSemana();
 };
 
-const _craqueTabOrder = {semana:0, historico:1};
+const _craqueTabOrder = {semana:0, historico:1, rank:2};
 window._setCraqueTab = function(tab){
   if(tab === _craque_tab) return;
   const body = document.getElementById('craque-modal-body');
