@@ -6119,9 +6119,11 @@ function _notifsVivas(notifs){
 // Wrap de swipe com lixeira para qualquer notif
 function _swipeWrap(id, innerHtml, isPersonal){
   const delFn = isPersonal ? `_apagarNotif('${id}')` : `_apagarFeedItem('${id}')`;
+  // stopPropagation evita que esse clique "borbulhe" até o listener global
+  // que fecha o painel de notificações ao clicar fora dele.
   return `<div class="notif-swipe-wrap" id="sw-${id}" data-notif-id="${id}">
     ${innerHtml}
-    <div class="notif-swipe-delete" onclick="${delFn}">🗑️</div>
+    <div class="notif-swipe-delete" onclick="event.stopPropagation();${delFn}">🗑️</div>
   </div>`;
 }
 
@@ -6140,6 +6142,25 @@ window._apagarFeedItem = function(id){
   localStorage.setItem('notif_lidas_'+groupId, JSON.stringify(lidasF));
   _updateNotifBadge();
   _renderNotifPanel();
+};
+
+// ── Duplo clique numa notificação de conquista (feed ou pessoal): abre o
+// perfil de conquistas do jogador certo já com scroll automático até o card ──
+window._abrirConquistaDoFeed = async function(uid, cqId){
+  if(!uid || !cqId) return;
+  // Fecha o painel de notificações antes de abrir o modal de conquistas
+  const panel=document.getElementById('notif-panel');
+  const overlay=document.getElementById('notif-overlay');
+  if(panel) panel.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+  await window.abrirConquistas(uid);
+  // Aguarda a transição de entrada do modal terminar antes de rolar até o card.
+  // _cqScrollToCard vive em outro <script> (não-module), por isso é acessada
+  // via window — dentro de um <script type="module"> não há vazamento de
+  // escopo automático como em scripts clássicos.
+  setTimeout(()=>{
+    if(typeof window._cqScrollToCard === 'function') window._cqScrollToCard(cqId);
+  }, 260);
 };
 
 function _renderNotifPanel(){
@@ -6224,7 +6245,9 @@ function _renderNotifPanel(){
         </div>`;
       } else if(n.tipo==='conquista_desbloqueada'){
         const stack = n.stackCount ? ` <span style="opacity:.6;font-size:11px">(×${n.stackCount})</span>` : '';
-        inner=`<div class="notif-item${unread?' unread':''}" style="border-left-color:#FFD700">
+        const dblClickAttr = n.cqId ? ` ondblclick="window._abrirConquistaDoFeed('${currentUser.uid}','${n.cqId}')"` : '';
+        const cursorStyle = n.cqId ? ';cursor:pointer' : '';
+        inner=`<div class="notif-item${unread?' unread':''}" style="border-left-color:#FFD700${cursorStyle}"${dblClickAttr}>
           <div class="notif-icon">${n.icon||'🏅'}</div>
           <div class="notif-body">
             <div class="notif-text">Você desbloqueou a conquista <strong>${n.icon||'🏅'} ${n.nome||''}</strong>${stack}!</div>
@@ -6268,7 +6291,12 @@ function _renderNotifPanel(){
     html+=feedVisiveis.slice(0,30).map(ev=>{
       const unread=!lidasF.includes(ev.id)&&ev.uid!==currentUser?.uid;
       const icon=feedIcons[ev.tipo]||'🔔';
-      const inner=`<div class="notif-item${unread?' unread':''}">
+      // Conquistas têm cqId (jogador + conquista específica): duplo clique
+      // leva direto ao perfil de conquistas daquele jogador, com scroll até o card.
+      const dblClickAttr = (ev.tipo==='conquista' && ev.cqId)
+        ? ` ondblclick="window._abrirConquistaDoFeed('${ev.uid}','${ev.cqId}')" style="cursor:pointer"`
+        : '';
+      const inner=`<div class="notif-item${unread?' unread':''}"${dblClickAttr}>
         <div class="notif-icon">${icon}</div>
         <div class="notif-body">
           <div class="notif-text">${ev.texto||''}</div>
@@ -6384,6 +6412,10 @@ function _initSwipe(container){
 
 // Fechar painel ao clicar fora
 document.addEventListener('click',e=>{
+  // Ignora cliques no botão de excluir notificação (lixeira do swipe) — eles
+  // não devem fechar o painel, mesmo que o elemento já tenha sido removido
+  // do DOM no momento em que este listener roda.
+  if(e.target.closest&&e.target.closest('.notif-swipe-delete')) return;
   const panel=document.getElementById('notif-panel');
   const overlay=document.getElementById('notif-overlay');
   const btn=document.getElementById('notif-btn');
@@ -6405,13 +6437,13 @@ window.marcarTodasLidas=()=>{
 };
 
 // Publica evento no feed do grupo
-async function _publishFeed(tipo, texto){
+async function _publishFeed(tipo, texto, extra){
   if(!groupId||!currentUser) return;
   try{
     const snap=await getDoc(doc(db,'groups',groupId));
     const cur=snap.data();
     const feed=cur.feed||[];
-    const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7), tipo, texto, uid:currentUser.uid, ts:Date.now()};
+    const ev={id:Date.now()+'_'+Math.random().toString(36).slice(2,7), tipo, texto, uid:currentUser.uid, ts:Date.now(), ...(extra||{})};
     feed.push(ev);
     // Mantém máximo 100 eventos
     if(feed.length>100) feed.splice(0, feed.length-100);
@@ -6524,7 +6556,7 @@ async function _processarNovasConquistas(novas, publicarFeed, pendingUpdates, pe
   if(publicarFeed){
     for(const cq of novasConfirmadas){
       const stackSufx = cq._stackCount ? ` (×${cq._stackCount})` : '';
-      await _publishFeed('conquista', `<strong>${myProfile.displayName}</strong> desbloqueou a conquista <strong>${cq.icon} ${cq.nome}</strong>${stackSufx}!`);
+      await _publishFeed('conquista', `<strong>${myProfile.displayName}</strong> desbloqueou a conquista <strong>${cq.icon} ${cq.nome}</strong>${stackSufx}!`, {cqId: cq.id});
     }
   }
 }
@@ -14392,6 +14424,11 @@ function _cqScrollToCard(cqId){
     card.scrollIntoView({behavior:'smooth', block:'center'});
   }
 }
+// Exposta explicitamente em window: este script é clássico (não-module) e
+// já vazaria para window por padrão, mas a exposição explícita documenta a
+// dependência para quem a chama de dentro do <script type="module"> dos
+// painéis de notificação (_abrirConquistaDoFeed).
+window._cqScrollToCard = _cqScrollToCard;
 
 // ── Detalhe de conquista: quem no grupo tem e quantas vezes ────
 window.abrirDetalheCQ = async function(cqId){
