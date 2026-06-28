@@ -14551,13 +14551,9 @@ function _cqUpdateAlertBadges(){
   const mainAlert = document.getElementById('mfab-main-cq-alert');
   if(cqAlert) cqAlert.classList.toggle('visible', hasAlert);
   if(mainAlert) mainAlert.classList.toggle('visible', hasAlert);
-  // Badge numérico do botão principal do multi-fab
+  // Badge numérico removido — apenas o "!" é exibido
   const mainBadge = document.getElementById('mfab-main-badge');
-  if(mainBadge){
-    const n = window._cqPendingAlerts.size;
-    mainBadge.textContent = n > 0 ? String(n) : '';
-    mainBadge.style.display = n > 0 ? 'flex' : 'none';
-  }
+  if(mainBadge){ mainBadge.style.display = 'none'; }
 }
 
 // Adiciona alerta para conquistas novas pela 1ª vez (não retroativo)
