@@ -1482,6 +1482,26 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 .pen-subtab{flex:1;padding:9px 3px;text-align:center;font-size:11.5px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--tx2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pen-subtab.active{background:linear-gradient(135deg,rgba(255,90,122,.85) 0%,rgba(200,30,70,.9) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,90,122,.35);font-weight:700}
 
+/* ── SELETOR DE TEMPORADA (dropdown único, reusado em Pênaltis e Histórico) ── */
+.temporada-row{display:flex;align-items:center;gap:8px;padding:6px 1rem 14px;justify-content:center;flex-wrap:wrap}
+.temporada-cal{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;overflow:hidden;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.2);font-family:'DM Sans',sans-serif;line-height:1}
+.temporada-cal-top{background:#e54848;color:#fff;font-size:6px;font-weight:700;letter-spacing:.02em;width:100%;text-align:center;padding:1px 0}
+.temporada-cal-bottom{background:#fff;color:var(--tx);font-size:12px;font-weight:800;width:100%;text-align:center;padding:1px 0}
+.temporada-label{font-family:'DM Mono',monospace;font-size:12.5px;font-weight:700;color:var(--tx2);letter-spacing:.03em;white-space:nowrap}
+.temporada-select-wrap{position:relative;display:inline-flex;align-items:center}
+.temporada-select{
+  -webkit-appearance:none;appearance:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--tx);
+  background:var(--bg3);border:1.5px solid var(--bo2);border-radius:10px;
+  padding:7px 30px 7px 14px;cursor:pointer;transition:border-color .15s;
+}
+.temporada-select:focus{outline:none;border-color:var(--g)}
+.temporada-select-wrap::after{
+  content:'';position:absolute;right:12px;top:50%;width:7px;height:7px;
+  border-right:2px solid var(--tx2);border-bottom:2px solid var(--tx2);
+  transform:translateY(-65%) rotate(45deg);pointer-events:none;
+}
+
 /* ── CARD PÊNALTI GRANDE (estilo G+A) ── */
 .ri-pen-card{
   border-radius:20px;
@@ -8140,6 +8160,24 @@ window.setPenSubTab=sub=>{
     }
   }, isLite ? 50 : 200);
 };
+// ── Helper reutilizável: seletor de temporada (ícone de calendário + dropdown de anos) ──
+// Usado tanto na aba "Temporadas" de Pênaltis quanto na tela de Histórico.
+window.renderTemporadaSelector=function(anos, anoSel, onChangeAttr){
+  const MESES=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const hoje=new Date();
+  return `<div class="temporada-row">
+    <span class="temporada-cal">
+      <span class="temporada-cal-top">${MESES[hoje.getMonth()]}</span>
+      <span class="temporada-cal-bottom">${hoje.getDate()}</span>
+    </span>
+    <span class="temporada-label">TEMPORADA:</span>
+    <span class="temporada-select-wrap">
+      <select class="temporada-select" onchange="${onChangeAttr}">
+        ${anos.map(a=>`<option value="${a}"${a===anoSel?' selected':''}>${a}</option>`).join('')}
+      </select>
+    </span>
+  </div>`;
+};
 window.setPenAno=ano=>{
   if(ano===window._penAnoSel) return;
   const rl=$('rl');
@@ -8784,12 +8822,10 @@ function renderRanking(){
       return;
     }
 
-    // ── Accordion de seleção de temporada (todos os anos como botões iguais) ──
+    // ── Seletor de temporada (dropdown único: ícone de calendário + select de anos) ──
     const _temOutrosAnos = todosAnos.length > 1;
     const anoLabelHTML=(window._penSubTab==='ano'&&anoSel)
-      ? `<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px 1rem 14px;">
-          ${todosAnos.map(a=>`<button onclick="setPenAno('${a}')" style="padding:6px 20px;border-radius:99px;border:1.5px solid ${a===anoSel?'var(--g)':'var(--bo2)'};background:${a===anoSel?'rgba(64,201,96,.15)':'var(--bg3)'};color:${a===anoSel?'var(--g)':'var(--tx2)'};font-family:'DM Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent">${a}</button>`).join('')}
-        </div>`
+      ? window.renderTemporadaSelector(todosAnos, anoSel, "setPenAno(this.value)")
       : '';
 
     if(!activeData.length){
@@ -9650,12 +9686,8 @@ function renderHistTab(){
   // Define ano ativo
   if(!_histAnoAtivo||!anos.includes(_histAnoAtivo)) _histAnoAtivo=anos[anos.length-1];
 
-  // Seletor de anos
-  const anoSelector=`<div style="margin-bottom:1.25rem">
-    <select onchange="setHistAno(this.value)" style="padding:8px 14px;border-radius:99px;border:1.5px solid var(--bo2);background:var(--bg3);color:var(--tx);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;transition:border-color .18s">
-      ${anos.map(a=>`<option value="${a}" ${a===_histAnoAtivo?'selected':''}>${a}</option>`).join('')}
-    </select>
-  </div>`;
+  // Seletor de anos (mesmo padrão visual usado em Pênaltis > Temporadas)
+  const anoSelector=window.renderTemporadaSelector(anos, _histAnoAtivo, "setHistAno(this.value)");
 
   // Meses do ano ativo (inclui mês vigente se for do mesmo ano)
   const keysDoAno=Object.keys(hist).filter(k=>k.startsWith(_histAnoAtivo)).sort();
