@@ -13141,6 +13141,7 @@ const CONQUISTAS = [
   { id:'gols_30', cat:'⚽ Gols', nome:'Sniper',        desc:'30 gols em um mês', icon:'💥', tipo:'gols_mes', val:30 },
   { id:'gols_35', cat:'⚽ Gols', nome:'Máquina de Gols', desc:'35 gols em um mês', icon:'🤖', tipo:'gols_mes', val:35 },
   { id:'gols_40', cat:'⚽ Gols', nome:'Predador',      desc:'40 gols em um mês', icon:'🦅', tipo:'gols_mes', val:40 },
+  { id:'gols_50', cat:'⚽ Gols', nome:'Implacável',    desc:'50 gols em um mês', icon:'🔥', tipo:'gols_mes', val:50 },
   // ── ASSISTÊNCIAS ────────────────────────────────────────────
   { id:'assist_10', cat:'👟 Assistências', nome:'Garçom',                  desc:'10 assistências em um mês', icon:'🪄', tipo:'assist_mes', val:10 },
   { id:'assist_15', cat:'👟 Assistências', nome:'Maestro',                desc:'15 assistências em um mês', icon:'🎩', tipo:'assist_mes', val:15 },
@@ -13168,6 +13169,8 @@ const CONQUISTAS = [
   { id:'ga_50',  cat:'⚡ G+A no Mês', nome:'Craque',        desc:'50 G+A em um mês', icon:'🌟', tipo:'ga_mes', val:50 },
   { id:'ga_55',  cat:'⚡ G+A no Mês', nome:'Fenômeno',      desc:'55 G+A em um mês', icon:'🚀', tipo:'ga_mes', val:55 },
   { id:'ga_60',  cat:'⚡ G+A no Mês', nome:'Extraterrestre',desc:'60 G+A em um mês', icon:'🛸', tipo:'ga_mes', val:60 },
+  { id:'ga_70',  cat:'⚡ G+A no Mês', nome:'Cósmico',       desc:'70 G+A em um mês', icon:'🌌', tipo:'ga_mes', val:70 },
+  { id:'ga_80',  cat:'⚡ G+A no Mês', nome:'Mítico',        desc:'80 G+A em um mês', icon:'☄️', tipo:'ga_mes', val:80 },
   // ── GOLS NO ANO ─────────────────────────────────────────────
   { id:'gols_ano_150', cat:'📅 Gols no Ano', nome:'Cavani',         desc:'150 gols em um ano', icon:'🇺🇾', tipo:'gols_ano', val:150 },
   { id:'gols_ano_200', cat:'📅 Gols no Ano', nome:'Kylian Mbappé',  desc:'200 gols em um ano', icon:'⚡', tipo:'gols_ano', val:200 },
@@ -13561,7 +13564,7 @@ const XP_CONQUISTAS = {
   ultimo_acum_5: 5, ultimo_acum_10: 8, ultimo_acum_20: 12,
   // ⚽ Gols no Mês — começa baixo, dispara no fim
   gols_10: 30, gols_15: 50, gols_20: 80, gols_25: 130,
-  gols_30: 200, gols_35: 300, gols_40: 450,
+  gols_30: 200, gols_35: 300, gols_40: 450, gols_50: 650,
   // 👟 Assistências no Mês — começa baixo, dispara no fim
   assist_10: 30, assist_15: 50, assist_20: 80, assist_25: 130,
   assist_30: 200, assist_35: 300,
@@ -13573,7 +13576,7 @@ const XP_CONQUISTAS = {
   assist_total_700: 920, assist_total_1000: 1300,
   // ⚡ G+A no Mês — muito crescente
   ga_30: 60, ga_35: 100, ga_40: 160, ga_45: 240,
-  ga_50: 350, ga_55: 500, ga_60: 700,
+  ga_50: 350, ga_55: 500, ga_60: 700, ga_70: 1300, ga_80: 2000,
   // 📅 Gols no Ano — muito difícil
   gols_ano_150: 300, gols_ano_200: 480, gols_ano_250: 700, gols_ano_300: 980,
   // 💀 Gols Geral — extremamente difícil
