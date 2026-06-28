@@ -1394,7 +1394,7 @@ html.is-mouse .card:hover{box-shadow:var(--glow-card),0 0 0 1px rgba(255,255,255
 @keyframes recAtualDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 /* ── ANEL "VOCÊ" NO AVATAR ── */
 .av-you-ring{position:relative;display:inline-flex;flex-shrink:0}
-.av-you-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--g);animation:youRingPulse 2s ease-in-out infinite;pointer-events:none;z-index:1}
+.av-you-ring::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--g);pointer-events:none;z-index:1}
 @keyframes youRingPulse{0%,100%{box-shadow:0 0 0 0 rgba(77,255,176,.5),inset 0 0 0 0 rgba(77,255,176,.0);opacity:1}50%{box-shadow:0 0 0 4px rgba(77,255,176,.0),inset 0 0 8px rgba(77,255,176,.08);opacity:.7}}
 
 /* ── ANEL MVP (dourado) ── */
@@ -14076,17 +14076,15 @@ window.abrirConquistas = async function(uid){
   if(searchInput) searchInput.value = '';
   const clearBtn = document.getElementById('conquistas-search-clear');
   if(clearBtn) clearBtn.style.display = 'none';
-  // Pré-carrega o conteúdo (inclui fetch ao Firestore) ANTES de exibir o
-  // modal. Assim a transição de entrada só começa quando o conteúdo já
-  // está pronto, eliminando o flash de "Carregando..." que aparecia
-  // brevemente antes do modal de conquistas de fato abrir.
-  const html = await _buildConquistasHTML(_cqUid);
+  // Abre o modal imediatamente, depois preenche o conteúdo em paralelo.
+  // Elimina o delay perceptível entre o toque e a abertura do modal.
   const body = document.getElementById('conquistas-body');
-  if(body) body.innerHTML = html;
   modal.style.opacity='0';
-  modal.style.transition='opacity .22s ease';
+  modal.style.transition='opacity .18s ease';
   modal.style.display='flex';
   requestAnimationFrame(()=>{ modal.style.opacity='1'; });
+  const html = await _buildConquistasHTML(_cqUid);
+  if(body) body.innerHTML = html;
 };
 
 // Filtra os cards de conquistas exibidos por palavra-chave (nome, descrição ou categoria).
