@@ -16361,6 +16361,7 @@ document.addEventListener('touchstart', e => {
 
   /* ═══ MODAL DO MAPA PÚBLICO ════════════════════════════ */
   let _mapaFiltroUid = 'all'; // 'all' ou uid
+  let _mapaFiltroAno  = '__all__'; // '__all__' ou ex: '2025'
   let _editMode = false;       // true quando ADM está editando o mapa do jogador filtrado
   let _editPontos = null;      // cópia local dos pontos em edição (apenas do jogador filtrado)
   let _editSelIdx = null;      // índice (em _editPontos) do ponto selecionado/arrastando
@@ -16368,7 +16369,7 @@ document.addEventListener('touchstart', e => {
   let _editDirty = false;      // se há alterações não salvas
 
   window.renderPenMapaPanel = function(){
-    _mapaFiltroUid = 'all';
+    _mapaFiltroUid = 'all'; _mapaFiltroAno = '__all__';
     _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
     // Renderiza texto/filtros antes do canvas (canvas depende do elemento já estar no DOM e visível)
     _renderMapaSemCanvas();
@@ -16390,6 +16391,14 @@ document.addEventListener('touchstart', e => {
     _renderMapaCanvas();
   };
 
+  window.setPenMapaAno = function(ano){
+    if(_editMode && _editDirty && !confirm('Trocar de temporada vai descartar as alterações não salvas. Continuar?')) return;
+    _mapaFiltroAno = ano;
+    _editMode = false; _editPontos = null; _editSelIdx = null; _editDirty = false;
+    _renderMapaSemCanvas();
+    _renderMapaCanvas();
+  };
+
   function _getPontos(){
     const gd=_gd(); if(!gd||!gd.matches) return [];
     return gd.matches.flatMap(m=>{
@@ -16400,12 +16409,17 @@ document.addEventListener('touchstart', e => {
   }
 
   function _getMapaData(){
-    const todos = _getPontos();
+    const todosRaw = _getPontos();
+    // Anos disponíveis (de todos os pontos sem filtro)
+    const anosSet = new Set(todosRaw.map(p=>p.date?p.date.split('-')[0]:null).filter(Boolean));
+    const anos = [...anosSet].sort();
+    // Filtro por temporada
+    const todos = _mapaFiltroAno==='__all__' ? todosRaw : todosRaw.filter(p=>p.date && p.date.split('-')[0]===_mapaFiltroAno);
     const filtrado = _mapaFiltroUid==='all' ? todos : todos.filter(p=>p.uid===_mapaFiltroUid);
     const jogadores = [];
     const seenUids = new Set();
     todos.forEach(p=>{if(!seenUids.has(p.uid)){seenUids.add(p.uid);jogadores.push({uid:p.uid,name:p.name});}});
-    return {todos, filtrado, jogadores};
+    return {todos, filtrado, jogadores, anos};
   }
 
   /* ── Botão "Editar" (somente ADM) ─────────────────────── */
@@ -16495,27 +16509,23 @@ document.addEventListener('touchstart', e => {
   function _renderMapaSemCanvas(){
     const {todos, filtrado, jogadores} = _getMapaData();
 
-    // Filtros
+    // Filtros — selects estilo Performance
     const filterEl = document.getElementById('pen-mapa-filter');
     if(filterEl){
-      filterEl.innerHTML = `<button class="pen-mapa-chip${_mapaFiltroUid==='all'?' active':''}" onclick="setPenMapaFiltro('all')">Todos</button>` +
-        jogadores.map(j=>`<button class="pen-mapa-chip${_mapaFiltroUid===j.uid?' active':''}" onclick="setPenMapaFiltro('${j.uid}')">${j.name.split(' ')[0]}</button>`).join('');
-    }
-
-    // Stats — só exibe quando um jogador específico está selecionado (não no "Todos")
-    const totalPts = filtrado.length;
-    const okPts    = filtrado.filter(p=>p.ok).length;
-    const errPts   = totalPts-okPts;
-    const statsEl = document.getElementById('pen-mapa-stats');
-    if(statsEl){
-      if(_mapaFiltroUid==='all'){
-        statsEl.innerHTML='';
-      } else {
-        statsEl.innerHTML = totalPts===0?'':
-          `<div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#4caf50">${okPts}</div><div class="pen-mapa-stat-lbl">✅ Gols</div></div>
-           <div class="pen-mapa-stat"><div class="pen-mapa-stat-val" style="color:#e53935">${errPts}</div><div class="pen-mapa-stat-lbl">❌ Errados</div></div>
-           <div class="pen-mapa-stat"><div class="pen-mapa-stat-val">${totalPts>0?Math.round(okPts/totalPts*100):0}%</div><div class="pen-mapa-stat-lbl">Aproveit.</div></div>`;
-      }
+      const _svgArrow = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")";
+      const _selSt = "padding:3px 22px 3px 8px;border-radius:6px;border:1.5px solid #b7b8b6;background:#dedede;color:#494a48;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:" + _svgArrow + ";background-repeat:no-repeat;background-position:right 6px center";
+      const _lblSt = "font-size:9px;color:#494a48;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em";
+      const _rowSt = "display:flex;gap:8px;align-items:center;margin-bottom:8px";
+      const _optsJ = "<option value=\"all\" " + (_mapaFiltroUid==="all" ? "selected" : "") + ">Todos</option>" +
+        jogadores.map(function(j){ return "<option value=\"" + j.uid + "\" " + (_mapaFiltroUid===j.uid ? "selected" : "") + ">" + j.name + "</option>"; }).join("");
+      const _optsA = "<option value=\"__all__\" " + (_mapaFiltroAno==="__all__" ? "selected" : "") + ">Geral</option>" +
+        anos.map(function(a){ return "<option value=\"" + a + "\" " + (_mapaFiltroAno===a ? "selected" : "") + ">" + a + "</option>"; }).join("");
+      const _selAno = anos.length > 1
+        ? "<div style=\"" + _rowSt + "\"><span style=\"" + _lblSt + "\">📅 Temporada:</span><select onchange=\"setPenMapaAno(this.value)\" style=\"" + _selSt + "\">" + _optsA + "</select></div>"
+        : "";
+      filterEl.innerHTML =
+        "<div style=\"" + _rowSt + "\"><span style=\"" + _lblSt + "\">👤 Jogador:</span><select onchange=\"setPenMapaFiltro(this.value)\" style=\"" + _selSt + "\">" + _optsJ + "</select></div>" +
+        _selAno;
     }
 
     _renderEditBar();
@@ -16535,58 +16545,40 @@ document.addEventListener('touchstart', e => {
     if(_mapaFiltroUid==='all' && !_editMode){
       canvas.style.display='none';
       if(emptyEl) emptyEl.style.display='none';
-
-      // Remove mapas extras anteriores
       wrap.querySelectorAll('.pen-mapa-jogador-bloco').forEach(el=>el.remove());
-
-      // Filtra jogadores com pelo menos 1 cobrança mapeada
-      const jogadoresComDados = jogadores.filter(j=>todos.some(p=>p.uid===j.uid));
-
+      const jogadoresComDados = jogadores.filter(j=>filtrado.some(p=>p.uid===j.uid));
       if(jogadoresComDados.length===0){
         if(emptyEl) emptyEl.style.display='';
         return;
       }
-
       jogadoresComDados.forEach(j=>{
-        const pontosDele = todos.filter(p=>p.uid===j.uid);
-
+        const pontosDele = filtrado.filter(p=>p.uid===j.uid);
         const bloco = document.createElement('div');
         bloco.className='pen-mapa-jogador-bloco';
         bloco.style.cssText='margin-bottom:18px';
-
-        // Nome do jogador acima do mapa
         const nomeEl = document.createElement('div');
         nomeEl.style.cssText="text-align:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px";
         nomeEl.textContent=j.name;
         bloco.appendChild(nomeEl);
-
-        // Canvas do mapa
-        const c = document.createElement('canvas');
-        c.className='pen-gol-canvas';
-        c.style.cssText='cursor:default;width:100%;display:block';
-        bloco.appendChild(c);
+        const cv = document.createElement('canvas');
+        cv.className='pen-gol-canvas';
+        cv.style.cssText='cursor:default;width:100%;display:block';
+        bloco.appendChild(cv);
         wrap.appendChild(bloco);
-
-        // Aguarda o DOM para calcular a largura real
         requestAnimationFrame(()=>{
-          const cssW = c.offsetWidth || GW;
+          const cssW = cv.offsetWidth || GW;
           const cssH = Math.round(cssW * GH / GW);
-          c.width  = cssW;
-          c.height = cssH;
-          const ctx = c.getContext('2d');
-          drawGoal(ctx, cssW, cssH, pontosDele);
+          cv.width=cssW; cv.height=cssH;
+          drawGoal(cv.getContext('2d'), cssW, cssH, pontosDele);
         });
       });
       return;
     }
 
     // ── Modo jogador específico (ou edição) ──
-    // Remove blocos extras de "Todos" se houver
     wrap.querySelectorAll('.pen-mapa-jogador-bloco').forEach(el=>el.remove());
-
     const pontos = _editMode ? _editPontos : filtrado;
     const totalPts = pontos.length;
-
     if(totalPts===0){
       if(emptyEl) emptyEl.style.display='';
       canvas.style.display='none';
@@ -16596,11 +16588,9 @@ document.addEventListener('touchstart', e => {
     canvas.style.display='';
     const cssW = canvas.offsetWidth || GW;
     const cssH = Math.round(cssW * GH / GW);
-    canvas.width  = cssW;
-    canvas.height = cssH;
+    canvas.width=cssW; canvas.height=cssH;
     _mapaCanvasGeom = {cssW, cssH};
     const ctx=canvas.getContext('2d');
-
     if(_editMode){
       _drawEditableGoal(ctx, cssW, cssH);
       _setupMapaEditHandlers(canvas);
